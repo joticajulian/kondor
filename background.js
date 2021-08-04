@@ -1,52 +1,20 @@
 var exports = {};
 try {
   importScripts(
-    "vendor/noble-secp256k1.js",
     "vendor/base64-binary.js",
+    "vendor/bs58.bundle.js",
+    "vendor/noble-ripemd160.js",
+    "vendor/noble-secp256k1.js",
+    "vendor/sha256.min.js",
+    "js/background/utils.js",
     "js/background/variableblob.js",
     "js/background/serializer.js",
     "js/background/contract.js",
+    "js/background/baseAbis.js",
     "js/background/wallet.js"
   );
 
-  const abi = {
-    id: "Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=",
-    entries: {
-      name: {
-        id: 0x76ea4297,
-      },
-      symbol: {
-        id: 0x7e794b24,
-      },
-      decimals: {
-        id: 0x59dc15ce,
-      },
-      total_supply: {
-        id: 0xcf2e8212,
-      },
-      balance_of: {
-        id: 0x15619248,
-        args: Type.accountType,
-      },
-      transfer: {
-        id: 0x62efa292,
-        args: {
-          from: Type.accountType,
-          to: Type.accountType,
-          value: Type.uint64,
-        },
-      },
-      mint: {
-        id: 0xc2f82bdc,
-        args: {
-          to: Type.accountType,
-          value: Type.uint64,
-        },
-      },
-    },
-  };
-
-  const contract = new Contract(abi);
+  const contract = new Contract(abiKoin);
   const ope = contract.encodeOperation({
     name: "transfer",
     args: {
@@ -56,6 +24,8 @@ try {
     },
   });
   console.log(contract.decodeOperation(ope));
+  const w = Wallet.fromSeed("my seed");
+  console.log(w);
 } catch (e) {
   console.error(e);
 }

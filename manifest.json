@@ -10,19 +10,13 @@
   "web_accessible_resources": [
     {
       "resources": ["js/injected.js"],
-      "matches": [
-        "https://*/*",
-        "http://*/*"
-      ],
+      "matches": ["https://*/*", "http://*/*"],
       "use_dynamic_url": true
     }
   ],
   "content_scripts": [
     {
-      "matches": [
-        "https://*/*",
-        "http://*/*"
-      ],
+      "matches": ["https://*/*", "http://*/*"],
       "js": ["js/content.js"]
     }
   ],
