@@ -1,0 +1,10 @@
+{
+  "name": "condork",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Julian Gonzalez",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^2.3.2"
+  }
+}
