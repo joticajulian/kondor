@@ -31,7 +31,13 @@ class VariableBlob {
       this.buffer = buffer;
     }
   }
-  write(bytes) {
+  write(data, length = 0) {
+    let bytes =
+      typeof data === "string" ? Base64Binary.decode(data.slice(1)) : data;
+    if (length && bytes.length !== length)
+      throw new Error(
+        `Invalid length. Expected: ${length}. Received: ${bytes.length}`
+      );
     this.checkRemaining(bytes.length, true);
     this.buffer.set(bytes, this.offset);
     this.offset += bytes.length;
@@ -143,9 +149,11 @@ class VariableBlob {
   }
 
   // Buffer
-  serializeBuffer(buffer) {
-    this.serializeVarint(buffer.length);
-    this.write(buffer);
+  serializeBuffer(data) {
+    let bytes =
+      typeof data === "string" ? Base64Binary.decode(data.slice(1)) : data;
+    this.serializeVarint(bytes.length);
+    this.write(bytes);
   }
   deserializeBuffer() {
     const size = this.deserializeVarint();
@@ -162,14 +170,6 @@ class VariableBlob {
     const size = this.deserializeVarint();
     const buffer = this.read(size);
     return new TextDecoder().decode(buffer);
-  }
-
-  // Uint32
-  serializeUint32(num) {
-    this.writeUint32(num);
-  }
-  deserializeUint32() {
-    return this.readUint32();
   }
 
   // Bigint
@@ -200,13 +200,6 @@ class VariableBlob {
     return BigInt(numString);
   }
 
-  // Uint64
-  serializeUint64(bignum) {
-    this.serializeBigint(bignum, 64);
-  }
-  deserializeUint64() {
-    return this.deserializeBigint(64, true);
-  }
   toString() {
     return multibase64(this.buffer);
   }

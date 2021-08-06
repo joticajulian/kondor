@@ -18,4 +18,12 @@ class Wallet {
     const privateKey = sha256(seed);
     return new Wallet(privateKey);
   }
+
+  signTransaction(tx) {
+    const blobActiveData = serialize(tx.active_data, abiActiveData);
+    const hash = sha256(blobActiveData.buffer);
+    console.log("tx id is " + hash);
+    const signature = sign(hash, this.privateKey);
+    console.log("signature is " + signature);
+  }
 }

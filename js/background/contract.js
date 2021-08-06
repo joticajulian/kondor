@@ -9,11 +9,14 @@ class Contract {
       throw new Error(`Operation ${op.name} unknown`);
     const entry = this.entries[op.name];
     let serializedArgs = undefined;
-    if (entry.args) serializedArgs = serialize(op.args, entry.args).toString();
+    if (entry.args) {
+      serializedArgs = serialize(op.args, entry.args);
+      // console.log(serializedArgs.dataBuffer);
+    }
     return {
       contract_id: this.id,
       entry_point: entry.id,
-      args: serializedArgs,
+      args: serializedArgs.toString(),
     };
   }
 
