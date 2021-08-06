@@ -14,7 +14,7 @@ class VariableBlob {
       }
       this.offset = 0;
     } else {
-      this.buffer = new Uint8Array(0);
+      this.buffer = new Uint8Array(input);
       this.offset = 0;
     }
   }

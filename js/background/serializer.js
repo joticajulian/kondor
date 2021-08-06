@@ -173,7 +173,7 @@ function deserialize(vb, abi) {
     case "uint32":
       return vb.readUint32();
     case "uint64":
-      return vb.readUint64();
+      return vb.deserializeBigint(64, true);
     case "uint128":
       return vb.deserializeBigint(128, true);
     case "uint160":
@@ -187,7 +187,7 @@ function deserialize(vb, abi) {
     case "int32":
       return vb.readInt32();
     case "int64":
-      return vb.readInt64();
+      return vb.deserializeBigint(64, false);
     case "int128":
       return vb.deserializeBigint(128, false);
     case "int160":

@@ -7,7 +7,9 @@ try {
     "vendor/noble-secp256k1.js",
     "vendor/sha256.min.js",
     "js/background/utils.js",
+    "js/background/jsonrpc.js",
     "js/background/variableblob.js",
+    "js/background/multihash.js",
     "js/background/serializer.js",
     "js/background/contract.js",
     "js/background/baseAbis.js",
@@ -38,7 +40,7 @@ try {
   const tx = {
     active_data: {
       resource_limit: 1000000,
-      nonce: 9,
+      nonce: 0,
       operations: [
         {
           type: abiCallContractOperation.name,
@@ -47,7 +49,32 @@ try {
       ],
     },
   };
-  wallet.signTransaction(tx);
+
+  (async () => {
+    await wallet.signTransaction(tx);
+    console.log(tx);
+    try {
+      /*const a = await jsonrpc("chain.submit_transaction", { transaction: tx });
+      const a2 = await a.json();
+      console.log("a");
+      console.log(a2);*/
+      console.log("reading balance...");
+
+      const response = await jsonrpc(
+        "chain.read_contract",
+        contract.encodeOperation({
+          name: "balance_of",
+          args: wallet.address,
+        })
+      );
+      const resp2 = await response.json();
+      const vb = new VariableBlob(resp2.result.result);
+      console.log(deserialize(vb, { type: "uint64" }));
+    } catch (e) {
+      console.log("fetch error");
+      throw e;
+    }
+  })();
 } catch (e) {
   console.error(e);
 }

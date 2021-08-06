@@ -19,11 +19,24 @@ class Wallet {
     return new Wallet(privateKey);
   }
 
-  signTransaction(tx) {
+  async signTransaction(tx) {
     const blobActiveData = serialize(tx.active_data, abiActiveData);
     const hash = sha256(blobActiveData.buffer);
     console.log("tx id is " + hash);
-    const signature = sign(hash, this.privateKey);
-    console.log("signature is " + signature);
+    const [hex, recovery] = await sign(hash, this.privateKey, {
+      recovered: true,
+      canonical: true,
+    });
+    //
+    //console.log(ss)
+
+    // compact signature
+    const { r, s } = Signature.fromHex(hex);
+    const rHex = r.toString(16).padStart(64, "0");
+    const sHex = s.toString(16).padStart(64, "0");
+    const recId = (recovery + 31).toString(16).padStart(2, "0");
+    tx.signature_data = multibase64(toUint8Array(recId + rHex + sHex));
+    tx.id = new Multihash(toUint8Array(hash)).toString();
+    return tx;
   }
 }

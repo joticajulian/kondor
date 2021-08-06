@@ -71,7 +71,7 @@ const paramsKoinContract = {
     },
     balance_of: {
       id: 0x15619248,
-      args: "string",
+      args: { type: "string" },
     },
     transfer: {
       id: 0x62efa292,
