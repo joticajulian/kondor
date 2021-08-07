@@ -1,4 +1,5 @@
 var exports = {};
+
 try {
   importScripts(
     "vendor/base64-binary.js",
@@ -75,6 +76,15 @@ try {
       throw e;
     }
   })();
+
+  const a = "4,4,4,66";
+  /*chrome.storage.local.set({buf: a}, function() {
+    console.log('Value is set to ');
+  });*/
+  chrome.storage.local.get(['buf'], function(result) {
+    console.log('Value currently is ');
+    console.log(result.buf)
+  });
 } catch (e) {
   console.error(e);
 }
