@@ -77,13 +77,42 @@ try {
     }
   })();
 
-  const a = "4,4,4,66";
-  /*chrome.storage.local.set({buf: a}, function() {
-    console.log('Value is set to ');
-  });*/
-  chrome.storage.local.get(['buf'], function(result) {
-    console.log('Value currently is ');
-    console.log(result.buf)
+  const db = {
+    get: (keys) =>
+      new Promise((resolve, reject) => {
+        chrome.storage.local.get(keys, function (result) {
+          if (Object.keys(result).length == 0) resolve(null);
+          else resolve(result);
+        });
+      }),
+    set: (data) =>
+      new Promise((resolve, reject) => {
+        chrome.storage.local.set(data, function () {
+          resolve();
+        });
+      }),
+  };
+
+  async function asyncResponse(receiverId, fn) {
+    const result = await fn();
+    chrome.tabs.sendMessage(receiverId, result);
+  }
+
+  chrome.runtime.onMessage.addListener((msg, sender, sendResp) => {
+    if (msg.getOptsEncryption) {
+      sendResp(true);
+      asyncResponse(sender.tab.id, async () => {
+        const result = await db.get(["salt", "iv"]);
+        let opts = result;
+        if (!opts) {
+          // we take the salt and iv provided in the message
+          const { salt, iv } = msg.getOptsEncryption;
+          await db.set({ salt, iv });
+          opts = await db.get(["salt", "iv"]);
+        }
+        return opts;
+      });
+    }
   });
 } catch (e) {
   console.error(e);
