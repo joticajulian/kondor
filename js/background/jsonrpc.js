@@ -1,5 +1,5 @@
 async function jsonrpc(method, params) {
-  return fetch("http://45.56.104.152:8080", {
+  const response = await fetch("http://45.56.104.152:8080", {
     method: "POST",
     body: JSON.stringify({
       id: Math.round(Math.random() * 1000),
@@ -8,4 +8,7 @@ async function jsonrpc(method, params) {
       params,
     }),
   });
+  const json = await response.json();
+  if (json.error && json.error.message) throw new Error(json.error.message);
+  return json.result;
 }

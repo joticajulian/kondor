@@ -128,7 +128,9 @@ function serialize(data, abi) {
   return vb;
 }
 
-function deserialize(vb, abi) {
+function deserialize(buffer, abi) {
+  const vb = typeof buffer === "string" ? new VariableBlob(buffer) : buffer;
+
   let data;
   if (Array.isArray(abi)) {
     data = {};

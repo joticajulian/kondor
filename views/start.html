@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="kondork.css" />
+  </head>
+  <body>
+    <div class="title">KONDORK</div>
+    <div id="view-import" class="container">
+      <input
+        id="private-key"
+        type="text"
+        class="multi"
+        placeholder="Private key"
+      />
+      <button id="import">Import</button>
+    </div>
+    <div id="view-transfer" class="full-container hidden">
+      <div id="address"></div>
+      <div id="balance">
+        <div id="balance-value"></div>
+        <div id="token-name">TKOIN</div>
+      </div>
+      <div class="title-section">Transfer</div>
+      <input id="transfer-to" type="text" placeholder="to" />
+      <input id="transfer-amount" type="text" placeholder="amount" />
+      <button id="transfer">Transfer</button>
+    </div>
+    <div class="alert">
+      <p id="text-alert"></p>
+    </div>
+    <script src="start.js"></script>
+  </body>
+</html>
