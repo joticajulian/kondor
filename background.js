@@ -50,6 +50,14 @@ try {
     return deserialize(result.result, { type: "uint64" }).toString();
   }
 
+  async function getNonce() {
+    const result = await jsonrpc("chain.get_account_nonce", {
+      account: `M${btoa(wallet.address)}`
+    });
+    console.log(result);
+    return Number(result.nonce);
+  }
+
   async function transfer({ to, value }) {
     const from = wallet.address;
     const op = contract.encodeOperation({
@@ -60,7 +68,7 @@ try {
     const tx = {
       active_data: {
         resource_limit: 1000000,
-        nonce: 1,
+        nonce: await getNonce(),
         operations: [
           {
             type: abiCallContractOperation.name,
@@ -99,6 +107,7 @@ try {
         }
         case "transfer": {
           result = await transfer(params);
+          break;
         }
         /*case "getOptsEncryption": {
         sendResp(true);
@@ -122,6 +131,7 @@ try {
       }
     } catch (e) {
       error = { message: e.message };
+      console.log(e)
     }
 
     const response = { id, result, error };
