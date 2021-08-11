@@ -52,10 +52,17 @@ try {
 
   async function getNonce() {
     const result = await jsonrpc("chain.get_account_nonce", {
-      account: `M${btoa(wallet.address)}`
+      account: `M${btoa(wallet.address)}`,
     });
-    console.log(result);
     return Number(result.nonce);
+  }
+
+  async function getAccounts() {
+    return await db.get(["accounts"]);
+  }
+
+  async function storeAccount(encrypted) {
+    return await db.set({ accounts: encrypted });
   }
 
   async function transfer({ to, value }) {
@@ -86,7 +93,6 @@ try {
   }
 
   chrome.runtime.onMessage.addListener(async (msg, sender, sendResp) => {
-    console.log(sender);
     const { id, method, params } = msg;
     let result;
     let error = undefined;
@@ -95,6 +101,10 @@ try {
       switch (method) {
         case "importWallet": {
           result = importWallet(params);
+          break;
+        }
+        case "storeAccount": {
+          await storeAccount(params);
           break;
         }
         case "getBalance": {
@@ -109,21 +119,20 @@ try {
           result = await transfer(params);
           break;
         }
-        /*case "getOptsEncryption": {
-        sendResp(true);
-        asyncResponse(sender.tab, async () => {
-          const result = await db.get(["salt", "iv"]);
-          let opts = result;
-          if (!opts) {
+        case "getAccounts": {
+          result = await getAccounts();
+          break;
+        }
+        case "getOptsEncryption": {
+          result = await db.get(["salt", "iv"]);
+          if (!result) {
             // we take the salt and iv provided in the message
             const { salt, iv } = params;
             await db.set({ salt, iv });
-            opts = await db.get(["salt", "iv"]);
+            result = await db.get(["salt", "iv"]);
           }
-          return opts;
-        });
-        return;
-      }*/
+          break;
+        }
         default: {
           error = { message: `unknown method ${method}` };
           break;
@@ -131,11 +140,11 @@ try {
       }
     } catch (e) {
       error = { message: e.message };
-      console.log(e)
+      console.log("Error background");
+      console.error(e);
     }
 
     const response = { id, result, error };
-    console.log(response);
     if (sender.tab) chrome.tabs.sendMessage(sender.tab.id, response);
     else chrome.runtime.sendMessage(response);
   });

@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="kondork.css" />
+    <link rel="stylesheet" href="kondor.css" />
   </head>
   <body>
-    <div class="title">KONDORK</div>
+    <div class="title">KONDOR</div>
+    <div id="view-unlock" class="container">
+      <input id="password" type="password" placeholder="Password" />
+      <button id="unlock">Unlock</button>
+      <div class="sep">OR</div>
+      <button id="goto-import">Import</button>
+    </div>
     <div id="view-import" class="container">
       <input
         id="private-key"
@@ -12,6 +18,8 @@
         class="multi"
         placeholder="Private key"
       />
+      <div>Provide a password to lock the wallet</div>
+      <input id="set-password" type="text" placeholder="Password" />
       <button id="import">Import</button>
     </div>
     <div id="view-transfer" class="full-container hidden">

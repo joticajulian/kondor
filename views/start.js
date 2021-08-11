@@ -62,7 +62,7 @@ function getKey(keyMaterial, salt) {
 async function encrypt(data, password) {
   let salt = window.crypto.getRandomValues(new Uint8Array(16));
   let iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const opts = await sendMessage({ getOptsEncryption: { salt, iv } });
+  const opts = await sendMessage("getOptsEncryption", { salt, iv });
   salt = new Uint8Array(Object.keys(opts.salt).map((k) => opts.salt[k])).buffer;
   iv = new Uint8Array(Object.keys(opts.iv).map((k) => opts.iv[k])).buffer;
 
@@ -83,7 +83,7 @@ async function encrypt(data, password) {
 }
 
 async function decrypt(encrypted, password) {
-  const opts = await sendMessage({ getOptsEncryption: "decrypt" });
+  const opts = await sendMessage("getOptsEncryption", "decrypt");
   const salt = new Uint8Array(Object.keys(opts.salt).map((k) => opts.salt[k]))
     .buffer;
   const iv = new Uint8Array(Object.keys(opts.iv).map((k) => opts.iv[k])).buffer;
@@ -103,24 +103,15 @@ async function decrypt(encrypted, password) {
   return JSON.parse(message);
 }
 
-/*(async () => {
-    password = "aaabc";
-    console.log("encrypting...");
-    const data = {
-      name: "alice2",
-      privateKey: "123456789",
-    };
-    const encc = await encrypt(data, password);
-    console.log(encc);
-    console.log("decrypting...");
-    const resp = await decrypt(encc, password);
-    console.log(resp);
-  })();*/
-
+const viewUnlock = document.getElementById("view-unlock");
 const viewImport = document.getElementById("view-import");
 const viewTransfer = document.getElementById("view-transfer");
 const inputPrivateKey = document.getElementById("private-key");
+const inputSetPassword = document.getElementById("set-password");
+const inputPassword = document.getElementById("password");
 const buttonImport = document.getElementById("import");
+const buttonGotoImport = document.getElementById("goto-import");
+const buttonUnlock = document.getElementById("unlock");
 const textBalanceValue = document.getElementById("balance-value");
 const textAddress = document.getElementById("address");
 const inputTransferTo = document.getElementById("transfer-to");
@@ -128,18 +119,64 @@ const inputTransferAmount = document.getElementById("transfer-amount");
 const buttonTransfer = document.getElementById("transfer");
 const textAlert = document.getElementById("text-alert");
 
+async function init() {
+  const accounts = await sendMessage("getAccounts");
+  viewTransfer.classList.add("hidden");
+  if (accounts) {
+    viewUnlock.classList.remove("hidden");
+    viewImport.classList.add("hidden");
+  } else {
+    viewUnlock.classList.add("hidden");
+    viewImport.classList.remove("hidden");
+  }
+}
+init();
+
+buttonGotoImport.addEventListener("click", async () => {
+  viewUnlock.classList.add("hidden");
+  viewImport.classList.remove("hidden");
+});
+
+buttonUnlock.addEventListener("click", async () => {
+  try {
+    viewTransfer.classList.remove("hidden");
+    viewUnlock.classList.add("hidden");
+    const password = inputPassword.value;
+    const { accounts: encrypted } = await sendMessage("getAccounts");
+    const decrypted = await decrypt(encrypted, password);
+    const { privateKey } = decrypted;
+    await loadViewAccount(privateKey);
+  } catch (error) {
+    textAlert.innerText = error.message;
+    console.error(error);
+  }
+});
+
+async function loadViewAccount(privateKey) {
+  if (!privateKey) throw new Error("private key not defined");
+  await sendMessage("importWallet", privateKey);
+  const address = await sendMessage("getAddress");
+  textAddress.innerText = address;
+  const balance = await sendMessage("getBalance");
+  textBalanceValue.innerText = Number(balance) / 1e8;
+}
+
 buttonImport.addEventListener("click", async () => {
   viewTransfer.classList.remove("hidden");
   viewImport.classList.add("hidden");
   try {
-    await sendMessage("importWallet", inputPrivateKey.value);
-    const address = await sendMessage("getAddress");
-    const balance = await sendMessage("getBalance");
-    textBalanceValue.innerText = Number(balance) / 1e8;
-    textAddress.innerText = address;
+    const password = inputSetPassword.value;
+    const encrypted = await encrypt(
+      {
+        privateKey: inputPrivateKey.value,
+      },
+      password
+    );
+    await sendMessage("storeAccount", encrypted);
+    await loadViewAccount(inputPrivateKey.value);
   } catch (error) {
     textAlert.innerText = error.message;
-    console.log(error);
+    console.error(error);
   }
 });
 
@@ -163,9 +200,7 @@ buttonTransfer.addEventListener("click", async () => {
     const balance = await sendMessage("getBalance");
     textBalanceValue.innerText = Number(balance) / 1e8;
   } catch (error) {
-    console.log("textAlert");
-    console.log(error.message);
     textAlert.innerText = error.message;
-    console.log(error);
+    console.error(error);
   }
 });
