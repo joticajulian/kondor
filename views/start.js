@@ -103,6 +103,11 @@ async function decrypt(encrypted, password) {
   return JSON.parse(message);
 }
 
+let seed;
+let salt, iv;
+let accounts;
+let wallet;
+
 const viewUnlock = document.getElementById("view-unlock");
 const viewImport = document.getElementById("view-import");
 const viewTransfer = document.getElementById("view-transfer");
@@ -148,16 +153,55 @@ buttonUnlock.addEventListener("click", async () => {
     await loadViewAccount(privateKey);
   } catch (error) {
     textAlert.innerText = error.message;
-    console.error(error);
+    console.log(error);
   }
 });
 
 async function loadViewAccount(privateKey) {
   if (!privateKey) throw new Error("private key not defined");
-  await sendMessage("importWallet", privateKey);
-  const address = await sendMessage("getAddress");
-  textAddress.innerText = address;
-  const balance = await sendMessage("getBalance");
+  // await sendMessage("importWallet", privateKey);
+  wallet = new Wallet({
+    signer: Signer.fromSeed(privateKey),
+    provider: new Provider("http://45.56.104.152:8080"),
+    contract: new Contract({
+      id: "Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=",
+      entries: {
+        transfer: {
+          id: 1,
+          args: {
+            type: [
+              {
+                name: "from",
+                type: "string",
+              },
+              {
+                name: "to",
+                type: "string",
+              },
+              {
+                name: "value",
+                type: "uint64",
+              },
+            ],
+          },
+        },
+        balance_of: {
+          id: 0x15619248,
+          args: { type: "string" },
+        },
+      },
+    }),
+  });
+  // const address = await sendMessage("getAddress");
+  textAddress.innerText = wallet.getAddress();
+  // const balance = await sendMessage("getBalance");
+  const operation = wallet.encodeOperation({
+    name: "balance_of",
+    args: wallet.address,
+  });
+  console.log(wallet);console.log(operation)
+  const result = await wallet.readContract(operation.value);
+  const balance = deserialize(result.result, { type: "uint64" }).toString();
   textBalanceValue.innerText = Number(balance) / 1e8;
 }
 
