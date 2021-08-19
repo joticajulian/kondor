@@ -9,5 +9,8 @@
     "js-sha256": "^0.9.0",
     "noble-ripemd160": "^0.2.0",
     "prettier": "^2.3.2"
+  },
+  "dependencies": {
+    "koilib": "^1.0.0"
   }
 }
