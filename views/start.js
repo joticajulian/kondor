@@ -238,12 +238,14 @@ buttonTransfer.addEventListener("click", async () => {
     const value = getSatoshis(inputTransferAmount.value, 8);
     const tx = await wallet.newTransaction({
       getNonce: true,
-      operations: [wallet.encodeOperation({
-        name: "transfer",
-        args: { from, to, value }
-      })]
+      operations: [
+        wallet.encodeOperation({
+          name: "transfer",
+          args: { from, to, value },
+        }),
+      ],
     });
-    
+
     await wallet.signTransaction(tx);
     await wallet.sendTransaction(tx);
     textAlert.innerText = "Sent";

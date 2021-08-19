@@ -130,7 +130,8 @@ try {
             const { salt, iv } = params;
             await db.set({ salt, iv });
             result = await db.get(["salt", "iv"]);
-            if (!result) throw new Error("Local storage error: cannot save salt and iv");
+            if (!result)
+              throw new Error("Local storage error: cannot save salt and iv");
           }
           break;
         }
