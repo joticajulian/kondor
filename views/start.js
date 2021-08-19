@@ -159,7 +159,6 @@ buttonUnlock.addEventListener("click", async () => {
 
 async function loadViewAccount(privateKey) {
   if (!privateKey) throw new Error("private key not defined");
-  // await sendMessage("importWallet", privateKey);
   wallet = new Wallet({
     signer: Signer.fromSeed(privateKey),
     provider: new Provider("http://45.56.104.152:8080"),
@@ -167,7 +166,7 @@ async function loadViewAccount(privateKey) {
       id: "Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=",
       entries: {
         transfer: {
-          id: 1,
+          id: 0x62efa292,
           args: {
             type: [
               {
@@ -192,14 +191,11 @@ async function loadViewAccount(privateKey) {
       },
     }),
   });
-  // const address = await sendMessage("getAddress");
   textAddress.innerText = wallet.getAddress();
-  // const balance = await sendMessage("getBalance");
   const operation = wallet.encodeOperation({
     name: "balance_of",
-    args: wallet.address,
+    args: wallet.getAddress(),
   });
-  console.log(wallet);console.log(operation)
   const result = await wallet.readContract(operation.value);
   const balance = deserialize(result.result, { type: "uint64" }).toString();
   textBalanceValue.innerText = Number(balance) / 1e8;
@@ -237,12 +233,20 @@ function getSatoshis(value, decimals) {
 
 buttonTransfer.addEventListener("click", async () => {
   try {
+    const from = wallet.getAddress();
     const to = inputTransferTo.value;
     const value = getSatoshis(inputTransferAmount.value, 8);
-    await sendMessage("transfer", { to, value });
+    const tx = await wallet.newTransaction({
+      getNonce: true,
+      operations: [wallet.encodeOperation({
+        name: "transfer",
+        args: { from, to, value }
+      })]
+    });
+    
+    await wallet.signTransaction(tx);
+    await wallet.sendTransaction(tx);
     textAlert.innerText = "Sent";
-    const balance = await sendMessage("getBalance");
-    textBalanceValue.innerText = Number(balance) / 1e8;
   } catch (error) {
     textAlert.innerText = error.message;
     console.error(error);
