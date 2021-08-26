@@ -1,7 +1,3 @@
-.hidden {
-  display: none;
-}
-
 :root {
   --primary-color: #E2B7EC;
   --secondary-color: #110020;
@@ -113,6 +109,7 @@ h3 {
 .kondor-button {
   border-bottom: 1px solid var(--primary-color);
   padding: 0.8em 0.0;
+  cursor: pointer;
 }
 .kondor-button:hover {
   opacity: .5;
@@ -176,4 +173,55 @@ button {
   align-content: center;
   justify-content: center;
   align-items: center;
+}
+
+
+.logo-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100vh;
+}
+
+.opening-description {
+  padding: 0 4em;
+  text-align: left;
+  font-size: 1.2em;
+}
+#logo {
+  display: flex;
+  flex-direction: column;
+}
+#logo-mark {
+  margin-bottom: 3em;
+}
+
+.header-mark img {
+  width: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: row;
+}
+
+.card img {
+  padding: 2em 2em 2em 0;
+}
+
+.card p {
+  color: var(--kondor-gray);
+}
+
+
+input,
+textarea {
+  background-color: none;
+  width: 92%;
+  color: var(--kondor-gray);
+  padding: 1em;
+  margin: .5em 0 1em 0;
+  border: 1px solid var(--kondor-light);
 }
