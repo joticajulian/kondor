@@ -32,6 +32,7 @@ routePkey.onclick = () => {
   if (importWallet.style.display !== "none") {
     importWallet.style.display = "none"
     dashboard.style.display = "block"
+    loadViewAccount(inputPrivateKey.value)
   } else {
     unlock.style.display = "block"
   }
