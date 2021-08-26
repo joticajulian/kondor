@@ -114,7 +114,7 @@ const viewTransfer = document.getElementById("view-transfer");
 const inputPrivateKey = document.getElementById("private-key");
 const inputSetPassword = document.getElementById("set-password");
 const inputPassword = document.getElementById("password");
-const buttonImport = document.getElementById("import");
+const buttonImport = document.getElementById("route-pkey");
 const buttonGotoImport = document.getElementById("goto-import");
 const buttonUnlock = document.getElementById("unlock");
 const textBalanceValue = document.getElementById("balance-value");
@@ -160,7 +160,7 @@ buttonUnlock.addEventListener("click", async () => {
 async function loadViewAccount(privateKey) {
   if (!privateKey) throw new Error("private key not defined");
   wallet = new Wallet({
-    signer: Signer.fromSeed(privateKey),
+    signer: Signer.fromWif(privateKey),
     provider: new Provider("http://45.56.104.152:8080"),
     contract: new Contract({
       id: "Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=",
