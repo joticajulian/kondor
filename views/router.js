@@ -9,6 +9,8 @@ const dashboard = document.getElementById("dashboard")
 const routeUnlock = document.getElementById("route-unlock")
 const routeImport = document.getElementById("route-import")
 const routePkey = document.getElementById("route-pkey")
+const routebackUnlock = document.getElementById("routeback-unlock")
+const routebackImport = document.getElementById("routeback-import")
 
 
 routeUnlock.onclick = () => {
@@ -35,5 +37,23 @@ routePkey.onclick = () => {
     loadViewAccount(inputPrivateKey.value)
   } else {
     unlock.style.display = "block"
+  }
+}
+routebackUnlock.onclick = () => {
+  if (importWallet.style.display !== "none") {
+    importWallet.style.display = "none"
+    unlock.style.display = "block"
+    loadViewAccount(inputPrivateKey.value)
+  } else {
+    unlock.style.display = "block"
+  }
+}
+routebackImport.onclick = () => {
+  if (dashboard.style.display !== "none") {
+    dashboard.style.display = "none"
+    importWallet.style.display = "block"
+    loadViewAccount(inputPrivateKey.value)
+  } else {
+    importWallet.style.display = "block"
   }
 }
