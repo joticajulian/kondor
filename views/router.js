@@ -18,6 +18,7 @@ const routeExplainer = document.getElementById("route-explainer")
 const routeConfirm = document.getElementById("route-confirm")
 const routeConfirmed = document.getElementById("route-confirmed")
 const routeDashboard = document.getElementById("route-dashboard")
+const buttonTransfer = document.getElementById("transfer");
 
 
 // back buttons
@@ -59,6 +60,9 @@ routeConfirmed.onclick = () => {
 routeDashboard.onclick = () => {
     confirmed.style.display = "none"
     dashboard.style.display = "block"
+}
+buttonTransfer.onclick = () => {
+    sendKoin();
 }
 
 
