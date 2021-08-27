@@ -66,7 +66,7 @@ button:hover {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 4em;
+  margin-bottom: 3em;
 }
 
 .content-heading {
@@ -74,7 +74,7 @@ button:hover {
   font-size: 1.5em;
   font-weight: 100;
   text-transform: uppercase;
-  margin-bottom: 1em;
+  margin-bottom: .5em;
 }
 
 .container {
@@ -166,6 +166,28 @@ button:hover {
 .major {
   font-family: 'Major Mono Display', monospace;
 }
+.explainer {
+  width: 252px;
+  height: auto;
+  margin: 0 auto;
+  padding: 10px;
+  position: relative;
+  font-size: 1.2em;
+  line-height: 1.4em;
+}
+
+.explainer-card {
+  margin-bottom: 1em;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.text {
+  color: white;
+  font-weight: 100;
+}
 
 #logo {
   display: flex;
@@ -256,4 +278,28 @@ button:hover {
     box-shadow: 0 -2em;
     height: 5em;
   }
+}
+
+
+/* ANIMATIONS  */
+.red {
+  color: rgb(255, 1, 1);
+  font-weight: 700;
+}
+
+.blinkme {
+  animation: blinker 2s cubic-bezier(0, 0, 0.07, 0.98) infinite;
+}
+
+@keyframes blinker {
+  0% {
+    color: rgb(252, 221, 221);
+  }
+  50% {
+    color:rgb(255, 0, 0)
+  }
+  100% {
+    color: rgb(255, 255, 255);
+  }
+  
 }
