@@ -119,9 +119,9 @@ const buttonGotoImport = document.getElementById("goto-import");
 const buttonUnlock = document.getElementById("unlock");
 const textBalanceValue = document.getElementById("balance-value");
 const textAddress = document.getElementById("address");
-const inputTransferTo = document.getElementById("transfer-to");
-const inputTransferAmount = document.getElementById("transfer-amount");
-const buttonTransfer = document.getElementById("transfer");
+const inputTransferTo = document.getElementById("send-address");
+const inputTransferAmount = document.getElementById("send-amount");
+//const buttonTransfer = document.getElementById("transfer");
 const textAlert = document.getElementById("text-alert");
 
 async function init() {
@@ -231,7 +231,8 @@ function getSatoshis(value, decimals) {
   ).toString();
 }
 
-buttonTransfer.addEventListener("click", async () => {
+//buttonTransfer.addEventListener("click", async () => {
+async function sendKoin() {
   try {
     const from = wallet.getAddress();
     const to = inputTransferTo.value;
@@ -249,8 +250,10 @@ buttonTransfer.addEventListener("click", async () => {
     await wallet.signTransaction(tx);
     await wallet.sendTransaction(tx);
     textAlert.innerText = "Sent";
+    console.log("transaction sent")
   } catch (error) {
     textAlert.innerText = error.message;
     console.error(error);
   }
-});
+}
+//});
