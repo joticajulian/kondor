@@ -198,7 +198,8 @@ async function loadViewAccount(privateKey) {
   });
   const result = await wallet.readContract(operation.value);
   const balance = deserialize(result.result, { type: "uint64" }).toString();
-  textBalanceValue.innerText = Number(balance) / 1e8;
+  let numberBalance =  Number(balance) / 1e8;
+  textBalanceValue.innerText = numberBalance.toLocaleString('en');
 }
 
 buttonImport.addEventListener("click", async () => {
