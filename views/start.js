@@ -167,7 +167,7 @@ async function loadViewAccount(privateKey) {
       entries: {
         transfer: {
           id: 0x62efa292,
-          args: {
+          inputs: {
             type: [
               {
                 name: "from",
@@ -186,18 +186,17 @@ async function loadViewAccount(privateKey) {
         },
         balance_of: {
           id: 0x15619248,
-          args: { type: "string" },
+          inputs: { type: "string" },
+          outputs: { type: "uint64" },
         },
       },
     }),
   });
   textAddress.innerText = wallet.getAddress();
-  const operation = wallet.encodeOperation({
+  const balance = await wallet.readContract({
     name: "balance_of",
     args: wallet.getAddress(),
   });
-  const result = await wallet.readContract(operation.value);
-  const balance = deserialize(result.result, { type: "uint64" }).toString();
   let numberBalance =  Number(balance) / 1e8;
   textBalanceValue.innerText = numberBalance.toLocaleString('en');
 }
