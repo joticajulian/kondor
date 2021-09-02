@@ -131,6 +131,7 @@ button:hover {
   padding: 0 4em;
   text-align: left;
   font-size: 1.2em;
+  font-family: 'Major Mono Display', monospace;
 }
 
 .header-mark img {
@@ -189,6 +190,13 @@ button:hover {
   font-weight: 100;
 }
 
+.disabled {
+  color: gray;
+  cursor:not-allowed;
+}
+.warn {
+  color:deeppink;
+}
 #logo {
   display: flex;
   flex-direction: column;
@@ -211,6 +219,8 @@ button:hover {
   position: absolute;
   bottom: 0;
   right: 0;
+  width: 100vw;
+  opacity: 70%;
 }
 
 /* spinner */
