@@ -161,7 +161,7 @@ async function loadViewAccount(privateKey) {
   if (!privateKey) throw new Error("private key not defined");
   wallet = new Wallet({
     signer: Signer.fromWif(privateKey),
-    provider: new Provider("http://45.56.104.152:8080"),
+    provider: new Provider("http://159.203.119.0:8080"),
     contract: new Contract({
       id: "Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=",
       entries: {
