@@ -42,8 +42,9 @@ routePkey.onclick = () => {
     loadViewAccount(inputPrivateKey.value)
 }
 routeCreate.onclick = () => {
-    unlock.style.display = "none"
-    create.style.display = "block"
+    console.log("coming soon")
+    // unlock.style.display = "none"
+    // create.style.display = "block"
 }
 routeExplainer.onclick = () => {
     create.style.display = "none"
