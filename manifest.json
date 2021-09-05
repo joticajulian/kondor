@@ -3,24 +3,13 @@
   "description": "Koinos Wallet in your browser",
   "version": "0.1.0",
   "manifest_version": 3,
-  "background": {
-    "service_worker": "background.js"
-  },
-  "permissions": ["storage", "activeTab", "scripting"],
-  "web_accessible_resources": [
-    {
-      "resources": ["js/injected.js"],
-      "matches": ["https://*/*", "http://*/*"],
-      "use_dynamic_url": true
-    }
-  ],
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://*/*", "http://*/*"],
       "js": ["js/content.js"]
     }
   ],
-
   "action": {
     "default_popup": "views/start.html",
     "default_icon": {
