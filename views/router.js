@@ -33,12 +33,26 @@ const routebackExplainer = document.getElementById("routeback-explainer")
 const inputPasswordUnlock = document.getElementById("password-unlock");
 const inputSetPassword = document.getElementById("set-password");
 
+function alertError(msg) {
+  textAlert.innerText = msg;
+  const alert = document.getElementById("alert");
+  alert.classList.add("show", "danger");
+  alert.classList.remove("success", "info");
+}
+
+function alertSuccess(msg) {
+  textAlert.innerText = msg;
+  const alert = document.getElementById("alert");
+  alert.classList.add("show", "success");
+  alert.classList.remove("danger", "info");
+}
+
 async function trycatch(fn) {
   try {
     await fn();
   } catch (error) {
     console.log(error)
-    textAlert.innerText = error.message;
+    alertError(error.message)
     throw error; 
   }
 }
@@ -126,6 +140,6 @@ routebackUnlockCreate.onclick = () => trycatch(() => {
 routebackImport.onclick = () => trycatch(() => {
   console.log('import')
   dashboard.style.display = "none"
-  importWallet.style.display = "block"
+  unlock.style.display = "block"
   loadViewAccount(inputPrivateKey.value)
 });

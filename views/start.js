@@ -85,6 +85,6 @@ async function sendKoin() {
   });
   await wallet.signTransaction(tx);
   await wallet.sendTransaction(tx);
-  textAlert.innerText = "Sent";
+  alertSuccess("Sent");
   console.log("transaction sent")
 }
