@@ -1,6 +1,7 @@
 
 // element divs
 const home = document.getElementById("home")
+const unlockWelcome = document.getElementById("unlock-welcome")
 const unlock = document.getElementById("unlock")
 const importWallet = document.getElementById("import-wallet")
 const dashboard = document.getElementById("dashboard")
@@ -11,6 +12,8 @@ const confirmed = document.getElementById("confirmed")
 
 // buttons
 const routeUnlock = document.getElementById("route-unlock")
+const routeUnlock2 = document.getElementById("route-unlock2")
+const routeHome = document.getElementById("route-home")
 const routeImport = document.getElementById("route-import")
 const routePkey = document.getElementById("route-pkey")
 const routeCreate = document.getElementById("route-create")
@@ -20,30 +23,46 @@ const routeConfirmed = document.getElementById("route-confirmed")
 const routeDashboard = document.getElementById("route-dashboard")
 const buttonTransfer = document.getElementById("transfer");
 
-
 // back buttons
 const routebackUnlock = document.getElementById("routeback-unlock")
 const routebackUnlockCreate = document.getElementById("routeback-unlock-create")
 const routebackImport = document.getElementById("routeback-import")
 const routebackExplainer = document.getElementById("routeback-explainer")
 
+// inputs
+const inputPasswordUnlock = document.getElementById("password-unlock");
+const inputSetPassword = document.getElementById("set-password");
+
 // page routes
 routeUnlock.onclick = () => {
     home.style.display = "none"
-    unlock.style.display = "block"
+    unlockWelcome.style.display = "block"
+}
+routeUnlock2.onclick = async () => {
+    unlock.style.display = "none"
+    dashboard.style.display = "block"
+    const encrypted = await getAccounts();
+    const { privateKey } = await decrypt(encrypted, inputPasswordUnlock.value);
+    loadViewAccount(privateKey)
+}
+routeHome.onclick = () => {
+    unlock.style.display = "none"
+    home.style.display = "block"
 }
 routeImport.onclick = () => {
-    unlock.style.display = "none"
+    unlockWelcome.style.display = "none"
     importWallet.style.display = "block"
 }
-routePkey.onclick = () => {
+routePkey.onclick = async () => {
     importWallet.style.display = "none"
     dashboard.style.display = "block"
     loadViewAccount(inputPrivateKey.value)
+    const enc = await encrypt({ privateKey: inputPrivateKey.value }, inputSetPassword.value);
+    await storeAccount(enc);
 }
 routeCreate.onclick = () => {
     console.log("coming soon")
-    // unlock.style.display = "none"
+    // unlockWelcome.style.display = "none"
     // create.style.display = "block"
 }
 routeExplainer.onclick = () => {
@@ -71,22 +90,17 @@ buttonTransfer.onclick = () => {
 routebackUnlock.onclick = () => {
   console.log('unlock')
     importWallet.style.display = "none"
-    unlock.style.display = "block"
+    unlockWelcome.style.display = "block"
     loadViewAccount(inputPrivateKey.value)
 }
 routebackUnlockCreate.onclick = () => {
   console.log('unlock')
     create.style.display = "none"
-    unlock.style.display = "block"
+    unlockWelcome.style.display = "block"
 }
 routebackImport.onclick = () => {
   console.log('import')
     dashboard.style.display = "none"
     importWallet.style.display = "block"
     loadViewAccount(inputPrivateKey.value)
-}
-routebackExplainer.onclick = () => {
-  console.log('import')
-    explainer.style.display = "none"
-    importWallet.style.display = "block"
 }
