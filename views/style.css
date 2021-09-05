@@ -313,3 +313,30 @@ button:hover {
   }
   
 }
+
+.alert{
+  position: fixed;
+  bottom: -100px;
+  margin-bottom: 15px;
+  display: block;
+  width: calc(100% - 105px);
+  border-radius: 6px;
+  padding: 0px 20px;
+  text-align: left;
+  transition: all 0.3s;
+}
+.alert.show {
+  bottom: 0px;
+}
+.alert.danger {
+  background: #ff9f9f;
+  color: #8a0000;
+}
+.alert.info {
+  background: #ffef9f;
+  color: #828a00;
+}
+.alert.success {
+  background: #9fffbd;
+  color: #008a24;
+}
