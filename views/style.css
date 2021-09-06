@@ -52,6 +52,10 @@ button:hover {
   opacity: .5;
 }
 
+.w-60 {
+  width: 60%;
+}
+
 .hidden {
   display: none;
 }
@@ -164,6 +168,12 @@ button:hover {
   display: flex;
   align-items: center;
 }
+.buttons-spread {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3em;
+  width: 108%;
+}
 .major {
   font-family: 'Major Mono Display', monospace;
 }
@@ -220,7 +230,7 @@ button:hover {
   bottom: 0;
   right: 0;
   width: 100vw;
-  opacity: 70%;
+  opacity: 40%;
 }
 
 /* spinner */
