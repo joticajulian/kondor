@@ -75,16 +75,17 @@ routeUnlock2.onclick = () => trycatch(async () => {
     const encrypted = await getAccounts();
     if (!encrypted) throw new Error("There is no account stored");
 
+    let privateKey;
     try {
-      const { privateKey } = await decrypt(encrypted, inputPasswordUnlock.value);
-      loadViewAccount(privateKey)
+      const dec = await decrypt(encrypted, inputPasswordUnlock.value);
+      privateKey = dec.privateKey;
       unlock.style.display = "none"
       dashboard.style.display = "block"
     } catch (error) {
       console.log(error)
       throw new Error("Invalid private key");
     }
-    
+    await loadViewAccount(privateKey);
 });
 
 routeHome.onclick = () => {
@@ -98,7 +99,7 @@ routeImport.onclick = () => {
 routePkey.onclick = () => trycatch(async () => {
     importWallet.style.display = "none"
     dashboard.style.display = "block"
-    loadViewAccount(inputPrivateKey.value)
+    loadViewAccount(inputPrivateKey.value).catch(e => {throw e});
     const enc = await encrypt({ privateKey: inputPrivateKey.value }, inputSetPassword.value);
     await storeAccount(enc);
 });
@@ -129,15 +130,15 @@ routeDashboard.onclick = () => {
     dashboard.style.display = "block"
 }
 
-buttonTransfer.onclick = () => trycatch(() => {
-    sendKoin();
+buttonTransfer.onclick = () => trycatch(async () => {
+    await sendKoin();
 });
 
 // back button routes
-routebackUnlock.onclick = () => trycatch(() => {
+routebackUnlock.onclick = () => trycatch(async () => {
   importWallet.style.display = "none"
   unlockWelcome.style.display = "block"
-  loadViewAccount(inputPrivateKey.value)
+  await loadViewAccount(inputPrivateKey.value)
 });
 
 routebackUnlockCreate.onclick = () => trycatch(() => {
