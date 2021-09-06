@@ -23,11 +23,14 @@ const routeConfirmed = document.getElementById("route-confirmed")
 const routeDashboard = document.getElementById("route-dashboard")
 const buttonTransfer = document.getElementById("transfer");
 
+
 // back buttons
 const routebackUnlock = document.getElementById("routeback-unlock")
 const routebackUnlockCreate = document.getElementById("routeback-unlock-create")
 const routebackImport = document.getElementById("routeback-import")
 const routebackExplainer = document.getElementById("routeback-explainer")
+const routebackUnlockHomepage = document.getElementById("routeback-unlock-homepage")
+const routebackUnlockUnlockwelcome = document.getElementById("routeback-unlock-unlockwelcome")
 
 // inputs
 const inputPasswordUnlock = document.getElementById("password-unlock");
@@ -38,6 +41,9 @@ function alertError(msg) {
   const alert = document.getElementById("alert");
   alert.classList.add("show", "danger");
   alert.classList.remove("success", "info");
+  setTimeout(() => {
+    alert.classList.remove("show")
+  }, 3000);
 }
 
 function alertSuccess(msg) {
@@ -45,6 +51,9 @@ function alertSuccess(msg) {
   const alert = document.getElementById("alert");
   alert.classList.add("show", "success");
   alert.classList.remove("danger", "info");
+  setTimeout(() => {
+    alert.classList.remove("show")
+  }, 3000);
 }
 
 async function trycatch(fn) {
@@ -143,3 +152,11 @@ routebackImport.onclick = () => trycatch(() => {
   unlock.style.display = "block"
   loadViewAccount(inputPrivateKey.value)
 });
+routebackUnlockHomepage.onclick = () => {
+  home.style.display = "none"
+  unlock.style.display = "block"
+}
+routebackUnlockUnlockwelcome.onclick = () => {
+  unlockWelcome.style.display = "none"
+  unlock.style.display = "block"
+}
