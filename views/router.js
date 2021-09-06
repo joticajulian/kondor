@@ -35,6 +35,7 @@ const routebackUnlockUnlockwelcome = document.getElementById("routeback-unlock-u
 // inputs
 const inputPasswordUnlock = document.getElementById("password-unlock");
 const inputSetPassword = document.getElementById("set-password");
+const inputSetPassword2 = document.getElementById("set-password2");
 
 function alertError(msg) {
   textAlert.innerText = msg;
@@ -97,6 +98,9 @@ routeImport.onclick = () => {
     importWallet.style.display = "block"
 }
 routePkey.onclick = () => trycatch(async () => {
+    if (inputSetPassword.value !== inputSetPassword2.value) {
+      throw new Error("Password mismatch")
+    }
     importWallet.style.display = "none"
     dashboard.style.display = "block"
     loadViewAccount(inputPrivateKey.value).catch(e => {throw e});
