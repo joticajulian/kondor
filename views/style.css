@@ -207,6 +207,19 @@ button:hover {
 .warn {
   color:deeppink;
 }
+.testnet-banner {
+
+  display: flex;
+  justify-content: center;
+  padding: .2em;
+  background: rgb(201, 31, 31);
+  color: white;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+
+}
 #logo {
   display: flex;
   flex-direction: column;
