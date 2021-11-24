@@ -11,80 +11,124 @@ const textAddress = document.getElementById("address");
 const inputTransferTo = document.getElementById("send-address");
 const inputTransferAmount = document.getElementById("send-amount");
 const textAlert = document.getElementById("text-alert");
+var iframe = document.getElementById('theFrame');
 
-let wallet;
+let koin;
+let provider;
+let sandbox = {
+  reqIds: [],
+};
 
-async function loadViewAccount(privateKey) {
-  if (!privateKey) throw new Error("private key not defined");
-  const rpcNode = await getRpcNode();
-  wallet = new Wallet({
-    signer: Signer.fromWif(privateKey),
-    provider: new Provider(rpcNode),
-    contract: new Contract({
-      id: "Mkw96mR+Hh71IWwJoT/2lJXBDl5Q=",
-      entries: {
-        transfer: {
-          id: 0x62efa292,
-          inputs: {
-            type: [
-              {
-                name: "from",
-                type: "string",
-              },
-              {
-                name: "to",
-                type: "string",
-              },
-              {
-                name: "value",
-                type: "uint64",
-              },
-            ],
-          },
-        },
-        balance_of: {
-          id: 0x15619248,
-          inputs: { type: "string" },
-          outputs: { type: "uint64" },
-        },
-      },
-    }),
+async function sendSandbox(command, args) {
+  const reqId = Math.round(Math.random()*1000);
+  sandbox.reqIds.push(reqId); 
+  return await new Promise((resolve, reject) => {
+    // prepare the listener
+    const listener = (event) => {
+      console.log(event.data);
+      if (!event.data.id) return;
+      const i = sandbox.reqIds.findIndex(r => r === event.data.id);
+      if (i >= 0) {
+        sandbox.reqIds.splice(i, 1);
+        resolve(event.data.result);
+        window.removeEventListener("message", listener);
+        console.log("listener removed");
+      }
+    }
+
+    // listen
+    window.addEventListener("message", listener);
+
+    // send request
+    iframe.contentWindow.postMessage({
+      id: reqId,
+      command,
+      args,
+    }, '*');
   });
-  textAddress.innerText = wallet.getAddress();
-  const balance = await wallet.readContract({
-    name: "balance_of",
-    args: wallet.getAddress(),
-  });
-  let numberBalance =  Number(balance) / 1e8;
-  textBalanceValue.innerText = numberBalance.toLocaleString('en');
 }
 
-function getSatoshis(value, decimals) {
-  if (isNaN(Number(value))) throw new Error(`Invalid value ${value}`);
-  let [i, d] = value.replace(",", ".").split(".");
-  d = d ? d : "";
-  d = d.padEnd(decimals, "0");
-  return (
-    BigInt(i) * BigInt("1".padEnd(decimals + 1, "0")) +
-    BigInt(d)
-  ).toString();
+const serializer = {
+  serialize: async (...args) => {
+    return sendSandbox("serialize", args);
+  },
+  deserialize: async (...args) => {
+    return sendSandbox("deserialize", args);
+  },
+  setTypes: async (types) => {
+    return sendSandbox("setTypes", types);
+  }
+}
+
+const serializerTx = {
+  serialize: async (...args) => {
+    return sendSandbox("serializeTx", args);
+  },
+  deserialize: async (...args) => {
+    return sendSandbox("deserializeTx", args);
+  },
+}
+
+async function loadViewAccount(privKeyWif) {
+  if (!privKeyWif) throw new Error("private key not defined");
+  const rpcNode = await getRpcNode();
+  provider = new Provider([rpcNode]);
+  const signer = Signer.fromWif(privKeyWif);
+  signer.provider = provider;
+  signer.serializer = serializerTx;
+  await serializer.setTypes(utils.Krc20Abi.types);
+  const koinContract = new Contract({
+    id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+    abi: utils.Krc20Abi,
+    signer,
+    serializer,
+  });
+  koinContract.abi.methods.balanceOf.preformatInput = (owner) =>
+    ({ owner });
+  koinContract.abi.methods.balanceOf.preformatOutput = (res) =>
+    utils.formatUnits(res.value, 8);
+  koinContract.abi.methods.transfer.preformatInput = (input) => ({
+    from: signer.getAddress(),
+    to: input.to,
+    value: utils.parseUnits(input.value, 8),
+  });
+  koin = koinContract.functions;
+  textAddress.innerText = signer.getAddress();
+  const balance = await koin.balanceOf(signer.getAddress());
+  textBalanceValue.innerText = balance.result;
 }
 
 async function sendKoin() {
-  const from = wallet.getAddress();
-  const to = inputTransferTo.value;
-  const value = getSatoshis(inputTransferAmount.value, 8);
-  const tx = await wallet.newTransaction({
-    getNonce: true,
-    operations: [
-      wallet.encodeOperation({
-        name: "transfer",
-        args: { from, to, value },
-      }),
-    ],
+  const resTransfer = await koin.transfer({
+    to: inputTransferTo.value,
+    value: inputTransferAmount.value
   });
-  await wallet.signTransaction(tx);
-  await wallet.sendTransaction(tx);
-  alertSuccess("Sent");
-  console.log("transaction sent")
+  alertSuccess("Sent. waiting to be mined");
+  console.log("transaction sent");
+  let blocknumber = 0
+  while (true) {
+    head = await provider.getHeadInfo()
+    if (blocknumber !== head.head_topology.height) {
+      blocknumber = head.head_topology.height;
+      console.log("block " + blocknumber);
+      const [block] = await provider.getBlocks(Number(blocknumber), 1, head.head_topology.id);
+      if (block && block.block && block.block.transactions) {
+        console.log(`block ${blocknumber} has transactions`)
+        const tx = block.block.transactions.find(t => t.id === resTransfer.transaction.id);
+        if (tx) {
+          console.log(`tx mined in block ${blocknumber}`);
+          alertSuccess("transaction mined");
+          break;
+        } else {
+          console.log(`tx ${resTransfer.transaction.id} not found here`)
+        }
+      } else {
+        console.log(`block ${blocknumber} without transactions`)
+      }
+    }
+    await new Promise(r => setTimeout(r, 2000));
+    console.log("checking")
+  }
+  // blockId = await resTransfer.transactionResponse.wait();
+  // console.log(`Transaction mined in blockId ${blockId}`);
 }
