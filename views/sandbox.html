@@ -1,0 +1,47 @@
+<html>
+  <body>
+    <h1>Woot</h1>
+    <script src="koinos.js"></script>
+    <script>
+      let serializer;
+      const serializerTx = new Serializer(utils.ProtocolTypes, {
+        defaultTypeName: "active_transaction_data",
+        bytesConversion: false,
+      });
+
+      window.addEventListener('message', function(event) {
+        const { command, id, args } = event.data;
+        switch(command) {
+          case 'setTypes':
+            serializer = new Serializer(args);
+            event.source.postMessage({ id, result: 0 }, event.origin);
+            break;
+          case "serialize":
+            (async () => {
+              const result = await serializer.serialize(...args);
+              event.source.postMessage({ id, result }, event.origin);
+            })();
+            break;
+          case "deserialize":
+            (async () => {
+              const result = await serializer.deserialize(...args);
+              event.source.postMessage({ id, result }, event.origin);
+            })();
+            break;
+          case "serializeTx":
+          (async () => {
+              const result = await serializerTx.serialize(...args);
+              event.source.postMessage({ id, result }, event.origin);
+            })();
+            break;
+          case "deserializeTx":
+            (async () => {
+              const result = await serializerTx.deserialize(...args);
+              event.source.postMessage({ id, result }, event.origin);
+            })();
+            break;
+        }
+      });
+    </script>
+  </body>
+</html>
