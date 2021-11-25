@@ -42,9 +42,9 @@ function alertError(msg) {
   const alert = document.getElementById("alert");
   alert.classList.add("show", "danger");
   alert.classList.remove("success", "info");
-  setTimeout(() => {
+  /* setTimeout(() => {
     alert.classList.remove("show")
-  }, 3000);
+  }, 3000); */
 }
 
 function alertSuccess(msg) {
@@ -52,9 +52,9 @@ function alertSuccess(msg) {
   const alert = document.getElementById("alert");
   alert.classList.add("show", "success");
   alert.classList.remove("danger", "info");
-  setTimeout(() => {
+  /* setTimeout(() => {
     alert.classList.remove("show")
-  }, 3000);
+  }, 3000); */
 }
 
 async function trycatch(fn) {
