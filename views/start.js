@@ -15,6 +15,7 @@ var iframe = document.getElementById('theFrame');
 
 let koin;
 let provider;
+let signer;
 let sandbox = {
   reqIds: [],
 };
@@ -25,15 +26,17 @@ async function sendSandbox(command, args) {
   return await new Promise((resolve, reject) => {
     // prepare the listener
     const listener = (event) => {
-      console.log(event.data);
-      if (!event.data.id) return;
-      const i = sandbox.reqIds.findIndex(r => r === event.data.id);
-      if (i >= 0) {
-        sandbox.reqIds.splice(i, 1);
-        resolve(event.data.result);
-        window.removeEventListener("message", listener);
-        console.log("listener removed");
+      const { id, result, error } = event.data;
+      if (!id) return;
+      const i = sandbox.reqIds.findIndex(r => r === id);
+      if (i < 0) return;
+      sandbox.reqIds.splice(i, 1);
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
       }
+      window.removeEventListener("message", listener);
     }
 
     // listen
@@ -73,7 +76,7 @@ async function loadViewAccount(privKeyWif) {
   if (!privKeyWif) throw new Error("private key not defined");
   const rpcNode = await getRpcNode();
   provider = new Provider([rpcNode]);
-  const signer = Signer.fromWif(privKeyWif);
+  signer = Signer.fromWif(privKeyWif);
   signer.provider = provider;
   signer.serializer = serializerTx;
   await serializer.setTypes(utils.Krc20Abi.types);
@@ -94,6 +97,14 @@ async function loadViewAccount(privKeyWif) {
   });
   koin = koinContract.functions;
   textAddress.innerText = signer.getAddress();
+  await loadBalance();
+}
+
+function elapsedTime(iniTime) {
+  return Math.round((Date.now() - iniTime)/1000);
+}
+
+async function loadBalance() {
   const balance = await koin.balanceOf(signer.getAddress());
   textBalanceValue.innerText = balance.result;
 }
@@ -103,21 +114,21 @@ async function sendKoin() {
     to: inputTransferTo.value,
     value: inputTransferAmount.value
   });
-  alertSuccess("Sent. waiting to be mined");
+  alertSuccess("Sent. Waiting to be mined");
+  const iniTime = Date.now();
   console.log("transaction sent");
   let blocknumber = 0
   while (true) {
-    head = await provider.getHeadInfo()
-    if (blocknumber !== head.head_topology.height) {
-      blocknumber = head.head_topology.height;
-      console.log("block " + blocknumber);
-      const [block] = await provider.getBlocks(Number(blocknumber), 1, head.head_topology.id);
+    const { head_topology } = await provider.getHeadInfo()
+    if (blocknumber !== head_topology.height) {
+      blocknumber = head_topology.height;
+      const [block] = await provider.getBlocks(Number(blocknumber), 1, head_topology.id);
       if (block && block.block && block.block.transactions) {
         console.log(`block ${blocknumber} has transactions`)
         const tx = block.block.transactions.find(t => t.id === resTransfer.transaction.id);
         if (tx) {
           console.log(`tx mined in block ${blocknumber}`);
-          alertSuccess("transaction mined");
+          alertSuccess(`Transaction mined in block ${blocknumber}`);
           break;
         } else {
           console.log(`tx ${resTransfer.transaction.id} not found here`)
@@ -126,9 +137,8 @@ async function sendKoin() {
         console.log(`block ${blocknumber} without transactions`)
       }
     }
-    await new Promise(r => setTimeout(r, 2000));
-    console.log("checking")
+    alertSuccess(`Sent. Waiting to be mined (${elapsedTime(iniTime)}s)`);
+    await new Promise(r => setTimeout(r, 1000));
   }
-  // blockId = await resTransfer.transactionResponse.wait();
-  // console.log(`Transaction mined in blockId ${blockId}`);
+  await loadBalance();
 }
