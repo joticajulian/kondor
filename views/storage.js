@@ -63,7 +63,7 @@ function toUint8Array(hexString) {
       //    throw new Error("Local storage error: cannot save salt and iv");
       result = { salt, iv };
       r = await db.get(["salt", "iv"]);
-      if(!r) throw new Error("Local storage error: cannot save salt and iv");
+      if(!r) console.error("Local storage error: cannot save salt and iv");
     }
     const salt = new Uint8Array(Object.keys(result.salt).map((k) => result.salt[k])).buffer;
     const iv = new Uint8Array(Object.keys(result.iv).map((k) => result.iv[k])).buffer;
