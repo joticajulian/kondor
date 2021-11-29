@@ -55,18 +55,15 @@ function toUint8Array(hexString) {
   async function getOptsEncryption() {
     let result = await db.get(["salt", "iv"]);
     if (!result) {
-      const salt = window.crypto.getRandomValues(new Uint8Array(16));
-      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const salt = toHexString(window.crypto.getRandomValues(new Uint8Array(16)));
+      const iv = toHexString(window.crypto.getRandomValues(new Uint8Array(12)));
       await db.set({ salt, iv });
-      // result = await db.get(["salt", "iv"]);
-      // if (!result)
-      //    throw new Error("Local storage error: cannot save salt and iv");
-      result = { salt, iv };
-      r = await db.get(["salt", "iv"]);
-      if(!r) console.error("Local storage error: cannot save salt and iv");
+      result = await db.get(["salt", "iv"]);
+      if (!result)
+        throw new Error("Local storage error: cannot save salt and iv");
     }
-    const salt = new Uint8Array(Object.keys(result.salt).map((k) => result.salt[k])).buffer;
-    const iv = new Uint8Array(Object.keys(result.iv).map((k) => result.iv[k])).buffer;
+    const salt = toUint8Array(result.salt).buffer;
+    const iv = toUint8Array(result.iv).buffer;
     return { salt, iv };
   }
   
