@@ -1,0 +1,42 @@
+<html>
+  <body>
+    <script src="koinos.js"></script>
+    <script>
+      let serializer;
+      const serializerTx = new Serializer(utils.ProtocolTypes, {
+        defaultTypeName: "active_transaction_data",
+        bytesConversion: false,
+      });
+
+      window.addEventListener('message', async function (event) {
+        const { command, id, args } = event.data;
+        let result = 0;
+        try {
+          switch(command) {
+            case 'setTypes':
+              serializer = new Serializer(args);
+              break;
+            case "serialize":
+              result = await serializer.serialize(...args);
+              break;
+            case "deserialize":
+              result = await serializer.deserialize(...args);
+              break;
+            case "serializeTx":
+              result = await serializerTx.serialize(...args);
+              break;
+            case "deserializeTx":
+              result = await serializerTx.deserialize(...args);
+              break;
+            default:
+              throw new Error(`command ${command} not implemented`)
+          }
+          event.source.postMessage({ id, result }, event.origin);
+        } catch (error) {
+          console.error(error);
+          event.source.postMessage({ id, error }, event.origin);
+        }
+      });
+    </script>
+  </body>
+</html>
