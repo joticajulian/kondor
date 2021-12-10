@@ -8,8 +8,8 @@
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 600px;
-  width: 384px;
+  height: 500px;
+  width: 309px;
   font-family: 'Urbanist', sans-serif;
   background-color: var(--secondary-color);
   color: var(--primary-color);
@@ -26,6 +26,11 @@ h1,
 h2,
 h3 {
   font-weight: 400;
+}
+
+a, a:visited {
+  color: var(--primary-color);
+  text-decoration: none;
 }
 
 input,
@@ -57,12 +62,11 @@ textarea
 }
 
 button {
-  color: var(--primary-color);
-  border-bottom: 1px solid var(--kondor-light);
-  border-top: none;
-  border-right: none;
-  border-left: none;
-  padding: .8em 0;
+  background: var(--kondor-light);
+  padding: 0.8em;
+  color: var(--secondary-color);
+  border-radius: 8px;
+  border-width: 0;
   font-family: 'Major Mono Display', monospace;
   cursor: pointer;
 }

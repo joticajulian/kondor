@@ -4,7 +4,7 @@
     <LogoText/>
     <input type="password" placeholder="Password">
     <button @click="clicked">unlock</button>
-    <router-link to="/hello">import using Secret Recovery Phrase</router-link>
+    <router-link to="/newWallet">import using Secret Recovery Phrase</router-link>
   </div>
 </template>
 
@@ -20,8 +20,6 @@ export default {
   components: { Logo, LogoText },
   methods: {
     async clicked() {
-      console.log("button clicked")
-
       router.push("/hello")
     }
   }
