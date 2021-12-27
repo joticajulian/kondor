@@ -5,7 +5,7 @@
 </template>
 
 <script>
-//import { Signer } from 'koilib'
+import { Signer } from 'koilib'
 
 export default {
   data() {
@@ -15,9 +15,9 @@ export default {
   },
 
   created() {
-    //(async () => {
-      //this.address = Signer.fromSeed("julian").getAddress();
-    //})()
+    (async () => {
+      this.address = Signer.fromSeed("my seed").getAddress();
+    })()
   }
 }
 </script>

@@ -29,7 +29,7 @@
               result = await serializerTx.deserialize(...args);
               break;
             default:
-              throw new Error(`command ${command} not implemented`)
+              // throw new Error(`command ${command} not implemented`)
           }
           event.source.postMessage({ id, result }, event.origin);
         } catch (error) {
