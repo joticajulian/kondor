@@ -26,7 +26,6 @@ export default {
     async importKey() {
       if (this.password1 !== this.password2)
         throw new Error("password mismatch");
-      console.log(this.privateKey);
       const enc = await this.encrypt({ privateKey: this.privateKey }, this.password1);
       await this.setAccounts(enc);
       router.push('/dashboard');

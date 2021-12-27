@@ -20,7 +20,7 @@ export default {
   components: { Logo, LogoText },
   methods: {
     async clicked() {
-      router.push("/hello")
+      router.push("/dashboard")
     }
   }
 }

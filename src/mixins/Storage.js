@@ -17,17 +17,37 @@ function toHexString(buffer) {
 export default {
   name: 'Storage mixin',
 
+  data: function () {
+    return {
+      testAccounts: '',
+      testData: {},
+    }
+  },
+
   methods: {
     async readStorage(keys) {
+      if (process.env.VUE_APP_ENV === 'test') {
+        const result = {};
+        keys.forEach(k => {
+          if (typeof this.testData[k] !== "undefined")
+            result[k] = this.testData[k];
+        });
+        if (Object.keys(result).length === 0) return null;
+        return result;
+      }
       return new Promise((resolve) => {
         chrome.storage.local.get(keys, function (result) {
-          if (Object.keys(result).length == 0) resolve(null);
+          if (Object.keys(result).length === 0) resolve(null);
           else resolve(result);
         });
       });
     },
 
     async writeStorage(data) {
+      if (process.env.VUE_APP_ENV === 'test') {
+        Object.assign(this.testData, data);
+        return;
+      }
       return new Promise((resolve) => {
         chrome.storage.local.set(data, function () {
           resolve();
@@ -36,16 +56,26 @@ export default {
     },
 
     async getAccounts() {
+      /*if (process.env.VUE_APP_ENV === 'test') {
+        return this.testAccounts;
+      }*/
       const result = await this.readStorage(['accounts']);
       if (!result) return null;
       return result.accounts;
     },
 
     async setAccounts(encrypted) {
+      /*if (process.env.VUE_APP_ENV === 'test') {
+        this.testAccounts = encrypted;
+        return;
+      }*/
       this.writeStorage({ accounts: encrypted });
     },
 
     async getRpcNode() {
+      /*if (process.env.VUE_APP_ENV === 'test') {
+        return "http://api.koinos.io:8080";
+      }*/
       let result = await this.readStorage(['rpcNode']);
       if (!result) {
         // store default value
@@ -56,6 +86,7 @@ export default {
     },
 
     async setRpcNode(rpcNode) {
+      //if (process.env.VUE_APP_ENV === 'test') return;
       await this.writeStorage({ rpcNode });
     },
 
