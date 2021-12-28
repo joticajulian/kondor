@@ -20,6 +20,7 @@ export default {
       koinSerializer: null,
       koinContract: null,
       koin: null,
+      numErrors: 0,
     }
   },
 
@@ -29,6 +30,10 @@ export default {
     (async () => {
       const rpcNode = await this.getRpcNode();
       this.provider = new Provider([rpcNode]);
+      this.provider.onError = () => {
+        this.numErrors += 1;
+        return this.numErrors > 20;
+      }
       this.signer = Signer.fromWif(this.$store.state.privateKey);
       this.signer.provider = this.provider;
       this.signer.serializer = {
