@@ -56,30 +56,23 @@ export default {
     },
 
     async getAccounts() {
-      /*if (process.env.VUE_APP_ENV === 'test') {
-        return this.testAccounts;
-      }*/
       const result = await this.readStorage(['accounts']);
       if (!result) return null;
       return result.accounts;
     },
 
     async setAccounts(encrypted) {
-      /*if (process.env.VUE_APP_ENV === 'test') {
-        this.testAccounts = encrypted;
-        return;
-      }*/
       this.writeStorage({ accounts: encrypted });
     },
 
     async getRpcNode() {
-      /*if (process.env.VUE_APP_ENV === 'test') {
-        return "http://api.koinos.io:8080";
-      }*/
       let result = await this.readStorage(['rpcNode']);
       if (!result) {
         // store default value
-        await this.writeStorage({ rpcNode: "http://api.koinos.io:8080" });
+        const rpcNode = process.env.VUE_APP_ENV === "test"
+          ? "http://localhost:8081/jsonrpc"
+          : "http://api.koinos.io:8080";
+        await this.writeStorage({ rpcNode });
         result = await this.readStorage(['rpcNode']);
       }
       return result.rpcNode;
