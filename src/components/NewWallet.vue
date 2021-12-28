@@ -9,6 +9,12 @@
     </div>
     <div>
       <img src="" alt=""/>
+      <div>No, I already have a private key</div>
+      <div>Import your private key</div>
+      <button @click="importPrivateKey">Import private key</button>
+    </div>
+    <div>
+      <img src="" alt=""/>
       <div>Yes, let's setup a new wallet</div>
       <div>This will create a new wallet and seed phrase</div>
       <button>Create wallet</button>
@@ -21,8 +27,12 @@ import router from '@/router'
 
 export default {
   methods: {
+    async importPrivateKey() {
+      router.push("/importPrivateKey")
+    },
+
     async importWallet() {
-      router.push("/import")
+      
     }
   }
 };

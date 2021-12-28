@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Welcome from './components/Welcome.vue'
 import NewWallet from './components/NewWallet.vue'
 import Import from './components/Import'
+import ImportPrivateKey from './components/ImportPrivateKey'
 import Dashboard from './components/Dashboard.vue'
 
 Vue.use(Router)
@@ -23,6 +24,11 @@ export default new Router({
       path: '/import',
       name: 'Import',
       component: Import
+    },
+    {
+      path: '/importPrivateKey',
+      name: 'ImportPrivateKey',
+      component: ImportPrivateKey
     },
     {
       path: '/dashboard',

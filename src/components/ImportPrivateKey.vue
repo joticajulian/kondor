@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Import Existing Wallet</h1>
+    <h1>Import Private Key</h1>
     <img src="" alt=""/>
     <input id="private-key" v-model="privateKey" type="password" placeholder="Private key"/>
     <input id="password1" v-model="password1" type="password" placeholder="Set password"/>

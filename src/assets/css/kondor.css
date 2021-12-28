@@ -5,6 +5,10 @@
   --kondor-gray: #828282;
 }
 
+body {
+  margin: 0px;
+}
+
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
