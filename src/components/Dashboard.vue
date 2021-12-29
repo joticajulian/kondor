@@ -1,7 +1,10 @@
 <template>
   <div>
     <span>{{address}}</span>
-    <div>Balance {{balance}}</div>
+    <div>Balance {{balance}} tKoin</div>
+    <input v-model="toAddress" type="text" placeholder="To address"/>
+    <input v-model="amount" type="text" placeholder="Amount"/>
+    <button @click="transfer">Transfer</button>
   </div>
 </template>
 
@@ -21,6 +24,8 @@ export default {
       koinContract: null,
       koin: null,
       numErrors: 0,
+      toAddress: '',
+      amount: '',
     }
   },
 
@@ -78,6 +83,20 @@ export default {
     async loadBalance() {
       const { result } = await this.koin.balanceOf(this.address);
       this.balance = result;
+    },
+    async transfer() {
+      const { transaction, transactionResponse } = await this.koin.transfer({
+        to: this.toAddress,
+        value: this.amount,
+      });
+      console.log(`Transaction id ${transaction.id} submitted`);
+      const interval = setInterval(() => {
+        console.log("firing interval")
+        this.loadBalance();
+      }, 2000);
+      const blockNumber = await transactionResponse.wait("byBlock");
+      console.log("block number " + blockNumber);
+      clearInterval(interval);
     }
   }
 }
