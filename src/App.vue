@@ -1,16 +1,22 @@
 <template>
   <div id="app">
     <iframe id="sandbox" src="sandbox.html"></iframe>
-    <Nav/>
-    <router-view/>
+    <Nav />
+    <router-view />
+    <Alert
+      :type="$store.state.alertType"
+      :show="$store.state.alertShow"
+      :message="$store.state.alertMessage"
+      @onClose="$store.state.alertShow = false"
+    />
   </div>
 </template>
 
 <script>
-import Nav from '@/components/Nav'
+import Nav from "@/components/Nav";
+import Alert from "@/components/Alert";
 
 export default {
-  components: { Nav },
+  components: { Nav, Alert },
 };
 </script>
-

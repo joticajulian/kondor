@@ -6,7 +6,10 @@ const apiKoinos = "http://api.koinos.io:8080";
 
 fastify.options("/jsonrpc", async (req, reply) => {
   reply.header("Access-Control-Allow-Origin", "*");
-  reply.header("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token");
+  reply.header(
+    "Access-Control-Allow-Headers",
+    "Origin, Content-Type, X-Auth-Token"
+  );
   reply.header("Access-Control-Allow-Methods", "POST, OPTIONS");
   reply.send({});
 });
