@@ -15,20 +15,20 @@ function toHexString(buffer) {
 }
 
 export default {
-  name: 'Storage mixin',
+  name: "Storage mixin",
 
   data: function () {
     return {
-      testAccounts: '',
+      testAccounts: "",
       testData: {},
-    }
+    };
   },
 
   methods: {
     async readStorage(keys) {
-      if (process.env.VUE_APP_ENV === 'test') {
+      if (process.env.VUE_APP_ENV === "test") {
         const result = {};
-        keys.forEach(k => {
+        keys.forEach((k) => {
           if (typeof this.testData[k] !== "undefined")
             result[k] = this.testData[k];
         });
@@ -44,7 +44,7 @@ export default {
     },
 
     async writeStorage(data) {
-      if (process.env.VUE_APP_ENV === 'test') {
+      if (process.env.VUE_APP_ENV === "test") {
         Object.assign(this.testData, data);
         return;
       }
@@ -56,7 +56,7 @@ export default {
     },
 
     async getAccounts() {
-      const result = await this.readStorage(['accounts']);
+      const result = await this.readStorage(["accounts"]);
       if (!result) return null;
       return result.accounts;
     },
@@ -66,14 +66,15 @@ export default {
     },
 
     async getRpcNode() {
-      let result = await this.readStorage(['rpcNode']);
+      let result = await this.readStorage(["rpcNode"]);
       if (!result) {
         // store default value
-        const rpcNode = process.env.VUE_APP_ENV === "test"
-          ? "http://localhost:8081/jsonrpc"
-          : "http://api.koinos.io:8080";
+        const rpcNode =
+          process.env.VUE_APP_ENV === "test"
+            ? "http://localhost:8081/jsonrpc"
+            : "http://api.koinos.io:8080";
         await this.writeStorage({ rpcNode });
-        result = await this.readStorage(['rpcNode']);
+        result = await this.readStorage(["rpcNode"]);
       }
       return result.rpcNode;
     },
@@ -86,8 +87,12 @@ export default {
     async getOptsEncryption() {
       let result = await this.readStorage(["salt", "iv"]);
       if (!result) {
-        const salt = toHexString(window.crypto.getRandomValues(new Uint8Array(16)));
-        const iv = toHexString(window.crypto.getRandomValues(new Uint8Array(12)));
+        const salt = toHexString(
+          window.crypto.getRandomValues(new Uint8Array(16))
+        );
+        const iv = toHexString(
+          window.crypto.getRandomValues(new Uint8Array(12))
+        );
         await this.writeStorage({ salt, iv });
         result = await this.readStorage(["salt", "iv"]);
         if (!result)
@@ -108,7 +113,7 @@ export default {
         ["deriveBits", "deriveKey"]
       );
     },
-    
+
     async getKey(password, salt) {
       const keyMaterial = await this.getKeyMaterial(password);
       return window.crypto.subtle.deriveKey(
@@ -124,13 +129,13 @@ export default {
         ["encrypt", "decrypt"]
       );
     },
-    
-    async encrypt(data, password) {  
+
+    async encrypt(data, password) {
       const { salt, iv } = await this.getOptsEncryption();
       const key = await this.getKey(password, salt);
       const message = JSON.stringify(data);
       const encoded = new TextEncoder().encode(message);
-    
+
       const bufferEncrypted = await window.crypto.subtle.encrypt(
         { name: "AES-GCM", iv },
         key,
@@ -138,12 +143,12 @@ export default {
       );
       return toHexString(new Uint8Array(bufferEncrypted));
     },
-    
+
     async decrypt(encrypted, password) {
       const { salt, iv } = await this.getOptsEncryption();
       const key = await this.getKey(password, salt);
       const bufferEncrypted = toUint8Array(encrypted);
-    
+
       const decrypted = await window.crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
         key,

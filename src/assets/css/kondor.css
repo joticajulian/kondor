@@ -1,7 +1,7 @@
 :root {
-  --primary-color: #E2B7EC;
+  --primary-color: #e2b7ec;
   --secondary-color: #110020;
-  --kondor-light: #F7DCBF;
+  --kondor-light: #f7dcbf;
   --kondor-gray: #828282;
 }
 
@@ -14,10 +14,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: 500px;
   width: 309px;
-  font-family: 'Urbanist', sans-serif;
+  font-family: "Urbanist", sans-serif;
   background-color: var(--secondary-color);
   color: var(--primary-color);
-  padding: 2em;
+  padding: 20px;
 }
 
 #sandbox {
@@ -32,7 +32,8 @@ h3 {
   font-weight: 400;
 }
 
-a, a:visited {
+a,
+a:visited {
   color: var(--primary-color);
   text-decoration: none;
 }
@@ -43,7 +44,7 @@ textarea {
   width: 92%;
   color: var(--kondor-gray);
   padding: 1em;
-  margin: .5em 0 1em 0;
+  margin: 0.5em 0 1em 0;
   border: 1px solid var(--kondor-light);
 }
 
@@ -51,18 +52,17 @@ input,
 label,
 select,
 button,
-textarea
-{
-	/*margin:0;
+textarea {
+  /*margin:0;
 	border:0;
 	padding:0;*/
-	display:inline-block;
-	vertical-align:middle;
-	white-space:normal;
-	background:none;
-	line-height:1;	
-	font-size:13px;
-	font-family:Arial;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: normal;
+  background: none;
+  line-height: 1;
+  font-size: 13px;
+  font-family: Arial;
 }
 
 button {
@@ -71,9 +71,9 @@ button {
   color: var(--secondary-color);
   border-radius: 8px;
   border-width: 0;
-  font-family: 'Major Mono Display', monospace;
+  font-family: "Major Mono Display", monospace;
   cursor: pointer;
 }
 button:hover {
-  opacity: .5;
+  opacity: 0.5;
 }

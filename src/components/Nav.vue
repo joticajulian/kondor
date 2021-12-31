@@ -5,13 +5,13 @@
 </template>
 
 <script>
-import router from '@/router'
+import router from "@/router";
 
 export default {
   methods: {
     back() {
-      router.back()
-    }
-  }
+      router.back();
+    },
+  },
 };
 </script>

@@ -10,6 +10,7 @@ https://chrome.google.com/webstore/detail/kondor/ghipkefkpgkladckmlmdnadmcchefhj
 ## Developers
 
 The wallet has been created using Vue Framework. It can be tested in 2 ways:
+
 1. As a single-page application in a web page (recommended). As it is developed in Vue you can take advantage of the hot reloads for fast iteration. With this option the local storage is not tested, and instead of that it is bypassed by data written in memory.
 2. As browser extension. This option doesn't have the hot reloads offered by Vue but you can test it as extension with all features.
 
@@ -56,5 +57,5 @@ npm run build
 The compiled application will be located in the folder `dist`. Open chrome and go to `chrome://extensions/`. Make sure the `developer mode` is enabled. Click on `Load unpacked` and select the folder `dist` with the application. The extension should be ready to be tested.
 
 #### NOTE
-The Koinos Blockchain is currenlty available only as a test network and is prone to bugs and crashes, tKOIN has absolutely no value. To learn more about Koinos visit their website at [koinos.io](https://koinos.io)
 
+The Koinos Blockchain is currenlty available only as a test network and is prone to bugs and crashes, tKOIN has absolutely no value. To learn more about Koinos visit their website at [koinos.io](https://koinos.io)

@@ -1,3 +1,3 @@
 module.exports = {
-  transpileDependencies: ['@vue/reactivity']
-}
+  transpileDependencies: ["@vue/reactivity"],
+};
