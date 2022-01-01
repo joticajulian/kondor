@@ -8,12 +8,12 @@
         bytesConversion: false,
       });
 
-      window.addEventListener('message', async function (event) {
+      window.addEventListener("message", async function (event) {
         const { command, id, args } = event.data;
         let result = 0;
         try {
-          switch(command) {
-            case 'setTypes':
+          switch (command) {
+            case "setTypes":
               serializer = new Serializer(args);
               break;
             case "serialize":
@@ -29,7 +29,7 @@
               result = await serializerTx.deserialize(...args);
               break;
             default:
-              // throw new Error(`command ${command} not implemented`)
+              break;
           }
           event.source.postMessage({ id, result }, event.origin);
         } catch (error) {

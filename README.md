@@ -14,6 +14,12 @@ The wallet has been created using Vue Framework. It can be tested in 2 ways:
 1. As a single-page application in a web page (recommended). As it is developed in Vue you can take advantage of the hot reloads for fast iteration. With this option the local storage is not tested, and instead of that it is bypassed by data written in memory.
 2. As browser extension. This option doesn't have the hot reloads offered by Vue but you can test it as extension with all features.
 
+Setup the project by installing dependencies:
+
+```
+yarn install
+```
+
 ### Run as Single-Page Application
 
 When testing in localhost we need a proxy server to avoid the issues with cors. Start the server that adds the corresponding headers:
