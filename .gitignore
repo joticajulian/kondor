@@ -2,6 +2,7 @@
 node_modules
 /dist
 /local
+public/manifest.json
 
 
 # local env files
