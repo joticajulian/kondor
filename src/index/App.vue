@@ -13,8 +13,8 @@
 </template>
 
 <script>
-import Nav from "@/components/Nav";
-import Alert from "@/components/Alert";
+import Nav from "@/index/components/Nav";
+import Alert from "@/index/components/Alert";
 
 export default {
   components: { Nav, Alert },

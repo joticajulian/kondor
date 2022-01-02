@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Import Private Key</h1>
+    <h1>Import Existing Wallet</h1>
     <img src="" alt="" />
     <input
       id="private-key"
@@ -25,9 +25,9 @@
 </template>
 
 <script>
-import router from "@/router";
-import Storage from "@/mixins/Storage";
-import AlertHelper from "@/mixins/AlertHelper";
+import router from "@/index/router";
+import Storage from "@/shared/mixins/Storage";
+import AlertHelper from "@/shared/mixins/AlertHelper";
 
 export default {
   data() {
@@ -40,20 +40,15 @@ export default {
   mixins: [Storage, AlertHelper],
   methods: {
     async importKey() {
-      try {
-        if (this.password1 !== this.password2)
-          throw new Error("password mismatch");
-        const enc = await this.encrypt(
-          { privateKey: this.privateKey },
-          this.password1
-        );
-        await this.setAccounts(enc);
-        this.$store.state.privateKey = this.privateKey;
-        router.push("/dashboard");
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
+      if (this.password1 !== this.password2)
+        throw new Error("password mismatch");
+      const enc = await this.encrypt(
+        { privateKey: this.privateKey },
+        this.password1
+      );
+      await this.setAccounts(enc);
+      this.$store.state.privateKey = this.privateKey;
+      router.push("/dashboard");
     },
   },
 };
