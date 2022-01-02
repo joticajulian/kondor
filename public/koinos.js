@@ -6700,13 +6700,11 @@
           fieldType = util.decorateEnum(fieldType).name;
 
         return function fieldDecorator(prototype, fieldName) {
-          util
-            .decorateType(prototype.constructor)
-            .add(
-              new Field(fieldName, fieldId, fieldType, fieldRule, {
-                default: defaultValue,
-              })
-            );
+          util.decorateType(prototype.constructor).add(
+            new Field(fieldName, fieldId, fieldType, fieldRule, {
+              default: defaultValue,
+            })
+          );
         };
       };
 

@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import router from "@/router";
-import AlertHelper from "@/mixins/AlertHelper";
+import router from "@/index/router";
+import AlertHelper from "@/shared/mixins/AlertHelper";
 
 export default {
   mixins: [AlertHelper],

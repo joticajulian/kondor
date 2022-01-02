@@ -10,9 +10,9 @@
 
 <script>
 import { Contract, Provider, Signer, utils } from "koilib";
-import AlertHelper from "@/mixins/AlertHelper";
-import Storage from "@/mixins/Storage";
-import Sandbox from "@/mixins/Sandbox";
+import AlertHelper from "@/shared/mixins/AlertHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
 
 export default {
   data() {

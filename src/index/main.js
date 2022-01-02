@@ -2,7 +2,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import "@/assets/css/kondor.css";
+import "@/shared/assets/css/kondor.css";
 
 Vue.config.productionTip = false;
 

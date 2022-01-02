@@ -11,11 +11,11 @@
 </template>
 
 <script>
-import router from "@/router";
-import Logo from "@/components/Logo";
-import LogoText from "@/components/LogoText";
-import Storage from "@/mixins/Storage";
-import AlertHelper from "@/mixins/AlertHelper";
+import router from "@/index/router";
+import Logo from "@/shared/components/Logo";
+import LogoText from "@/shared/components/LogoText";
+import Storage from "@/shared/mixins/Storage";
+import AlertHelper from "@/shared/mixins/AlertHelper";
 
 export default {
   name: "Welcome",
