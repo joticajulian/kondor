@@ -21,7 +21,6 @@ export default {
       balance: "loading...",
       signer: null,
       provider: null,
-      koinSerializer: null,
       koinContract: null,
       koin: null,
       numErrors: 0,
@@ -41,30 +40,23 @@ export default {
           this.numErrors += 1;
           return this.numErrors > 20;
         };
+
         this.signer = Signer.fromWif(this.$store.state.privateKey);
         this.signer.provider = this.provider;
-        this.signer.serializer = {
-          serialize: async (...args) => {
-            return this.sendSandbox("serializeTx", args);
-          },
-          deserialize: async (...args) => {
-            return this.sendSandbox("deserializeTx", args);
-          },
-        };
-        this.koinSerializer = {
-          serialize: async (...args) => {
-            return this.sendSandbox("serialize", args);
-          },
-          deserialize: async (...args) => {
-            return this.sendSandbox("deserialize", args);
-          },
-        };
-        await this.sendSandbox("setTypes", utils.Krc20Abi.types);
+        this.signer.serializer = await this.newSandboxSerializer(
+          utils.ProtocolTypes,
+          {
+            defaultTypeName: "active_transaction_data",
+            bytesConversion: false,
+          }
+        );
+        this.address = this.signer.getAddress();
+
         this.koinContract = new Contract({
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
           abi: utils.Krc20Abi,
           signer: this.signer,
-          serializer: this.koinSerializer,
+          serializer: await this.newSandboxSerializer(utils.Krc20Abi.types),
         });
         this.koinContract.abi.methods.balanceOf.preformatInput = (owner) => ({
           owner,
@@ -72,12 +64,11 @@ export default {
         this.koinContract.abi.methods.balanceOf.preformatOutput = (res) =>
           utils.formatUnits(res.value, 8);
         this.koinContract.abi.methods.transfer.preformatInput = (input) => ({
-          from: this.signer.getAddress(),
+          from: this.address,
           to: input.to,
           value: utils.parseUnits(input.value, 8),
         });
         this.koin = this.koinContract.functions;
-        this.address = this.signer.getAddress();
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
@@ -109,7 +100,7 @@ export default {
           console.log("firing interval");
           this.loadBalance();
         }, 2000);
-        const blockNumber = await transactionResponse.wait("byBlock");
+        const blockNumber = await transactionResponse.wait();
         clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
