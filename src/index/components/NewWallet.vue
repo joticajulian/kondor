@@ -30,6 +30,7 @@ export default {
   mixins: [AlertHelper],
   methods: {
     async importPrivateKey() {
+      this.alertClose();
       router.push("/importPrivateKey");
     },
 

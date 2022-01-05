@@ -26,6 +26,8 @@ export default {
       this.$store.state.alertShow = true;
     },
     alertClose() {
+      this.$store.state.alertType = "";
+      this.$store.state.alertMessage = "";
       this.$store.state.alertShow = false;
     },
   },

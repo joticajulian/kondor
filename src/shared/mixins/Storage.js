@@ -17,20 +17,13 @@ function toHexString(buffer) {
 export default {
   name: "Storage mixin",
 
-  data: function () {
-    return {
-      testAccounts: "",
-      testData: {},
-    };
-  },
-
   methods: {
     async readStorage(keys) {
       if (process.env.VUE_APP_ENV === "test") {
         const result = {};
         keys.forEach((k) => {
-          if (typeof this.testData[k] !== "undefined")
-            result[k] = this.testData[k];
+          if (typeof this.$store.state.testData[k] !== "undefined")
+            result[k] = this.$store.state.testData[k];
         });
         if (Object.keys(result).length === 0) return null;
         return result;
@@ -45,7 +38,7 @@ export default {
 
     async writeStorage(data) {
       if (process.env.VUE_APP_ENV === "test") {
-        Object.assign(this.testData, data);
+        Object.assign(this.$store.state.testData, data);
         return;
       }
       return new Promise((resolve) => {
@@ -80,7 +73,6 @@ export default {
     },
 
     async setRpcNode(rpcNode) {
-      //if (process.env.VUE_APP_ENV === 'test') return;
       await this.writeStorage({ rpcNode });
     },
 
@@ -147,15 +139,30 @@ export default {
     async decrypt(encrypted, password) {
       const { salt, iv } = await this.getOptsEncryption();
       const key = await this.getKey(password, salt);
-      const bufferEncrypted = toUint8Array(encrypted);
+      let bufferEncrypted;
+      try {
+        bufferEncrypted = toUint8Array(encrypted);
+      } catch (error) {
+        throw new Error(`Invalid encryted value (${encrypted})`);
+      }
 
-      const decrypted = await window.crypto.subtle.decrypt(
-        { name: "AES-GCM", iv },
-        key,
-        bufferEncrypted
-      );
-      const message = new TextDecoder().decode(decrypted);
-      return JSON.parse(message);
+      let decrypted;
+      try {
+        decrypted = await window.crypto.subtle.decrypt(
+          { name: "AES-GCM", iv },
+          key,
+          bufferEncrypted
+        );
+      } catch (error) {
+        throw new Error("Invalid password");
+      }
+
+      try {
+        const message = new TextDecoder().decode(decrypted);
+        return JSON.parse(message);
+      } catch (error) {
+        throw new Error("Decrypted value cannot be decoded and parsed to JSON");
+      }
     },
   },
 };

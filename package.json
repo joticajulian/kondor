@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "node manifest.js && vue-cli-service build",
+    "build": "node manifest.js && vue-cli-service build --mode production",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {

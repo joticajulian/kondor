@@ -11,7 +11,17 @@ import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+  data() {
+    return {
+      rpcNode: "",
+    };
+  },
   mixins: [Storage, AlertHelper],
+  mounted() {
+    (async () => {
+      this.rpcNode = await this.getRpcNode();
+    })();
+  },
   methods: {
     async set() {
       try {

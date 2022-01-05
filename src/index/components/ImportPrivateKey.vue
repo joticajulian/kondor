@@ -49,6 +49,7 @@ export default {
         );
         await this.setAccounts(enc);
         this.$store.state.privateKey = this.privateKey;
+        this.alertClose();
         router.push("/dashboard");
       } catch (error) {
         this.alertDanger(error.message);
