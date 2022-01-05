@@ -2,31 +2,22 @@
   <body>
     <script src="koinos.js"></script>
     <script>
-      let serializer;
-      const serializerTx = new Serializer(utils.ProtocolTypes, {
-        defaultTypeName: "active_transaction_data",
-        bytesConversion: false,
-      });
-
+      const serializers = {};
       window.addEventListener("message", async function (event) {
         const { command, id, args } = event.data;
+        const { serId, serArgs } = args;
         let result = 0;
+
         try {
           switch (command) {
-            case "setTypes":
-              serializer = new Serializer(args);
+            case "newSerializer":
+              serializers[serId] = new Serializer(...serArgs);
               break;
             case "serialize":
-              result = await serializer.serialize(...args);
+              result = await serializers[serId].serialize(...serArgs);
               break;
             case "deserialize":
-              result = await serializer.deserialize(...args);
-              break;
-            case "serializeTx":
-              result = await serializerTx.serialize(...args);
-              break;
-            case "deserializeTx":
-              result = await serializerTx.deserialize(...args);
+              result = await serializers[serId].deserialize(...serArgs);
               break;
             default:
               break;
