@@ -9,6 +9,7 @@ export default new Vuex.Store({
     alertShow: false,
     alertMessage: "",
     alertType: "",
+    testData: {},
   },
   mutations: {},
   actions: {},

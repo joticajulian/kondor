@@ -12,8 +12,6 @@ body {
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 500px;
-  width: 309px;
   font-family: "Urbanist", sans-serif;
   background-color: var(--secondary-color);
   color: var(--primary-color);
