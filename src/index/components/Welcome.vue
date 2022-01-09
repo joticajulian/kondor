@@ -18,6 +18,7 @@ import Logo from "@/shared/components/Logo";
 import LogoText from "@/shared/components/LogoText";
 import Storage from "@/shared/mixins/Storage";
 import AlertHelper from "@/shared/mixins/AlertHelper";
+import Message from "@/shared/mixins/Message";
 
 export default {
   name: "Welcome",
@@ -27,7 +28,7 @@ export default {
       password: "",
     };
   },
-  mixins: [Storage, AlertHelper],
+  mixins: [Storage, AlertHelper, Message],
 
   components: { Logo, LogoText },
 

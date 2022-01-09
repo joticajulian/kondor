@@ -7,6 +7,9 @@ const manifest = {
   version: packageJson.version,
   manifest_version: 3,
   permissions: ["storage"],
+  background: {
+    service_worker: "js/background.js",
+  },
   content_scripts: [
     {
       matches: ["https://*/*", "http://*/*"],
