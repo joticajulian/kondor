@@ -1,3 +1,7 @@
+/**
+ * This webpack config is used apart from Vue to create
+ * another set of files that don't have an UI
+ */
 const path = require("path");
 
 module.exports = {
@@ -7,7 +11,7 @@ module.exports = {
   },
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "dist/js"),
+    path: path.resolve(__dirname, "public/js"),
   },
   resolve: {
     extensions: [".ts", ".js"],
