@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "node manifest.js && vue-cli-service build --mode production",
+    "build:ts": "rimraf lib && tsc",
+    "build:webpack": "webpack --mode=production --config webpack.config.js",
+    "build:vue": "node manifest.js && vue-cli-service build --mode production",
+    "build": "yarn build:ts && yarn build:webpack && yarn build:vue",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -31,6 +34,7 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0",
     "fastify": "^3.25.2",
+    "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",
     "typescript": "^4.5.4",
     "webpack-cli": "^4.9.1"

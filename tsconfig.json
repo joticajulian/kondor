@@ -15,8 +15,8 @@
     "declaration": true,
     "skipLibCheck": true,
     "target": "ES2019",
-    "module": "CommonJS",
+    "module": "ES6",
     "outDir": "lib"
   },
-  "include": ["src/**/*.ts"]
+  "files": ["src/ts/Messenger.ts"],
 }

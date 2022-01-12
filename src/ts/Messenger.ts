@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 interface Message {
   id: number;
   data?: {
