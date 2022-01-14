@@ -19,6 +19,9 @@ export default {
           router.push("/dashboard");
           return "ok";
         }
+        case "sendTransaction": {
+          return "ok";
+        }
         default:
           return undefined;
       }
