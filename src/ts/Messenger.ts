@@ -2,10 +2,12 @@
 
 interface Message {
   id: number;
-  data?: {
-    command?: string;
-    [x: string]: unknown;
-  } | unknown;
+  data?:
+    | {
+        command?: string;
+        [x: string]: unknown;
+      }
+    | unknown;
   error?: Error;
 }
 
@@ -29,6 +31,11 @@ declare const chrome: {
   };
   windows: {
     create: (opts: unknown, callback: () => void) => void;
+  };
+  storage: {
+    local: {
+      get: (keys: string[], callback: (result: unknown) => void) => void;
+    };
   };
 };
 
@@ -81,7 +88,10 @@ export default class Messenger {
     });
   }
 
-  async sendMessage(to: number | string, data: unknown): Promise<unknown> {
+  async sendMessage<T = unknown>(
+    to: number | string,
+    data: unknown
+  ): Promise<T> {
     const id = Math.round(Math.random() * 10000);
     this.msgPool.push({ id });
 
@@ -99,7 +109,7 @@ export default class Messenger {
     }
     const [msgResp] = this.msgPool.splice(i, 1);
     if (msgResp.error) throw msgResp.error;
-    return msgResp.response;
+    return msgResp.response as T;
   }
 }
 
