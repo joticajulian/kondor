@@ -27,27 +27,47 @@ declare const window: {
 };
 
 let popupLoaded = false;
-const messenger = new Messenger(async (request) => {
-  const { data } = request;
-  const { command } = data as { command: string };
-  switch (command) {
-    case "popupLoaded": {
-      popupLoaded = true;
-      return "ok";
+const messenger: Messenger = new Messenger({
+  onExtensionRequest: async (message) => {
+    console.log("content command extension: " + message.command);
+    const { command } = message;
+    switch (command) {
+      case "popupLoaded": {
+        popupLoaded = true;
+        return "ok";
+      }
+      default:
+        return undefined;
     }
-    default:
-      return undefined;
-  }
+  },
+  onDomRequest: async (event) => {
+    console.log("content command dom: " + event.data.command);
+    const { command, args } = event.data;
+    switch (command) {
+      case "sendTransaction": {
+        return messenger.sendExtensionMessage(
+          "extension",
+          "sendTransaction",
+          args
+        );
+      }
+      default:
+        return undefined;
+    }
+  },
 });
 
 (async () => {
-  await messenger.sendMessage("extension", {
-    command: "openPopup",
-  });
+  const a = await messenger.sendExtensionMessage("extension", "openPopup");
+  console.log("reponse openup");
+  console.log(a);
   while (!popupLoaded) await new Promise((r) => setTimeout(r, 20));
-  const response2 = await messenger.sendMessage("extension", {
-    command: "newWallet",
-  });
+  console.log("popup loaded");
+  const response2 = await messenger.sendExtensionMessage(
+    "extension",
+    "newWallet"
+  );
+  console.log("response newWallet");
   console.log(response2);
 })();
 
@@ -65,28 +85,3 @@ const messenger = new Messenger(async (request) => {
   if (!result) throw new Error("rpcNode can not be read from the storage");
   return result.rpcNode;
 }; */
-
-window.addEventListener("message", async function (event) {
-  const { command, id, args } = event.data;
-  let result = 0;
-
-  try {
-    switch (command) {
-      case "sendTransaction": {
-        const { tx, abis } = args as { tx: unknown; abis: unknown };
-        result = await messenger.sendMessage("extension", {
-          command: "sendTransaction",
-          tx,
-          abis,
-        });
-        break;
-      }
-      default:
-        break;
-    }
-    window.postMessage({ id, result }, "*");
-  } catch (error) {
-    console.error(error);
-    window.postMessage({ id, error }, "*");
-  }
-});

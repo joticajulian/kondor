@@ -11,33 +11,37 @@ export default {
   },
 
   created() {
-    this.messenger = new Messenger(async (request) => {
-      const { data } = request;
-      const { command } = data;
-      switch (command) {
-        case "newWallet": {
-          router.push("/dashboard");
-          return "ok";
+    this.messenger = new Messenger({
+      onExtensionRequest: async (message) => {
+        console.log("vue command extension: " + message.command);
+        const { command, args } = message;
+        switch (command) {
+          case "newWallet": {
+            router.push("/dashboard");
+            return "ok";
+          }
+          case "sendTransaction": {
+            return "transaction sent: " + JSON.stringify(args);
+          }
+          default:
+            return undefined;
         }
-        case "sendTransaction": {
-          return "ok";
-        }
-        default:
-          return undefined;
-      }
+      },
     });
 
     (async () => {
       console.log("asking to bg the tabId");
-      const tabId = await this.messenger.sendMessage("extension", {
-        command: "getTab",
-      });
+      const tabId = await this.messenger.sendExtensionMessage(
+        "extension",
+        "getTab"
+      );
       console.log("resp background");
       console.log(tabId);
       console.log("sending message popupLoaded to webpage");
-      const response2 = await this.messenger.sendMessage(tabId, {
-        command: "popupLoaded",
-      });
+      const response2 = await this.messenger.sendExtensionMessage(
+        tabId,
+        "popupLoaded"
+      );
       console.log("resp tab");
       console.log(response2);
     })();
