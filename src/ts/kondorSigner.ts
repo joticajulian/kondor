@@ -1,4 +1,5 @@
 import { SignerInterface } from "koilib";
+import { Messenger } from "./Messenger";
 import {
   Abi,
   ActiveTransactionData,
@@ -6,63 +7,7 @@ import {
   TransactionJson,
 } from "koilib/lib/interface";
 
-interface Event {
-  data: {
-    command: string;
-    id: number;
-    args: unknown;
-    result?: unknown;
-    error?: unknown;
-  };
-  source: {
-    postMessage: (data: unknown, target: string) => void;
-  };
-  origin: string;
-}
-
-declare const window: {
-  addEventListener: (what: string, listener: (event: Event) => unknown) => void;
-  removeEventListener: (
-    what: string,
-    listener: (event: Event) => unknown
-  ) => void;
-  postMessage: (data: unknown, target: string) => void;
-  [x: string]: unknown;
-};
-
-async function sendMessage<T = unknown>(
-  command: string,
-  args: unknown
-): Promise<T> {
-  const reqId = Math.round(Math.random() * 10000);
-  return new Promise((resolve: (result: T) => void, reject) => {
-    // prepare the listener
-    const listener = (event: Event) => {
-      const { id, command, result, error } = event.data;
-
-      // reject different ids and the request with the same id
-      if (id !== reqId || command) return;
-
-      // send response
-      if (error) reject(error);
-      else resolve(result as T);
-      window.removeEventListener("message", listener);
-    };
-
-    // listen
-    window.addEventListener("message", listener);
-
-    // send request
-    window.postMessage(
-      {
-        id: reqId,
-        command,
-        args,
-      },
-      "*"
-    );
-  });
-}
+const messenger = new Messenger({});
 
 export const signer: SignerInterface = {
   getAddress: (): string => {
@@ -86,7 +31,7 @@ export const signer: SignerInterface = {
     tx: TransactionJson,
     abis?: Record<string, Abi>
   ): Promise<SendTransactionResponse> => {
-    return sendMessage("sendTransaction", { tx, abis });
+    return messenger.sendDomMessage("sendTransaction", { tx, abis });
   },
 };
 
