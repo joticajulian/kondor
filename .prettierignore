@@ -2,3 +2,6 @@ vendor
 node_modules
 local
 dist
+lib
+public/js
+public/manifest.json

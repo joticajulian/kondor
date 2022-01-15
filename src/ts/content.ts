@@ -2,21 +2,27 @@
 // import { Abi, ActiveTransactionData, SendTransactionResponse, TransactionJson } from "koilib/lib/interface";
 import { Messenger } from "./Messenger";
 
+interface Event {
+  data: {
+    command: string;
+    id: number;
+    args: unknown;
+    result?: unknown;
+    error?: unknown;
+  };
+  source: {
+    postMessage: (data: unknown, target: string) => void;
+  };
+  origin: string;
+}
+
 declare const window: {
-  addEventListener: (
+  addEventListener: (what: string, listener: (event: Event) => unknown) => void;
+  removeEventListener: (
     what: string,
-    listener: (event: {
-      data: {
-        command: string;
-        id: number;
-        args: unknown;
-      };
-      source: {
-        postMessage: (data: unknown, target: string) => void;
-      };
-      origin: string;
-    }) => unknown
+    listener: (event: Event) => unknown
   ) => void;
+  postMessage: (data: unknown, target: string) => void;
   [x: string]: unknown;
 };
 
@@ -35,19 +41,13 @@ const messenger = new Messenger(async (request) => {
 });
 
 (async () => {
-  console.log("calling bg to openPopup");
-  const response1 = await messenger.sendMessage("extension", {
+  await messenger.sendMessage("extension", {
     command: "openPopup",
   });
-  console.log("response from bg");
-  console.log(response1);
   while (!popupLoaded) await new Promise((r) => setTimeout(r, 20));
-  console.log("popup uploaded");
-  console.log("sending a message to the popup");
   const response2 = await messenger.sendMessage("extension", {
     command: "newWallet",
   });
-  console.log("response from extension");
   console.log(response2);
 })();
 
@@ -84,9 +84,9 @@ window.addEventListener("message", async function (event) {
       default:
         break;
     }
-    event.source.postMessage({ id, result }, event.origin);
+    window.postMessage({ id, result }, "*");
   } catch (error) {
     console.error(error);
-    event.source.postMessage({ id, error }, event.origin);
+    window.postMessage({ id, error }, "*");
   }
 });
