@@ -38,8 +38,12 @@ async function sendMessage<T = unknown>(
   return new Promise((resolve: (result: T) => void, reject) => {
     // prepare the listener
     const listener = (event: Event) => {
-      const { id, result, error } = event.data;
-      if (id !== reqId) return;
+      const { id, command, result, error } = event.data;
+
+      // reject different ids and the request with the same id
+      if (id !== reqId || command) return;
+
+      // send response
       if (error) reject(error);
       else resolve(result as T);
       window.removeEventListener("message", listener);
