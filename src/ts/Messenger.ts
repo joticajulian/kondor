@@ -80,11 +80,10 @@ export default class Messenger {
 
     if (opts.onExtensionRequest) {
       this.onExtensionRequest = opts.onExtensionRequest;
-      chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
-        const { id } = data;
-        sendResponse();
-
-        (async () => {
+      chrome.runtime.onMessage.addListener(
+        async (data, sender, sendResponse) => {
+          sendResponse();
+          const { id } = data;
           let message: Message = { id };
           try {
             const result = await this.onExtensionRequest!(data, sender);
@@ -100,8 +99,8 @@ export default class Messenger {
             return;
           }
           chrome.runtime.sendMessage(message);
-        })();
-      });
+        }
+      );
     }
 
     if (opts.onDomRequest) {
@@ -164,7 +163,7 @@ export default class Messenger {
     const reqId = Math.round(Math.random() * 10000);
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
-      const listener: extensionListener = (data, sender, sendResponse) => {
+      const listener: extensionListener = (data, _sender, sendResponse) => {
         const { id, command, result, error } = data;
         sendResponse();
 
@@ -175,7 +174,6 @@ export default class Messenger {
         if (error) reject(error);
         else resolve(result as T);
         chrome.runtime.onMessage.removeListener(listener);
-        if (sender) console.log(sender);
       };
 
       // listen
