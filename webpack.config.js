@@ -8,7 +8,7 @@ module.exports = {
   entry: {
     background: "./src/ts/background.ts",
     content: "./src/ts/content.ts",
-    kondorSigner: "./src/ts/kondorSigner.ts",
+    kondorIndex: "./src/ts/kondorIndex.ts",
   },
   output: {
     filename: "[name].js",

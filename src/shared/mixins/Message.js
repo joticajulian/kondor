@@ -20,7 +20,7 @@ export default {
             router.push("/dashboard");
             return "ok";
           }
-          case "sendTransaction": {
+          case "signer:sendTransaction": {
             return "transaction sent: " + JSON.stringify(args);
           }
           default:

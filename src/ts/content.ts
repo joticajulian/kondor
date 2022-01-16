@@ -1,5 +1,3 @@
-// import { Provider, SignerInterface } from "koilib";
-// import { Abi, ActiveTransactionData, SendTransactionResponse, TransactionJson } from "koilib/lib/interface";
 import { Messenger } from "./Messenger";
 
 interface Event {
@@ -26,6 +24,21 @@ declare const window: {
   [x: string]: unknown;
 };
 
+const allowedCommands = [
+  "signer:sendTransaction",
+  "provider:call",
+  "provider:getNonce",
+  "provider:getAccountRc",
+  "provider:getTransactionsById",
+  "provider:getBlocksById",
+  "provider:getHeadInfo",
+  "provider:getBlocks",
+  "provider:getBlock",
+  "provider:sendTransaction",
+  "provider:wait",
+  "provider:readContract",
+];
+
 let popupLoaded = false;
 const messenger: Messenger = new Messenger({
   onExtensionRequest: async (message) => {
@@ -43,17 +56,10 @@ const messenger: Messenger = new Messenger({
   onDomRequest: async (event) => {
     console.log("content command dom: " + event.data.command);
     const { command, args } = event.data;
-    switch (command) {
-      case "sendTransaction": {
-        return messenger.sendExtensionMessage(
-          "extension",
-          "sendTransaction",
-          args
-        );
-      }
-      default:
-        return undefined;
+    if (allowedCommands.includes(command!)) {
+      return messenger.sendExtensionMessage("extension", command!, args);
     }
+    return undefined;
   },
 });
 

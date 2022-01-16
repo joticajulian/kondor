@@ -27,11 +27,26 @@ export const signer: SignerInterface = {
   decodeTransaction: (): Promise<ActiveTransactionData> => {
     throw new Error("decodeTransaction is not available");
   },
-  sendTransaction: (
+  sendTransaction: async (
     tx: TransactionJson,
     abis?: Record<string, Abi>
   ): Promise<SendTransactionResponse> => {
-    return messenger.sendDomMessage("sendTransaction", { tx, abis });
+    const txId = await messenger.sendDomMessage("signer:sendTransaction", {
+      tx,
+      abis,
+    });
+    return {
+      wait: async (
+        type: "byTransactionId" | "byBlock" = "byBlock",
+        timeout = 30000
+      ) => {
+        return messenger.sendDomMessage("provider:wait", {
+          txId,
+          type,
+          timeout,
+        });
+      },
+    };
   },
 };
 
