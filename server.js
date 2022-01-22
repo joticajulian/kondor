@@ -1,4 +1,5 @@
 const fastify = require("fastify")({ logger: true });
+const path = require("path");
 const axios = require("axios");
 
 // proxy jsonrpc to avoid cors issues
@@ -12,6 +13,11 @@ fastify.options("/jsonrpc", async (req, reply) => {
   );
   reply.header("Access-Control-Allow-Methods", "POST, OPTIONS");
   reply.send({});
+});
+
+fastify.register(require("fastify-static"), {
+  root: path.join(__dirname, "public"),
+  prefix: "/public/", // optional: default '/'
 });
 
 fastify.post("/jsonrpc", async (req, reply) => {

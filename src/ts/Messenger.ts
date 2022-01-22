@@ -6,16 +6,22 @@ interface Sender {
   };
 }
 
-interface Message {
+interface MessageRequest {
   id: number;
-  command?: string;
-  args?: unknown;
+  command: string;
+  args: unknown;
+}
+
+interface MessageResponse {
+  id: number;
   result?: unknown;
   error?: unknown;
 }
 
-interface Event {
-  data: Message;
+type Message = MessageRequest | MessageResponse;
+
+interface Event<T = Message> {
+  data: T;
   source: {
     postMessage: (data: unknown, target: string) => void;
   };
@@ -23,11 +29,11 @@ interface Event {
 }
 
 type OnExtensionRequest = (
-  message: Message,
+  message: MessageRequest,
   sender?: Sender
 ) => Promise<unknown>;
 
-type OnDomRequest = (event: Event) => Promise<unknown>;
+type OnDomRequest = (event: Event<MessageRequest>) => Promise<unknown>;
 
 type extensionListener = (
   request: Message,
@@ -83,10 +89,16 @@ export default class Messenger {
       chrome.runtime.onMessage.addListener(
         async (data, sender, sendResponse) => {
           sendResponse();
-          const { id } = data;
-          let message: Message = { id };
+          const { id, command } = data as MessageRequest;
+          // check if it is a MessageRequest
+          if (!command) return;
+
+          let message: MessageResponse = { id };
           try {
-            const result = await this.onExtensionRequest!(data, sender);
+            const result = await this.onExtensionRequest!(
+              data as MessageRequest,
+              sender
+            );
             message.result = result;
           } catch (err) {
             message.error = err as Error;
@@ -106,10 +118,15 @@ export default class Messenger {
     if (opts.onDomRequest) {
       this.onDomRequest = opts.onDomRequest;
       window.addEventListener("message", async (event) => {
-        const { id } = event.data;
-        let message: Message = { id };
+        const { id, command } = event.data as MessageRequest;
+        // check if it is a MessageRequest
+        if (!command) return;
+
+        let message: MessageResponse = { id };
         try {
-          const result = await this.onDomRequest!(event);
+          const result = await this.onDomRequest!(
+            event as Event<MessageRequest>
+          );
           message.result = result;
         } catch (err) {
           message.error = err as Error;
@@ -129,10 +146,13 @@ export default class Messenger {
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
       const listener = (event: Event) => {
-        const { id, command, result, error } = (event as Event).data;
+        // ignore requests
+        if ((event as Event<MessageRequest>).data.command) return;
 
-        // reject different ids and the request with the same id
-        if (id !== reqId || command) return;
+        const { id, result, error } = (event as Event<MessageResponse>).data;
+
+        // ignore different ids
+        if (id !== reqId) return;
 
         // send response
         if (error) reject(error);
@@ -164,11 +184,15 @@ export default class Messenger {
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
       const listener: extensionListener = (data, _sender, sendResponse) => {
-        const { id, command, result, error } = data;
         sendResponse();
 
-        // reject different ids and the request with the same id
-        if (id !== reqId || command) return;
+        // ignore requests
+        if ((data as MessageRequest).command) return;
+
+        const { id, result, error } = data as MessageResponse;
+
+        // ignore different ids
+        if (id !== reqId) return;
 
         // send response
         if (error) reject(error);

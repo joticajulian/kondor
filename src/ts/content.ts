@@ -57,12 +57,12 @@ const messenger: Messenger = new Messenger({
     console.log("content command dom: " + event.data.command);
     const { command, args } = event.data;
     if (allowedCommands.includes(command!)) {
-      return messenger.sendExtensionMessage("extension", command!, args);
+      return messenger.sendExtensionMessage("extension", command, args);
     }
     return undefined;
   },
 });
-
+/*
 (async () => {
   const a = await messenger.sendExtensionMessage("extension", "openPopup");
   console.log("reponse openup");
@@ -76,18 +76,4 @@ const messenger: Messenger = new Messenger({
   console.log("response newWallet");
   console.log(response2);
 })();
-
-/* function readStorage(keys: string[]) {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(keys, function (result) {
-      if (Object.keys(result).length === 0) resolve(null);
-      else resolve(result);
-    });
-  });
-}; */
-
-/* async function getRpcNode() {
-  let result = (await readStorage(["rpcNode"])) as { rpcNode: string };
-  if (!result) throw new Error("rpcNode can not be read from the storage");
-  return result.rpcNode;
-}; */
+*/

@@ -1,10 +1,24 @@
+import { Provider } from "koilib/lib/browser";
+import {
+  CallContractOperationJson,
+  TransactionJson,
+} from "koilib/lib/interface";
 import { Messenger } from "./Messenger";
+import * as storage from "./storage";
 
 let tabIdRequester: number | undefined;
+
 new Messenger({
   onExtensionRequest: async (message, sender) => {
     console.log("background command extension: " + message.command);
-    const { command } = message;
+    const { command, args } = message;
+
+    let provider = new Provider([]);
+    if (command.startsWith("provider")) {
+      const rpcNodes = await storage.getRpcNodes();
+      provider = new Provider(rpcNodes);
+    }
+
     switch (command) {
       case "openPopup": {
         if (!sender || !sender.tab)
@@ -26,6 +40,52 @@ new Messenger({
       }
       case "getTab": {
         return tabIdRequester;
+      }
+      case "provider:call": {
+        const { method, params } = args as { method: string; params: unknown };
+        return provider.call(method, params);
+      }
+      case "provider:getNonce": {
+        const { account } = args as { account: string };
+        return provider.getNonce(account);
+      }
+      case "provider:getAccountRc": {
+        const { account } = args as { account: string };
+        return provider.getAccountRc(account);
+      }
+      case "provider:getTransactionsById": {
+        const { transactionIds } = args as { transactionIds: string[] };
+        return provider.getTransactionsById(transactionIds);
+      }
+      case "provider:getBlocksById": {
+        const { blockIds } = args as { blockIds: string[] };
+        return provider.getBlocksById(blockIds);
+      }
+      case "provider:getHeadInfo": {
+        return provider.getHeadInfo();
+      }
+      case "provider:getBlocks": {
+        const { height, numBlocks, idRef } = args as {
+          height: number;
+          numBlocks?: number;
+          idRef?: string;
+        };
+        return provider.getBlocks(height, numBlocks, idRef);
+      }
+      case "provider:getBlock": {
+        const { height } = args as { height: number };
+        return provider.getBlock(height);
+      }
+      case "provider:sendTransaction": {
+        const { transaction } = args as { transaction: TransactionJson };
+        return provider.sendTransaction(transaction);
+      }
+      /* case "provider:wait": {
+        return provider.wait(...args);
+      } */
+      case "provider:readContract": {
+        const { operation } = args as { operation: CallContractOperationJson };
+        return provider.readContract(operation);
       }
       default:
         return undefined;

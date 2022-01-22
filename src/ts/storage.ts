@@ -1,0 +1,38 @@
+export async function write(key: string, value: unknown): Promise<void> {
+  return new Promise((resolve) => {
+    const data: { [x: string]: unknown } = {};
+    data[key] = value;
+    chrome.storage.local.set(data, function () {
+      resolve();
+    });
+  });
+}
+
+export async function read<T = unknown>(
+  key: string,
+  strict = true
+): Promise<T | undefined> {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get([key], function (result) {
+      if (Object.keys(result).length !== 0) return resolve(result[key] as T);
+      if (strict) return reject(new Error(`${key} not found, it is undefined`));
+      return resolve(undefined);
+    });
+  });
+}
+
+export async function setAccounts(encrypted: string): Promise<void> {
+  return write("accounts", encrypted);
+}
+
+export async function getAccounts(strict = true): Promise<string> {
+  return read("accounts", strict) as Promise<string>;
+}
+
+export async function setRpcNodes(rpcNodes: string[]): Promise<void> {
+  return write("rpcNodes", rpcNodes);
+}
+
+export async function getRpcNodes(strict = true): Promise<string[]> {
+  return read("rpcNodes", strict) as Promise<string[]>;
+}
