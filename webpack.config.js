@@ -23,4 +23,7 @@ module.exports = {
   optimization: {
     minimize: false,
   },
+  externals: {
+    "cross-fetch": "fetch",
+  },
 };
