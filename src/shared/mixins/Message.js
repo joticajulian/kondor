@@ -12,8 +12,7 @@ export default {
 
   created() {
     this.messenger = new Messenger({
-      onExtensionRequest: async (message) => {
-        console.log("vue command extension: " + message.command);
+      onExtensionRequest: async (message, id, sender) => {
         const { command, args } = message;
         switch (command) {
           case "newWallet": {
@@ -21,7 +20,20 @@ export default {
             return "ok";
           }
           case "signer:sendTransaction": {
-            return "transaction sent: " + JSON.stringify(args);
+            this.$store.state.requests.push({
+              id,
+              command,
+              args,
+              sender,
+            });
+            router.push("/sendTransaction");
+
+            /**
+             * _derived:true is returned to not send a response
+             * yet (see Messenger.ts). The /sendTransaction view
+             * will take care of the response
+             */
+            return { _derived: true };
           }
           default:
             return undefined;
