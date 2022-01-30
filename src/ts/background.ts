@@ -9,7 +9,7 @@ import * as storage from "./storage";
 let tabIdRequester: number | undefined;
 
 new Messenger({
-  onExtensionRequest: async (message, sender) => {
+  onExtensionRequest: async (message, id, sender) => {
     console.log("background command extension: " + message.command);
     const { command, args } = message;
 

@@ -30,10 +30,14 @@ interface Event<T = Message> {
 
 type OnExtensionRequest = (
   message: MessageRequest,
+  id: number,
   sender?: Sender
-) => Promise<unknown>;
+) => Promise<unknown | { _derived: boolean }>;
 
-type OnDomRequest = (event: Event<MessageRequest>) => Promise<unknown>;
+type OnDomRequest = (
+  event: Event<MessageRequest>,
+  id: number
+) => Promise<unknown | { derived: boolean }>;
 
 type extensionListener = (
   request: Message,
@@ -81,8 +85,8 @@ export default class Messenger {
     onDomRequest?: OnDomRequest;
     onExtensionRequest?: OnExtensionRequest;
   }) {
-    this.onExtensionRequest = async () => {};
-    this.onDomRequest = async () => {};
+    this.onExtensionRequest = async () => ({});
+    this.onDomRequest = async () => ({});
 
     if (opts.onExtensionRequest) {
       this.onExtensionRequest = opts.onExtensionRequest;
@@ -97,8 +101,17 @@ export default class Messenger {
           try {
             const result = await this.onExtensionRequest!(
               data as MessageRequest,
+              id,
               sender
             );
+
+            // check if other process will send the response
+            if (
+              typeof result === "object" &&
+              (result as { _derived: boolean })._derived
+            )
+              return;
+
             message.result = result;
           } catch (err) {
             message.error = err as Error;
@@ -125,8 +138,17 @@ export default class Messenger {
         let message: MessageResponse = { id };
         try {
           const result = await this.onDomRequest!(
-            event as Event<MessageRequest>
+            event as Event<MessageRequest>,
+            id
           );
+
+          // check if other process will send the response
+          if (
+            typeof result === "object" &&
+            (result as { _derived: boolean })._derived
+          )
+            return;
+
           message.result = result;
         } catch (err) {
           message.error = err as Error;
@@ -135,6 +157,18 @@ export default class Messenger {
         if (typeof message.result === "undefined" && !message.error) return;
         window.postMessage(message, "*");
       });
+    }
+  }
+
+  sendResponse(
+    type: "dom" | "extension",
+    message: MessageResponse,
+    sender?: Sender
+  ): void {
+    if (type === "dom") window.postMessage(message, "*");
+    else {
+      if (sender && sender.tab) chrome.tabs.sendMessage(sender.tab.id, message);
+      else chrome.runtime.sendMessage(message);
     }
   }
 
