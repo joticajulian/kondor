@@ -26,6 +26,8 @@ declare const window: {
 
 const allowedCommands = [
   "signer:sendTransaction",
+  "signer:encodeTransaction",
+  "signer:decodeTransaction",
   "provider:call",
   "provider:getNonce",
   "provider:getAccountRc",
@@ -40,6 +42,12 @@ const allowedCommands = [
 ];
 
 let popupLoaded = false;
+
+async function openPopup() {
+  await messenger.sendExtensionMessage("extension", "openPopup");
+  while (!popupLoaded) await new Promise((r) => setTimeout(r, 20));
+}
+
 const messenger: Messenger = new Messenger({
   onExtensionRequest: async (message) => {
     console.log("content command extension: " + message.command);
@@ -57,6 +65,7 @@ const messenger: Messenger = new Messenger({
     console.log("content command dom: " + event.data.command);
     const { command, args } = event.data;
     if (allowedCommands.includes(command!)) {
+      if (!popupLoaded) await openPopup();
       return messenger.sendExtensionMessage("extension", command, args);
     }
     return undefined;

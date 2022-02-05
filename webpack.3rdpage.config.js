@@ -6,12 +6,11 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    background: "./src/ts/background.ts",
-    content: "./src/ts/content.ts",
+    kondorIndex: "./src/ts/kondorIndex.ts",
   },
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "public/js"),
+    path: path.resolve(__dirname, "3rdpage/js"),
   },
   resolve: {
     extensions: [".ts", ".js"],

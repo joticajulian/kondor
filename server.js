@@ -16,8 +16,8 @@ fastify.options("/jsonrpc", async (req, reply) => {
 });
 
 fastify.register(require("fastify-static"), {
-  root: path.join(__dirname, "public"),
-  prefix: "/public/", // optional: default '/'
+  root: path.join(__dirname, "3rdpage"),
+  prefix: "/",
 });
 
 fastify.post("/jsonrpc", async (req, reply) => {

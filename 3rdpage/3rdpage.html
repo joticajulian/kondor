@@ -1,0 +1,43 @@
+<html>
+  <body>
+    <button onclick="transferKoin()">Transfer</button>
+    <script src="js/kondorIndex.js"></script>
+    <script src="js/koinos.min.js"></script>
+    <script>
+      async function main() {
+        console.log(kondor);
+        console.log("calling getHeadInfo");
+        const head = await kondor.provider.getHeadInfo();
+        console.log("result");
+        console.log(head);
+      }
+      async function transferKoin() {
+        const signer = kondor.signer;
+        const koinContract = new Contract({
+          id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+          abi: utils.Krc20Abi,
+          provider: kondor.provider,
+          signer,
+        });
+        const koin = koinContract.functions;
+
+        // Transfer
+        console.log(koinContract);
+        const { transaction, transactionResponse } = await koin.transfer({
+          from: "172AB1FgCsYrRAW5cwQ8KjadgxofvgPFd6",
+          to: "172AB1FgCsYrRAW5cwQ8KjadgxofvgPFd6",
+          value: "100001", // utils.parseUnits("10.0001", 8),
+        });
+        console.log(`Transaction id ${transaction.id} submitted`);
+
+        //// wait to be mined
+        //const blockNumber = await transactionResponse.wait();
+        //console.log(`Transaction mined. Block number: ${blockNumber}`);
+        //
+        //// read the balance
+        //const { result } = await koin.balanceOf(signer.getAddress());
+        //console.log(balance.result);
+      }
+    </script>
+  </body>
+</html>

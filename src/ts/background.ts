@@ -1,5 +1,6 @@
 import { Provider } from "koilib/lib/browser";
 import {
+  ActiveTransactionData,
   CallContractOperationJson,
   TransactionJson,
 } from "koilib/lib/interface";
@@ -9,6 +10,8 @@ import * as storage from "./storage";
 let tabIdRequester: number | undefined;
 
 new Messenger({
+  // eslint-disable-next-line
+  // @ts-ignore
   onExtensionRequest: async (message, id, sender) => {
     console.log("background command extension: " + message.command);
     const { command, args } = message;
