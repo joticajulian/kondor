@@ -6,7 +6,7 @@ import { Messenger } from "../../../lib/Messenger";
 
 // {0: 23, 1: 34} ==> [23, 34]
 function objToArray(obj) {
-  return Object.keys(obj).map(k => obj[k]);
+  return Object.keys(obj).map((k) => obj[k]);
 }
 
 export default {
@@ -37,14 +37,16 @@ export default {
                 bytesConversion: false,
               }
             );
-            const operations = args.activeData.operations.map(op => {
+            const operations = args.activeData.operations.map((op) => {
               if (op.call_contract) {
                 return {
                   call_contract: {
-                    contract_id: new Uint8Array(objToArray(op.call_contract.contract_id)),
+                    contract_id: new Uint8Array(
+                      objToArray(op.call_contract.contract_id)
+                    ),
                     args: new Uint8Array(objToArray(op.call_contract.args)),
-                    entry_point: op.call_contract.entry_point
-                  }
+                    entry_point: op.call_contract.entry_point,
+                  },
                 };
               }
               // TODO: other types of operations
