@@ -19,13 +19,19 @@ export const signer: SignerInterface = {
     throw new Error("getPrivateKey is not available");
   },
   signTransaction: (): Promise<TransactionJson> => {
-    throw new Error("signTransaction is not available");
+    throw new Error(
+      "signTransaction is not available. Use sendTransaction instead"
+    );
   },
-  encodeTransaction: (): Promise<TransactionJson> => {
-    throw new Error("encodeTransaction is not available");
+  encodeTransaction: async (
+    activeData: ActiveTransactionData
+  ): Promise<TransactionJson> => {
+    return messenger.sendDomMessage("signer:encodeTransaction", { activeData });
   },
-  decodeTransaction: (): Promise<ActiveTransactionData> => {
-    throw new Error("decodeTransaction is not available");
+  decodeTransaction: async (
+    tx: TransactionJson
+  ): Promise<ActiveTransactionData> => {
+    return messenger.sendDomMessage("signer:decodeTransaction", { tx });
   },
   sendTransaction: async (
     tx: TransactionJson,

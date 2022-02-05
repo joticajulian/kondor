@@ -5,6 +5,7 @@ import NewWallet from "./components/NewWallet.vue";
 import Import from "./components/Import";
 import ImportPrivateKey from "./components/ImportPrivateKey";
 import Dashboard from "./components/Dashboard.vue";
+import SendTransaction from "./components/SendTransaction.vue";
 
 Vue.use(Router);
 
@@ -34,6 +35,11 @@ export default new Router({
       path: "/dashboard",
       name: "Dashboard",
       component: Dashboard,
+    },
+    {
+      path: "/sendTransaction",
+      name: "Send Transaction",
+      component: SendTransaction,
     },
   ],
 });
