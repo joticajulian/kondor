@@ -3,6 +3,8 @@
     <div>Signature request</div>
     <div>{{ requester }}</div>
     <div>{{ data }}</div>
+    <button @click="sign">Sign</button>
+    <button @click="cancel">Cancel</button>
   </div>
 </template>
 
@@ -17,6 +19,7 @@ export default {
     return {
       data: "",
       requester: "",
+      id: -1,
     };
   },
 
@@ -43,10 +46,6 @@ export default {
       });
       const active = await signer.decodeTransaction(request.args.tx);
       const decodedOperations = [];
-      console.log("decoded tx");
-      console.log(active);
-      console.log("req");
-      console.log(request);
       for (let i = 0; i < active.operations.length; i += 1) {
         const op = active.operations[i];
         if (!op.call_contract) {
@@ -68,10 +67,27 @@ export default {
         });
       }
 
-      console.log("requester:");
-      console.log(request.sender);
       this.data = JSON.stringify(decodedOperations, null, 2);
+      this.requester = request.sender.origin;
+      this.id = request.id;
       // TODO: check nonce and limit mana
+    },
+
+    async sign() {
+      const requests = this.$store.state.requests.filter(
+        (r) =>
+          r.command === "signer:sendTransaction" &&
+          r.id === this.id &&
+          r.sender.origin === this.requester
+      );
+      const [request] = requests;
+      // TODO: throw error if there are requests.length > 1
+      const signer = Signer.fromSeed("");
+      signer.serializer = await this.newSandboxSerializer(utils.ProtocolTypes, {
+        defaultTypeName: "active_transaction_data",
+        bytesConversion: false,
+      });
+      const active = await signer.decodeTransaction(request.args.tx);
     },
   },
 };
