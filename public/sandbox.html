@@ -5,6 +5,7 @@
       const serializers = {};
       window.addEventListener("message", async function (event) {
         const { command, id, args } = event.data;
+        if (!args) return;
         const { serId, serArgs } = args;
         let result = 0;
 

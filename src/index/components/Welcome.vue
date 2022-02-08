@@ -3,8 +3,7 @@
     <Logo />
     <LogoText />
     <div v-if="hasAccounts">
-      <input type="password" v-model="password" placeholder="Password" />
-      <button @click="unlock">unlock</button>
+      <Unlock @onUnlock="unlock()" @onError="alertDanger($event.message)" />
     </div>
     <router-link to="/newWallet"
       >import using Secret Recovery Phrase</router-link
@@ -14,6 +13,7 @@
 
 <script>
 import router from "@/index/router";
+import Unlock from "@/index/components/Unlock.vue";
 import Logo from "@/shared/components/Logo";
 import LogoText from "@/shared/components/LogoText";
 import Storage from "@/shared/mixins/Storage";
@@ -30,7 +30,7 @@ export default {
   },
   mixins: [Storage, AlertHelper, Message],
 
-  components: { Logo, LogoText },
+  components: { Logo, LogoText, Unlock },
 
   mounted() {
     (async () => {
@@ -40,16 +40,8 @@ export default {
 
   methods: {
     async unlock() {
-      try {
-        const enc = await this.getAccounts();
-        const { privateKey } = await this.decrypt(enc, this.password);
-        this.$store.state.privateKey = privateKey;
-        this.alertClose();
-        router.push("/dashboard");
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
+      this.alertClose();
+      router.push("/dashboard");
     },
   },
 };

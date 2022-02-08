@@ -22,10 +22,9 @@
         const koin = koinContract.functions;
 
         // Transfer
-        console.log(koinContract);
         const { transaction, transactionResponse } = await koin.transfer({
-          from: "172AB1FgCsYrRAW5cwQ8KjadgxofvgPFd6",
-          to: "172AB1FgCsYrRAW5cwQ8KjadgxofvgPFd6",
+          from: "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
+          to: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
           value: "100001", // utils.parseUnits("10.0001", 8),
         });
         console.log(`Transaction id ${transaction.id} submitted`);

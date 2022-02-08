@@ -3,15 +3,24 @@
     <div>Signature request</div>
     <div>{{ requester }}</div>
     <div>{{ data }}</div>
-    <button @click="sign">Sign</button>
+    <div v-if="!unlocked">
+      <Unlock
+        @onUnlock="unlocked = true"
+        @onError="alertDanger($event.message)"
+      />
+    </div>
+    <button @click="sign" :disabled="!unlocked">Sign</button>
     <button @click="cancel">Cancel</button>
   </div>
 </template>
 
 <script>
-import { Signer, Contract, utils } from "koilib";
+import { Signer, Contract, Provider, utils } from "koilib";
+import Unlock from "@/index/components/Unlock.vue";
 import AlertHelper from "@/shared/mixins/AlertHelper";
+import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
+import Messenger from "../../../lib/Messenger";
 
 export default {
   name: "Send transaction",
@@ -20,10 +29,14 @@ export default {
       data: "",
       requester: "",
       id: -1,
+      unlocked: !!this.$store.state.privateKey,
+      numErrors: 0,
     };
   },
 
-  mixins: [Sandbox, AlertHelper],
+  mixins: [Storage, Sandbox, AlertHelper],
+
+  components: { Unlock },
 
   mounted() {
     const requests = this.$store.state.requests.filter(
@@ -82,12 +95,32 @@ export default {
       );
       const [request] = requests;
       // TODO: throw error if there are requests.length > 1
-      const signer = Signer.fromSeed("");
+      const rpcNode = await this.getRpcNode();
+      const provider = new Provider([rpcNode]);
+      provider.onError = () => {
+        this.numErrors += 1;
+        return this.numErrors > 20;
+      };
+      const signer = Signer.fromWif(this.$store.state.privateKey);
+      signer.provider = provider;
       signer.serializer = await this.newSandboxSerializer(utils.ProtocolTypes, {
         defaultTypeName: "active_transaction_data",
         bytesConversion: false,
       });
-      const active = await signer.decodeTransaction(request.args.tx);
+      const { operations } = await signer.decodeTransaction(request.args.tx);
+      const transaction = await signer.encodeTransaction({
+        operations,
+        rc_limit: 1e8,
+      });
+      await signer.sendTransaction(transaction);
+      new Messenger({}).sendResponse("extension", {
+        id: this.id,
+        result: transaction.id,
+      });
+    },
+
+    cancel() {
+      console.log("cancel not implemented");
     },
   },
 };
