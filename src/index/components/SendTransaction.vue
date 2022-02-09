@@ -107,16 +107,19 @@ export default {
         defaultTypeName: "active_transaction_data",
         bytesConversion: false,
       });
-      const { operations } = await signer.decodeTransaction(request.args.tx);
-      const transaction = await signer.encodeTransaction({
-        operations,
-        rc_limit: 1e8,
-      });
-      await signer.sendTransaction(transaction);
-      new Messenger({}).sendResponse("extension", {
-        id: this.id,
-        result: transaction.id,
-      });
+      let message = { id: request.id };
+      try {
+        const { operations } = await signer.decodeTransaction(request.args.tx);
+        const tx = await signer.encodeTransaction({
+          operations,
+          rc_limit: 1e8,
+        });
+        const transaction = await signer.sendTransaction(tx);
+        message.result = transaction;
+      } catch (err) {
+        message.error = err;
+      }
+      new Messenger().sendResponse("extension", message, request.sender);
     },
 
     cancel() {

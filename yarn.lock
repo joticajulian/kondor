@@ -5733,10 +5733,10 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-koilib@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-2.6.1.tgz#11fd4555aeda1efea285b8482df8e70b19826e0e"
-  integrity sha512-HFtICglM9YyEV1Fve3Y3Rf/susPViJqx7DUKYvutR/ZiGt62iRn9WCq4jjlBG5tOYEkBsWGzm6JGJtMhvlseag==
+koilib@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-2.7.0.tgz#459ed3673d9ff90e5f3c4b838c13aabaefb48d24"
+  integrity sha512-rGp1NxC0CDYe4a/YVG4h238GeHoEOtKayrchXxjbz9k6zUgWokVcKtQ5qWCMwffYcWHDSHyFMmt7d1QVqjxbXw==
   dependencies:
     "@noble/hashes" "^1.0.0"
     "@noble/secp256k1" "^1.5.0"

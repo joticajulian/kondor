@@ -2,7 +2,6 @@ import { Messenger } from "./Messenger";
 import {
   BlockJson,
   CallContractOperationJson,
-  SendTransactionResponse,
   TransactionJson,
 } from "koilib/lib/interface";
 
@@ -85,22 +84,9 @@ export const provider = {
     return messenger.sendDomMessage("provider:getBlock", { height });
   },
 
-  async sendTransaction(
-    transaction: TransactionJson
-  ): Promise<SendTransactionResponse> {
+  async sendTransaction(transaction: TransactionJson): Promise<{}> {
     await messenger.sendDomMessage("provider:sendTransaction", { transaction });
-    return {
-      wait: async (
-        type: "byTransactionId" | "byBlock" = "byBlock",
-        timeout = 30000
-      ) => {
-        return messenger.sendDomMessage("provider:wait", {
-          txId: transaction.id,
-          type,
-          timeout,
-        });
-      },
-    };
+    return {};
   },
 
   async readContract(operation: CallContractOperationJson): Promise<{
