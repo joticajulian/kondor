@@ -22,12 +22,16 @@
         const koin = koinContract.functions;
 
         // Transfer
-        const { transaction, transactionResponse } = await koin.transfer({
-          from: "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
-          to: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
-          value: "100001", // utils.parseUnits("10.0001", 8),
-        });
-        console.log(`Transaction id ${transaction.id} submitted`);
+        const /*{ transaction, transactionResponse }*/ aa = await koin.transfer(
+            {
+              from: "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
+              to: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
+              value: "100001", // utils.parseUnits("10.0001", 8),
+            }
+          );
+        //console.log(`Transaction id ${transaction.id} submitted`);
+        console.log("submitted");
+        console.log(aa);
 
         //// wait to be mined
         //const blockNumber = await transactionResponse.wait();

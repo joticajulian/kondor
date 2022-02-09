@@ -3,8 +3,8 @@ import { Messenger } from "./Messenger";
 import {
   Abi,
   ActiveTransactionData,
-  SendTransactionResponse,
   TransactionJson,
+  TransactionJsonWait,
 } from "koilib/lib/interface";
 
 const messenger = new Messenger({});
@@ -36,18 +36,22 @@ export const signer: SignerInterface = {
   sendTransaction: async (
     tx: TransactionJson,
     abis?: Record<string, Abi>
-  ): Promise<SendTransactionResponse> => {
-    const txId = await messenger.sendDomMessage("signer:sendTransaction", {
-      tx,
-      abis,
-    });
+  ): Promise<TransactionJsonWait> => {
+    const transaction = await messenger.sendDomMessage<TransactionJson>(
+      "signer:sendTransaction",
+      {
+        tx,
+        abis,
+      }
+    );
     return {
+      ...transaction,
       wait: async (
         type: "byTransactionId" | "byBlock" = "byBlock",
         timeout = 30000
       ) => {
         return messenger.sendDomMessage("provider:wait", {
-          txId,
+          txId: transaction.id,
           type,
           timeout,
         });

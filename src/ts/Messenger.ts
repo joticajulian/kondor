@@ -42,7 +42,7 @@ type OnDomRequest = (
 type extensionListener = (
   request: Message,
   sender: Sender,
-  sendResponse: () => void
+  res: () => void
 ) => void;
 
 declare const chrome: {
@@ -81,51 +81,46 @@ export default class Messenger {
 
   public onDomRequest: OnDomRequest;
 
-  constructor(opts: {
+  constructor(opts?: {
     onDomRequest?: OnDomRequest;
     onExtensionRequest?: OnExtensionRequest;
   }) {
     this.onExtensionRequest = async () => ({});
     this.onDomRequest = async () => ({});
 
+    if (!opts) return;
+
     if (opts.onExtensionRequest) {
       this.onExtensionRequest = opts.onExtensionRequest;
-      chrome.runtime.onMessage.addListener(
-        async (data, sender, sendResponse) => {
-          sendResponse();
-          const { id, command } = data as MessageRequest;
-          // check if it is a MessageRequest
-          if (!command) return;
+      chrome.runtime.onMessage.addListener(async (data, sender, res) => {
+        res();
+        const { id, command } = data as MessageRequest;
+        // check if it is a MessageRequest
+        if (!command) return;
 
-          let message: MessageResponse = { id };
-          try {
-            const result = await this.onExtensionRequest!(
-              data as MessageRequest,
-              id,
-              sender
-            );
+        let message: MessageResponse = { id };
+        try {
+          const result = await this.onExtensionRequest!(
+            data as MessageRequest,
+            id,
+            sender
+          );
 
-            // check if other process will send the response
-            if (
-              typeof result === "object" &&
-              (result as { _derived: boolean })._derived
-            )
-              return;
-
-            message.result = result;
-          } catch (err) {
-            message.error = err as Error;
-          }
-
-          if (typeof message.result === "undefined" && !message.error) return;
-
-          if (sender.tab) {
-            chrome.tabs.sendMessage(sender.tab.id, message);
+          // check if other process will send the response
+          if (
+            typeof result === "object" &&
+            (result as { _derived: boolean })._derived
+          )
             return;
-          }
-          chrome.runtime.sendMessage(message);
+
+          message.result = result;
+        } catch (err) {
+          message.error = err as Error;
         }
-      );
+
+        if (typeof message.result === "undefined" && !message.error) return;
+        this.sendResponse("extension", message, sender);
+      });
     }
 
     if (opts.onDomRequest) {
@@ -155,7 +150,7 @@ export default class Messenger {
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
-        window.postMessage(message, "*");
+        this.sendResponse("dom", message);
       });
     }
   }
@@ -217,8 +212,8 @@ export default class Messenger {
     const reqId = Math.round(Math.random() * 10000);
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
-      const listener: extensionListener = (data, _sender, sendResponse) => {
-        sendResponse();
+      const listener: extensionListener = (data, _sender, res) => {
+        res();
 
         // ignore requests
         if ((data as MessageRequest).command) return;

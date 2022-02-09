@@ -90,7 +90,7 @@ export default {
     async transfer() {
       let interval;
       try {
-        const { transaction, transactionResponse } = await this.koin.transfer({
+        const { transaction } = await this.koin.transfer({
           to: this.toAddress,
           value: this.amount,
         });
@@ -100,7 +100,7 @@ export default {
           console.log("firing interval");
           this.loadBalance();
         }, 2000);
-        const blockNumber = await transactionResponse.wait();
+        const blockNumber = await transaction.wait();
         clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
