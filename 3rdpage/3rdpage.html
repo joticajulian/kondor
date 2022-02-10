@@ -1,45 +1,67 @@
 <html>
   <body>
-    <button onclick="transferKoin()">Transfer</button>
+    <div class="group">
+      <button onclick="getAccounts()">Get accounts</button>
+    </div>
+    <div class="group">
+      <label for="from">From:</label>
+      <input id="from" type="text" />
+      <label for="to">To:</label>
+      <input id="to" type="text" />
+      <label for="value">Value:</label>
+      <input id="value" type="text" />
+      <button onclick="transferKoin()">Transfer</button>
+    </div>
+    <div id="result"></div>
     <script src="js/kondorIndex.js"></script>
     <script src="js/koinos.min.js"></script>
     <script>
-      async function main() {
-        console.log(kondor);
-        console.log("calling getHeadInfo");
-        const head = await kondor.provider.getHeadInfo();
-        console.log("result");
-        console.log(head);
+      const inputFrom = document.getElementById("from");
+      const inputTo = document.getElementById("to");
+      const inputValue = document.getElementById("value");
+      const divText = document.getElementById("result");
+
+      async function getAccounts() {
+        try {
+          const accounts = await kondor.getAccounts();
+          console.log(accounts);
+          divText.innerHTML = `Accounts: ${JSON.stringify(accounts)}`;
+        } catch (error) {
+          divText.innerHTML = `Error: ${error.message}`;
+        }
       }
+
       async function transferKoin() {
-        const signer = kondor.signer;
-        const koinContract = new Contract({
-          id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-          abi: utils.Krc20Abi,
-          provider: kondor.provider,
-          signer,
-        });
-        const koin = koinContract.functions;
+        try {
+          // contract definition
+          const koin = new Contract({
+            id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+            abi: utils.Krc20Abi,
+            provider: kondor.provider,
+            signer: kondor.signer,
+          }).functions;
 
-        // Transfer
-        const /*{ transaction, transactionResponse }*/ aa = await koin.transfer(
-            {
-              from: "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
-              to: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
-              value: "100001", // utils.parseUnits("10.0001", 8),
-            }
-          );
-        //console.log(`Transaction id ${transaction.id} submitted`);
-        console.log("submitted");
-        console.log(aa);
+          // transfer
+          const { transaction } = await koin.transfer({
+            from: inputFrom.value,
+            to: inputTo.value,
+            value: utils.parseUnits(inputValue.value, 8),
+          });
+          console.log(transaction);
+          divText.innerHTML = `transaction ${transaction.id} submitted. Waiting to be mined`;
 
-        //// wait to be mined
-        //const blockNumber = await transactionResponse.wait();
-        //console.log(`Transaction mined. Block number: ${blockNumber}`);
-        //
-        //// read the balance
-        //const { result } = await koin.balanceOf(signer.getAddress());
-        //console.log(balance.result);
+          // wait to be mined
+          const blockNumber = await transaction.wait();
+          console.log(`Mined in block ${blockNumber}`);
+          divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}`;
+
+          // read the balance
+          const { result } = await koin.balanceOf(inputFrom.value);
+          console.log(result);
+          divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`;
+        } catch (error) {
+          divText.innerHTML = `Error: ${error.message}`;
+        }
       }
     </script>
   </body>
