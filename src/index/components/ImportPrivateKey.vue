@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { Signer } from "koilib";
 import router from "@/index/router";
 import Storage from "@/shared/mixins/Storage";
 import AlertHelper from "@/shared/mixins/AlertHelper";
@@ -43,11 +44,18 @@ export default {
       try {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        const enc = await this.encrypt(
-          { privateKey: this.privateKey },
-          this.password1
-        );
-        await this.setAccounts(enc);
+        const signer = Signer.fromWif(this.privateKey);
+        const accounts = [
+          {
+            address: signer.getAddress(),
+            name: "",
+            encryptedPrivateKey: await this.encrypt(
+              this.privateKey,
+              this.password1
+            ),
+          },
+        ];
+        await this.setAccounts(accounts);
         this.$store.state.privateKey = this.privateKey;
         this.alertClose();
         router.push("/dashboard");

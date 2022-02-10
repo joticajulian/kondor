@@ -54,8 +54,8 @@ export default {
       return result.accounts;
     },
 
-    async setAccounts(encrypted) {
-      this.writeStorage({ accounts: encrypted });
+    async setAccounts(accounts) {
+      this.writeStorage({ accounts });
     },
 
     async getRpcNode() {
@@ -125,8 +125,7 @@ export default {
     async encrypt(data, password) {
       const { salt, iv } = await this.getOptsEncryption();
       const key = await this.getKey(password, salt);
-      const message = JSON.stringify(data);
-      const encoded = new TextEncoder().encode(message);
+      const encoded = new TextEncoder().encode(data);
 
       const bufferEncrypted = await window.crypto.subtle.encrypt(
         { name: "AES-GCM", iv },
@@ -157,12 +156,7 @@ export default {
         throw new Error("Invalid password");
       }
 
-      try {
-        const message = new TextDecoder().decode(decrypted);
-        return JSON.parse(message);
-      } catch (error) {
-        throw new Error("Decrypted value cannot be decoded and parsed to JSON");
-      }
+      return new TextDecoder().decode(decrypted);
     },
   },
 };

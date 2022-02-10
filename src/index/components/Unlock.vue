@@ -21,8 +21,11 @@ export default {
     async unlock() {
       console.log("click unlock");
       try {
-        const enc = await this.getAccounts();
-        const { privateKey } = await this.decrypt(enc, this.password);
+        const accounts = await this.getAccounts();
+        const privateKey = await this.decrypt(
+          accounts[0].encryptedPrivateKey,
+          this.password
+        );
         this.$store.state.privateKey = privateKey;
         this.$emit("onUnlock");
         console.log("unlock ok");
