@@ -66,7 +66,8 @@ const messenger: Messenger = new Messenger({
     console.log("content command dom: " + event.data.command);
     const { command, args } = event.data;
     if (allowedCommands.includes(command!)) {
-      if (!popupLoaded) await openPopup();
+      popupLoaded = false;
+      await openPopup();
       return messenger.sendExtensionMessage("extension", command, args);
     }
     return undefined;
