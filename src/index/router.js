@@ -6,6 +6,7 @@ import Import from "./components/Import";
 import ImportPrivateKey from "./components/ImportPrivateKey";
 import Dashboard from "./components/Dashboard.vue";
 import SendTransaction from "./components/SendTransaction.vue";
+import GetAccounts from "./components/GetAccounts.vue";
 
 Vue.use(Router);
 
@@ -40,6 +41,11 @@ export default new Router({
       path: "/sendTransaction",
       name: "Send Transaction",
       component: SendTransaction,
+    },
+    {
+      path: "/getAccounts",
+      name: "Get Accounts",
+      component: GetAccounts,
     },
   ],
 });

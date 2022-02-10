@@ -83,9 +83,14 @@ new Messenger({
         const { transaction } = args as { transaction: TransactionJson };
         return provider.sendTransaction(transaction);
       }
-      /* case "provider:wait": {
-        return provider.wait(...args);
-      } */
+      case "provider:wait": {
+        const { txId, type, timeout } = args as {
+          txId: string;
+          type: "byTransactionId" | "byBlock";
+          timeout: number;
+        };
+        return provider.wait(txId, type, timeout);
+      }
       case "provider:readContract": {
         const { operation } = args as { operation: CallContractOperationJson };
         return provider.readContract(operation);

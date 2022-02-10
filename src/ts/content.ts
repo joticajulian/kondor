@@ -25,6 +25,7 @@ declare const window: {
 };
 
 const allowedCommands = [
+  "getAccounts",
   "signer:sendTransaction",
   "signer:encodeTransaction",
   "signer:decodeTransaction",
@@ -71,18 +72,3 @@ const messenger: Messenger = new Messenger({
     return undefined;
   },
 });
-/*
-(async () => {
-  const a = await messenger.sendExtensionMessage("extension", "openPopup");
-  console.log("reponse openup");
-  console.log(a);
-  while (!popupLoaded) await new Promise((r) => setTimeout(r, 20));
-  console.log("popup loaded");
-  const response2 = await messenger.sendExtensionMessage(
-    "extension",
-    "newWallet"
-  );
-  console.log("response newWallet");
-  console.log(response2);
-})();
-*/

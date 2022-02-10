@@ -28,6 +28,17 @@ export default {
             router.push("/dashboard");
             return "ok";
           }
+          case "getAccounts": {
+            this.$store.state.requests.push({
+              id,
+              command,
+              args,
+              sender,
+            });
+            router.push("/getAccounts");
+
+            return { _derived: true };
+          }
           case "signer:encodeTransaction": {
             const signer = Signer.fromSeed("");
             signer.serializer = await this.newSandboxSerializer(

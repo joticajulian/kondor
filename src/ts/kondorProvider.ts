@@ -84,6 +84,18 @@ export const provider = {
     return messenger.sendDomMessage("provider:getBlock", { height });
   },
 
+  async wait(
+    txId: string,
+    type: "byTransactionId" | "byBlock" = "byBlock",
+    timeout = 30000
+  ): Promise<string | number> {
+    return messenger.sendDomMessage("provider:wait", {
+      txId,
+      type,
+      timeout,
+    });
+  },
+
   async sendTransaction(transaction: TransactionJson): Promise<{}> {
     await messenger.sendDomMessage("provider:sendTransaction", { transaction });
     return {};
