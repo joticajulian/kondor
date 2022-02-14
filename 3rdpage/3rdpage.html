@@ -28,6 +28,7 @@
           divText.innerHTML = `Accounts: ${JSON.stringify(accounts)}`;
         } catch (error) {
           divText.innerHTML = `Error: ${error.message}`;
+          console.error(error);
         }
       }
 
@@ -61,6 +62,7 @@
           divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`;
         } catch (error) {
           divText.innerHTML = `Error: ${error.message}`;
+          console.error(error);
         }
       }
     </script>

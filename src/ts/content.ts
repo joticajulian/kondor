@@ -42,11 +42,11 @@ const allowedCommands = [
   "provider:readContract",
 ];
 
-let popupLoaded = false;
+let popupReady = false;
 
-async function openPopup() {
-  await messenger.sendExtensionMessage("extension", "openPopup");
-  while (!popupLoaded) await new Promise((r) => setTimeout(r, 20));
+async function preparePopup() {
+  await messenger.sendExtensionMessage("extension", "preparePopup");
+  while (!popupReady) await new Promise((r) => setTimeout(r, 20));
 }
 
 const messenger: Messenger = new Messenger({
@@ -54,8 +54,8 @@ const messenger: Messenger = new Messenger({
     console.log("content command extension: " + message.command);
     const { command } = message;
     switch (command) {
-      case "popupLoaded": {
-        popupLoaded = true;
+      case "popupReady": {
+        popupReady = true;
         return "ok";
       }
       default:
@@ -66,8 +66,9 @@ const messenger: Messenger = new Messenger({
     console.log("content command dom: " + event.data.command);
     const { command, args } = event.data;
     if (allowedCommands.includes(command!)) {
-      popupLoaded = false;
-      await openPopup();
+      popupReady = false;
+      await preparePopup();
+      console.log("popup ready.");
       return messenger.sendExtensionMessage("extension", command, args);
     }
     return undefined;

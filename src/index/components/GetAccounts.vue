@@ -12,6 +12,7 @@
 <script>
 import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
+import Message from "@/shared/mixins/Message";
 import Messenger from "../../../lib/Messenger";
 
 export default {
@@ -23,7 +24,7 @@ export default {
     };
   },
 
-  mixins: [Storage, AlertHelper],
+  mixins: [Storage, AlertHelper, Message],
 
   mounted() {
     const requests = this.$store.state.requests.filter(

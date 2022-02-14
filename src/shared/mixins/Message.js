@@ -13,14 +13,14 @@ export default {
   name: "Message mixin",
   data: function () {
     return {
-      messenger: null,
+      _messenger: null,
     };
   },
 
   mixins: [Sandbox],
 
   created() {
-    this.messenger = new Messenger({
+    this._messenger = new Messenger({
       onExtensionRequest: async (message, id, sender) => {
         const { command, args } = message;
         switch (command) {
@@ -28,14 +28,21 @@ export default {
             router.push("/dashboard");
             return "ok";
           }
+          case "ping2": {
+            this.returnPopupReady();
+            return "ok";
+          }
           case "getAccounts": {
+            console.log("1");
             this.$store.state.requests.push({
               id,
               command,
               args,
               sender,
             });
+            console.log("2");
             router.push("/getAccounts");
+            console.log("3");
 
             return { _derived: true };
           }
@@ -92,21 +99,25 @@ export default {
       },
     });
 
-    (async () => {
+    this.returnPopupReady();
+  },
+
+  methods: {
+    async returnPopupReady() {
       console.log("asking to bg the tabId");
-      const tabId = await this.messenger.sendExtensionMessage(
+      const tabId = await this._messenger.sendExtensionMessage(
         "extension",
         "getTab"
       );
       console.log("resp background");
       console.log(tabId);
       console.log("sending message popupLoaded to webpage");
-      const response2 = await this.messenger.sendExtensionMessage(
+      const response2 = await this._messenger.sendExtensionMessage(
         tabId,
-        "popupLoaded"
+        "popupReady"
       );
       console.log("resp tab");
       console.log(response2);
-    })();
+    },
   },
 };

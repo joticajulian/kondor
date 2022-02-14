@@ -20,6 +20,7 @@ import Unlock from "@/index/components/Unlock.vue";
 import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
+import Message from "@/shared/mixins/Message";
 import Messenger from "../../../lib/Messenger";
 
 export default {
@@ -31,10 +32,11 @@ export default {
       id: -1,
       unlocked: !!this.$store.state.privateKey,
       numErrors: 0,
+      messenger: null,
     };
   },
 
-  mixins: [Storage, Sandbox, AlertHelper],
+  mixins: [Storage, Sandbox, AlertHelper, Message],
 
   components: { Unlock },
 
@@ -48,6 +50,7 @@ export default {
      */
     const [request] = requests;
     this.decodeTransaction(request);
+    this.messenger = new Messenger({ onExtensionRequest: () => undefined });
   },
 
   methods: {
@@ -119,7 +122,7 @@ export default {
       } catch (err) {
         message.error = err;
       }
-      new Messenger().sendResponse("extension", message, request.sender);
+      this.messenger.sendResponse("extension", message, request.sender);
     },
 
     cancel() {
