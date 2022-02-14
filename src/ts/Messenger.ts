@@ -97,6 +97,12 @@ export default class Messenger {
         const { id, command } = data as MessageRequest;
         // check if it is a MessageRequest
         if (!command) return;
+        console.log("ext request: ", command);
+        // check if it's ping request
+        if (command === "ping") {
+          this.sendResponse("extension", { id, result: "ok" }, sender);
+          return;
+        }
 
         let message: MessageResponse = { id };
         try {
@@ -105,17 +111,22 @@ export default class Messenger {
             id,
             sender
           );
+          console.log("ext result: ");
+          console.log(result);
 
           // check if other process will send the response
           if (
             typeof result === "object" &&
+            result !== null &&
             (result as { _derived: boolean })._derived
           )
             return;
 
           message.result = result;
         } catch (err) {
-          message.error = err as Error;
+          message.error = `Error command ${command} (extension): ${
+            (err as Error).message
+          }`;
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
@@ -129,6 +140,7 @@ export default class Messenger {
         const { id, command } = event.data as MessageRequest;
         // check if it is a MessageRequest
         if (!command) return;
+        console.log("dom request: ", command);
 
         let message: MessageResponse = { id };
         try {
@@ -136,17 +148,22 @@ export default class Messenger {
             event as Event<MessageRequest>,
             id
           );
+          console.log("dom result: ");
+          console.log(result);
 
           // check if other process will send the response
           if (
             typeof result === "object" &&
+            result !== null &&
             (result as { _derived: boolean })._derived
           )
             return;
 
           message.result = result;
         } catch (err) {
-          message.error = err as Error;
+          message.error = `Error command ${command} (dom): ${
+            (err as Error).message
+          }`;
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
@@ -160,6 +177,8 @@ export default class Messenger {
     message: MessageResponse,
     sender?: Sender
   ): void {
+    console.log("sending response ", type, " ", sender?.tab);
+    console.log(message);
     if (type === "dom") window.postMessage(message, "*");
     else {
       if (sender && sender.tab) chrome.tabs.sendMessage(sender.tab.id, message);
@@ -207,7 +226,11 @@ export default class Messenger {
   async sendExtensionMessage<T = unknown>(
     to: number | string,
     command: string,
-    args?: unknown
+    args?: unknown,
+    opts?: {
+      timeout?: number;
+      ping?: boolean;
+    }
   ): Promise<T> {
     const reqId = Math.round(Math.random() * 10000);
     return new Promise((resolve: (result: T) => void, reject) => {
@@ -246,6 +269,32 @@ export default class Messenger {
           command,
           args,
         });
+      }
+
+      // const opts = { ping: to === "extension", ...options };
+
+      // define timeout
+      if (opts && opts.timeout) {
+        setTimeout(() => {
+          reject(new Error(`message timeout ${opts.timeout} ms`));
+          chrome.runtime.onMessage.removeListener(listener);
+        }, opts.timeout);
+      }
+
+      // ping
+      if (opts && opts.ping) {
+        (async () => {
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            try {
+              await new Promise((r) => setTimeout(r, 500));
+              await this.sendExtensionMessage(to, "ping", {}, { timeout: 20 });
+            } catch (err) {
+              reject(new Error("Connection closed"));
+              chrome.runtime.onMessage.removeListener(listener);
+            }
+          }
+        })();
       }
     });
   }

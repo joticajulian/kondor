@@ -9,7 +9,7 @@ import * as storage from "./storage";
 
 let tabIdRequester: number | undefined;
 
-new Messenger({
+const messenger = new Messenger({
   // eslint-disable-next-line
   // @ts-ignore
   onExtensionRequest: async (message, id, sender) => {
@@ -23,22 +23,33 @@ new Messenger({
     }
 
     switch (command) {
-      case "openPopup": {
+      case "preparePopup": {
         if (!sender || !sender.tab)
-          throw new Error("invalid command openPopup");
-        tabIdRequester = sender.tab.id;
-        chrome.windows.create(
-          {
-            focused: true,
-            height: 500,
-            width: 309,
-            type: "popup",
-            url: "index.html",
-            top: 0,
-            left: 0,
-          },
-          () => {}
-        );
+          throw new Error("invalid command preparePopup");
+
+        try {
+          await messenger.sendExtensionMessage(
+            "extension",
+            "ping2",
+            {},
+            { timeout: 20 }
+          );
+        } catch (error) {
+          console.log(error);
+          tabIdRequester = sender.tab.id;
+          chrome.windows.create(
+            {
+              focused: true,
+              height: 500,
+              width: 309,
+              type: "popup",
+              url: "index.html",
+              top: 0,
+              left: 0,
+            },
+            () => {}
+          );
+        }
         return "ok";
       }
       case "getTab": {
