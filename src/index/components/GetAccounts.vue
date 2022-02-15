@@ -13,7 +13,6 @@
 import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
 import Message from "@/shared/mixins/Message";
-import Messenger from "../../../lib/Messenger";
 
 export default {
   name: "Get accounts",
@@ -51,14 +50,14 @@ export default {
         id: this.id,
         result: accounts,
       };
-      new Messenger().sendResponse("extension", message, this.requester);
+      this.messenger.sendResponse("extension", message, this.requester);
     },
     cancel() {
       const message = {
         id: this.id,
         error: new Error("getAccounts cancelled"),
       };
-      new Messenger().sendResponse("extension", message, this.requester);
+      this.messenger.sendResponse("extension", message, this.requester);
     },
   },
 };

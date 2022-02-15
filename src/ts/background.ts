@@ -9,6 +9,8 @@ import * as storage from "./storage";
 
 let tabIdRequester: number | undefined;
 
+console.log("call background");
+
 const messenger = new Messenger({
   // eslint-disable-next-line
   // @ts-ignore
@@ -34,6 +36,7 @@ const messenger = new Messenger({
             {},
             { timeout: 20 }
           );
+          console.log("ping2 ok, no need to create a new popup");
         } catch (error) {
           console.log(error);
           tabIdRequester = sender.tab.id;

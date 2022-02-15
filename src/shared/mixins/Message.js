@@ -13,18 +13,20 @@ export default {
   name: "Message mixin",
   data: function () {
     return {
-      _messenger: null,
+      messenger: null,
     };
   },
 
   mixins: [Sandbox],
 
   created() {
-    this._messenger = new Messenger({
+    this.messenger = new Messenger({
+      replyPing: true,
       onExtensionRequest: async (message, id, sender) => {
         const { command, args } = message;
         switch (command) {
           case "newWallet": {
+            this.messenger.removeListeners();
             router.push("/dashboard");
             return "ok";
           }
@@ -41,6 +43,7 @@ export default {
               sender,
             });
             console.log("2");
+            this.messenger.removeListeners();
             router.push("/getAccounts");
             console.log("3");
 
@@ -84,6 +87,7 @@ export default {
               args,
               sender,
             });
+            this.messenger.removeListeners();
             router.push("/sendTransaction");
 
             /**
@@ -105,14 +109,14 @@ export default {
   methods: {
     async returnPopupReady() {
       console.log("asking to bg the tabId");
-      const tabId = await this._messenger.sendExtensionMessage(
+      const tabId = await this.messenger.sendExtensionMessage(
         "extension",
         "getTab"
       );
       console.log("resp background");
       console.log(tabId);
       console.log("sending message popupLoaded to webpage");
-      const response2 = await this._messenger.sendExtensionMessage(
+      const response2 = await this.messenger.sendExtensionMessage(
         tabId,
         "popupReady"
       );
