@@ -81,9 +81,16 @@ export default class Messenger {
 
   public onDomRequest: OnDomRequest;
 
+  public listeners: {
+    type: "extension" | "dom";
+    id: number | "onRequest";
+    listener: unknown;
+  }[] = [];
+
   constructor(opts?: {
     onDomRequest?: OnDomRequest;
     onExtensionRequest?: OnExtensionRequest;
+    replyPing?: boolean;
   }) {
     this.onExtensionRequest = async () => ({});
     this.onDomRequest = async () => ({});
@@ -92,19 +99,29 @@ export default class Messenger {
 
     if (opts.onExtensionRequest) {
       this.onExtensionRequest = opts.onExtensionRequest;
-      chrome.runtime.onMessage.addListener(async (data, sender, res) => {
+      const listener: extensionListener = async (data, sender, res) => {
         res();
         const { id, command } = data as MessageRequest;
         // check if it is a MessageRequest
         if (!command) return;
+
+        let message: MessageResponse = { id };
+
         console.log("ext request: ", command);
         // check if it's ping request
-        if (command === "ping") {
-          this.sendResponse("extension", { id, result: "ok" }, sender);
+        if (opts.replyPing && command === "ping") {
+          const { args } = data as MessageRequest;
+          if (
+            this.listeners.find((l) => l.id === (args as { id: number }).id)
+          ) {
+            message.result = "ok";
+          } else {
+            message.error = new Error("Connection closed");
+          }
+          this.sendResponse("extension", message, sender);
           return;
         }
 
-        let message: MessageResponse = { id };
         try {
           const result = await this.onExtensionRequest!(
             data as MessageRequest,
@@ -131,12 +148,14 @@ export default class Messenger {
 
         if (typeof message.result === "undefined" && !message.error) return;
         this.sendResponse("extension", message, sender);
-      });
+      };
+      this.listeners.push({ type: "extension", id: "onRequest", listener });
+      chrome.runtime.onMessage.addListener(listener);
     }
 
     if (opts.onDomRequest) {
       this.onDomRequest = opts.onDomRequest;
-      window.addEventListener("message", async (event) => {
+      const listener: (event: Event<Message>) => unknown = async (event) => {
         const { id, command } = event.data as MessageRequest;
         // check if it is a MessageRequest
         if (!command) return;
@@ -168,7 +187,9 @@ export default class Messenger {
 
         if (typeof message.result === "undefined" && !message.error) return;
         this.sendResponse("dom", message);
-      });
+      };
+      this.listeners.push({ type: "dom", id: "onRequest", listener });
+      window.addEventListener("message", listener);
     }
   }
 
@@ -209,6 +230,7 @@ export default class Messenger {
       };
 
       // listen
+      this.listeners.push({ type: "dom", id: reqId, listener });
       window.addEventListener("message", listener);
 
       // send request
@@ -232,6 +254,7 @@ export default class Messenger {
       ping?: boolean;
     }
   ): Promise<T> {
+    console.log("sendExtensionMessage");
     const reqId = Math.round(Math.random() * 10000);
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
@@ -249,10 +272,11 @@ export default class Messenger {
         // send response
         if (error) reject(error);
         else resolve(result as T);
-        chrome.runtime.onMessage.removeListener(listener);
+        this.removeListener(reqId);
       };
 
       // listen
+      this.listeners.push({ type: "extension", id: reqId, listener });
       chrome.runtime.onMessage.addListener(listener);
 
       // send request
@@ -270,6 +294,13 @@ export default class Messenger {
           args,
         });
       }
+      console.log("message sent");
+      console.log({
+        to,
+        id: reqId,
+        command,
+        args,
+      });
 
       // const opts = { ping: to === "extension", ...options };
 
@@ -277,7 +308,7 @@ export default class Messenger {
       if (opts && opts.timeout) {
         setTimeout(() => {
           reject(new Error(`message timeout ${opts.timeout} ms`));
-          chrome.runtime.onMessage.removeListener(listener);
+          this.removeListener(reqId);
         }, opts.timeout);
       }
 
@@ -287,16 +318,61 @@ export default class Messenger {
           // eslint-disable-next-line no-constant-condition
           while (true) {
             try {
-              await new Promise((r) => setTimeout(r, 500));
-              await this.sendExtensionMessage(to, "ping", {}, { timeout: 20 });
-            } catch (err) {
-              reject(new Error("Connection closed"));
-              chrome.runtime.onMessage.removeListener(listener);
+              await new Promise((r) => setTimeout(r, 2000));
+              const ll = await this.sendExtensionMessage(
+                to,
+                "ping",
+                { id: reqId },
+                { timeout: 20 }
+              );
+              console.log("response ping");
+              console.log(ll);
+            } catch (error) {
+              reject(error);
+              this.removeListener(reqId);
+              break;
             }
           }
         })();
       }
     });
+  }
+
+  removeListener(id: number | string) {
+    const index = this.listeners.findIndex((l) => l.id === id);
+    if (index < 0) {
+      console.log(`listener ${id} not found`);
+      return;
+    } else {
+      console.log(`removing listener ${id}`);
+    }
+    const removed = this.listeners.splice(index, 1);
+    const { listener, type } = removed[0];
+    if (type === "dom") {
+      window.removeEventListener(
+        "message",
+        listener as (event: Event<Message>) => unknown
+      );
+    } else {
+      chrome.runtime.onMessage.removeListener(listener as extensionListener);
+    }
+  }
+
+  removeListeners() {
+    console.log("removing listeners");
+    console.log(this.listeners);
+    this.listeners.forEach((l) => {
+      const { type, listener } = l;
+      if (type === "dom") {
+        window.removeEventListener(
+          "message",
+          listener as (event: Event<Message>) => unknown
+        );
+      } else {
+        chrome.runtime.onMessage.removeListener(listener as extensionListener);
+      }
+    });
+    this.listeners = [];
   }
 }
 

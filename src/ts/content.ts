@@ -69,7 +69,9 @@ const messenger: Messenger = new Messenger({
       popupReady = false;
       await preparePopup();
       console.log("popup ready.");
-      return messenger.sendExtensionMessage("extension", command, args);
+      return messenger.sendExtensionMessage("extension", command, args, {
+        ping: true,
+      });
     }
     return undefined;
   },

@@ -21,7 +21,6 @@ import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 import Message from "@/shared/mixins/Message";
-import Messenger from "../../../lib/Messenger";
 
 export default {
   name: "Send transaction",
@@ -32,7 +31,6 @@ export default {
       id: -1,
       unlocked: !!this.$store.state.privateKey,
       numErrors: 0,
-      messenger: null,
     };
   },
 
@@ -50,7 +48,6 @@ export default {
      */
     const [request] = requests;
     this.decodeTransaction(request);
-    this.messenger = new Messenger({ onExtensionRequest: () => undefined });
   },
 
   methods: {
