@@ -19,7 +19,7 @@ export default {
 
   mixins: [Sandbox],
 
-  created() {
+  mounted() {
     this.messenger = new Messenger({
       onExtensionRequest: async (message, id, sender) => {
         const { command, args } = message;
@@ -130,9 +130,12 @@ export default {
       console.log(response2);
     },
 
-    removeRequest(id) {
-      const index = this.$store.state.requests.find((r) => r.id === id);
-      this.$store.state.requests.splice(index, 1);
+    sendResponse(type, message, requester) {
+      this.messenger.sendResponse(type, message, requester);
+
+      // remove request
+      const index = this.$store.state.requests.find((r) => r.id === message.id);
+      if (index >= 0) this.$store.state.requests.splice(index, 1);
     },
   },
 };

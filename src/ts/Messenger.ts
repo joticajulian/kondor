@@ -90,7 +90,6 @@ export default class Messenger {
   constructor(opts?: {
     onDomRequest?: OnDomRequest;
     onExtensionRequest?: OnExtensionRequest;
-    replyPing?: boolean;
   }) {
     this.onExtensionRequest = async () => ({});
     this.onDomRequest = async () => ({});
@@ -108,19 +107,6 @@ export default class Messenger {
         let message: MessageResponse = { id };
 
         console.log("ext request ", id, ": ", command);
-        // check if it's ping request
-        if (opts.replyPing && command === "ping") {
-          const { args } = data as MessageRequest;
-          if (
-            this.listeners.find((l) => l.id === (args as { id: number }).id)
-          ) {
-            message.result = "ok";
-          } else {
-            message.error = "Connection closed";
-          }
-          this.sendResponse("extension", message, sender);
-          return;
-        }
 
         try {
           const result = await this.onExtensionRequest!(
@@ -141,11 +127,9 @@ export default class Messenger {
 
           message.result = result;
         } catch (error) {
-          message.error = `Error command ${command} (extension): ${
-            (error as Error).message
-          }`;
+          message.error = (error as Error).message;
           if (!(error as Error).message) {
-            console.log(message.error);
+            console.log(`Error command ${command} (extension):`);
             console.log(error);
           }
         }
@@ -184,11 +168,9 @@ export default class Messenger {
 
           message.result = result;
         } catch (error) {
-          message.error = `Error command ${command} (dom): ${
-            (error as Error).message
-          }`;
+          message.error = (error as Error).message;
           if (!(error as Error).message) {
-            console.log(message.error);
+            console.log(`Error command ${command} (dom): `);
             console.log(error);
           }
         }
@@ -315,7 +297,7 @@ export default class Messenger {
       // define timeout
       if (opts && opts.timeout) {
         setTimeout(() => {
-          reject(new Error(`message timeout ${opts.timeout} ms`));
+          reject(new Error("Connection lost"));
           this.removeListener(reqId);
         }, opts.timeout);
       }
@@ -323,10 +305,9 @@ export default class Messenger {
       // ping
       if (opts && opts.ping) {
         (async () => {
-          // eslint-disable-next-line no-constant-condition
-          while (true) {
+          while (this.listeners.find((l) => l.id === reqId)) {
             try {
-              await new Promise((r) => setTimeout(r, 2000));
+              await new Promise((r) => setTimeout(r, 1000));
               const ll = await this.sendExtensionMessage(
                 to,
                 "ping",

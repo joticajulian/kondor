@@ -119,11 +119,15 @@ export default {
       } catch (err) {
         message.error = err;
       }
-      this.messenger.sendResponse("extension", message, request.sender);
+      this.sendResponse("extension", message, this.requester);
     },
 
     cancel() {
-      console.log("cancel not implemented");
+      const message = {
+        id: this.id,
+        error: "sendTransaction cancelled",
+      };
+      this.sendResponse("extension", message, this.requester);
     },
   },
 };
