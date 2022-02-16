@@ -51,13 +51,15 @@ export default {
         result: accounts,
       };
       this.messenger.sendResponse("extension", message, this.requester);
+      this.removeRequest(this.id);
     },
     cancel() {
       const message = {
         id: this.id,
-        error: new Error("getAccounts cancelled"),
+        error: "getAccounts cancelled",
       };
       this.messenger.sendResponse("extension", message, this.requester);
+      this.removeRequest(this.id);
     },
   },
 };

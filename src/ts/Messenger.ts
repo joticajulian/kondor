@@ -15,7 +15,7 @@ interface MessageRequest {
 interface MessageResponse {
   id: number;
   result?: unknown;
-  error?: unknown;
+  error?: string;
 }
 
 type Message = MessageRequest | MessageResponse;
@@ -107,7 +107,7 @@ export default class Messenger {
 
         let message: MessageResponse = { id };
 
-        console.log("ext request: ", command);
+        console.log("ext request ", id, ": ", command);
         // check if it's ping request
         if (opts.replyPing && command === "ping") {
           const { args } = data as MessageRequest;
@@ -116,7 +116,7 @@ export default class Messenger {
           ) {
             message.result = "ok";
           } else {
-            message.error = new Error("Connection closed");
+            message.error = "Connection closed";
           }
           this.sendResponse("extension", message, sender);
           return;
@@ -140,10 +140,14 @@ export default class Messenger {
             return;
 
           message.result = result;
-        } catch (err) {
+        } catch (error) {
           message.error = `Error command ${command} (extension): ${
-            (err as Error).message
+            (error as Error).message
           }`;
+          if (!(error as Error).message) {
+            console.log(message.error);
+            console.log(error);
+          }
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
@@ -179,10 +183,14 @@ export default class Messenger {
             return;
 
           message.result = result;
-        } catch (err) {
+        } catch (error) {
           message.error = `Error command ${command} (dom): ${
-            (err as Error).message
+            (error as Error).message
           }`;
+          if (!(error as Error).message) {
+            console.log(message.error);
+            console.log(error);
+          }
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
@@ -224,7 +232,7 @@ export default class Messenger {
         if (id !== reqId) return;
 
         // send response
-        if (error) reject(error);
+        if (error) reject(new Error(error));
         else resolve(result as T);
         window.removeEventListener("message", listener);
       };
@@ -270,7 +278,7 @@ export default class Messenger {
         if (id !== reqId) return;
 
         // send response
-        if (error) reject(error);
+        if (error) reject(new Error(error));
         else resolve(result as T);
         this.removeListener(reqId);
       };
