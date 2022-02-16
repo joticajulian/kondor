@@ -21,13 +21,19 @@ export default {
 
   created() {
     this.messenger = new Messenger({
-      replyPing: true,
       onExtensionRequest: async (message, id, sender) => {
         const { command, args } = message;
         switch (command) {
           case "newWallet": {
             this.messenger.removeListeners();
             router.push("/dashboard");
+            return "ok";
+          }
+          case "ping": {
+            const request = this.$store.state.requests.find(
+              (r) => r.id === args.id
+            );
+            if (!request) throw new Error("Connection closed");
             return "ok";
           }
           case "ping2": {
@@ -122,6 +128,11 @@ export default {
       );
       console.log("resp tab");
       console.log(response2);
+    },
+
+    removeRequest(id) {
+      const index = this.$store.state.requests.find((r) => r.id === id);
+      this.$store.state.requests.splice(index, 1);
     },
   },
 };
