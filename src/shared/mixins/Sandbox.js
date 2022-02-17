@@ -45,6 +45,9 @@ export default {
       const iframeSandbox = document.getElementById("sandbox");
       const reqId = Math.round(Math.random() * 10000);
       this.reqIds.push(reqId);
+      while (!this.$store.state.sandboxLoaded) {
+        await new Promise((r) => setTimeout(r, 20));
+      }
       return await new Promise((resolve, reject) => {
         // prepare the listener
         const listener = (event) => {

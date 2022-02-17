@@ -41,17 +41,14 @@ export default {
             return "ok";
           }
           case "getAccounts": {
-            console.log("1");
             this.$store.state.requests.push({
               id,
               command,
               args,
               sender,
             });
-            console.log("2");
             this.messenger.removeListeners();
             router.push("/getAccounts");
-            console.log("3");
 
             return { _derived: true };
           }

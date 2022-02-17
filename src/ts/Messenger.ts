@@ -349,7 +349,6 @@ export default class Messenger {
 
   removeListeners() {
     console.log("removing listeners");
-    console.log(this.listeners);
     this.listeners.forEach((l) => {
       const { type, listener } = l;
       if (type === "dom") {

@@ -11,6 +11,7 @@ export default new Vuex.Store({
     alertType: "",
     requests: [],
     testData: {},
+    sandboxLoaded: false,
   },
   mutations: {},
   actions: {},
