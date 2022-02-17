@@ -9,8 +9,6 @@ import * as storage from "./storage";
 
 let tabIdRequester: number | undefined;
 
-console.log("call background");
-
 const messenger = new Messenger({
   // eslint-disable-next-line
   // @ts-ignore

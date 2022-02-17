@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <iframe id="sandbox" src="sandbox.html"></iframe>
+    <iframe
+      id="sandbox"
+      src="sandbox.html"
+      @load="$store.state.sandboxLoaded = true"
+    ></iframe>
     <Nav />
     <router-view />
     <Alert

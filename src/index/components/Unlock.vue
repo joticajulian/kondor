@@ -19,7 +19,6 @@ export default {
 
   methods: {
     async unlock() {
-      console.log("click unlock");
       try {
         const accounts = await this.getAccounts();
         const privateKey = await this.decrypt(
@@ -28,11 +27,8 @@ export default {
         );
         this.$store.state.privateKey = privateKey;
         this.$emit("onUnlock");
-        console.log("unlock ok");
       } catch (error) {
         this.$emit("onError", error);
-        console.log("unlock error");
-        console.log(error);
       }
     },
   },
