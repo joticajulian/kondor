@@ -62,6 +62,16 @@ npm run build
 
 The compiled application will be located in the folder `dist`. Open chrome and go to `chrome://extensions/`. Make sure the `developer mode` is enabled. Click on `Load unpacked` and select the folder `dist` with the application. The extension should be ready to be tested.
 
+### Test webpage
+
+You may also want to test the signature request from a third page. Build the test page:
+
+```
+yarn build:3rdpage
+```
+
+it will be available in http://localhost:8081/3rdpage.html
+
 #### NOTE
 
 The Koinos Blockchain is currenlty available only as a test network and is prone to bugs and crashes, tKOIN has absolutely no value. To learn more about Koinos visit their website at [koinos.io](https://koinos.io)

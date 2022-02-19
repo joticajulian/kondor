@@ -105,8 +105,8 @@ export default class Messenger {
         if (!command) return;
 
         let message: MessageResponse = { id };
-
-        console.log("ext request ", id, ": ", command);
+        console.debug("incoming request", id, ":", command);
+        console.debug((data as MessageRequest).args);
 
         try {
           const result = await this.onExtensionRequest!(
@@ -114,24 +114,20 @@ export default class Messenger {
             id,
             sender
           );
-          console.log("ext result: ");
-          console.log(result);
 
           // check if other process will send the response
           if (
             typeof result === "object" &&
             result !== null &&
             (result as { _derived: boolean })._derived
-          )
+          ) {
+            console.debug("response", id, "derived");
             return;
+          }
 
           message.result = result;
         } catch (error) {
           message.error = (error as Error).message;
-          if (!(error as Error).message) {
-            console.log(`Error command ${command} (extension):`);
-            console.log(error);
-          }
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
@@ -147,32 +143,30 @@ export default class Messenger {
         const { id, command } = event.data as MessageRequest;
         // check if it is a MessageRequest
         if (!command) return;
-        console.log("dom request: ", command);
 
         let message: MessageResponse = { id };
+        console.debug("incoming request", id, ":", command);
+        console.debug((event.data as MessageRequest).args);
+
         try {
           const result = await this.onDomRequest!(
             event as Event<MessageRequest>,
             id
           );
-          console.log("dom result: ");
-          console.log(result);
 
           // check if other process will send the response
           if (
             typeof result === "object" &&
             result !== null &&
             (result as { _derived: boolean })._derived
-          )
+          ) {
+            console.debug("response", id, "derived");
             return;
+          }
 
           message.result = result;
         } catch (error) {
           message.error = (error as Error).message;
-          if (!(error as Error).message) {
-            console.log(`Error command ${command} (dom): `);
-            console.log(error);
-          }
         }
 
         if (typeof message.result === "undefined" && !message.error) return;
@@ -188,8 +182,8 @@ export default class Messenger {
     message: MessageResponse,
     sender?: Sender
   ): void {
-    console.log("sending response ", type, " ", sender?.tab);
-    console.log(message);
+    console.debug("outgoing response", message.id, ":");
+    console.debug(message);
     if (type === "dom") window.postMessage(message, "*");
     else {
       if (sender && sender.tab) chrome.tabs.sendMessage(sender.tab.id, message);
@@ -214,9 +208,16 @@ export default class Messenger {
         if (id !== reqId) return;
 
         // send response
-        if (error) reject(new Error(error));
-        else resolve(result as T);
-        window.removeEventListener("message", listener);
+        if (error) {
+          console.debug("error received", id, ":");
+          console.debug(error);
+          reject(new Error(error));
+        } else {
+          console.debug("response received", id, ":");
+          console.debug(result);
+          resolve(result as T);
+        }
+        this.removeListener(reqId);
       };
 
       // listen
@@ -232,6 +233,8 @@ export default class Messenger {
         },
         "*"
       );
+      console.debug("sending message", reqId, command, "to dom");
+      console.debug(args);
     });
   }
 
@@ -244,7 +247,6 @@ export default class Messenger {
       ping?: boolean;
     }
   ): Promise<T> {
-    console.log("sendExtensionMessage");
     const reqId = Math.round(Math.random() * 10000);
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
@@ -260,8 +262,15 @@ export default class Messenger {
         if (id !== reqId) return;
 
         // send response
-        if (error) reject(new Error(error));
-        else resolve(result as T);
+        if (error) {
+          console.debug("error received", id, ":");
+          console.debug(error);
+          reject(new Error(error));
+        } else {
+          console.debug("response received", id, ":");
+          console.debug(result);
+          resolve(result as T);
+        }
         this.removeListener(reqId);
       };
 
@@ -284,15 +293,8 @@ export default class Messenger {
           args,
         });
       }
-      console.log("message sent");
-      console.log({
-        to,
-        id: reqId,
-        command,
-        args,
-      });
-
-      // const opts = { ping: to === "extension", ...options };
+      console.debug("sending message", reqId, command, "to", to);
+      console.debug(args);
 
       // define timeout
       if (opts && opts.timeout) {
@@ -308,14 +310,12 @@ export default class Messenger {
           while (this.listeners.find((l) => l.id === reqId)) {
             try {
               await new Promise((r) => setTimeout(r, 1000));
-              const ll = await this.sendExtensionMessage(
+              await this.sendExtensionMessage(
                 to,
                 "ping",
                 { id: reqId },
-                { timeout: 20 }
+                { timeout: 80 }
               );
-              console.log("response ping");
-              console.log(ll);
             } catch (error) {
               reject(error);
               this.removeListener(reqId);
@@ -329,12 +329,7 @@ export default class Messenger {
 
   removeListener(id: number | string) {
     const index = this.listeners.findIndex((l) => l.id === id);
-    if (index < 0) {
-      console.log(`listener ${id} not found`);
-      return;
-    } else {
-      console.log(`removing listener ${id}`);
-    }
+    if (index < 0) return;
     const removed = this.listeners.splice(index, 1);
     const { listener, type } = removed[0];
     if (type === "dom") {
@@ -348,7 +343,6 @@ export default class Messenger {
   }
 
   removeListeners() {
-    console.log("removing listeners");
     this.listeners.forEach((l) => {
       const { type, listener } = l;
       if (type === "dom") {

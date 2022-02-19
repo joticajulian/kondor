@@ -51,7 +51,6 @@ async function preparePopup() {
 
 const messenger: Messenger = new Messenger({
   onExtensionRequest: async (message) => {
-    console.log("content command extension: " + message.command);
     const { command } = message;
     switch (command) {
       case "popupReady": {
@@ -63,12 +62,10 @@ const messenger: Messenger = new Messenger({
     }
   },
   onDomRequest: async (event) => {
-    console.log("content command dom: " + event.data.command);
     const { command, args } = event.data;
     if (allowedCommands.includes(command!)) {
       popupReady = false;
       await preparePopup();
-      console.log("popup ready.");
       return messenger.sendExtensionMessage("extension", command, args, {
         ping: true,
       });
