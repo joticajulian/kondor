@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>Signature request</div>
-    <div>{{ requester }}</div>
+    <div>{{ requester.origin }}</div>
     <div>{{ data }}</div>
     <div v-if="!unlocked">
       <Unlock
@@ -47,6 +47,8 @@ export default {
      * and ask to the user to select one to see the details
      */
     const [request] = requests;
+    this.requester = request.sender;
+    this.id = request.id;
     this.decodeTransaction(request);
   },
 
@@ -81,8 +83,6 @@ export default {
       }
 
       this.data = JSON.stringify(decodedOperations, null, 2);
-      this.requester = request.sender.origin;
-      this.id = request.id;
       // TODO: check nonce and limit mana
     },
 
@@ -91,7 +91,7 @@ export default {
         (r) =>
           r.command === "signer:sendTransaction" &&
           r.id === this.id &&
-          r.sender.origin === this.requester
+          r.sender.origin === this.requester.origin
       );
       const [request] = requests;
       // TODO: throw error if there are requests.length > 1
