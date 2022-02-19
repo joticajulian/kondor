@@ -75,3 +75,6 @@ button {
 button:hover {
   opacity: 0.5;
 }
+button:disabled {
+  background: #a28f7a;
+}

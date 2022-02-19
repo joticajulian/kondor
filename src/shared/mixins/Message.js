@@ -111,20 +111,11 @@ export default {
 
   methods: {
     async returnPopupReady() {
-      console.log("asking to bg the tabId");
       const tabId = await this.messenger.sendExtensionMessage(
         "extension",
         "getTab"
       );
-      console.log("resp background");
-      console.log(tabId);
-      console.log("sending message popupLoaded to webpage");
-      const response2 = await this.messenger.sendExtensionMessage(
-        tabId,
-        "popupReady"
-      );
-      console.log("resp tab");
-      console.log(response2);
+      await this.messenger.sendExtensionMessage(tabId, "popupReady");
     },
 
     sendResponse(type, message, requester) {

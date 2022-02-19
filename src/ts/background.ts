@@ -13,7 +13,6 @@ const messenger = new Messenger({
   // eslint-disable-next-line
   // @ts-ignore
   onExtensionRequest: async (message, id, sender) => {
-    console.log("background command extension: " + message.command);
     const { command, args } = message;
 
     let provider = new Provider([]);
@@ -34,9 +33,7 @@ const messenger = new Messenger({
             {},
             { timeout: 20 }
           );
-          console.log("ping2 ok, no need to create a new popup");
         } catch (error) {
-          console.log(error);
           tabIdRequester = sender.tab.id;
           chrome.windows.create(
             {
