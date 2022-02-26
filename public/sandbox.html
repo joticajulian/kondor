@@ -5,14 +5,18 @@
       const serializers = {};
       window.addEventListener("message", async function (event) {
         const { command, id, args } = event.data;
-        if (!args) return;
-        const { serId, serArgs } = args;
-        let result = 0;
+        // check if it is a MessageRequest
+        if (!command) return;
+
+        let message = { id };
 
         try {
+          const { serId, serArgs } = args;
+          let result = undefined;
           switch (command) {
             case "newSerializer":
               serializers[serId] = new Serializer(...serArgs);
+              result = 0;
               break;
             case "serialize":
               result = await serializers[serId].serialize(...serArgs);
@@ -23,11 +27,13 @@
             default:
               break;
           }
+          message.result = result;
           event.source.postMessage({ id, result }, event.origin);
         } catch (error) {
-          console.error(error);
-          event.source.postMessage({ id, error }, event.origin);
+          message.error = error.message;
         }
+        if (message.result === undefined && !message.error) return;
+        event.source.postMessage(message, event.origin);
       });
     </script>
   </body>

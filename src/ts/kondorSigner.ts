@@ -26,18 +26,23 @@ export const signer: SignerInterface = {
   encodeTransaction: async (
     activeData: ActiveTransactionData
   ): Promise<TransactionJson> => {
-    return messenger.sendDomMessage("signer:encodeTransaction", { activeData });
+    return messenger.sendDomMessage("popup", "signer:encodeTransaction", {
+      activeData,
+    });
   },
   decodeTransaction: async (
     tx: TransactionJson
   ): Promise<ActiveTransactionData> => {
-    return messenger.sendDomMessage("signer:decodeTransaction", { tx });
+    return messenger.sendDomMessage("popup", "signer:decodeTransaction", {
+      tx,
+    });
   },
   sendTransaction: async (
     tx: TransactionJson,
     abis?: Record<string, Abi>
   ): Promise<TransactionJsonWait> => {
     const transaction = await messenger.sendDomMessage<TransactionJson>(
+      "popup",
       "signer:sendTransaction",
       {
         tx,
@@ -50,7 +55,7 @@ export const signer: SignerInterface = {
         type: "byTransactionId" | "byBlock" = "byBlock",
         timeout = 30000
       ) => {
-        return messenger.sendDomMessage("provider:wait", {
+        return messenger.sendDomMessage("background", "provider:wait", {
           txId: transaction.id,
           type,
           timeout,

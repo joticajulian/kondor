@@ -24,11 +24,7 @@ declare const window: {
   [x: string]: unknown;
 };
 
-const allowedCommands = [
-  "getAccounts",
-  "signer:sendTransaction",
-  "signer:encodeTransaction",
-  "signer:decodeTransaction",
+const backgroundCommands = [
   "provider:call",
   "provider:getNonce",
   "provider:getAccountRc",
@@ -42,10 +38,17 @@ const allowedCommands = [
   "provider:readContract",
 ];
 
+const popupCommands = [
+  "getAccounts",
+  "signer:sendTransaction",
+  "signer:encodeTransaction",
+  "signer:decodeTransaction",
+];
+
 let popupReady = false;
 
 async function preparePopup() {
-  await messenger.sendExtensionMessage("extension", "preparePopup");
+  await messenger.sendExtensionMessage("background", "preparePopup");
   while (!popupReady) await new Promise((r) => setTimeout(r, 20));
 }
 
@@ -62,14 +65,18 @@ const messenger: Messenger = new Messenger({
     }
   },
   onDomRequest: async (event) => {
-    const { command, args } = event.data;
-    if (allowedCommands.includes(command!)) {
+    const { command, args, to } = event.data;
+    const isBackgroundCommand = backgroundCommands.includes(command!);
+    const isPopupCommand = popupCommands.includes(command!);
+    if (!isBackgroundCommand && !isPopupCommand) return undefined;
+
+    if (isPopupCommand) {
       popupReady = false;
       await preparePopup();
-      return messenger.sendExtensionMessage("extension", command, args, {
-        ping: true,
-      });
     }
-    return undefined;
+
+    return messenger.sendExtensionMessage(to, command, args, {
+      ping: true,
+    });
   },
 });

@@ -22,7 +22,10 @@ export default {
   mounted() {
     this.messenger = new Messenger({
       onExtensionRequest: async (message, id, sender) => {
-        const { command, args } = message;
+        const { command, args, to } = message;
+
+        if (to !== "popup") return undefined;
+
         switch (command) {
           case "newWallet": {
             this.messenger.removeListeners();
@@ -112,7 +115,7 @@ export default {
   methods: {
     async returnPopupReady() {
       const tabId = await this.messenger.sendExtensionMessage(
-        "extension",
+        "background",
         "getTab"
       );
       await this.messenger.sendExtensionMessage(tabId, "popupReady");
@@ -122,7 +125,9 @@ export default {
       this.messenger.sendResponse(type, message, requester);
 
       // remove request
-      const index = this.$store.state.requests.find((r) => r.id === message.id);
+      const index = this.$store.state.requests.findIndex(
+        (r) => r.id === message.id
+      );
       if (index >= 0) this.$store.state.requests.splice(index, 1);
     },
   },

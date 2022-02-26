@@ -9,15 +9,22 @@ const messenger = new Messenger({});
 
 export const provider = {
   async call<T = unknown>(method: string, params: unknown): Promise<T> {
-    return messenger.sendDomMessage("provider:call", { method, params });
+    return messenger.sendDomMessage("background", "provider:call", {
+      method,
+      params,
+    });
   },
 
   async getNonce(account: string): Promise<number> {
-    return messenger.sendDomMessage("provider:getNonce", { account });
+    return messenger.sendDomMessage("background", "provider:getNonce", {
+      account,
+    });
   },
 
   async getAccountRc(account: string): Promise<string> {
-    return messenger.sendDomMessage("provider:getAccountRc", { account });
+    return messenger.sendDomMessage("background", "provider:getAccountRc", {
+      account,
+    });
   },
 
   async getTransactionsById(transactionIds: string[]): Promise<{
@@ -26,9 +33,13 @@ export const provider = {
       containing_blocks: string[];
     }[];
   }> {
-    return messenger.sendDomMessage("provider:getTransactionsById", {
-      transactionIds,
-    });
+    return messenger.sendDomMessage(
+      "background",
+      "provider:getTransactionsById",
+      {
+        transactionIds,
+      }
+    );
   },
 
   async getBlocksById(blockIds: string[]): Promise<{
@@ -38,7 +49,9 @@ export const provider = {
       block: BlockJson;
     }[];
   }> {
-    return messenger.sendDomMessage("provider:getBlocksById", { blockIds });
+    return messenger.sendDomMessage("background", "provider:getBlocksById", {
+      blockIds,
+    });
   },
 
   async getHeadInfo(): Promise<{
@@ -49,7 +62,7 @@ export const provider = {
     };
     last_irreversible_block: string;
   }> {
-    return messenger.sendDomMessage("provider:getHeadInfo");
+    return messenger.sendDomMessage("background", "provider:getHeadInfo");
   },
 
   async getBlocks(
@@ -66,7 +79,7 @@ export const provider = {
       };
     }[]
   > {
-    return messenger.sendDomMessage("provider:getBlocks", {
+    return messenger.sendDomMessage("background", "provider:getBlocks", {
       height,
       numBlocks,
       idRef,
@@ -81,7 +94,9 @@ export const provider = {
       [x: string]: unknown;
     };
   }> {
-    return messenger.sendDomMessage("provider:getBlock", { height });
+    return messenger.sendDomMessage("background", "provider:getBlock", {
+      height,
+    });
   },
 
   async wait(
@@ -89,7 +104,7 @@ export const provider = {
     type: "byTransactionId" | "byBlock" = "byBlock",
     timeout = 30000
   ): Promise<string | number> {
-    return messenger.sendDomMessage("provider:wait", {
+    return messenger.sendDomMessage("background", "provider:wait", {
       txId,
       type,
       timeout,
@@ -97,7 +112,9 @@ export const provider = {
   },
 
   async sendTransaction(transaction: TransactionJson): Promise<{}> {
-    await messenger.sendDomMessage("provider:sendTransaction", { transaction });
+    await messenger.sendDomMessage("background", "provider:sendTransaction", {
+      transaction,
+    });
     return {};
   },
 
@@ -105,7 +122,9 @@ export const provider = {
     result: string;
     logs: string;
   }> {
-    return messenger.sendDomMessage("provider:readContract", { operation });
+    return messenger.sendDomMessage("background", "provider:readContract", {
+      operation,
+    });
   },
 };
 
