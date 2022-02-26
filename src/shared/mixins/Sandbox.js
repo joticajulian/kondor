@@ -43,21 +43,24 @@ export default {
      */
     async sendSandbox(command, args) {
       const iframeSandbox = document.getElementById("sandbox");
-      const reqId = Math.round(Math.random() * 10000);
-      this.reqIds.push(reqId);
       while (!this.$store.state.sandboxLoaded) {
         await new Promise((r) => setTimeout(r, 20));
       }
+      const reqId = crypto.randomUUID();
       return await new Promise((resolve, reject) => {
         // prepare the listener
         const listener = (event) => {
+          // ignore requests
+          if (event.data.command) return;
+
           const { id, result, error } = event.data;
-          if (!id) return;
-          const i = this.reqIds.findIndex((r) => r === id);
-          if (i < 0) return;
-          this.reqIds.splice(i, 1);
+
+          // ignore different ids
+          if (id !== reqId) return;
+
+          // send response
           if (error) {
-            reject(error);
+            reject(new Error(error));
           } else {
             resolve(result);
           }
