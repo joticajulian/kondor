@@ -47,6 +47,8 @@
             from: inputFrom.value,
             to: inputTo.value,
             value: utils.parseUnits(inputValue.value, 8),
+          }, {
+            payer: inputFrom.value,
           });
           console.log(transaction);
           divText.innerHTML = `transaction ${transaction.id} submitted. Waiting to be mined`;
