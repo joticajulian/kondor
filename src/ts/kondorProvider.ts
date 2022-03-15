@@ -65,6 +65,10 @@ export const provider = {
     return messenger.sendDomMessage("background", "provider:getHeadInfo");
   },
 
+  async getChainId(): Promise<string> {
+    return messenger.sendDomMessage("background", "provider:getChainId");
+  },
+
   async getBlocks(
     height: number,
     numBlocks = 1,
@@ -116,6 +120,12 @@ export const provider = {
       transaction,
     });
     return {};
+  },
+
+  async submitBlock(block: BlockJson): Promise<Record<string, never>> {
+    return messenger.sendDomMessage("background", "provider:submitBlock", {
+      block,
+    });
   },
 
   async readContract(operation: CallContractOperationJson): Promise<{

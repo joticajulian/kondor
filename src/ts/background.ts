@@ -1,7 +1,8 @@
-import { Provider } from "koilib/lib/browser";
+import { Provider, Signer } from "koilib/lib/browser";
 import {
   CallContractOperationJson,
   TransactionJson,
+  BlockJson,
 } from "koilib/lib/interface";
 import { Messenger } from "./Messenger";
 import * as storage from "./storage";
@@ -26,9 +27,16 @@ const messenger = new Messenger({
     requestIds.push(id);
 
     let provider = new Provider([]);
+    let signer: Signer;
     if (command.startsWith("provider")) {
       const rpcNodes = await storage.getRpcNodes();
       provider = new Provider(rpcNodes);
+    }
+    if (command.startsWith("signer")) {
+      const rpcNodes = await storage.getRpcNodes();
+      provider = new Provider(rpcNodes);
+      signer = Signer.fromSeed("seed");
+      signer.provider = provider;
     }
 
     try {
@@ -107,6 +115,10 @@ const messenger = new Messenger({
           result = await provider.getHeadInfo();
           break;
         }
+        case "provider:getChainId": {
+          result = await provider.getChainId();
+          break;
+        }
         case "provider:getBlocks": {
           const { height, numBlocks, idRef } = args as {
             height: number;
@@ -121,11 +133,6 @@ const messenger = new Messenger({
           result = await provider.getBlock(height);
           break;
         }
-        case "provider:sendTransaction": {
-          const { transaction } = args as { transaction: TransactionJson };
-          result = await provider.sendTransaction(transaction);
-          break;
-        }
         case "provider:wait": {
           const { txId, type, timeout } = args as {
             txId: string;
@@ -135,12 +142,28 @@ const messenger = new Messenger({
           result = await provider.wait(txId, type, timeout);
           break;
         }
+        case "provider:sendTransaction": {
+          const { transaction } = args as { transaction: TransactionJson };
+          result = await provider.sendTransaction(transaction);
+          break;
+        }
+        case "provider:submitBlock": {
+          const { block } = args as { block: BlockJson };
+          result = await provider.submitBlock(block);
+          break;
+        }
         case "provider:readContract": {
           const { operation } = args as {
             operation: CallContractOperationJson;
           };
           result = await provider.readContract(operation);
           break;
+        }
+        case "signer:prepareTransaction": {
+          const { transaction } = args as { transaction: TransactionJson };
+          if (!transaction.header || !transaction.header.payer)
+            throw new Error("Please define a payer for the transaction");
+          result = await signer!.prepareTransaction(transaction);
         }
         default: {
           result = undefined;

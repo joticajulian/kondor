@@ -41,15 +41,8 @@ export default {
           return this.numErrors > 20;
         };
 
-        this.signer = Signer.fromWif(this.$store.state.privateKey);
+        this.signer = Signer.fromWif(this.$store.state.privateKey, true);
         this.signer.provider = this.provider;
-        this.signer.serializer = await this.newSandboxSerializer(
-          utils.ProtocolTypes,
-          {
-            defaultTypeName: "active_transaction_data",
-            bytesConversion: false,
-          }
-        );
         this.address = this.signer.getAddress();
 
         this.koinContract = new Contract({

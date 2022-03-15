@@ -306,7 +306,7 @@ export default class Messenger {
         }
         console.debug("sending message", reqId, command, "to", to);
         console.debug(args);
-      }
+      };
       sendMessage();
 
       // define timeout

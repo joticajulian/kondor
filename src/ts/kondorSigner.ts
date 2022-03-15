@@ -2,7 +2,7 @@ import { SignerInterface } from "koilib";
 import { Messenger } from "./Messenger";
 import {
   Abi,
-  ActiveTransactionData,
+  BlockJson,
   TransactionJson,
   TransactionJsonWait,
 } from "koilib/lib/interface";
@@ -23,19 +23,24 @@ export const signer: SignerInterface = {
       "signTransaction is not available. Use sendTransaction instead"
     );
   },
-  encodeTransaction: async (
-    activeData: ActiveTransactionData
-  ): Promise<TransactionJson> => {
-    return messenger.sendDomMessage("popup", "signer:encodeTransaction", {
-      activeData,
-    });
+  signHash: (): Promise<Uint8Array> => {
+    throw new Error("signHash is not available. Use sendTransaction instead");
   },
-  decodeTransaction: async (
-    tx: TransactionJson
-  ): Promise<ActiveTransactionData> => {
-    return messenger.sendDomMessage("popup", "signer:decodeTransaction", {
-      tx,
-    });
+  prepareBlock: (): Promise<BlockJson> => {
+    throw new Error("prepareBlock is not available");
+  },
+  signBlock: (): Promise<BlockJson> => {
+    throw new Error("signBlock is not available");
+  },
+  prepareTransaction: async (
+    transaction: TransactionJson
+  ): Promise<TransactionJson> => {
+    const tx = await messenger.sendDomMessage<TransactionJson>(
+      "background",
+      "signer:prepareTransaction",
+      { transaction }
+    );
+    return tx;
   },
   sendTransaction: async (
     tx: TransactionJson,

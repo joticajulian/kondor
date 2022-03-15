@@ -31,18 +31,21 @@ const backgroundCommands = [
   "provider:getTransactionsById",
   "provider:getBlocksById",
   "provider:getHeadInfo",
+  "provider:getChainId",
   "provider:getBlocks",
   "provider:getBlock",
-  "provider:sendTransaction",
   "provider:wait",
+  "provider:sendTransaction",
+  "provider:submitBlock",
   "provider:readContract",
+  "signer:prepareTransaction",
 ];
 
 const popupCommands = [
   "getAccounts",
+  "signer:signHash",
+  "signer:signTransaction",
   "signer:sendTransaction",
-  "signer:encodeTransaction",
-  "signer:decodeTransaction",
 ];
 
 let popupReady = false;
