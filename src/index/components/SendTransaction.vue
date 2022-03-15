@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { Signer, Contract, Provider, utils } from "koilib";
+import { Signer, Contract, Provider } from "koilib";
 import Unlock from "@/index/components/Unlock.vue";
 import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
@@ -54,22 +54,17 @@ export default {
 
   methods: {
     async decodeTransaction(request) {
-      const signer = Signer.fromSeed("");
-      signer.serializer = await this.newSandboxSerializer(utils.ProtocolTypes, {
-        defaultTypeName: "active_transaction_data",
-        bytesConversion: false,
-      });
-      const active = await signer.decodeTransaction(request.args.tx);
+      const { operations } = request.args.tx;
       const decodedOperations = [];
-      for (let i = 0; i < active.operations.length; i += 1) {
-        const op = active.operations[i];
+      for (let i = 0; i < operations.length; i += 1) {
+        const op = operations[i];
         if (!op.call_contract) {
           // upload contract or set system call don't
           // require an extra decode
           decodedOperations.push(op);
           return;
         }
-        const contractId = utils.encodeBase58(op.call_contract.contract_id);
+        const contractId = op.call_contract.contract_id;
         const abi = request.args.abis[contractId];
         const contract = new Contract({
           id: contractId,
@@ -103,18 +98,9 @@ export default {
       };
       const signer = Signer.fromWif(this.$store.state.privateKey);
       signer.provider = provider;
-      signer.serializer = await this.newSandboxSerializer(utils.ProtocolTypes, {
-        defaultTypeName: "active_transaction_data",
-        bytesConversion: false,
-      });
       let message = { id: request.id };
       try {
-        const { operations } = await signer.decodeTransaction(request.args.tx);
-        const tx = await signer.encodeTransaction({
-          operations,
-          rc_limit: 1e8,
-        });
-        const transaction = await signer.sendTransaction(tx);
+        const transaction = await signer.sendTransaction(request.args.tx);
         message.result = transaction;
       } catch (err) {
         message.error = err;
