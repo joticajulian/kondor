@@ -252,6 +252,7 @@ export default class Messenger {
     opts?: {
       timeout?: number;
       ping?: boolean;
+      retries?: number;
     }
   ): Promise<T> {
     const reqId = crypto.randomUUID();
@@ -286,24 +287,27 @@ export default class Messenger {
       chrome.runtime.onMessage.addListener(listener);
 
       // send request
-      if (["popup", "background"].includes(to as string)) {
-        chrome.runtime.sendMessage({
-          id: reqId,
-          command,
-          args,
-          to,
-        });
-      } else {
-        // 'to' is tab.id
-        chrome.tabs.sendMessage(to as number, {
-          id: reqId,
-          command,
-          args,
-          to,
-        });
+      const sendMessage = () => {
+        if (["popup", "background"].includes(to as string)) {
+          chrome.runtime.sendMessage({
+            id: reqId,
+            command,
+            args,
+            to,
+          });
+        } else {
+          // 'to' is tab.id
+          chrome.tabs.sendMessage(to as number, {
+            id: reqId,
+            command,
+            args,
+            to,
+          });
+        }
+        console.debug("sending message", reqId, command, "to", to);
+        console.debug(args);
       }
-      console.debug("sending message", reqId, command, "to", to);
-      console.debug(args);
+      sendMessage();
 
       // define timeout
       if (opts && opts.timeout) {
@@ -316,6 +320,7 @@ export default class Messenger {
       // ping
       if (opts && opts.ping) {
         (async () => {
+          let retries = opts?.retries || 0;
           await new Promise((r) => setTimeout(r, 1000));
           while (this.listeners.find((l) => l.id === reqId)) {
             try {
@@ -327,9 +332,15 @@ export default class Messenger {
               );
               await new Promise((r) => setTimeout(r, 1000));
             } catch (error) {
-              reject(error);
-              this.removeListener(reqId);
-              break;
+              if (retries <= 0) {
+                reject(error);
+                this.removeListener(reqId);
+                break;
+              }
+              retries -= 1;
+              console.log(`retrying ${reqId}. remaining retries: ${retries}`);
+              sendMessage();
+              await new Promise((r) => setTimeout(r, 100));
             }
           }
         })();

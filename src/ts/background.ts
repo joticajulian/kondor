@@ -1,6 +1,5 @@
 import { Provider } from "koilib/lib/browser";
 import {
-  ActiveTransactionData,
   CallContractOperationJson,
   TransactionJson,
 } from "koilib/lib/interface";
