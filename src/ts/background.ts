@@ -164,6 +164,7 @@ const messenger = new Messenger({
           if (!transaction.header || !transaction.header.payer)
             throw new Error("Please define a payer for the transaction");
           result = await signer!.prepareTransaction(transaction);
+          break;
         }
         default: {
           result = undefined;
