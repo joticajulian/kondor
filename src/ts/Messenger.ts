@@ -81,6 +81,14 @@ declare const window: {
   [x: string]: unknown;
 };
 
+function getError(e: unknown): string {
+  if (typeof e !== "object") return e as string;
+  if ((e as Error).message) return (e as Error).message;
+  console.debug("unknown kondor error");
+  console.debug(e);
+  return "unknown kondor error";
+}
+
 export default class Messenger {
   public onExtensionRequest: OnExtensionRequest;
 
@@ -216,8 +224,8 @@ export default class Messenger {
         // send response
         if (error) {
           console.debug("error received", id, ":");
-          console.debug(error);
-          reject(new Error(error));
+          console.debug(getError(error));
+          reject(new Error(getError(error)));
         } else {
           console.debug("response received", id, ":");
           console.debug(result);
@@ -272,8 +280,8 @@ export default class Messenger {
         // send response
         if (error) {
           console.debug("error received", id, ":");
-          console.debug(error);
-          reject(new Error(error));
+          console.debug(getError(error));
+          reject(new Error(getError(error)));
         } else {
           console.debug("response received", id, ":");
           console.debug(result);
