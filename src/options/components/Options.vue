@@ -5,7 +5,7 @@
     <button @click="setRpcNodes">Set RPC Nodes</button>
     <div>Set Chain Id</div>
     <input v-model="chainId" type="text" />
-    <button @click="setChainId"></button>
+    <button @click="setChainId">Set Chain Id</button>
   </div>
 </template>
 
@@ -23,7 +23,8 @@ export default {
   mixins: [Storage, AlertHelper],
   mounted() {
     (async () => {
-      this.rpcNodes = await this._getRpcNodes().join(",");
+      this.rpcNodes = (await this._getRpcNodes()).join(",");
+      this.chainId = await this._getChainId();
     })();
   },
   methods: {
