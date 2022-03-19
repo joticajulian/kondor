@@ -34,8 +34,8 @@ export default {
   mounted() {
     (async () => {
       try {
-        const rpcNode = await this.getRpcNode();
-        this.provider = new Provider([rpcNode]);
+        const rpcNodes = await this._getRpcNodes();
+        this.provider = new Provider(rpcNodes);
         this.provider.onError = () => {
           this.numErrors += 1;
           return this.numErrors > 20;
