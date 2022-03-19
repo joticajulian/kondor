@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import * as storage from "../../../lib/storage";
 
 function toUint8Array(hexString) {
   return new Uint8Array(
@@ -18,80 +19,76 @@ export default {
   name: "Storage mixin",
 
   methods: {
-    async readStorage(keys) {
+    async _write(key, value) {
       if (process.env.VUE_APP_ENV === "test") {
-        const result = {};
-        keys.forEach((k) => {
-          if (typeof this.$store.state.testData[k] !== "undefined")
-            result[k] = this.$store.state.testData[k];
-        });
-        if (Object.keys(result).length === 0) return null;
-        return result;
-      }
-      return new Promise((resolve) => {
-        chrome.storage.local.get(keys, function (result) {
-          if (Object.keys(result).length === 0) resolve(null);
-          else resolve(result);
-        });
-      });
-    },
-
-    async writeStorage(data) {
-      if (process.env.VUE_APP_ENV === "test") {
-        Object.assign(this.$store.state.testData, data);
+        this.$store.state.testData[key] = value;
         return;
       }
-      return new Promise((resolve) => {
-        chrome.storage.local.set(data, function () {
-          resolve();
-        });
-      });
+      return storage.write(key, value);
     },
 
-    async getAccounts() {
-      const result = await this.readStorage(["accounts"]);
-      if (!result) return null;
-      return result.accounts;
-    },
-
-    async setAccounts(accounts) {
-      this.writeStorage({ accounts });
-    },
-
-    async getRpcNode() {
-      let result = await this.readStorage(["rpcNode"]);
-      if (!result) {
-        // store default value
-        const rpcNode =
-          process.env.VUE_APP_ENV === "test"
-            ? "http://localhost:8081/jsonrpc"
-            : "http://api.koinos.io:8080";
-        await this.writeStorage({ rpcNode });
-        result = await this.readStorage(["rpcNode"]);
+    async _read(key, strict) {
+      if (process.env.VUE_APP_ENV === "test") {
+        if (typeof this.$store.state.testData[key] !== "undefined")
+          return this.$store.state.testData[key];
+        if (strict) throw new Error(`${key} not found, it is undefined`);
+        return undefined;
       }
-      return result.rpcNode;
+      return storage.read(key, strict);
     },
 
-    async setRpcNode(rpcNode) {
-      await this.writeStorage({ rpcNode });
+    async _setAccounts(encrypted) {
+      return this._write("accounts", encrypted);
     },
+
+    async _getAccounts(strict = false) {
+      return this._read("accounts", strict);
+    },
+
+    async _setRpcNodes(rpcNodes) {
+      return this._write("rpcNodes", rpcNodes);
+    },
+
+    async _getRpcNodes(strict = false) {
+      let rpcNodes = this._read("rpcNodes", strict);
+      if (!rpcNodes) {
+        // store default value
+        rpcNodes =
+          process.env.VUE_APP_ENV === "test"
+            ? ["http://localhost:8081/jsonrpc"]
+            : ["http://api.koinos.io:8080"];
+        await this._setRpcNodes(rpcNodes);
+        rpcNodes = await this._read("rpcNodes", true);
+      }
+      return rpcNodes;
+    },
+
+    async _setChainId(chainId) {
+      return this._write("chainId", chainId);
+    },
+
+    async _getChainId(strict = false) {
+      return this._read("chainId", strict);
+    },
+
+    // TODO: remove the following functions and replace them
+    // with the ones in storage.ts
 
     async getOptsEncryption() {
-      let result = await this.readStorage(["salt", "iv"]);
-      if (!result) {
-        const salt = toHexString(
+      let saltString = await this._read("salt", false);
+      let ivString = await this._read("iv", false);
+      if (!saltString || !ivString) {
+        saltString = toHexString(
           window.crypto.getRandomValues(new Uint8Array(16))
         );
-        const iv = toHexString(
+        ivString = toHexString(
           window.crypto.getRandomValues(new Uint8Array(12))
         );
-        await this.writeStorage({ salt, iv });
-        result = await this.readStorage(["salt", "iv"]);
-        if (!result)
-          throw new Error("Local storage error: cannot save salt and iv");
+        await this._write("salt", saltString);
+        await this._write("iv", ivString);
       }
-      const salt = toUint8Array(result.salt).buffer;
-      const iv = toUint8Array(result.iv).buffer;
+      const salt = toUint8Array(saltString).buffer;
+      const iv = toUint8Array(ivString).buffer;
       return { salt, iv };
     },
 

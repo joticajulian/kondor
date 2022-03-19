@@ -20,7 +20,7 @@ export default {
   methods: {
     async unlock() {
       try {
-        const accounts = await this.getAccounts();
+        const accounts = await this._getAccounts();
         const privateKey = await this.decrypt(
           accounts[0].encryptedPrivateKey,
           this.password

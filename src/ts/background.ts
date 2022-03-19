@@ -116,7 +116,12 @@ const messenger = new Messenger({
           break;
         }
         case "provider:getChainId": {
-          result = await provider.getChainId();
+          let chainId = await storage.getChainId(false);
+          if (!chainId) {
+            chainId = await provider.getChainId();
+            await storage.setChainId(chainId);
+          }
+          result = chainId;
           break;
         }
         case "provider:getBlocks": {
@@ -163,6 +168,14 @@ const messenger = new Messenger({
           const { transaction } = args as { transaction: TransactionJson };
           if (!transaction.header || !transaction.header.payer)
             throw new Error("Please define a payer for the transaction");
+          if (!transaction.header.chain_id) {
+            let chainId = await storage.getChainId(false);
+            if (!chainId) {
+              chainId = await provider.getChainId();
+              await storage.setChainId(chainId);
+            }
+            transaction.header.chain_id = chainId;
+          }
           result = await signer!.prepareTransaction(transaction);
           break;
         }

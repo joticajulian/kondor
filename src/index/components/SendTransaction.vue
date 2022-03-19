@@ -76,7 +76,7 @@ export default {
             contract_id: utils.decodeBase58(op.call_contract.contract_id),
             entry_point: op.call_contract.entry_point,
             args: utils.decodeBase64url(op.call_contract.args),
-          }
+          },
         });
         decodedOperations.push({
           call_contract: { contractId, name, args },
@@ -96,8 +96,8 @@ export default {
       );
       const [request] = requests;
       // TODO: throw error if there are requests.length > 1
-      const rpcNode = await this.getRpcNode();
-      const provider = new Provider([rpcNode]);
+      const rpcNodes = await this._getRpcNodes();
+      const provider = new Provider(rpcNodes);
       provider.onError = () => {
         this.numErrors += 1;
         return this.numErrors > 20;

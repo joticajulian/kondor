@@ -5,8 +5,8 @@ async function getOptsEncryption(): Promise<{
   salt: ArrayBufferLike;
   iv: ArrayBufferLike;
 }> {
-  let saltString = await storage.read<string>("salt");
-  let ivString = await storage.read<string>("iv");
+  let saltString = await storage.read<string>("salt", false);
+  let ivString = await storage.read<string>("iv", false);
   if (!saltString || !ivString) {
     saltString = toHexString(window.crypto.getRandomValues(new Uint8Array(16)));
     ivString = toHexString(window.crypto.getRandomValues(new Uint8Array(12)));
