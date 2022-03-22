@@ -4,16 +4,63 @@ import {
   TransactionJson,
   BlockJson,
 } from "koilib/lib/interface";
-import { Messenger } from "./Messenger";
+import { Messenger, Sender } from "./Messenger";
 import * as storage from "./storage";
 
-let tabIdRequester: number | undefined;
-let requestIds: string[] = [];
+const EXPIRATION_ID = 30 * 60 * 1000; // 30 minutes
 
-function removeId(id: string) {
-  const index = requestIds.findIndex((rId) => rId === id);
-  if (index < 0) return;
-  requestIds.splice(index, 1);
+let tabIdRequester: number | undefined;
+
+const getIds = async () => {
+  const ids =
+    (await storage.read<{ id: string; timestamp: number }[]>(
+      "bg-ids",
+      false
+    )) || [];
+  return ids.filter(
+    (id) => id.timestamp && Date.now() < id.timestamp + EXPIRATION_ID
+  );
+};
+
+const writeIds = async (ids: { id: string; timestamp: number }[]) => {
+  await storage.write("bg-ids", ids);
+};
+
+const idHelper = {
+  add: async (id: string) => {
+    const ids = await getIds();
+    ids.push({ id, timestamp: Date.now() });
+    await writeIds(ids);
+  },
+  remove: async (id: string) => {
+    const ids = await getIds();
+    const index = ids.findIndex((rId) => rId.id === id);
+    if (index < 0) return;
+    ids.splice(index, 1);
+    await writeIds(ids);
+  },
+};
+
+async function preparePopup(sender?: Sender) {
+  if (!sender || !sender.tab) throw new Error("invalid command preparePopup");
+
+  try {
+    await messenger.sendExtensionMessage("popup", "ping2", {}, { timeout: 20 });
+  } catch (error) {
+    tabIdRequester = sender.tab.id;
+    chrome.windows.create(
+      {
+        focused: true,
+        height: 500,
+        width: 309,
+        type: "popup",
+        url: "index.html",
+        top: 0,
+        left: 0,
+      },
+      () => {}
+    );
+  }
 }
 
 const messenger = new Messenger({
@@ -24,7 +71,7 @@ const messenger = new Messenger({
 
     if (to !== "background") return undefined;
 
-    requestIds.push(id);
+    await idHelper.add(id);
 
     let provider = new Provider([]);
     let signer: Signer;
@@ -43,37 +90,13 @@ const messenger = new Messenger({
       let result: unknown;
       switch (command) {
         case "preparePopup": {
-          if (!sender || !sender.tab)
-            throw new Error("invalid command preparePopup");
-
-          try {
-            await messenger.sendExtensionMessage(
-              "popup",
-              "ping2",
-              {},
-              { timeout: 20 }
-            );
-          } catch (error) {
-            tabIdRequester = sender.tab.id;
-            chrome.windows.create(
-              {
-                focused: true,
-                height: 500,
-                width: 309,
-                type: "popup",
-                url: "index.html",
-                top: 0,
-                left: 0,
-              },
-              () => {}
-            );
-          }
+          await preparePopup(sender);
           result = "ok";
           break;
         }
         case "ping": {
-          const rId = requestIds.find(
-            (rId) => rId === (args as { id: string }).id
+          const rId = (await getIds()).find(
+            (rId) => rId.id === (args as { id: string }).id
           );
           if (!rId) throw new Error("Connection closed background");
           result = "ok";
@@ -165,6 +188,7 @@ const messenger = new Messenger({
           break;
         }
         case "signer:prepareTransaction": {
+          preparePopup(sender);
           const { transaction } = args as { transaction: TransactionJson };
           if (!transaction.header || !transaction.header.payer)
             throw new Error("Please define a payer for the transaction");
@@ -184,10 +208,10 @@ const messenger = new Messenger({
           break;
         }
       }
-      removeId(id);
+      await idHelper.remove(id);
       return result;
     } catch (error) {
-      removeId(id);
+      await idHelper.remove(id);
       throw error;
     }
   },

@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-interface Sender {
+export interface Sender {
   tab?: {
     id: number;
   };
