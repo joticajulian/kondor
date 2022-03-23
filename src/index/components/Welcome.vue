@@ -1,13 +1,18 @@
 <template>
-  <div>
-    <Logo />
-    <LogoText />
+  <div class="container">
+    <div class="logo">
+      <div><Logo /></div>
+      <br>
+      <div><LogoText /></div>
+    </div>
     <div v-if="hasAccounts">
       <Unlock @onUnlock="unlock()" @onError="alertDanger($event.message)" />
     </div>
-    <router-link to="/newWallet"
-      >import using Secret Recovery Phrase</router-link
-    >
+    <div class="welcome-message">
+      Welcome to kondor!
+      <br />the first of its kind wallet for the first of its kind blockchain, koinos
+    </div>
+    <router-link to="/newWallet" class="link">Get Started</router-link>
   </div>
 </template>
 
@@ -46,3 +51,30 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+.welcome-message {
+  width: 90%;
+  margin: 2em 0;
+  line-height: 1.2em;
+  color: var(--kondor-light)
+}
+.logo {
+  display: flex;
+  flex-direction: column;
+}
+.link {
+  border-bottom: 1px dotted white;
+  padding-bottom: 8px;
+}
+.link:hover {
+  border-bottom: 2px solid white;
+  color: white;
+}
+</style>
