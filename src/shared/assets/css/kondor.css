@@ -78,3 +78,33 @@ button:hover {
 button:disabled {
   background: #a28f7a;
 }
+
+.flex {
+  display:flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-center {
+  justify-content: center;
+}
+
+/* Margins */
+
+.mt-50 {
+  margin-top:50px;
+}
+
+.mt-10 {
+  margin-top:10px;
+}
+
+.my-5 {
+  margin: 5px 0 5px 0;
+}
+
+.my-default {
+  margin: 0.5em 0 1em 0;
+}
