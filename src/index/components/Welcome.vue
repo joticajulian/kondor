@@ -1,13 +1,21 @@
 <template>
   <div>
-    <Logo />
-    <LogoText />
+    <div class="flex flex-center">
+      <div class="flex flex-column">
+        <Logo />
+        <div class="mt-10"></div>
+        <LogoText />
+      </div>
+    </div>
+
     <div v-if="hasAccounts">
       <Unlock @onUnlock="unlock()" @onError="alertDanger($event.message)" />
     </div>
-    <router-link to="/newWallet"
-      >import using Secret Recovery Phrase</router-link
-    >
+    <div class="mt-50">
+      <router-link to="/newWallet"
+        >import using Secret Recovery Phrase</router-link
+      >
+    </div>
   </div>
 </template>
 
