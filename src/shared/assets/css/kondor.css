@@ -5,17 +5,21 @@
   --kondor-gray: #828282;
 }
 
+@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
+
 body {
   margin: 0px;
+  background: var(--secondary-color);
 }
 
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Urbanist", sans-serif;
+  font-family: "Major Mono Display", monospace;
   background-color: var(--secondary-color);
   color: var(--primary-color);
   padding: 20px;
+  text-transform: lowercase;
 }
 
 #sandbox {
@@ -59,15 +63,12 @@ textarea {
   white-space: normal;
   background: none;
   line-height: 1;
-  font-size: 13px;
+  font-size: 12px;
   font-family: Arial;
 }
-
 button {
-  background: var(--kondor-light);
   padding: 0.8em;
-  color: var(--secondary-color);
-  border-radius: 8px;
+  color: var(--kondor-light);
   border-width: 0;
   font-family: "Major Mono Display", monospace;
   cursor: pointer;
@@ -77,4 +78,47 @@ button:hover {
 }
 button:disabled {
   background: #a28f7a;
+}
+.link {
+  border-bottom: 1px dotted white;
+  padding-bottom: 0 0 8px 0;
+}
+.link:hover {
+  border-bottom: 2px solid white;
+  color: white;
+}
+
+.proper {
+  text-transform: capitalize;
+}
+.title {
+  text-transform: capitalize;
+  padding-bottom: 0.3em;
+}
+.body {
+  text-transform: capitalize;
+  color: var(--kondor-gray);
+  font-size: 0.8em;
+  padding-bottom: 1em;
+  line-height: 1.5em;
+  width: 80%;
+  text-align: center;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5em 0;
+  width: 100%;
+}
+.container {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--kondor-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.heading {
+  text-transform: uppercase;
+  font-size: 1.4em;
 }
