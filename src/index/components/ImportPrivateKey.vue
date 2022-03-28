@@ -1,6 +1,6 @@
 <template>
-  <div class="container">
-    <div class="section">
+  <div class="middle">
+    <div class="container">
       <h1>Import Private Key</h1>
       <img src="" alt="" />
       <input
@@ -76,5 +76,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 80%;
+}
+.middle {
+      display: flex;
+    justify-content: center;
 }
 </style>
