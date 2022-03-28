@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 export async function write(key: string, value: unknown): Promise<void> {
   return new Promise((resolve) => {
     const data: { [x: string]: unknown } = {};
@@ -35,4 +36,12 @@ export async function setRpcNodes(rpcNodes: string[]): Promise<void> {
 
 export async function getRpcNodes(strict = true): Promise<string[]> {
   return read("rpcNodes", strict) as Promise<string[]>;
+}
+
+export async function setChainId(chainId: string): Promise<void> {
+  return write("chainId", chainId);
+}
+
+export async function getChainId(strict = true): Promise<string> {
+  return read("chainId", strict) as Promise<string>;
 }

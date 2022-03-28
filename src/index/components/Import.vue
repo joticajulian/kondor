@@ -46,7 +46,7 @@ export default {
         { privateKey: this.privateKey },
         this.password1
       );
-      await this.setAccounts(enc);
+      await this._setAccounts(enc);
       this.$store.state.privateKey = this.privateKey;
       router.push("/dashboard");
     },

@@ -40,22 +40,15 @@ export default {
   mounted() {
     (async () => {
       try {
-        const rpcNode = await this.getRpcNode();
-        this.provider = new Provider([rpcNode]);
+        const rpcNodes = await this._getRpcNodes();
+        this.provider = new Provider(rpcNodes);
         this.provider.onError = () => {
           this.numErrors += 1;
           return this.numErrors > 20;
         };
 
-        this.signer = Signer.fromWif(this.$store.state.privateKey);
+        this.signer = Signer.fromWif(this.$store.state.privateKey, true);
         this.signer.provider = this.provider;
-        this.signer.serializer = await this.newSandboxSerializer(
-          utils.ProtocolTypes,
-          {
-            defaultTypeName: "active_transaction_data",
-            bytesConversion: false,
-          }
-        );
         this.address = this.signer.getAddress();
 
         this.koinContract = new Contract({
