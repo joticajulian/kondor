@@ -8,10 +8,10 @@
       show: show,
     }"
   >
-    <div>
+    <div class="message">
       {{ message }}
     </div>
-    <button @click="$emit('onClose')">X</button>
+    <div @click="$emit('onClose')" class="close">X</div>
   </div>
 </template>
 
@@ -30,28 +30,37 @@ export default {
   position: fixed;
   bottom: -150px;
   margin-bottom: 15px;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 269px;
   border-radius: 6px;
   padding: 8px 20px;
   text-align: left;
   transition: all 0.3s;
+  font-family: Arial, Helvetica, sans-serif !important;
+  background: #292929;
+  color: #f7d4d4;
 }
 
 .show {
   bottom: 30px;
 }
-
+.close {
+  padding: 1em 0 1em 1em;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+.message {
+  padding: 2em 0;
+}
 .danger {
-  background: #ff9f9f;
-  color: #8a0000;
+  border-bottom: 3px solid red;
 }
 .info {
-  background: #ffef9f;
-  color: #828a00;
+  border-bottom: 3px solid orange;
 }
 .success {
-  background: #9fffbd;
-  color: #008a24;
+  border-bottom: 3px solid greenyellow;
 }
 </style>

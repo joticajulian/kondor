@@ -42,9 +42,9 @@ a:visited {
 
 input,
 textarea {
-  background-color: none;
-  width: 92%;
-  color: var(--kondor-gray);
+  background-color: var(--kondor-light) !important;
+  width: 100%;
+  color: var(--secondary-color);
   padding: 1em;
   margin: 0.5em 0 1em 0;
   border: 1px solid var(--kondor-light);
