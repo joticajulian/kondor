@@ -1,10 +1,16 @@
 <template>
-  <div>
-    <span>{{ address }}</span>
-    <div>Balance {{ balance }} tKoin</div>
-    <input v-model="toAddress" type="text" placeholder="To address" />
-    <input v-model="amount" type="text" placeholder="Amount" />
-    <button @click="transfer">Transfer</button>
+  <div class="container">
+    <div class="column">
+      <div class="info container">
+        <span>{{ address }}</span>
+        <div>Balance {{ balance }} tKoin</div>
+      </div>
+      <div class="transfer container">
+        <input v-model="toAddress" type="text" placeholder="To address" />
+        <input v-model="amount" type="text" placeholder="Amount" />
+        <button @click="transfer" class="link">transfer</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -113,3 +119,13 @@ export default {
   },
 };
 </script>
+<style scoped>
+.column {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3em;
+}
+input {
+  margin: 2em 0;
+}
+</style>

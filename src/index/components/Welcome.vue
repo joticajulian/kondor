@@ -8,11 +8,18 @@
     <div v-if="hasAccounts">
       <Unlock @onUnlock="unlock()" @onError="alertDanger($event.message)" />
     </div>
-    <div class="welcome-message">
+    <div class="welcome-message" v-if="!hasAccounts">
       Welcome to kondor!
       <br />the first of its kind wallet for the first of its kind blockchain, koinos
     </div>
-    <router-link to="/newWallet" class="link">Get Started</router-link>
+    <router-link to="/newWallet" class="link">
+      <div v-if="hasAccounts" class="recover">
+        Recover Wallet
+      </div>
+      <div v-else>
+        unlock
+      </div>
+    </router-link>
   </div>
 </template>
 
@@ -60,10 +67,11 @@ export default {
   height: 100%;
 }
 .welcome-message {
-  width: 90%;
+  width: 77%;
   margin: 2em 0;
   line-height: 1.2em;
-  color: var(--kondor-light)
+  color: var(--kondor-light);
+  text-align: center;
 }
 .logo {
   display: flex;
@@ -76,5 +84,8 @@ export default {
 .link:hover {
   border-bottom: 2px solid white;
   color: white;
+}
+.recover {
+  margin-top: 3em;
 }
 </style>
