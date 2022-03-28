@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="container">
     <input type="password" v-model="password" placeholder="Password" />
-    <button @click="unlock">unlock</button>
+    <button @click="unlock" class="link">unlock</button>
   </div>
 </template>
 
@@ -34,3 +34,17 @@ export default {
   },
 };
 </script>
+<style scoped>
+  .container {
+    margin-top: 3em;
+    margin-bottom: 2em;
+  }
+  .link {
+  border-bottom: 1px dotted white;
+  padding-bottom: 8px;
+}
+.link:hover {
+  border-bottom: 2px solid white;
+  color: white;
+}
+</style>

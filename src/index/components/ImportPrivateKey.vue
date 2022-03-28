@@ -1,26 +1,28 @@
 <template>
-  <div>
-    <h1>Import Private Key</h1>
-    <img src="" alt="" />
-    <input
-      id="private-key"
-      v-model="privateKey"
-      type="password"
-      placeholder="Private key"
-    />
-    <input
-      id="password1"
-      v-model="password1"
-      type="password"
-      placeholder="Set password"
-    />
-    <input
-      id="password2"
-      v-model="password2"
-      type="password"
-      placeholder="Confirm password"
-    />
-    <button @click="importKey">Import now</button>
+  <div class="middle">
+    <div class="container">
+      <h1>Import Private Key</h1>
+      <img src="" alt="" />
+      <input
+        id="private-key"
+        v-model="privateKey"
+        type="password"
+        placeholder="Private key"
+      />
+      <input
+        id="password1"
+        v-model="password1"
+        type="password"
+        placeholder="Set password"
+      />
+      <input
+        id="password2"
+        v-model="password2"
+        type="password"
+        placeholder="Confirm password"
+      />
+      <button @click="importKey" class="link">import now</button>
+    </div>
   </div>
 </template>
 
@@ -67,3 +69,17 @@ export default {
   },
 };
 </script>
+<style scoped>
+.container {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--kondor-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+}
+.middle {
+      display: flex;
+    justify-content: center;
+}
+</style>
