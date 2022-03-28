@@ -126,6 +126,6 @@ export default {
   margin-top: 3em;
 }
 input {
-  margin: 2em 0;
+  margin: 1em 0;
 }
 </style>

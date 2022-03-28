@@ -118,7 +118,7 @@
       <div class="body">This will create a new wallet and seed phrase</div>
       <button class="link disabled">create new wallet</button>
     </div>
-    <div class="message">creating a wallet and importing using 12 word phrase coming soon</div>
+    <div class="message">creating a wallet and importing <br> using 12 word phrase coming soon</div>
   </div>
 </template>
 
