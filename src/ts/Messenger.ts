@@ -1,19 +1,20 @@
 /* eslint-disable no-undef */
 
-interface Sender {
+export interface Sender {
   tab?: {
     id: number;
   };
 }
 
 interface MessageRequest {
-  id: number;
+  id: string;
   command: string;
+  to: string | number;
   args: unknown;
 }
 
 interface MessageResponse {
-  id: number;
+  id: string;
   result?: unknown;
   error?: string;
 }
@@ -30,13 +31,13 @@ interface Event<T = Message> {
 
 type OnExtensionRequest = (
   message: MessageRequest,
-  id: number,
+  id: string,
   sender?: Sender
 ) => Promise<unknown | { _derived: boolean }>;
 
 type OnDomRequest = (
   event: Event<MessageRequest>,
-  id: number
+  id: string
 ) => Promise<unknown | { derived: boolean }>;
 
 type extensionListener = (
@@ -44,6 +45,10 @@ type extensionListener = (
   sender: Sender,
   res: () => void
 ) => void;
+
+declare const crypto: {
+  randomUUID: () => string;
+};
 
 declare const chrome: {
   runtime: {
@@ -76,6 +81,14 @@ declare const window: {
   [x: string]: unknown;
 };
 
+function getError(e: unknown): string {
+  if (typeof e !== "object") return e as string;
+  if ((e as Error).message) return (e as Error).message;
+  console.debug("unknown kondor error");
+  console.debug(e);
+  return "unknown kondor error";
+}
+
 export default class Messenger {
   public onExtensionRequest: OnExtensionRequest;
 
@@ -83,7 +96,7 @@ export default class Messenger {
 
   public listeners: {
     type: "extension" | "dom";
-    id: number | "onRequest";
+    id: string | "onRequest";
     listener: unknown;
   }[] = [];
 
@@ -192,10 +205,11 @@ export default class Messenger {
   }
 
   async sendDomMessage<T = unknown>(
+    to: number | string,
     command: string,
     args?: unknown
   ): Promise<T> {
-    const reqId = Math.round(Math.random() * 10000);
+    const reqId = crypto.randomUUID();
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
       const listener = (event: Event) => {
@@ -210,8 +224,8 @@ export default class Messenger {
         // send response
         if (error) {
           console.debug("error received", id, ":");
-          console.debug(error);
-          reject(new Error(error));
+          console.debug(getError(error));
+          reject(new Error(getError(error)));
         } else {
           console.debug("response received", id, ":");
           console.debug(result);
@@ -230,6 +244,7 @@ export default class Messenger {
           id: reqId,
           command,
           args,
+          to,
         },
         "*"
       );
@@ -245,9 +260,10 @@ export default class Messenger {
     opts?: {
       timeout?: number;
       ping?: boolean;
+      retries?: number;
     }
   ): Promise<T> {
-    const reqId = Math.round(Math.random() * 10000);
+    const reqId = crypto.randomUUID();
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
       const listener: extensionListener = (data, _sender, res) => {
@@ -264,8 +280,8 @@ export default class Messenger {
         // send response
         if (error) {
           console.debug("error received", id, ":");
-          console.debug(error);
-          reject(new Error(error));
+          console.debug(getError(error));
+          reject(new Error(getError(error)));
         } else {
           console.debug("response received", id, ":");
           console.debug(result);
@@ -279,22 +295,27 @@ export default class Messenger {
       chrome.runtime.onMessage.addListener(listener);
 
       // send request
-      if (to === "extension") {
-        chrome.runtime.sendMessage({
-          id: reqId,
-          command,
-          args,
-        });
-      } else {
-        // 'to' is tab.id
-        chrome.tabs.sendMessage(to as number, {
-          id: reqId,
-          command,
-          args,
-        });
-      }
-      console.debug("sending message", reqId, command, "to", to);
-      console.debug(args);
+      const sendMessage = () => {
+        if (["popup", "background"].includes(to as string)) {
+          chrome.runtime.sendMessage({
+            id: reqId,
+            command,
+            args,
+            to,
+          });
+        } else {
+          // 'to' is tab.id
+          chrome.tabs.sendMessage(to as number, {
+            id: reqId,
+            command,
+            args,
+            to,
+          });
+        }
+        console.debug("sending message", reqId, command, "to", to);
+        console.debug(args);
+      };
+      sendMessage();
 
       // define timeout
       if (opts && opts.timeout) {
@@ -307,19 +328,27 @@ export default class Messenger {
       // ping
       if (opts && opts.ping) {
         (async () => {
+          let retries = opts?.retries || 0;
+          await new Promise((r) => setTimeout(r, 1000));
           while (this.listeners.find((l) => l.id === reqId)) {
             try {
-              await new Promise((r) => setTimeout(r, 1000));
               await this.sendExtensionMessage(
                 to,
                 "ping",
-                { id: reqId },
+                { id: reqId, to },
                 { timeout: 80 }
               );
+              await new Promise((r) => setTimeout(r, 1000));
             } catch (error) {
-              reject(error);
-              this.removeListener(reqId);
-              break;
+              if (retries <= 0) {
+                reject(error);
+                this.removeListener(reqId);
+                break;
+              }
+              retries -= 1;
+              console.log(`retrying ${reqId}. remaining retries: ${retries}`);
+              sendMessage();
+              await new Promise((r) => setTimeout(r, 100));
             }
           }
         })();
@@ -327,7 +356,7 @@ export default class Messenger {
     });
   }
 
-  removeListener(id: number | string) {
+  removeListener(id: string) {
     const index = this.listeners.findIndex((l) => l.id === id);
     if (index < 0) return;
     const removed = this.listeners.splice(index, 1);

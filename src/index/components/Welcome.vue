@@ -46,7 +46,7 @@ export default {
 
   mounted() {
     (async () => {
-      this.hasAccounts = await this.getAccounts();
+      this.hasAccounts = await this._getAccounts();
     })();
   },
 

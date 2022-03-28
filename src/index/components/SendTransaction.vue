@@ -54,29 +54,30 @@ export default {
 
   methods: {
     async decodeTransaction(request) {
-      const signer = Signer.fromSeed("");
-      signer.serializer = await this.newSandboxSerializer(utils.ProtocolTypes, {
-        defaultTypeName: "active_transaction_data",
-        bytesConversion: false,
-      });
-      const active = await signer.decodeTransaction(request.args.tx);
+      const { operations } = request.args.tx;
       const decodedOperations = [];
-      for (let i = 0; i < active.operations.length; i += 1) {
-        const op = active.operations[i];
+      for (let i = 0; i < operations.length; i += 1) {
+        const op = operations[i];
         if (!op.call_contract) {
           // upload contract or set system call don't
           // require an extra decode
           decodedOperations.push(op);
           return;
         }
-        const contractId = utils.encodeBase58(op.call_contract.contract_id);
+        const contractId = op.call_contract.contract_id;
         const abi = request.args.abis[contractId];
         const contract = new Contract({
           id: contractId,
           abi,
           serializer: await this.newSandboxSerializer(abi.types),
         });
-        const { name, args } = await contract.decodeOperation(op);
+        const { name, args } = await contract.decodeOperation({
+          call_contract: {
+            contract_id: utils.decodeBase58(op.call_contract.contract_id),
+            entry_point: op.call_contract.entry_point,
+            args: utils.decodeBase64url(op.call_contract.args),
+          },
+        });
         decodedOperations.push({
           call_contract: { contractId, name, args },
         });
@@ -95,26 +96,17 @@ export default {
       );
       const [request] = requests;
       // TODO: throw error if there are requests.length > 1
-      const rpcNode = await this.getRpcNode();
-      const provider = new Provider([rpcNode]);
+      const rpcNodes = await this._getRpcNodes();
+      const provider = new Provider(rpcNodes);
       provider.onError = () => {
         this.numErrors += 1;
         return this.numErrors > 20;
       };
       const signer = Signer.fromWif(this.$store.state.privateKey);
       signer.provider = provider;
-      signer.serializer = await this.newSandboxSerializer(utils.ProtocolTypes, {
-        defaultTypeName: "active_transaction_data",
-        bytesConversion: false,
-      });
       let message = { id: request.id };
       try {
-        const { operations } = await signer.decodeTransaction(request.args.tx);
-        const tx = await signer.encodeTransaction({
-          operations,
-          rc_limit: 1e8,
-        });
-        const transaction = await signer.sendTransaction(tx);
+        const transaction = await signer.sendTransaction(request.args.tx);
         message.result = transaction;
       } catch (err) {
         message.error = err;

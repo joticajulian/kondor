@@ -40,7 +40,7 @@ export default {
 
   methods: {
     async accept() {
-      let accounts = await this.getAccounts();
+      let accounts = await this._getAccounts();
       accounts = accounts.map((a) => {
         // eslint-disable-next-line no-unused-vars
         const { encryptedPrivateKey, ...pubData } = a;

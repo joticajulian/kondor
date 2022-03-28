@@ -7,13 +7,13 @@
     "build:ts": "rimraf lib && tsc",
     "build:webpack": "webpack --mode=production --config webpack.config.js && copyfiles -u 2 public/js/* dist/js",
     "build:3rdpage": "webpack --mode=production --config webpack.3rdpage.config.js && copyfiles -u 3 node_modules/koilib/dist/koinos.min.js 3rdpage/js",
-    "build:vue": "node manifest.js && vue-cli-service build --mode production",
+    "build:vue": "node manifest.js && copyfiles -u 3 node_modules/koilib/dist/koinos.js public/js && vue-cli-service build --mode production",
     "build": "yarn build:ts && yarn build:webpack && yarn build:vue",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.20.3",
-    "koilib": "^2.7.0",
+    "koilib": "^3.0.0",
     "vue": "^2.6.14",
     "vue-loader": "^15.9.8",
     "vue-router": "^3.5.3",

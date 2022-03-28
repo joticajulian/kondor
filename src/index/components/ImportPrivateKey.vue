@@ -57,7 +57,7 @@ export default {
             ),
           },
         ];
-        await this.setAccounts(accounts);
+        await this._setAccounts(accounts);
         this.$store.state.privateKey = this.privateKey;
         this.alertClose();
         router.push("/dashboard");

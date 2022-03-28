@@ -1,5 +1,9 @@
 <html>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+  </head>
   <body>
+    <h2>Kondor Example</h2>
     <div class="group">
       <button onclick="getAccounts()">Get accounts</button>
     </div>
@@ -43,11 +47,16 @@
           }).functions;
 
           // transfer
-          const { transaction } = await koin.transfer({
-            from: inputFrom.value,
-            to: inputTo.value,
-            value: utils.parseUnits(inputValue.value, 8),
-          });
+          const { transaction } = await koin.transfer(
+            {
+              from: inputFrom.value,
+              to: inputTo.value,
+              value: utils.parseUnits(inputValue.value, 8),
+            },
+            {
+              payer: inputFrom.value,
+            }
+          );
           console.log(transaction);
           divText.innerHTML = `transaction ${transaction.id} submitted. Waiting to be mined`;
 
@@ -57,7 +66,7 @@
           divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}`;
 
           // read the balance
-          const { result } = await koin.balanceOf(inputFrom.value);
+          const { result } = await koin.balanceOf({ owner: inputFrom.value });
           console.log(result);
           divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`;
         } catch (error) {

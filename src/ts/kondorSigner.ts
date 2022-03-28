@@ -2,7 +2,7 @@ import { SignerInterface } from "koilib";
 import { Messenger } from "./Messenger";
 import {
   Abi,
-  ActiveTransactionData,
+  BlockJson,
   TransactionJson,
   TransactionJsonWait,
 } from "koilib/lib/interface";
@@ -23,21 +23,31 @@ export const signer: SignerInterface = {
       "signTransaction is not available. Use sendTransaction instead"
     );
   },
-  encodeTransaction: async (
-    activeData: ActiveTransactionData
-  ): Promise<TransactionJson> => {
-    return messenger.sendDomMessage("signer:encodeTransaction", { activeData });
+  signHash: (): Promise<Uint8Array> => {
+    throw new Error("signHash is not available. Use sendTransaction instead");
   },
-  decodeTransaction: async (
-    tx: TransactionJson
-  ): Promise<ActiveTransactionData> => {
-    return messenger.sendDomMessage("signer:decodeTransaction", { tx });
+  prepareBlock: (): Promise<BlockJson> => {
+    throw new Error("prepareBlock is not available");
+  },
+  signBlock: (): Promise<BlockJson> => {
+    throw new Error("signBlock is not available");
+  },
+  prepareTransaction: async (
+    transaction: TransactionJson
+  ): Promise<TransactionJson> => {
+    const tx = await messenger.sendDomMessage<TransactionJson>(
+      "background",
+      "signer:prepareTransaction",
+      { transaction }
+    );
+    return tx;
   },
   sendTransaction: async (
     tx: TransactionJson,
     abis?: Record<string, Abi>
   ): Promise<TransactionJsonWait> => {
     const transaction = await messenger.sendDomMessage<TransactionJson>(
+      "popup",
       "signer:sendTransaction",
       {
         tx,
@@ -50,7 +60,7 @@ export const signer: SignerInterface = {
         type: "byTransactionId" | "byBlock" = "byBlock",
         timeout = 30000
       ) => {
-        return messenger.sendDomMessage("provider:wait", {
+        return messenger.sendDomMessage("background", "provider:wait", {
           txId: transaction.id,
           type,
           timeout,
