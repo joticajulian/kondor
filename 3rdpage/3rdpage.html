@@ -23,31 +23,31 @@
       const inputFrom = document.getElementById("from");
       const inputTo = document.getElementById("to");
       const inputValue = document.getElementById("value");
-      const divText = document.getElementById("result");
+      const elResult = document.getElementById("result");
 
-      const result = {
-        hide: () => divText.setAttribute("style", "display:none;"),
+      const divResult = {
+        hide: () => elResult.setAttribute("style", "display:none;"),
         show: (msg) => {
-          divText.innerHTML = msg;
-          divText.setAttribute("style", "display:block;");
+          elResult.innerHTML = msg;
+          elResult.setAttribute("style", "display:block;");
         },
       };
-      result.hide();
+      divResult.hide();
 
       async function getAccounts() {
-        result.hide();
+        divResult.hide();
         try {
           const accounts = await kondor.getAccounts();
           console.log(accounts);
-          result.show(`Accounts: ${JSON.stringify(accounts)}`);
+          divResult.show(`Accounts: ${JSON.stringify(accounts)}`);
         } catch (error) {
-          result.show(`Error: ${error.message}`);
+          divResult.show(`Error: ${error.message}`);
           console.error(error);
         }
       }
 
       async function transferKoin() {
-        result.hide();
+        divResult.hide();
         try {
           // contract definition
           const koin = new Contract({
@@ -69,25 +69,25 @@
             }
           );
           console.log(transaction);
-          result.show(
+          divResult.show(
             `transaction ${transaction.id} submitted. Waiting to be mined`
           );
 
           // wait to be mined
           const blockNumber = await transaction.wait();
           console.log(`Mined in block ${blockNumber}`);
-          result.show(
+          divResult.show(
             `transaction ${transaction.id} submitted. Mined in block ${blockNumber}`
           );
 
           // read the balance
           const { result } = await koin.balanceOf({ owner: inputFrom.value });
           console.log(result);
-          result.show(
+          divResult.show(
             `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`
           );
         } catch (error) {
-          result.show(`Error: ${error.message}`);
+          divResult.show(`Error: ${error.message}`);
           console.error(error);
         }
       }
