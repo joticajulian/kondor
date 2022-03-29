@@ -13,7 +13,12 @@
         >
           <rect x="8" y="9" width="55" height="55" fill="url(#pattern0)" />
           <defs>
-            <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+            <pattern
+              id="pattern0"
+              patternContentUnits="objectBoundingBox"
+              width="1"
+              height="1"
+            >
               <use xlink:href="#image0" transform="scale(0.000244141)" />
             </pattern>
             <image
@@ -26,8 +31,13 @@
         </svg>
       </div>
       <div class="title">No, I have the secret information</div>
-      <div class="body">Import your existing wallet using your 12 word seed phrase or private key</div>
-      <button @click="importWallet" class="link disabled">use 12 word phrase</button>
+      <div class="body">
+        Import your existing wallet using your 12 word seed phrase or private
+        key
+      </div>
+      <button @click="importWallet" class="link disabled">
+        use 12 word phrase
+      </button>
       <button @click="importPrivateKey" class="link">use private key</button>
     </div>
     <div class="section">
@@ -118,7 +128,10 @@
       <div class="body">This will create a new wallet and seed phrase</div>
       <button class="link disabled">create new wallet</button>
     </div>
-    <div class="message">creating a wallet and importing <br> using 12 word phrase coming soon</div>
+    <div class="message">
+      creating a wallet and importing <br />
+      using 12 word phrase coming soon
+    </div>
   </div>
 </template>
 
@@ -129,8 +142,8 @@ import AlertHelper from "@/shared/mixins/AlertHelper";
 export default {
   data() {
     return {
-      publicPath: process.env.BASE_URL
-    }
+      publicPath: process.env.BASE_URL,
+    };
   },
   mixins: [AlertHelper],
   methods: {
@@ -139,7 +152,7 @@ export default {
       router.push("/importPrivateKey");
     },
 
-    async importWallet() { },
+    async importWallet() {},
   },
 };
 </script>
@@ -186,7 +199,7 @@ img {
   cursor: not-allowed;
 }
 .message {
-  font-size: .5em;
+  font-size: 0.5em;
   color: var(--kondor-gray);
   text-align: center;
 }

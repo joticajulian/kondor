@@ -89,10 +89,18 @@ export default {
     async transfer() {
       let interval;
       try {
-        const { transaction } = await this.koin.transfer({
-          to: this.toAddress,
-          value: this.amount,
-        });
+        let chainId = await this._getChainId(false);
+        if (!chainId) {
+          chainId = await this.provider.getChainId();
+          await this._setChainId(chainId);
+        }
+        const { transaction } = await this.koin.transfer(
+          {
+            to: this.toAddress,
+            value: this.amount,
+          },
+          { chainId }
+        );
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted`);
         interval = setInterval(() => {
