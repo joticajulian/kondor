@@ -84,8 +84,8 @@ declare const window: {
 function getError(e: unknown): string {
   if (typeof e !== "object") return e as string;
   if ((e as Error).message) return (e as Error).message;
-  console.debug("unknown kondor error");
-  console.debug(e);
+  // console.debug("unknown kondor error");
+  // console.debug(e);
   return "unknown kondor error";
 }
 
@@ -118,8 +118,8 @@ export default class Messenger {
         if (!command) return;
 
         let message: MessageResponse = { id };
-        console.debug("incoming request", id, ":", command);
-        console.debug((data as MessageRequest).args);
+        // console.debug("incoming request", id, ":", command);
+        // console.debug((data as MessageRequest).args);
 
         try {
           const result = await this.onExtensionRequest!(
@@ -134,7 +134,7 @@ export default class Messenger {
             result !== null &&
             (result as { _derived: boolean })._derived
           ) {
-            console.debug("response", id, "derived");
+            // console.debug("response", id, "derived");
             return;
           }
 
@@ -158,8 +158,8 @@ export default class Messenger {
         if (!command) return;
 
         let message: MessageResponse = { id };
-        console.debug("incoming request", id, ":", command);
-        console.debug((event.data as MessageRequest).args);
+        // console.debug("incoming request", id, ":", command);
+        // console.debug((event.data as MessageRequest).args);
 
         try {
           const result = await this.onDomRequest!(
@@ -173,7 +173,7 @@ export default class Messenger {
             result !== null &&
             (result as { _derived: boolean })._derived
           ) {
-            console.debug("response", id, "derived");
+            // console.debug("response", id, "derived");
             return;
           }
 
@@ -195,8 +195,8 @@ export default class Messenger {
     message: MessageResponse,
     sender?: Sender
   ): void {
-    console.debug("outgoing response", message.id, ":");
-    console.debug(message);
+    // console.debug("outgoing response", message.id, ":");
+    // console.debug(message);
     if (type === "dom") window.postMessage(message, "*");
     else {
       if (sender && sender.tab) chrome.tabs.sendMessage(sender.tab.id, message);
@@ -223,12 +223,12 @@ export default class Messenger {
 
         // send response
         if (error) {
-          console.debug("error received", id, ":");
-          console.debug(getError(error));
+          // console.debug("error received", id, ":");
+          // console.debug(getError(error));
           reject(new Error(getError(error)));
         } else {
-          console.debug("response received", id, ":");
-          console.debug(result);
+          // console.debug("response received", id, ":");
+          // console.debug(result);
           resolve(result as T);
         }
         this.removeListener(reqId);
@@ -248,8 +248,8 @@ export default class Messenger {
         },
         "*"
       );
-      console.debug("sending message", reqId, command, "to dom");
-      console.debug(args);
+      // console.debug("sending message", reqId, command, "to dom");
+      // console.debug(args);
     });
   }
 
@@ -279,12 +279,12 @@ export default class Messenger {
 
         // send response
         if (error) {
-          console.debug("error received", id, ":");
-          console.debug(getError(error));
+          // console.debug("error received", id, ":");
+          // console.debug(getError(error));
           reject(new Error(getError(error)));
         } else {
-          console.debug("response received", id, ":");
-          console.debug(result);
+          // console.debug("response received", id, ":");
+          // console.debug(result);
           resolve(result as T);
         }
         this.removeListener(reqId);
@@ -312,8 +312,8 @@ export default class Messenger {
             to,
           });
         }
-        console.debug("sending message", reqId, command, "to", to);
-        console.debug(args);
+        // console.debug("sending message", reqId, command, "to", to);
+        // console.debug(args);
       };
       sendMessage();
 
