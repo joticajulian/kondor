@@ -25,18 +25,29 @@
       const inputValue = document.getElementById("value");
       const divText = document.getElementById("result");
 
+      const result = {
+        hide: () => divText.setAttribute("style", "display:none;"),
+        show: (msg) => {
+          divText.innerHTML = msg;
+          divText.setAttribute("style", "display:block;");
+        },
+      };
+      result.hide();
+
       async function getAccounts() {
+        result.hide();
         try {
           const accounts = await kondor.getAccounts();
           console.log(accounts);
-          divText.innerHTML = `Accounts: ${JSON.stringify(accounts)}`;
+          result.show(`Accounts: ${JSON.stringify(accounts)}`);
         } catch (error) {
-          divText.innerHTML = `Error: ${error.message}`;
+          result.show(`Error: ${error.message}`);
           console.error(error);
         }
       }
 
       async function transferKoin() {
+        result.hide();
         try {
           // contract definition
           const koin = new Contract({
@@ -58,19 +69,25 @@
             }
           );
           console.log(transaction);
-          divText.innerHTML = `transaction ${transaction.id} submitted. Waiting to be mined`;
+          result.show(
+            `transaction ${transaction.id} submitted. Waiting to be mined`
+          );
 
           // wait to be mined
           const blockNumber = await transaction.wait();
           console.log(`Mined in block ${blockNumber}`);
-          divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}`;
+          result.show(
+            `transaction ${transaction.id} submitted. Mined in block ${blockNumber}`
+          );
 
           // read the balance
           const { result } = await koin.balanceOf({ owner: inputFrom.value });
           console.log(result);
-          divText.innerHTML = `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`;
+          result.show(
+            `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`
+          );
         } catch (error) {
-          divText.innerHTML = `Error: ${error.message}`;
+          result.show(`Error: ${error.message}`);
           console.error(error);
         }
       }
