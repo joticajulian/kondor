@@ -79,7 +79,7 @@ export default {
   width: 80%;
 }
 .middle {
-      display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 </style>

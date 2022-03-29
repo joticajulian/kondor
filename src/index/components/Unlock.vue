@@ -35,11 +35,11 @@ export default {
 };
 </script>
 <style scoped>
-  .container {
-    margin-top: 3em;
-    margin-bottom: 2em;
-  }
-  .link {
+.container {
+  margin-top: 3em;
+  margin-bottom: 2em;
+}
+.link {
   border-bottom: 1px dotted white;
   padding-bottom: 8px;
 }

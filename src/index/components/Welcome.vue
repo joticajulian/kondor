@@ -2,7 +2,7 @@
   <div class="container">
     <div class="logo">
       <div><Logo /></div>
-      <br>
+      <br />
       <div><LogoText /></div>
     </div>
     <div v-if="hasAccounts">
@@ -10,15 +10,12 @@
     </div>
     <div class="welcome-message" v-if="!hasAccounts">
       Welcome to kondor!
-      <br />the first of its kind wallet for the first of its kind blockchain, koinos
+      <br />the first of its kind wallet for the first of its kind blockchain,
+      koinos
     </div>
     <router-link to="/newWallet" class="link">
-      <div v-if="hasAccounts" class="recover">
-        Recover Wallet
-      </div>
-      <div v-else>
-        unlock
-      </div>
+      <div v-if="hasAccounts" class="recover">Recover Wallet</div>
+      <div v-else>unlock</div>
     </router-link>
   </div>
 </template>
