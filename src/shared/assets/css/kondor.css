@@ -67,11 +67,12 @@ textarea {
   font-family: Arial;
 }
 button {
-  padding: 0.8em;
+  padding: 0.8em 0;
   color: var(--kondor-light);
   border-width: 0;
   font-family: "Major Mono Display", monospace;
   cursor: pointer;
+  text-transform: lowercase;
 }
 button:hover {
   opacity: 0.5;
@@ -121,4 +122,8 @@ button:disabled {
 .heading {
   text-transform: uppercase;
   font-size: 1.4em;
+}
+
+.content-50 {
+  width: 50%;
 }

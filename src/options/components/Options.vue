@@ -1,11 +1,13 @@
 <template>
-  <div>
-    <div>Set RPC Nodes separated by commas</div>
-    <input v-model="rpcNodes" type="text" />
-    <button @click="setRpcNodes">Set RPC Nodes</button>
-    <div>Set Chain Id</div>
-    <input v-model="chainId" type="text" />
-    <button @click="setChainId">Set Chain Id</button>
+  <div class="container">
+    <div class="content-50">
+      <div>Set RPC Nodes separated by commas</div>
+      <input v-model="rpcNodes" type="text" />
+      <button @click="setRpcNodes">Set RPC Nodes</button>
+      <div>Set Chain Id</div>
+      <input v-model="chainId" type="text" />
+      <button @click="setChainId">Set Chain Id</button>
+    </div>
   </div>
 </template>
 
@@ -47,3 +49,10 @@ export default {
   },
 };
 </script>
+<style scoped>
+
+button {
+  margin-bottom: 4em;
+  border-bottom: 0.5px dashed;
+}
+</style>
