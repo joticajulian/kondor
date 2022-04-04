@@ -29,7 +29,6 @@ export default {
       provider: null,
       koinContract: null,
       koin: null,
-      numErrors: 0,
       toAddress: "",
       amount: "",
     };
@@ -42,10 +41,6 @@ export default {
       try {
         const rpcNodes = await this._getRpcNodes();
         this.provider = new Provider(rpcNodes);
-        this.provider.onError = () => {
-          this.numErrors += 1;
-          return this.numErrors > 20;
-        };
 
         this.signer = Signer.fromWif(this.$store.state.privateKey, true);
         this.signer.provider = this.provider;
@@ -53,9 +48,9 @@ export default {
 
         this.koinContract = new Contract({
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-          abi: utils.Krc20Abi,
+          abi: utils.tokenAbi,
           signer: this.signer,
-          serializer: await this.newSandboxSerializer(utils.Krc20Abi.types),
+          serializer: await this.newSandboxSerializer(utils.tokenAbi.types),
         });
         this.koinContract.abi.methods.balanceOf.preformatInput = (owner) => ({
           owner,
@@ -94,7 +89,7 @@ export default {
           chainId = await this.provider.getChainId();
           await this._setChainId(chainId);
         }
-        const { transaction } = await this.koin.transfer(
+        const { transaction, receipt } = await this.koin.transfer(
           {
             to: this.toAddress,
             value: this.amount,
@@ -102,7 +97,9 @@ export default {
           { chainId }
         );
         this.alertSuccess("Sent. Waiting to be mined ...");
-        console.log(`Transaction id ${transaction.id} submitted`);
+        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
+        console.log(receipt);
+        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
         interval = setInterval(() => {
           console.log("firing interval");
           this.loadBalance();
