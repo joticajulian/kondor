@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div>
     <div>Signature request</div>
     <div>{{ requester.origin }}</div>
     <div>{{ data }}</div>
