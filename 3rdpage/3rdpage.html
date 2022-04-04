@@ -52,13 +52,13 @@
           // contract definition
           const koin = new Contract({
             id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-            abi: utils.Krc20Abi,
+            abi: utils.tokenAbi,
             provider: kondor.provider,
             signer: kondor.signer,
           }).functions;
 
           // transfer
-          const { transaction } = await koin.transfer(
+          const { transaction, receipt } = await koin.transfer(
             {
               from: inputFrom.value,
               to: inputTo.value,
@@ -68,7 +68,11 @@
               payer: inputFrom.value,
             }
           );
-          console.log(transaction);
+          console.log(`transaction ${transaction.id} submitted. Receipt:`);
+          console.log(receipt);
+
+          if (receipt.logs) throw new Error(receipt.logs.join(", "));
+
           divResult.show(
             `transaction ${transaction.id} submitted. Waiting to be mined`
           );
