@@ -3,7 +3,13 @@
     <div class="column">
       <div class="info container">
         <span>{{ address }}</span>
-        <div>Balance {{ balance }} tKoin</div>
+        <div class="balance">
+          <div class="heading"></div>
+          <div class="amount">
+            <div class="balance">{{ balance }}</div>
+            <div class="tkoin">(t)KOIN</div>
+          </div>
+        </div>
       </div>
       <div class="transfer container">
         <input v-model="toAddress" type="text" placeholder="To address" />
@@ -29,7 +35,6 @@ export default {
       provider: null,
       koinContract: null,
       koin: null,
-      numErrors: 0,
       toAddress: "",
       amount: "",
     };
@@ -42,10 +47,6 @@ export default {
       try {
         const rpcNodes = await this._getRpcNodes();
         this.provider = new Provider(rpcNodes);
-        this.provider.onError = () => {
-          this.numErrors += 1;
-          return this.numErrors > 20;
-        };
 
         this.signer = Signer.fromWif(this.$store.state.privateKey, true);
         this.signer.provider = this.provider;
@@ -53,9 +54,9 @@ export default {
 
         this.koinContract = new Contract({
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-          abi: utils.Krc20Abi,
+          abi: utils.tokenAbi,
           signer: this.signer,
-          serializer: await this.newSandboxSerializer(utils.Krc20Abi.types),
+          serializer: await this.newSandboxSerializer(utils.tokenAbi.types),
         });
         this.koinContract.abi.methods.balanceOf.preformatInput = (owner) => ({
           owner,
@@ -94,7 +95,7 @@ export default {
           chainId = await this.provider.getChainId();
           await this._setChainId(chainId);
         }
-        const { transaction } = await this.koin.transfer(
+        const { transaction, receipt } = await this.koin.transfer(
           {
             to: this.toAddress,
             value: this.amount,
@@ -102,7 +103,9 @@ export default {
           { chainId }
         );
         this.alertSuccess("Sent. Waiting to be mined ...");
-        console.log(`Transaction id ${transaction.id} submitted`);
+        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
+        console.log(receipt);
+        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
         interval = setInterval(() => {
           console.log("firing interval");
           this.loadBalance();
@@ -128,5 +131,35 @@ export default {
 }
 input {
   margin: 1em 0;
+}
+.balance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.amount {
+  font-size: 2em;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-weight: 100;
+  margin: 1em 0;
+}
+.heading {
+  font-size: 0.8em;
+}
+.info {
+  text-transform: none;
+  font-weight: 300;
+}
+.tkoin {
+  font-size: 0.5em;
+}
+.balance {
+  font-weight: 100;
+  font-size: 1.5em;
 }
 </style>

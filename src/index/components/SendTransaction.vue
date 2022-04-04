@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { Signer, Contract, Provider, utils } from "koilib";
+import { Signer, Contract, Provider } from "koilib";
 import Unlock from "@/index/components/Unlock.vue";
 import AlertHelper from "@/shared/mixins/AlertHelper";
 import Storage from "@/shared/mixins/Storage";
@@ -71,13 +71,7 @@ export default {
           abi,
           serializer: await this.newSandboxSerializer(abi.types),
         });
-        const { name, args } = await contract.decodeOperation({
-          call_contract: {
-            contract_id: utils.decodeBase58(op.call_contract.contract_id),
-            entry_point: op.call_contract.entry_point,
-            args: utils.decodeBase64url(op.call_contract.args),
-          },
-        });
+        const { name, args } = await contract.decodeOperation(op);
         decodedOperations.push({
           call_contract: { contractId, name, args },
         });
@@ -124,3 +118,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+button {
+  margin-bottom: 4em;
+  border-bottom: 0.5px dashed;
+}
+</style>
