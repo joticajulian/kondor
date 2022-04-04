@@ -4,6 +4,7 @@ import Welcome from "./components/Welcome.vue";
 import NewWallet from "./components/NewWallet.vue";
 import Import from "./components/Import";
 import ImportPrivateKey from "./components/ImportPrivateKey";
+import ImportSeedPhrase from "./components/ImportSeedPhrase";
 import Dashboard from "./components/Dashboard.vue";
 import SendTransaction from "./components/SendTransaction.vue";
 import GetAccounts from "./components/GetAccounts.vue";
@@ -31,6 +32,11 @@ export default new Router({
       path: "/importPrivateKey",
       name: "ImportPrivateKey",
       component: ImportPrivateKey,
+    },
+    {
+      path: "/importSeedPhrase",
+      name: "ImportSeedPhrase",
+      component: ImportSeedPhrase,
     },
     {
       path: "/dashboard",
