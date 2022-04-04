@@ -6,6 +6,7 @@
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Roboto:wght@100;300;500&display=swap");
 
 body {
   margin: 0px;
@@ -64,14 +65,15 @@ textarea {
   background: none;
   line-height: 1;
   font-size: 12px;
-  font-family: Arial;
+  font-family: "Roboto", sans-serif;
 }
 button {
-  padding: 0.8em;
+  padding: 0.8em 0;
   color: var(--kondor-light);
   border-width: 0;
   font-family: "Major Mono Display", monospace;
   cursor: pointer;
+  text-transform: lowercase;
 }
 button:hover {
   opacity: 0.5;
@@ -112,7 +114,8 @@ button:disabled {
   width: 100%;
 }
 .container {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
@@ -121,4 +124,8 @@ button:disabled {
 .heading {
   text-transform: uppercase;
   font-size: 1.4em;
+}
+
+.content-50 {
+  width: 50%;
 }

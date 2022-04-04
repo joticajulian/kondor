@@ -163,7 +163,7 @@ export default {
 </script>
 <style scoped>
 .container {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Roboto", sans-serif;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
@@ -205,7 +205,6 @@ img {
 }
 .message {
   font-size: 0.5em;
-  color: var(--kondor-gray);
   text-align: center;
 }
 </style>
