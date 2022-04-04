@@ -3,7 +3,13 @@
     <div class="column">
       <div class="info container">
         <span>{{ address }}</span>
-        <div>Balance {{ balance }} tKoin</div>
+        <div class="balance">
+          <div class="heading"></div>
+          <div class="amount">
+            <div class="balance">{{ balance }}</div>
+            <div class="tkoin">(t)KOIN</div>
+          </div>
+        </div>
       </div>
       <div class="transfer container">
         <input v-model="toAddress" type="text" placeholder="To address" />
@@ -125,5 +131,35 @@ export default {
 }
 input {
   margin: 1em 0;
+}
+.balance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.amount {
+  font-size: 2em;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-weight: 100;
+  margin: 1em 0;
+}
+.heading {
+  font-size: 0.8em;
+}
+.info {
+  text-transform: none;
+  font-weight: 300;
+}
+.tkoin {
+  font-size: 0.5em;
+}
+.balance {
+  font-weight: 100;
+  font-size: 1.5em;
 }
 </style>

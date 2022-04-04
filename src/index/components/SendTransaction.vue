@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <div>Signature request</div>
     <div>{{ requester.origin }}</div>
     <div>{{ data }}</div>
@@ -118,3 +118,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+button {
+  margin-bottom: 4em;
+  border-bottom: 0.5px dashed;
+}
+</style>
