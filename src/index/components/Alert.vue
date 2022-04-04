@@ -38,7 +38,7 @@ export default {
   padding: 8px 20px;
   text-align: left;
   transition: all 0.3s;
-  font-family: 'Roboto' sans-serif !important;
+  font-family: "Roboto" sans-serif !important;
   background: #292929;
   color: #f7d4d4;
 }

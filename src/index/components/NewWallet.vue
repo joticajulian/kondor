@@ -158,7 +158,7 @@ export default {
 </script>
 <style scoped>
 .container {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
