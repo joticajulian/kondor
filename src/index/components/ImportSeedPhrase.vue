@@ -6,7 +6,6 @@
       <input
         id="seed"
         v-model="mnemonic"
-        type="password"
         placeholder="Seed phrase"
       />
       <input
@@ -31,10 +30,11 @@ import { Signer } from "koilib";
 import router from "@/index/router";
 import Storage from "@/shared/mixins/Storage";
 import AlertHelper from "@/shared/mixins/AlertHelper";
+const ethers = require("ethers");
 export default {
   data() {
     return {
-      privateKey: "",
+      mnemonic: "",
       password1: "",
       password2: "",
     };
@@ -43,14 +43,13 @@ export default {
   methods: {
     async importSeedPhrase() {
       try {
+
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        const ethers = require("ethers");
         const hdNode = ethers.utils.HDNode.fromMnemonic(this.mnemonic);
         const keyNumber0 = hdNode.derivePath("m/44'/659'/0'/0/0");
-        let privateKey=keyNumber0;
-        console.log("privateKey",privateKey.privateKey)
-        const signer = Signer.fromWif(privateKey.privateKey);
+        const signer = new Signer({ privateKey: keyNumber0.privateKey.slice(2) });
+        const privateKey = signer.getPrivateKey("wif", false);
         const accounts = [
           {
             address: signer.getAddress(),
