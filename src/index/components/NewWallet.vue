@@ -35,9 +35,10 @@
         Import your existing wallet using your 12 word seed phrase or private
         key
       </div>
-      <button @click="importWallet" class="link disabled">
+      <button @click="importSeedPhrase" class="link">
         use 12 word phrase
       </button>
+
       <button @click="importPrivateKey" class="link">use private key</button>
     </div>
     <div class="section">
@@ -128,6 +129,7 @@
       <div class="body">This will create a new wallet and seed phrase</div>
       <button class="link disabled">create new wallet</button>
     </div>
+
     <div class="message">
       creating a wallet and importing <br />
       using 12 word phrase coming soon
@@ -151,7 +153,10 @@ export default {
       this.alertClose();
       router.push("/importPrivateKey");
     },
-
+    async importSeedPhrase(){
+      this.alertClose();
+      router.push("/importSeedPhrase");
+    },
     async importWallet() {},
   },
 };
