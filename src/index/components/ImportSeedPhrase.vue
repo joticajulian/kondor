@@ -25,12 +25,13 @@
   </div>
 </template>
 
-<script>
+<script> 
 import { Signer } from "koilib";
 import router from "@/index/router";
 import Storage from "@/shared/mixins/Storage";
 import AlertHelper from "@/shared/mixins/AlertHelper";
 const ethers = require("ethers");
+
 export default {
   data() {
     return {
