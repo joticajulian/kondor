@@ -1,5 +1,4 @@
-import Vue from "vue";
-import Router from "vue-router";
+import { createRouter } from "vue-router";
 import Welcome from "./components/Welcome.vue";
 import NewWallet from "./components/NewWallet.vue";
 import Import from "./components/Import";
@@ -8,9 +7,7 @@ import Dashboard from "./components/Dashboard.vue";
 import SendTransaction from "./components/SendTransaction.vue";
 import GetAccounts from "./components/GetAccounts.vue";
 
-Vue.use(Router);
-
-export default new Router({
+export default createRouter({
   routes: [
     {
       path: "/",

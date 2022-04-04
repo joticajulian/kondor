@@ -46,6 +46,13 @@ export default {
           this.numErrors += 1;
           return this.numErrors > 20;
         };
+        this.provider.onError = (error, node, newNode) => {
+          console.log(`Error from node ${node}`);
+          console.log(error);
+          console.log(`changing node to ${newNode}`);
+          const abort = true;
+          return abort;
+        }
 
         this.signer = Signer.fromWif(this.$store.state.privateKey, true);
         this.signer.provider = this.provider;

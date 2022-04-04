@@ -5,6 +5,7 @@ import {
   BlockJson,
   TransactionJson,
   TransactionJsonWait,
+  TransactionReceipt
 } from "koilib/lib/interface";
 
 const messenger = new Messenger({});
@@ -45,8 +46,14 @@ export const signer: SignerInterface = {
   sendTransaction: async (
     tx: TransactionJson,
     abis?: Record<string, Abi>
-  ): Promise<TransactionJsonWait> => {
-    const transaction = await messenger.sendDomMessage<TransactionJson>(
+  ): Promise<{
+    receipt: TransactionReceipt;
+    transaction: TransactionJsonWait;
+  }> => {
+    const { transaction, receipt} = await messenger.sendDomMessage<{
+      receipt: TransactionReceipt;
+      transaction: TransactionJson;
+    }>(
       "popup",
       "signer:sendTransaction",
       {
@@ -55,6 +62,8 @@ export const signer: SignerInterface = {
       }
     );
     return {
+      receipt,
+      transaction: {
       ...transaction,
       wait: async (
         type: "byTransactionId" | "byBlock" = "byBlock",
@@ -65,7 +74,8 @@ export const signer: SignerInterface = {
           type,
           timeout,
         });
-      },
+      }
+    },
     };
   },
 };
