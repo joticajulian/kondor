@@ -1,11 +1,17 @@
 <template>
-  <div>
-    <div>Get accounts</div>
-    <div>{{ requester.origin }}</div>
-    <div>{{ requester.origin }} wants to know your address</div>
-    <div>TODO: checkbox with list of addresses / contract wallets</div>
-    <button @click="accept">Accept</button>
-    <button @click="cancel">Cancel</button>
+  <div class="center-column">
+    <div class="">
+      <div>Get accounts</div>
+      <div>{{ requester.origin }}</div>
+      <div>{{ requester.origin }} wants to know your address</div>
+      <div>TODO: checkbox with list of addresses / contract wallets</div>
+    </div>
+    <div>
+      <div class="buttons">
+        <button class="link" @click="accept">Accept</button>
+        <button class="link" @click="cancel">Cancel</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -62,3 +68,18 @@ export default {
   },
 };
 </script>
+<style scoped>
+.container {
+  width: 90%;
+  padding: 2em 0;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 300;
+  text-transform: none;
+  align-items: flex-start;
+}
+.buttons {
+  display: flex;
+  justify-content: space-evenly;
+  width: 90%;
+}
+</style>

@@ -4,8 +4,11 @@
       <div class="info container">
         <span>{{ address }}</span>
         <div class="balance">
-          <div class="heading">Balance</div>
-          <div class="amount">{{ balance }} tKOIN</div>
+          <div class="heading"></div>
+          <div class="amount">
+            <div class="balance">{{ balance }}</div>
+            <div class="tkoin">(t)KOIN</div>
+          </div>
         </div>
       </div>
       <div class="transfer container">
@@ -134,11 +137,32 @@ input {
 }
 .balance {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 .amount {
   font-size: 2em;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font-weight: 100;
+  margin: 1em 0;
 }
 .heading {
-  font-size: .8em;
+  font-size: 0.8em;
+}
+.info {
+  text-transform: none;
+  font-weight: 300;
+}
+.tkoin {
+  font-size: 0.5em;
+}
+.balance {
+  font-weight: 100;
+  font-size: 1.5em;
 }
 </style>
