@@ -71,7 +71,6 @@ export default {
 </script>
 <style scoped>
 .container {
-  font-family: Arial, Helvetica, sans-serif;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
@@ -81,5 +80,6 @@ export default {
 .middle {
   display: flex;
   justify-content: center;
+  text-transform: none;
 }
 </style>
