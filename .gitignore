@@ -5,6 +5,7 @@ node_modules
 /lib
 public/manifest.json
 public/js
+3rdpage/js
 
 # local env files
 .env.local
