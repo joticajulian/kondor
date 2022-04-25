@@ -81,7 +81,7 @@ export default {
     async loadBalance() {
       try {
         const { result } = await this.koin.balanceOf(this.address);
-        this.balance = result;
+        this.balance = result.toLocaleString('en');
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
