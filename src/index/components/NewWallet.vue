@@ -35,8 +35,8 @@
         Import your existing wallet using your 12 word seed phrase or private
         key
       </div>
-      <button @click="importSeedPhrase" class="link">
-        use 12 word phrase
+      <button @click="importSeedPhrase" class="link disabled">
+        12 word phrase (coming soon)
       </button>
 
       <button @click="importPrivateKey" class="link">use private key</button>
@@ -127,13 +127,9 @@
       <img src alt />
       <div class="proper title">Yes, let's setup a new wallet</div>
       <div class="body">This will create a new wallet and seed phrase</div>
-      <button class="link disabled">create new wallet</button>
+      <button class="link disabled">new wallet (coming soon)</button>
     </div>
 
-    <div class="message">
-      creating a wallet and importing <br />
-      using 12 word phrase coming soon
-    </div>
   </div>
 </template>
 
@@ -202,9 +198,5 @@ img {
 .disabled {
   color: var(--kondor-gray);
   cursor: not-allowed;
-}
-.message {
-  font-size: 0.5em;
-  text-align: center;
 }
 </style>
