@@ -6,14 +6,14 @@
         <div class="balance">
           <div class="heading"></div>
           <div class="amount">
-            <div class="balance">{{ balance }}</div>
+            <div class="balance">{{ balanceFormatted }}</div>
             <div class="tkoin">(t)KOIN</div>
           </div>
         </div>
       </div>
       <div class="transfer container">
         <input v-model="toAddress" type="text" placeholder="To address" />
-        <input v-model="amount" type="text" placeholder="Amount" />
+        <input @keyup.enter="transfer" v-model="amount" type="text" placeholder="Amount" />
         <button @click="transfer" class="link">transfer</button>
       </div>
     </div>
@@ -114,12 +114,19 @@ export default {
         clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
+        this.toAddress = ""
+        this.amount = ""
       } catch (error) {
         clearInterval(interval);
         this.alertDanger(error.message);
         throw error;
       }
     },
+  },
+  computed: {
+    balanceFormatted () {
+      return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
   },
 };
 </script>
@@ -137,9 +144,10 @@ input {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  font-weight: 100;
+  font-size: 2.5rem;
 }
 .amount {
-  font-size: 2em;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -157,9 +165,5 @@ input {
 }
 .tkoin {
   font-size: 0.5em;
-}
-.balance {
-  font-weight: 100;
-  font-size: 1.5em;
 }
 </style>
