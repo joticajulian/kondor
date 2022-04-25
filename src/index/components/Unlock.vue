@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <input type="password" v-model="password" placeholder="Password" />
+    <input @keyup.enter="unlock" type="password" v-model="password" placeholder="Password" />
     <button @click="unlock" class="link">unlock</button>
   </div>
 </template>
