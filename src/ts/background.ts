@@ -1,10 +1,10 @@
 import { Provider, Signer } from "koilib/lib/browser";
+import { Messenger, Sender } from "kondor-js/lib/browser";
 import {
   CallContractOperationJson,
   TransactionJson,
   BlockJson,
 } from "koilib/lib/interface";
-import { Messenger, Sender } from "./Messenger";
 import * as storage from "./storage";
 
 const EXPIRATION_ID = 30 * 60 * 1000; // 30 minutes

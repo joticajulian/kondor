@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
+import { Messenger } from "kondor-js";
 import router from "@/index/router";
 import Sandbox from "@/shared/mixins/Sandbox";
-import { Messenger } from "../../../lib/Messenger";
 
 export default {
   name: "Message mixin",
