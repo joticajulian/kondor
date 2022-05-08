@@ -1,4 +1,4 @@
-import { Messenger } from "./Messenger";
+import { Messenger } from "kondor-js/lib/browser";
 
 interface Event {
   data: {
