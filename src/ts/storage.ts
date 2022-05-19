@@ -1,4 +1,11 @@
 /* eslint-disable no-undef */
+export interface Account {
+  mnemonicPath?: string;
+  encryptedPrivateKey?: string;
+  name: string;
+  address: string;
+}
+
 export async function write(key: string, value: unknown): Promise<void> {
   return new Promise((resolve) => {
     const data: { [x: string]: unknown } = {};
@@ -22,7 +29,15 @@ export async function read<T = unknown>(
   });
 }
 
-export async function setAccounts(encrypted: string): Promise<void> {
+export async function setMnemonic(encrypted: string): Promise<void> {
+  return write("mnemonic", encrypted);
+}
+
+export async function getMnemonic(strict = true): Promise<string> {
+  return read("mnemonic", strict) as Promise<string>;
+}
+
+export async function setAccounts(encrypted: Account[]): Promise<void> {
   return write("accounts", encrypted);
 }
 

@@ -129,7 +129,6 @@
       <div class="body">This will create a new wallet and seed phrase</div>
       <button class="link disabled">new wallet (coming soon)</button>
     </div>
-
   </div>
 </template>
 
@@ -149,7 +148,7 @@ export default {
       this.alertClose();
       router.push("/importPrivateKey");
     },
-    async importSeedPhrase(){
+    async importSeedPhrase() {
       this.alertClose();
       router.push("/importSeedPhrase");
     },

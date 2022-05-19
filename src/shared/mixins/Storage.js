@@ -22,6 +22,7 @@ export default {
     async _write(key, value) {
       if (process.env.VUE_APP_ENV === "test") {
         this.$store.state.testData[key] = value;
+        console.log(this.$store.state.testData);
         return;
       }
       return storage.write(key, value);
@@ -35,6 +36,14 @@ export default {
         return undefined;
       }
       return storage.read(key, strict);
+    },
+
+    async _setMnemonic(encrypted) {
+      return this._write("mnemonic", encrypted);
+    },
+
+    async _getMnemonic(strict = false) {
+      return this._read("mnemonic", strict);
     },
 
     async _setAccounts(encrypted) {
