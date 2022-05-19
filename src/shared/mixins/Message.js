@@ -17,6 +17,7 @@ export default {
     this.messenger = new Messenger({
       onExtensionRequest: async (message, id, sender) => {
         const { command, args, to } = message;
+        const request = { id, command, args, sender };
 
         if (to !== "popup") return undefined;
 
@@ -38,38 +39,33 @@ export default {
             return "ok";
           }
           case "getAccounts": {
-            this.$store.state.requests.push({
-              id,
-              command,
-              args,
-              sender,
-            });
+            this.$store.state.requests.push(request);
             this.messenger.removeListeners();
             router.push("/getAccounts");
-
             return { _derived: true };
           }
           case "signer:signHash": {
-            throw new Error("function not implemented in this version");
+            this.$store.state.requests.push(request);
+            this.messenger.removeListeners();
+            router.push("/signHash");
+            return { _derived: true };
+          }
+          case "signer:signMessage": {
+            this.$store.state.requests.push(request);
+            this.messenger.removeListeners();
+            router.push("/signMessage");
+            return { _derived: true };
           }
           case "signer:signTransaction": {
-            throw new Error("function not implemented in this version");
+            this.$store.state.requests.push(request);
+            this.messenger.removeListeners();
+            router.push("/getAccounts");
+            return { _derived: true };
           }
           case "signer:sendTransaction": {
-            this.$store.state.requests.push({
-              id,
-              command,
-              args,
-              sender,
-            });
+            this.$store.state.requests.push(request);
             this.messenger.removeListeners();
             router.push("/sendTransaction");
-
-            /**
-             * _derived:true is returned to not send a response
-             * yet (see Messenger.ts). The /sendTransaction view
-             * will take care of the response
-             */
             return { _derived: true };
           }
           default:

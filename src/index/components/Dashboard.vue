@@ -13,7 +13,12 @@
       </div>
       <div class="transfer container">
         <input v-model="toAddress" type="text" placeholder="To address" />
-        <input @keyup.enter="transfer" v-model="amount" type="text" placeholder="Amount" />
+        <input
+          @keyup.enter="transfer"
+          v-model="amount"
+          type="text"
+          placeholder="Amount"
+        />
         <button @click="transfer" class="link">transfer</button>
       </div>
     </div>
@@ -43,12 +48,24 @@ export default {
   mixins: [Storage, Sandbox, AlertHelper],
 
   mounted() {
-    (async () => {
+    this.loadAccount(0);
+  },
+
+  watch: {
+    "$store.state.currentIndexAccount": function () {
+      console.log("index changed to ", this.$store.state.currentIndexAccount);
+    },
+  },
+
+  methods: {
+    async loadAccount(index) {
       try {
         const rpcNodes = await this._getRpcNodes();
         this.provider = new Provider(rpcNodes);
 
-        this.signer = Signer.fromWif(this.$store.state.privateKey, true);
+        const currentAccount = this.$store.state.accounts[index];
+
+        this.signer = Signer.fromWif(currentAccount.privateKey, true);
         this.signer.provider = this.provider;
         this.address = this.signer.getAddress();
 
@@ -74,14 +91,11 @@ export default {
         throw error;
       }
       await this.loadBalance();
-    })();
-  },
-
-  methods: {
+    },
     async loadBalance() {
       try {
         const { result } = await this.koin.balanceOf(this.address);
-        this.balance = result.toLocaleString('en');
+        this.balance = result.toLocaleString("en");
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
@@ -114,8 +128,8 @@ export default {
         clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
-        this.toAddress = ""
-        this.amount = ""
+        this.toAddress = "";
+        this.amount = "";
       } catch (error) {
         clearInterval(interval);
         this.alertDanger(error.message);
@@ -124,9 +138,9 @@ export default {
     },
   },
   computed: {
-    balanceFormatted () {
-      return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }
+    balanceFormatted() {
+      return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
   },
 };
 </script>

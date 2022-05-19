@@ -1,3 +1,5 @@
+import router from "@/index/router";
+
 export default {
   name: "Alert mixin",
 
@@ -7,6 +9,17 @@ export default {
       alertMessage: "",
       alertType: "",
     };
+  },
+
+  created() {
+    switch (router.currentRoute.path) {
+      case "/dashboard":
+        this.$store.state.showAccountMenu = true;
+        break;
+      default:
+        this.$store.state.showAccountMenu = false;
+        break;
+    }
   },
 
   methods: {

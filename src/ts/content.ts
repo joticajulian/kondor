@@ -44,6 +44,7 @@ const backgroundCommands = [
 const popupCommands = [
   "getAccounts",
   "signer:signHash",
+  "signer:signMessage",
   "signer:signTransaction",
   "signer:sendTransaction",
 ];
