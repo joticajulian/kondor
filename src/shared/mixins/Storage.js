@@ -22,7 +22,6 @@ export default {
     async _write(key, value) {
       if (process.env.VUE_APP_ENV === "test") {
         this.$store.state.testData[key] = value;
-        console.log(this.$store.state.testData);
         return;
       }
       return storage.write(key, value);
