@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button v-if="$store.state.showAccountMenu" @click="toggleDropdown()">
+    <button @click="toggleDropdown()">
       {{ currentAccount }}
     </button>
     <div v-if="showDropdown" class="dropdown-content">
@@ -24,10 +24,8 @@ export default {
     };
   },
 
-  created() {
-    if (this.$store.state.accounts.length > 0) {
-      this.currentAccount = this.$store.state.accounts[0].name;
-    }
+  mounted() {
+    this.loadAccount();
   },
 
   methods: {
@@ -37,6 +35,14 @@ export default {
 
     selectAccount(index) {
       this.$store.state.currentIndexAccount = index;
+      this.showDropdown = false;
+      this.loadAccount();
+    },
+
+    loadAccount() {
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAccount = this.$store.state.accounts[index].name;
     },
   },
 };
