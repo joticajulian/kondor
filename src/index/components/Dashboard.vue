@@ -53,7 +53,7 @@ export default {
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      console.log("index changed to ", this.$store.state.currentIndexAccount);
+      this.loadAccount(this.$store.state.currentIndexAccount);
     },
   },
 

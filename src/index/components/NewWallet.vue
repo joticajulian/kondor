@@ -35,9 +35,7 @@
         Import your existing wallet using your 12 word seed phrase or private
         key
       </div>
-      <button @click="importSeedPhrase" class="link disabled">
-        12 word phrase (coming soon)
-      </button>
+      <button @click="importSeedPhrase" class="link">12 word phrase</button>
 
       <button @click="importPrivateKey" class="link">use private key</button>
     </div>

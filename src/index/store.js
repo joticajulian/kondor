@@ -45,6 +45,7 @@ export default new Vuex.Store({
     sandboxLoaded: false,
 
     showAccountMenu: false,
+    showBackButton: true,
   },
   mutations: {},
   actions: {},

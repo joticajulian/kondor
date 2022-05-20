@@ -1,7 +1,9 @@
 <template>
   <div>
-    <button @click="back"><span>&#8592;</span></button>
-    <AccountMenu />
+    <button v-if="$store.state.showBackButton" @click="back">
+      <span>&#8592;</span>
+    </button>
+    <AccountMenu v-if="$store.state.showAccountMenu" />
   </div>
 </template>
 
