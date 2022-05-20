@@ -11,11 +11,17 @@
       >
         <div @click="selectAccount(index)">{{ account.name }}</div>
       </div>
+      <div disabled class="separator"></div>
+      <div @click="createAccount()" class="dropdown-item">+ Create account</div>
+      <div class="dropdown-item">+ Import account</div>
     </div>
   </div>
 </template>
 
 <script>
+import { Signer } from "koilib";
+import { ethers } from "ethers";
+
 export default {
   data() {
     return {
@@ -43,6 +49,23 @@ export default {
       if (this.$store.state.accounts.length === 0) return;
       const index = this.$store.state.currentIndexAccount;
       this.currentAccount = this.$store.state.accounts[index].name;
+    },
+
+    createAccount() {
+      const mnemonic = this.$store.state.mnemonic;
+      const hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
+      const newIndex = this.$store.state.accounts.length;
+      const keyPath = `m/44'/659'/0'/0/${newIndex}`;
+      const keyNumber = hdNode.derivePath(keyPath);
+      const signer = new Signer({
+        privateKey: keyNumber.privateKey.slice(2),
+      });
+      this.$store.state.accounts.push({
+        privateKey: signer.getPrivateKey("wif"),
+        name: `Account ${newIndex}`,
+        address: signer.getAddress(),
+      });
+      this.selectAccount(newIndex);
     },
   },
 };
@@ -74,5 +97,11 @@ export default {
 
 .dropdown-item:hover {
   background: var(--primary-color);
+}
+
+.separator {
+  margin-top: 8px;
+  border-top: 1px solid #666;
+  padding: 0;
 }
 </style>

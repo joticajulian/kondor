@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export interface Account {
   mnemonicPath?: string;
   encryptedPrivateKey?: string;
@@ -6,6 +5,7 @@ export interface Account {
   address: string;
 }
 
+/* eslint-disable no-undef */
 export async function write(key: string, value: unknown): Promise<void> {
   return new Promise((resolve) => {
     const data: { [x: string]: unknown } = {};
