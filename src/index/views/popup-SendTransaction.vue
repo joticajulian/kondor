@@ -16,11 +16,15 @@
 
 <script>
 import { Signer, Contract, Provider } from "koilib";
-import Unlock from "@/index/components/Unlock.vue";
-import AlertHelper from "@/shared/mixins/AlertHelper";
+
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 import Message from "@/shared/mixins/Message";
+
+// components
+import Unlock from "@/index/components/Unlock.vue";
 
 export default {
   name: "Send transaction",
@@ -34,7 +38,7 @@ export default {
     };
   },
 
-  mixins: [Storage, Sandbox, AlertHelper, Message],
+  mixins: [Storage, Sandbox, ViewHelper, Message],
 
   components: { Unlock },
 

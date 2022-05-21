@@ -132,7 +132,9 @@
 
 <script>
 import router from "@/index/router";
-import AlertHelper from "@/shared/mixins/AlertHelper";
+
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper";
 
 export default {
   data() {
@@ -140,7 +142,7 @@ export default {
       publicPath: process.env.BASE_URL,
     };
   },
-  mixins: [AlertHelper],
+  mixins: [ViewHelper],
   methods: {
     async importPrivateKey() {
       this.alertClose();

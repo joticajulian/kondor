@@ -22,12 +22,16 @@
 
 <script>
 import router from "@/index/router";
+
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Message from "@/shared/mixins/Message"; // todo: don't use Welcome.vue as landing page for popups
+
+// components
 import Unlock from "@/index/components/Unlock.vue";
 import Logo from "@/shared/components/Logo";
 import LogoText from "@/shared/components/LogoText";
-import Storage from "@/shared/mixins/Storage";
-import AlertHelper from "@/shared/mixins/AlertHelper";
-import Message from "@/shared/mixins/Message";
 
 export default {
   name: "Welcome",
@@ -37,7 +41,7 @@ export default {
       password: "",
     };
   },
-  mixins: [Storage, AlertHelper, Message],
+  mixins: [Storage, ViewHelper, Message],
 
   components: { Logo, LogoText, Unlock },
 

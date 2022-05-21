@@ -1,6 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Options from "./components/Options.vue";
+import Options from "./views/Options.vue";
 
 Vue.use(Router);
 

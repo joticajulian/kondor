@@ -1,7 +1,7 @@
 import router from "@/index/router";
 
 export default {
-  name: "Alert mixin",
+  name: "View helper mixin",
 
   data: function () {
     return {

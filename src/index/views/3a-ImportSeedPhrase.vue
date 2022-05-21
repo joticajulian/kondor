@@ -25,8 +25,10 @@
 import { Signer } from "koilib";
 import { ethers } from "ethers";
 import router from "@/index/router";
+
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
-import AlertHelper from "@/shared/mixins/AlertHelper";
 
 export default {
   data() {
@@ -36,7 +38,7 @@ export default {
       password2: "",
     };
   },
-  mixins: [Storage, AlertHelper],
+  mixins: [Storage, ViewHelper],
   methods: {
     async importSeedPhrase() {
       try {
