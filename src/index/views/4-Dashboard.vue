@@ -50,7 +50,7 @@ export default {
   mixins: [Storage, Sandbox, ViewHelper],
 
   mounted() {
-    this.loadAccount(0);
+    this.loadAccount(this.$store.state.currentIndexAccount);
   },
 
   watch: {

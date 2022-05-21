@@ -16,7 +16,6 @@
 </template>
 
 <script>
-
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
