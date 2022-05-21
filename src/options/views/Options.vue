@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import AlertHelper from "@/shared/mixins/AlertHelper";
+import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
@@ -22,7 +22,7 @@ export default {
       chainId: "",
     };
   },
-  mixins: [Storage, AlertHelper],
+  mixins: [Storage, ViewHelper],
   mounted() {
     (async () => {
       this.rpcNodes = (await this._getRpcNodes()).join(",");

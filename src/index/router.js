@@ -1,15 +1,15 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Welcome from "./components/Welcome.vue";
-import NewWallet from "./components/NewWallet.vue";
-import ImportPrivateKey from "./components/ImportPrivateKey";
-import ImportSeedPhrase from "./components/ImportSeedPhrase";
-import Dashboard from "./components/Dashboard.vue";
-import GetAccounts from "./components/GetAccounts.vue";
-// import SignHash from "./components/SignHash.vue";
-// import SignMessage from "./components/SignMessage.vue";
-// import SignTransaction from "./components/SignTransaction.vue";
-import SendTransaction from "./components/SendTransaction.vue";
+import Welcome from "./views/1-Welcome.vue";
+import NewWallet from "./views/2-NewWallet.vue";
+import ImportSeedPhrase from "./views/3a-ImportSeedPhrase";
+import ImportPrivateKey from "./views/3b-ImportPrivateKey";
+import Dashboard from "./views/4-Dashboard.vue";
+import GetAccounts from "./views/popup-GetAccounts.vue";
+// import SignHash from "./views/popup-SignHash.vue";
+// import SignMessage from "./views/popup-SignMessage.vue";
+// import SignTransaction from "./views/popup-SignTransaction.vue";
+import SendTransaction from "./views/popup-SendTransaction.vue";
 
 Vue.use(Router);
 

@@ -16,7 +16,9 @@
 </template>
 
 <script>
-import AlertHelper from "@/shared/mixins/AlertHelper";
+
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Message from "@/shared/mixins/Message";
 
@@ -29,7 +31,7 @@ export default {
     };
   },
 
-  mixins: [Storage, AlertHelper, Message],
+  mixins: [Storage, ViewHelper, Message],
 
   mounted() {
     const requests = this.$store.state.requests.filter(

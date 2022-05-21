@@ -27,7 +27,9 @@
 
 <script>
 import { Contract, Provider, Signer, utils } from "koilib";
-import AlertHelper from "@/shared/mixins/AlertHelper";
+
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 
@@ -45,7 +47,7 @@ export default {
     };
   },
 
-  mixins: [Storage, Sandbox, AlertHelper],
+  mixins: [Storage, Sandbox, ViewHelper],
 
   mounted() {
     this.loadAccount(0);
