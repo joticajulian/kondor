@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="toggleDropdown()">
+    <button @click="toggleDropdown()" class="link">
       {{ currentAccount }}
     </button>
     <div v-if="showDropdown" class="dropdown-content">
@@ -19,8 +19,7 @@
 </template>
 
 <script>
-import { Signer } from "koilib";
-import { ethers } from "ethers";
+import router from "@/index/router";
 
 export default {
   data() {
@@ -52,20 +51,7 @@ export default {
     },
 
     createAccount() {
-      const mnemonic = this.$store.state.mnemonic;
-      const hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
-      const newIndex = this.$store.state.accounts.length;
-      const keyPath = `m/44'/659'/0'/0/${newIndex}`;
-      const keyNumber = hdNode.derivePath(keyPath);
-      const signer = new Signer({
-        privateKey: keyNumber.privateKey.slice(2),
-      });
-      this.$store.state.accounts.push({
-        privateKey: signer.getPrivateKey("wif"),
-        name: `Account ${newIndex}`,
-        address: signer.getAddress(),
-      });
-      this.selectAccount(newIndex);
+      router.push("/createAccount");
     },
   },
 };
