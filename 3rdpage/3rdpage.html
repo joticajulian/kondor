@@ -54,7 +54,7 @@
             id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
             abi: utils.tokenAbi,
             provider: kondor.provider,
-            signer: kondor.signer,
+            signer: kondor.getSigner(inputFrom.value),
           }).functions;
 
           // transfer

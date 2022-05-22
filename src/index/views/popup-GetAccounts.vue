@@ -4,7 +4,18 @@
       <div>Get accounts</div>
       <div>{{ requester.origin }}</div>
       <div>{{ requester.origin }} wants to know your address</div>
-      <div>TODO: checkbox with list of addresses / contract wallets</div>
+      <div v-if="unlocked">
+        <label v-for="(account, index) in $store.state.accounts" :key="index">
+          <span>{{ account.name }} - {{ account.address }}</span>
+          <input type="checkbox" v-model="inputs[index]" />
+        </label>
+      </div>
+      <div v-else>
+        <Unlock
+          @onUnlock="unlocked = true"
+          @onError="alertDanger($event.message)"
+        />
+      </div>
     </div>
     <div>
       <div class="buttons">
@@ -21,16 +32,23 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Message from "@/shared/mixins/Message";
 
+// components
+import Unlock from "@/index/components/Unlock.vue";
+
 export default {
   name: "Get accounts",
   data: function () {
     return {
       requester: "",
       id: -1,
+      inputs: [],
+      unlocked: !!this.$store.state.accounts.length > 0,
     };
   },
 
   mixins: [Storage, ViewHelper, Message],
+
+  components: { Unlock },
 
   mounted() {
     const requests = this.$store.state.requests.filter(
@@ -47,12 +65,16 @@ export default {
 
   methods: {
     async accept() {
-      let accounts = await this._getAccounts();
-      accounts = accounts.map((a) => {
-        // eslint-disable-next-line no-unused-vars
-        const { encryptedPrivateKey, ...pubData } = a;
-        return pubData;
-      });
+      const accounts = this.$store.state.accounts
+        .map((account) => {
+          return {
+            name: account.name,
+            address: account.address,
+          };
+        })
+        .filter((account, index) => {
+          return this.inputs[index];
+        });
       const message = {
         id: this.id,
         result: accounts,
