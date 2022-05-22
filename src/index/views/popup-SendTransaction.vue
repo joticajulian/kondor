@@ -2,10 +2,11 @@
   <div>
     <div>Signature request</div>
     <div>{{ requester.origin }}</div>
+    <div>signer: {{ signerData }}</div>
     <div>{{ data }}</div>
     <div v-if="!unlocked">
       <Unlock
-        @onUnlock="unlocked = true"
+        @onUnlock="afterUnlocked()"
         @onError="alertDanger($event.message)"
       />
     </div>
@@ -31,10 +32,12 @@ export default {
   data: function () {
     return {
       data: "",
+      signerData: "",
       requester: "",
-      id: -1,
-      unlocked: !!this.$store.state.privateKey,
+      account: null,
+      unlocked: !!this.$store.state.accounts.length > 0,
       numErrors: 0,
+      request: null,
     };
   },
 
@@ -50,15 +53,22 @@ export default {
      * TODO: for several requests create a list of requesters
      * and ask to the user to select one to see the details
      */
-    const [request] = requests;
-    this.requester = request.sender;
-    this.id = request.id;
-    this.decodeTransaction(request);
+    this.request = requests[0];
+    this.requester = this.request.sender;
+    this.decodeTransaction();
   },
 
   methods: {
-    async decodeTransaction(request) {
-      const { operations } = request.args.tx;
+    async decodeTransaction() {
+      if (this.request.args.signerAddress) {
+        this.signerData = this.request.args.signerAddress;
+      } else {
+        console.warn(
+          `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.0`
+        );
+        this.signerData = "undefined";
+      }
+      const { operations } = this.request.args.tx;
       const decodedOperations = [];
       for (let i = 0; i < operations.length; i += 1) {
         const op = operations[i];
@@ -69,7 +79,7 @@ export default {
           return;
         }
         const contractId = op.call_contract.contract_id;
-        const abi = request.args.abis[contractId];
+        const abi = this.request.args.abis[contractId];
         const contract = new Contract({
           id: contractId,
           abi,
@@ -85,14 +95,15 @@ export default {
       // TODO: check nonce and limit mana
     },
 
-    async sign() {
-      const requests = this.$store.state.requests.filter(
-        (r) =>
-          r.command === "signer:sendTransaction" &&
-          r.id === this.id &&
-          r.sender.origin === this.requester.origin
+    afterUnlocked() {
+      this.unlocked = true;
+      this.account = this.$store.state.accounts.find(
+        (a) => a.address === this.request.args.signerAddress
       );
-      const [request] = requests;
+      this.signerData = `${this.account.name} - ${this.account.address}`;
+    },
+
+    async sign() {
       // TODO: throw error if there are requests.length > 1
       const rpcNodes = await this._getRpcNodes();
       const provider = new Provider(rpcNodes);
@@ -100,24 +111,24 @@ export default {
         this.numErrors += 1;
         return this.numErrors > 20;
       };
-      const signer = Signer.fromWif(this.$store.state.privateKey);
+      const signer = Signer.fromWif(this.account.privateKey);
       signer.provider = provider;
-      let message = { id: request.id };
+      let message = { id: this.request.id };
       try {
-        const transaction = await signer.sendTransaction(request.args.tx);
+        const transaction = await signer.sendTransaction(this.request.args.tx);
         message.result = transaction;
       } catch (err) {
         message.error = err;
       }
-      this.sendResponse("extension", message, this.requester);
+      this.sendResponse("extension", message, this.request.sender);
     },
 
     cancel() {
       const message = {
-        id: this.id,
+        id: this.request.id,
         error: "sendTransaction cancelled",
       };
-      this.sendResponse("extension", message, this.requester);
+      this.sendResponse("extension", message, this.request.sender);
     },
   },
 };

@@ -1,7 +1,8 @@
 <template>
   <div class="container">
+    <h1>New account</h1>
     <input
-      @keyup.enter="unlock"
+      @keyup.enter="accept"
       type="text"
       v-model="name"
       placeholder="Name"
