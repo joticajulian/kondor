@@ -5,10 +5,7 @@
     <div>signer: {{ signerData }}</div>
     <div>{{ data }}</div>
     <div v-if="!unlocked">
-      <Unlock
-        @onUnlock="afterUnlocked()"
-        @onError="alertDanger($event.message)"
-      />
+      <Unlock @onUnlock="afterUnlocked()" @onError="alertDanger($event)" />
     </div>
     <button @click="sign" :disabled="!unlocked">Sign</button>
     <button @click="cancel">Cancel</button>

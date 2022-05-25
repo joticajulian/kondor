@@ -5,6 +5,7 @@ import NewWallet from "./views/2-NewWallet.vue";
 import ImportSeedPhrase from "./views/3a-ImportSeedPhrase";
 import ImportPrivateKey from "./views/3b-ImportPrivateKey";
 import Dashboard from "./views/4-Dashboard.vue";
+import Signers from "./views/5-Signers.vue";
 import CreateAccount from "./views/setting-CreateAccount";
 import GetAccounts from "./views/popup-GetAccounts.vue";
 // import SignHash from "./views/popup-SignHash.vue";
@@ -40,6 +41,11 @@ export default new Router({
       path: "/dashboard",
       name: "Dashboard",
       component: Dashboard,
+    },
+    {
+      path: "/signers",
+      name: "Signers",
+      component: Signers,
     },
     {
       path: "/createAccount",

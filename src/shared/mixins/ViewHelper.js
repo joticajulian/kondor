@@ -34,7 +34,12 @@ export default {
       this.$store.state.alertMessage = message;
       this.$store.state.alertShow = true;
     },
-    alertDanger(message) {
+    alertDanger(error) {
+      let message = error;
+      if (typeof error !== "string") {
+        console.error(error);
+        if (error && error.message) message = error.message;
+      }
       this.$store.state.alertType = "danger";
       this.$store.state.alertMessage = message;
       this.$store.state.alertShow = true;

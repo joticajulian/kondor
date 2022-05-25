@@ -6,7 +6,7 @@
       <div><LogoText /></div>
     </div>
     <div v-if="hasAccounts">
-      <Unlock @onUnlock="unlock()" @onError="alertDanger($event.message)" />
+      <Unlock @onUnlock="unlock()" @onError="alertDanger($event)" />
     </div>
     <div class="welcome-message" v-if="!hasAccounts">
       Welcome to kondor!

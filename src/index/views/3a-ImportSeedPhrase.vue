@@ -58,6 +58,7 @@ export default {
             mnemonicPath: keyPath,
             name: "Account 0",
             address: signer.getAddress(),
+            signers: [],
           },
         ]);
 
@@ -67,6 +68,7 @@ export default {
             privateKey: signer.getPrivateKey("wif"),
             name: "Account 0",
             address: signer.getAddress(),
+            signers: [],
           },
         ];
 

@@ -58,6 +58,7 @@ export default {
             ),
             name: "Account 0",
             address: signer.getAddress(),
+            signers: [],
           },
         ]);
 
@@ -67,6 +68,7 @@ export default {
             privateKey: this.privateKey,
             name: "Account 0",
             address: signer.getAddress(),
+            signers: [],
           },
         ];
 

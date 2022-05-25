@@ -36,6 +36,7 @@ export default {
         this.alertSuccess("RPC Node set");
       } catch (error) {
         this.alertDanger(error.message);
+        throw error;
       }
     },
     async setChainId() {
@@ -44,6 +45,7 @@ export default {
         this.alertSuccess("Chain Id set");
       } catch (error) {
         this.alertDanger(error.message);
+        throw error;
       }
     },
   },

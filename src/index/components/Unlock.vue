@@ -35,22 +35,44 @@ export default {
           mnemonic = await this.decrypt(encryptedMnemonic, this.password);
           const hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
           accounts = await Promise.all(
-            encryptedAccounts.map(async (encAccount) => {
-              const key = hdNode.derivePath(encAccount.mnemonicPath);
-              const signer = new Signer({
-                privateKey: key.privateKey.slice(2),
+            encryptedAccounts.map((encAccount) => {
+              const keyAcc = hdNode.derivePath(encAccount.mnemonicPath);
+              const signerAcc = new Signer({
+                privateKey: keyAcc.privateKey.slice(2),
               });
-              if (signer.getAddress() !== encAccount.address) {
+              if (signerAcc.getAddress() !== encAccount.address) {
                 throw new Error(
                   `Error in account "${encAccount.name}". Expected address: ${
                     encAccount.address
-                  }. Derived: ${signer.getAddress()}`
+                  }. Derived: ${signerAcc.getAddress()}`
                 );
               }
               return {
-                privateKey: signer.getPrivateKey("wif"),
+                privateKey: signerAcc.getPrivateKey("wif"),
                 name: encAccount.name,
-                address: signer.getAddress(),
+                address: signerAcc.getAddress(),
+                signers: encAccount.signers
+                  ? encAccount.signers.map((s) => {
+                      const keySigner = hdNode.derivePath(s.mnemonicPath);
+                      const signer = new Signer({
+                        privateKey: keySigner.privateKey.slice(2),
+                      });
+                      if (signer.getAddress() !== s.address) {
+                        throw new Error(
+                          `Error in account "${encAccount.name}", signer "${
+                            s.name
+                          }". Expected address: ${
+                            s.address
+                          }. Derived: ${signer.getAddress()}`
+                        );
+                      }
+                      return {
+                        privateKey: signer.getPrivateKey("wif"),
+                        name: s.name,
+                        address: signer.getAddress(),
+                      };
+                    })
+                  : [],
               };
             })
           );

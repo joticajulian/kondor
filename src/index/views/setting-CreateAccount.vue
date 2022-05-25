@@ -38,7 +38,7 @@ export default {
         if (!this.name) throw new Error("No name defined");
         const hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
         const newIndex = this.$store.state.accounts.length;
-        const keyPath = `m/44'/659'/0'/0/${newIndex}`;
+        const keyPath = `m/44'/659'/${newIndex}'/0/0`;
         const keyNumber = hdNode.derivePath(keyPath);
         const signer = new Signer({
           privateKey: keyNumber.privateKey.slice(2),
