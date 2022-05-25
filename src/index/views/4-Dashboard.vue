@@ -2,6 +2,7 @@
   <div class="container">
     <div class="column">
       <div class="info container">
+        <router-link to="/signers" class="link">Signers</router-link>
         <span>{{ address }}</span>
         <div class="balance">
           <div class="heading"></div>

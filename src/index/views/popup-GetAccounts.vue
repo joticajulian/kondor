@@ -11,10 +11,7 @@
         </label>
       </div>
       <div v-else>
-        <Unlock
-          @onUnlock="unlocked = true"
-          @onError="alertDanger($event.message)"
-        />
+        <Unlock @onUnlock="unlocked = true" @onError="alertDanger($event)" />
       </div>
     </div>
     <div>
@@ -70,6 +67,12 @@ export default {
           return {
             name: account.name,
             address: account.address,
+            signers: account.signers.map((signer) => {
+              return {
+                name: signer.name,
+                address: signer.address,
+              };
+            }),
           };
         })
         .filter((account, index) => {

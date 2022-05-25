@@ -27,13 +27,13 @@ export default new Vuex.Store({
           name: "Account 0",
         },
         {
-          address: "1v7APTduCirUiu2S9VerVALdNYuGawZvo",
-          mnemonicPath: "m/44'/659'/0'/0/1",
+          address: "1M1mXKrtB5QDscNmb1tVGfJeAW2G2aawgB",
+          mnemonicPath: "m/44'/659'/1'/0/0",
           name: "Account 1",
         },
         {
-          address: "13NpGcpXrmC61XDmdXjU2w3sxyhWSEahMP",
-          mnemonicPath: "m/44'/659'/0'/0/2",
+          address: "13uM85E2sNUhjuyk98F3EftxNZT7uetynP",
+          mnemonicPath: "m/44'/659'/2'/0/0",
           name: "Account 2",
         },
       ],

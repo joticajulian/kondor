@@ -6135,10 +6135,12 @@ koilib@^3.1.1:
     multibase "^4.0.6"
     protobufjs "^6.11.2"
 
-kondor-js@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.2.0.tgz#1092ef1118530eabf66127292fa9872f206c1f11"
-  integrity sha512-ZD+evUPrDeMcK+WzUNIxEuY5cRdVKiUH4Rg8gPq7Z2158YDRzf9XKtQqNIZQxDhFMPKbx3iCaOHN0rXm9+CHaA==
+kondor-js@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.2.1.tgz#4c2cccbe23344ac1e82bfe134e7ca74d537d9b3c"
+  integrity sha512-zQH0Mf2sYu8LUKi4EoQTy9ix5wRUT3PMCuUS6ZMYLbicd0CYzy3Vho5fT83yNs/Cs/sgF0q5k+rZDJXYw75ajQ==
+  dependencies:
+    koilib "^3.1.1"
 
 launch-editor-middleware@^2.2.1:
   version "2.3.0"

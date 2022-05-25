@@ -81,6 +81,7 @@ const messenger: Messenger = new Messenger({
 
     return messenger.sendExtensionMessage(to, command, args, {
       ping: true,
+      pingTimeout: 2000,
     });
   },
 });
