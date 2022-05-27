@@ -118,6 +118,7 @@ export default {
         message.error = err;
       }
       this.sendResponse("extension", message, this.request.sender);
+      window.close();
     },
 
     cancel() {
@@ -126,6 +127,7 @@ export default {
         error: "sendTransaction cancelled",
       };
       this.sendResponse("extension", message, this.request.sender);
+      window.close();
     },
   },
 };

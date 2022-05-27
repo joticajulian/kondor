@@ -4,15 +4,10 @@
       <div>Get accounts</div>
       <div>{{ requester.origin }}</div>
       <div>{{ requester.origin }} wants to know your address</div>
-      <div v-if="unlocked">
-        <label v-for="(account, index) in $store.state.accounts" :key="index">
-          <span>{{ account.name }} - {{ account.address }}</span>
-          <input type="checkbox" v-model="inputs[index]" />
-        </label>
-      </div>
-      <div v-else>
-        <Unlock @onUnlock="unlocked = true" @onError="alertDanger($event)" />
-      </div>
+      <label v-for="(account, index) in accounts" :key="index">
+        <span>{{ account.name }} - {{ account.address }}</span>
+        <input type="checkbox" v-model="inputs[index]" />
+      </label>
     </div>
     <div>
       <div class="buttons">
@@ -29,9 +24,6 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Message from "@/shared/mixins/Message";
 
-// components
-import Unlock from "@/index/components/Unlock.vue";
-
 export default {
   name: "Get accounts",
   data: function () {
@@ -39,13 +31,11 @@ export default {
       requester: "",
       id: -1,
       inputs: [],
-      unlocked: !!this.$store.state.accounts.length > 0,
+      accounts: [],
     };
   },
 
   mixins: [Storage, ViewHelper, Message],
-
-  components: { Unlock },
 
   mounted() {
     const requests = this.$store.state.requests.filter(
@@ -58,21 +48,29 @@ export default {
     const [request] = requests;
     this.requester = request.sender;
     this.id = request.id;
+
+    this.loadAccounts();
   },
 
   methods: {
+    async loadAccounts() {
+      this.accounts = await this._getAccounts();
+    },
+
     async accept() {
-      const accounts = this.$store.state.accounts
+      const accounts = this.accounts
         .map((account) => {
           return {
             name: account.name,
             address: account.address,
-            signers: account.signers.map((signer) => {
-              return {
-                name: signer.name,
-                address: signer.address,
-              };
-            }),
+            signers: account.signers
+              ? account.signers.map((signer) => {
+                  return {
+                    name: signer.name,
+                    address: signer.address,
+                  };
+                })
+              : [],
           };
         })
         .filter((account, index) => {
@@ -83,6 +81,7 @@ export default {
         result: accounts,
       };
       this.sendResponse("extension", message, this.requester);
+      window.close();
     },
     cancel() {
       const message = {
@@ -90,6 +89,7 @@ export default {
         error: "getAccounts cancelled",
       };
       this.sendResponse("extension", message, this.requester);
+      window.close();
     },
   },
 };
