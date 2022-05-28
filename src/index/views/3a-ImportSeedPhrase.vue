@@ -16,7 +16,7 @@
         type="password"
         placeholder="Confirm password"
       />
-      <button @click="importSeedPhrase" class="link">import now</button>
+      <button @click="importSeedPhrase" class="">import now</button>
     </div>
   </div>
 </template>
@@ -83,6 +83,12 @@ export default {
 };
 </script>
 <style scoped>
+input {
+  margin-bottom: 2em;
+}
+h1 {
+  margin-bottom: 1em;
+}
 .container {
   font-family: Arial, Helvetica, sans-serif;
   color: var(--kondor-light);
@@ -94,5 +100,7 @@ export default {
 .middle {
   display: flex;
   justify-content: center;
+  margin: 2em 0;
 }
+
 </style>
