@@ -82,3 +82,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.container {
+  min-height: 20em;
+  margin: 4em 2em;
+}
+</style>

@@ -5,7 +5,7 @@
       <br />
       <div><LogoText /></div>
     </div>
-    <div v-if="hasAccounts">
+    <div v-if="hasAccounts" class="unlock">
       <Unlock @onUnlock="unlock()" @onError="alertDanger($event)" />
     </div>
     <div class="welcome-message" v-if="!hasAccounts">
@@ -77,6 +77,9 @@ export default {
 .logo {
   display: flex;
   flex-direction: column;
+  padding-top: 4em;
+  align-items: center;
+  width: 100%;
 }
 .link {
   border-bottom: 1px dotted white;
@@ -88,5 +91,9 @@ export default {
 }
 .recover {
   margin-top: 3em;
+}
+.unlock {
+  width: 70%;
+  margin-top: 2em;
 }
 </style>
