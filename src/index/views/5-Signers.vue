@@ -67,11 +67,15 @@ export default {
         });
 
         const encryptedAccounts = await this._getAccounts();
-        encryptedAccounts[accIndex].signers.push({
-          mnemonicPath: keyPath,
-          name: `signer ${newIndex}`,
-          address: signer.getAddress(),
-        });
+        if (encryptedAccounts[accIndex].signers) {
+          encryptedAccounts[accIndex].signers.push({
+            mnemonicPath: keyPath,
+            name: `signer ${newIndex}`,
+            address: signer.getAddress(),
+          });
+        } else {
+          encryptedAccounts[accIndex].signers = [];
+        }
         await this._setAccounts(encryptedAccounts);
         this.loadSigners(accIndex);
       } catch (error) {
