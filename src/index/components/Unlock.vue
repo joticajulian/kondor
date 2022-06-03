@@ -6,7 +6,7 @@
       v-model="password"
       placeholder="Password"
     />
-    <button @click="unlock" class="link">unlock</button>
+    <button @click="unlock" class="link">{{ labelButton }}</button>
   </div>
 </template>
 
@@ -17,6 +17,14 @@ import Storage from "@/shared/mixins/Storage";
 
 export default {
   name: "Unlock",
+
+  props: {
+    labelButton: {
+      type: String,
+      default: "unlock",
+    },
+  },
+
   data() {
     return {
       password: "",
@@ -98,7 +106,7 @@ export default {
         this.$store.state.mnemonic = mnemonic;
         this.$store.state.accounts = accounts;
 
-        this.$emit("onUnlock");
+        this.$emit("onUnlock", this.password);
       } catch (error) {
         this.$emit("onError", error);
       }
