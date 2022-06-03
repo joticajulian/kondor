@@ -125,7 +125,7 @@
       <img src alt />
       <div class="proper title">Yes, let's setup a new wallet</div>
       <div class="body">This will create a new wallet and seed phrase</div>
-      <button class="link disabled">new wallet (coming soon)</button>
+      <button @click="generateSeed" class="link">new wallet</button>
     </div>
   </div>
 </template>
@@ -152,7 +152,10 @@ export default {
       this.alertClose();
       router.push("/importSeedPhrase");
     },
-    async importWallet() {},
+    async generateSeed() {
+      this.alertClose();
+      router.push("/generateSeed");
+    },
   },
 };
 </script>
