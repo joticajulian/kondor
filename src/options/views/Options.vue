@@ -7,22 +7,42 @@
       <div>Set Chain Id</div>
       <input v-model="chainId" type="text" />
       <button @click="setChainId">Set Chain Id</button>
+      <div>
+        Delete wallet: Remove all private keys and accounts from this wallet
+      </div>
+      <button @click="deleteWallet">Delete wallet</button>
+      <div>View seed and private keys</div>
+      <Unlock
+        labelButton="View seed and private keys"
+        @onUnlock="viewSecrets"
+        @onError="alertDanger($event)"
+      />
+      <div>{{ secrets }}</div>
     </div>
   </div>
 </template>
 
 <script>
+// mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
+
+// components
+import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
   data() {
     return {
       rpcNodes: "",
       chainId: "",
+      secrets: "",
     };
   },
+
   mixins: [Storage, ViewHelper],
+
+  components: { Unlock },
+
   mounted() {
     (async () => {
       this.rpcNodes = (await this._getRpcNodes()).join(",");
@@ -39,6 +59,7 @@ export default {
         throw error;
       }
     },
+
     async setChainId() {
       try {
         await this._setChainId(this.chainId);
@@ -47,6 +68,26 @@ export default {
         this.alertDanger(error.message);
         throw error;
       }
+    },
+
+    async deleteWallet() {
+      try {
+        await this._setMnemonic(null);
+        await this._setAccounts([]);
+        // await this._setRpcNodes(null);
+        // await this._setChainId(null);
+        this.alertSuccess("Wallet deleted");
+      } catch (error) {
+        this.alertDanger(error.message);
+        throw error;
+      }
+    },
+
+    async viewSecrets() {
+      this.secrets = JSON.stringify({
+        mnemonic: this.$store.state.mnemonic,
+        accounts: this.$store.state.accounts,
+      });
     },
   },
 };
