@@ -58,8 +58,8 @@ export default {
     },
 
     async _getRpcNodes(strict = false) {
-      let rpcNodes = this._read("rpcNodes", strict);
-      if (!rpcNodes) {
+      let rpcNodes = await this._read("rpcNodes", strict);
+      if (!rpcNodes || rpcNodes.length === 0) {
         // store default value
         rpcNodes =
           process.env.VUE_APP_ENV === "test"

@@ -29,7 +29,7 @@ import Storage from "@/shared/mixins/Storage";
 import Message from "@/shared/mixins/Message"; // todo: don't use Welcome.vue as landing page for popups
 
 // components
-import Unlock from "@/index/components/Unlock.vue";
+import Unlock from "@/shared/components/Unlock.vue";
 import Logo from "@/shared/components/Logo";
 import LogoText from "@/shared/components/LogoText";
 
@@ -47,7 +47,8 @@ export default {
 
   mounted() {
     (async () => {
-      this.hasAccounts = await this._getAccounts();
+      const encAccounts = await this._getAccounts();
+      this.hasAccounts = encAccounts && encAccounts.length > 0;
     })();
   },
 

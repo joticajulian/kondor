@@ -55,7 +55,7 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 // components
-import Unlock from "@/index/components/Unlock.vue";
+import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
   data() {

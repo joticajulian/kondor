@@ -12,7 +12,12 @@
         <div @click="selectAccount(index)">{{ account.name }}</div>
       </div>
       <div disabled class="separator"></div>
-      <div @click="createAccount()" class="dropdown-item">+ Create account</div>
+      <div v-if="$store.state.mnemonic">
+        <div @click="createAccount" class="dropdown-item">+ Create account</div>
+      </div>
+      <div v-else>
+        <div @click="addSeed" class="dropdown-item">+ Add seed to wallet</div>
+      </div>
       <div class="dropdown-item">+ Import account</div>
     </div>
   </div>
@@ -52,6 +57,10 @@ export default {
 
     createAccount() {
       router.push("/createAccount");
+    },
+
+    addSeed() {
+      router.push("/generateSeed?privateKeyExist=true");
     },
   },
 };

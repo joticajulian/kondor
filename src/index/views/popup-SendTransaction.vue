@@ -22,7 +22,7 @@ import Sandbox from "@/shared/mixins/Sandbox";
 import Message from "@/shared/mixins/Message";
 
 // components
-import Unlock from "@/index/components/Unlock.vue";
+import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
   name: "Send transaction",
@@ -95,7 +95,9 @@ export default {
     afterUnlocked() {
       this.unlocked = true;
       this.account = this.$store.state.accounts.find(
-        (a) => a.address === this.request.args.signerAddress
+        (a) =>
+          !this.request.args.signerAddress ||
+          a.address === this.request.args.signerAddress
       );
       this.signerData = `${this.account.name} - ${this.account.address}`;
     },
