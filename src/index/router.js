@@ -8,11 +8,6 @@ import GenerateSeed from "./views/3c-GenerateSeed";
 import Dashboard from "./views/4-Dashboard.vue";
 import Signers from "./views/5-Signers.vue";
 import CreateAccount from "./views/setting-CreateAccount";
-import GetAccounts from "./views/popup-GetAccounts.vue";
-// import SignHash from "./views/popup-SignHash.vue";
-// import SignMessage from "./views/popup-SignMessage.vue";
-// import SignTransaction from "./views/popup-SignTransaction.vue";
-import SendTransaction from "./views/popup-SendTransaction.vue";
 
 Vue.use(Router);
 
@@ -57,31 +52,6 @@ export default new Router({
       path: "/createAccount",
       name: "Create Account",
       component: CreateAccount,
-    },
-    {
-      path: "/getAccounts",
-      name: "Get Accounts",
-      component: GetAccounts,
-    },
-    /*{
-      path: "/signHash",
-      name: "Sign Hash",
-      component: SignHash,
-    },
-    {
-      path: "/signMessage",
-      name: "Sign Message",
-      component: SignMessage,
-    },
-    {
-      path: "/signTransaction",
-      name: "Sign Transaction",
-      component: SignTransaction,
-    },*/
-    {
-      path: "/sendTransaction",
-      name: "Send Transaction",
-      component: SendTransaction,
     },
   ],
 });
