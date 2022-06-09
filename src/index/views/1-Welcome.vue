@@ -15,7 +15,7 @@
     </div>
     <router-link to="/newWallet" class="link">
       <div v-if="hasAccounts" class="recover">Recover Wallet</div>
-      <div v-else>unlock</div>
+      <div v-else>New Wallet</div>
     </router-link>
   </div>
 </template>

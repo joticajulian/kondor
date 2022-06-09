@@ -14,7 +14,7 @@
 
 <script>
 import Nav from "@/index/components/Nav";
-import Alert from "@/index/components/Alert";
+import Alert from "@/shared/components/Alert";
 
 export default {
   components: { Nav, Alert },

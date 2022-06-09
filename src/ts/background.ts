@@ -54,7 +54,7 @@ async function preparePopup(sender?: Sender) {
         height: 500,
         width: 309,
         type: "popup",
-        url: "index.html",
+        url: "popup.html",
         top: 0,
         left: 0,
       },

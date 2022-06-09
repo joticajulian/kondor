@@ -88,6 +88,9 @@ export default {
         mnemonic: this.$store.state.mnemonic,
         accounts: this.$store.state.accounts,
       });
+      this.alertSuccess(
+        "Secrets are visible, be careful not to expose them to third parties"
+      );
     },
   },
 };
