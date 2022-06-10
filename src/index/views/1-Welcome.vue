@@ -26,7 +26,6 @@ import router from "@/index/router";
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
-import Message from "@/shared/mixins/Message"; // todo: don't use Welcome.vue as landing page for popups
 
 // components
 import Unlock from "@/shared/components/Unlock.vue";
@@ -41,7 +40,7 @@ export default {
       password: "",
     };
   },
-  mixins: [Storage, ViewHelper, Message],
+  mixins: [Storage, ViewHelper],
 
   components: { Logo, LogoText, Unlock },
 
