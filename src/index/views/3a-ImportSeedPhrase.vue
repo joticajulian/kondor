@@ -22,9 +22,8 @@
 </template>
 
 <script>
-import { Signer } from "koilib";
-import { ethers } from "ethers";
 import router from "@/index/router";
+import { HDKoinos } from "../../../lib/HDKoinos";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -44,20 +43,16 @@ export default {
       try {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        const hdNode = ethers.utils.HDNode.fromMnemonic(this.mnemonic);
-        const keyPath = "m/44'/659'/0'/0/0";
-        const keyNumber0 = hdNode.derivePath(keyPath);
-        const signer = new Signer({
-          privateKey: keyNumber0.privateKey.slice(2),
-        });
+        const hdKoinos = new HDKoinos(this.mnemonic);
+        const acc0 = hdKoinos.deriveKeyAccount(0);
         await this._setMnemonic(
           await this.encrypt(this.mnemonic, this.password1)
         );
         await this._setAccounts([
           {
-            mnemonicPath: keyPath,
+            mnemonicPath: acc0.keyPath,
             name: "Account 0",
-            address: signer.getAddress(),
+            address: acc0.address,
             signers: [],
           },
         ]);
@@ -65,9 +60,9 @@ export default {
         this.$store.state.mnemonic = this.mnemonic;
         this.$store.state.accounts = [
           {
-            privateKey: signer.getPrivateKey("wif"),
+            privateKey: acc0.privateKey,
             name: "Account 0",
-            address: signer.getAddress(),
+            address: acc0.address,
             signers: [],
           },
         ];

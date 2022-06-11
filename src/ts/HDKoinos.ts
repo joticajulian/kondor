@@ -14,15 +14,17 @@ export class HDKoinos {
     );
   }
 
-  deriveKey(path: string): {
+  deriveKey(keyPath: string): {
+    keyPath: string;
     privateKey: string;
     address: string;
   } {
-    const key = this.hdNode.derivePath(path);
+    const key = this.hdNode.derivePath(keyPath);
     const signer = new Signer({
       privateKey: key.privateKey.slice(2),
     });
     return {
+      keyPath,
       privateKey: signer.getPrivateKey("wif", false),
       address: signer.getAddress(),
     };
