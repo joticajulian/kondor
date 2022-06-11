@@ -22,19 +22,19 @@ export default new Vuex.Store({
        */
       accounts: [
         {
-          address: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
-          mnemonicPath: "m/44'/659'/0'/0/0",
           name: "Account 0",
+          keyPath: "m/44'/659'/0'/0/0",
+          address: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
         },
         {
-          address: "1M1mXKrtB5QDscNmb1tVGfJeAW2G2aawgB",
-          mnemonicPath: "m/44'/659'/1'/0/0",
           name: "Account 1",
+          keyPath: "m/44'/659'/1'/0/0",
+          address: "1M1mXKrtB5QDscNmb1tVGfJeAW2G2aawgB",
         },
         {
-          address: "13uM85E2sNUhjuyk98F3EftxNZT7uetynP",
-          mnemonicPath: "m/44'/659'/2'/0/0",
           name: "Account 2",
+          keyPath: "m/44'/659'/2'/0/0",
+          address: "13uM85E2sNUhjuyk98F3EftxNZT7uetynP",
         },
       ],
       iv: "b652a4defd2e34b3c44b881d",

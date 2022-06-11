@@ -49,43 +49,44 @@ export default {
         }
         accounts = await Promise.all(
           encryptedAccounts.map(async (encAccount) => {
-            let acc;
-            if (encAccount.mnemonicPath) {
-              acc = hdKoinos.deriveKey(encAccount.mnemonicPath);
+            let account;
+            if (encAccount.keyPath) {
+              account = hdKoinos.deriveKey(encAccount);
             } else {
               const privateKey = await this.decrypt(
                 encAccount.encryptedPrivateKey,
                 this.password
               );
               const sig = Signer.fromWif(privateKey);
-              acc = {
-                privateKey: sig.getPrivateKey("wif", false),
-                address: sig.getAddress(),
+
+              if (sig.getAddress() !== encAccount.address) {
+                throw new Error(
+                  `Error in "${encAccount.name}". Expected address: ${
+                    encAccount.address
+                  }. Derived: ${sig.getAddress()}`
+                );
+              }
+
+              account = {
+                public: {
+                  name: encAccount.name,
+                  address: sig.getAddress(),
+                },
+                private: {
+                  privateKey: sig.getPrivateKey("wif", false),
+                },
               };
             }
 
-            if (acc.address !== encAccount.address) {
-              throw new Error(
-                `Error in account "${encAccount.name}". Expected address: ${encAccount.address}. Derived: ${acc.address}`
-              );
-            }
-
             return {
-              privateKey: acc.privateKey,
-              name: encAccount.name,
-              address: acc.address,
+              ...account.public,
+              ...account.private,
               signers: encAccount.signers
                 ? encAccount.signers.map((s) => {
-                    const signerAcc = hdKoinos.deriveKey(s.mnemonicPath);
-                    if (signerAcc.address !== s.address) {
-                      throw new Error(
-                        `Error in account "${encAccount.name}", signer "${s.name}". Expected address: ${s.address}. Derived: ${signerAcc.address}`
-                      );
-                    }
+                    const signerAcc = hdKoinos.deriveKey(s);
                     return {
-                      privateKey: signerAcc.privateKey,
-                      name: s.name,
-                      address: signerAcc.address,
+                      ...signerAcc.public,
+                      ...signerAcc.private,
                     };
                   })
                 : [],
