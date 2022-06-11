@@ -12,8 +12,8 @@
 
 <script>
 import { Signer } from "koilib";
-import { ethers } from "ethers";
 import Storage from "@/shared/mixins/Storage";
+import { HDKoinos } from "../../../lib/HDKoinos";
 
 export default {
   name: "Unlock",
@@ -39,60 +39,53 @@ export default {
         const encryptedAccounts = await this._getAccounts();
         let accounts = [];
         let mnemonic = null;
-        let hdNode = null;
+        let hdKoinos = null;
         if (encryptedMnemonic) {
           mnemonic = await this.decrypt(encryptedMnemonic, this.password);
-          hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
+          hdKoinos = new HDKoinos(mnemonic);
         }
         if (!encryptedAccounts || encryptedAccounts.length === 0) {
           throw new Error("No accounts stored in the wallet");
         }
         accounts = await Promise.all(
           encryptedAccounts.map(async (encAccount) => {
-            let signerAcc;
+            let acc;
             if (encAccount.mnemonicPath) {
-              const keyAcc = hdNode.derivePath(encAccount.mnemonicPath);
-              signerAcc = new Signer({
-                privateKey: keyAcc.privateKey.slice(2),
-              });
+              acc = hdKoinos.deriveKey(encAccount.mnemonicPath);
             } else {
               const privateKey = await this.decrypt(
                 encAccount.encryptedPrivateKey,
                 this.password
               );
-              signerAcc = Signer.fromWif(privateKey);
+              const sig = Signer.fromWif(privateKey);
+              acc = {
+                privateKey: sig.getPrivateKey("wif", false),
+                address: sig.getAddress(),
+              };
             }
 
-            if (signerAcc.getAddress() !== encAccount.address) {
+            if (acc.address !== encAccount.address) {
               throw new Error(
-                `Error in account "${encAccount.name}". Expected address: ${
-                  encAccount.address
-                }. Derived: ${signerAcc.getAddress()}`
+                `Error in account "${encAccount.name}". Expected address: ${encAccount.address}. Derived: ${acc.address}`
               );
             }
+
             return {
-              privateKey: signerAcc.getPrivateKey("wif"),
+              privateKey: acc.privateKey,
               name: encAccount.name,
-              address: signerAcc.getAddress(),
+              address: acc.address,
               signers: encAccount.signers
                 ? encAccount.signers.map((s) => {
-                    const keySigner = hdNode.derivePath(s.mnemonicPath);
-                    const signer = new Signer({
-                      privateKey: keySigner.privateKey.slice(2),
-                    });
-                    if (signer.getAddress() !== s.address) {
+                    const signerAcc = hdKoinos.deriveKey(s.mnemonicPath);
+                    if (signerAcc.address !== s.address) {
                       throw new Error(
-                        `Error in account "${encAccount.name}", signer "${
-                          s.name
-                        }". Expected address: ${
-                          s.address
-                        }. Derived: ${signer.getAddress()}`
+                        `Error in account "${encAccount.name}", signer "${s.name}". Expected address: ${s.address}. Derived: ${signerAcc.address}`
                       );
                     }
                     return {
-                      privateKey: signer.getPrivateKey("wif"),
+                      privateKey: signerAcc.privateKey,
                       name: s.name,
-                      address: signer.getAddress(),
+                      address: signerAcc.address,
                     };
                   })
                 : [],

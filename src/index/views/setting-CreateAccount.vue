@@ -13,9 +13,8 @@
 </template>
 
 <script>
-import { Signer } from "koilib";
-import { ethers } from "ethers";
 import router from "@/index/router";
+import { HDKoinos } from "../../../lib/HDKoinos";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -36,24 +35,20 @@ export default {
         const mnemonic = this.$store.state.mnemonic;
         if (!mnemonic) throw new Error("No seed phrase found");
         if (!this.name) throw new Error("No name defined");
-        const hdNode = ethers.utils.HDNode.fromMnemonic(mnemonic);
+        const hdKoinos = new HDKoinos(mnemonic);
         const newIndex = this.$store.state.accounts.length;
-        const keyPath = `m/44'/659'/${newIndex}'/0/0`;
-        const keyNumber = hdNode.derivePath(keyPath);
-        const signer = new Signer({
-          privateKey: keyNumber.privateKey.slice(2),
-        });
+        const acc = hdKoinos.deriveKeyAccount(newIndex);
         this.$store.state.accounts.push({
-          privateKey: signer.getPrivateKey("wif"),
+          privateKey: acc.privateKey,
           name: this.name,
-          address: signer.getAddress(),
+          address: acc.address,
         });
 
         const encryptedAccounts = await this._getAccounts();
         encryptedAccounts.push({
-          mnemonicPath: keyPath,
+          mnemonicPath: acc.keyPath,
           name: this.name,
-          address: signer.getAddress(),
+          address: acc.address,
         });
         await this._setAccounts(encryptedAccounts);
         this.$store.state.currentIndexAccount = newIndex;
