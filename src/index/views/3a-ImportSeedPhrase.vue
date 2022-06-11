@@ -44,15 +44,13 @@ export default {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
         const hdKoinos = new HDKoinos(this.mnemonic);
-        const acc0 = hdKoinos.deriveKeyAccount(0);
+        const account = hdKoinos.deriveKeyAccount(0, "Account 0");
         await this._setMnemonic(
           await this.encrypt(this.mnemonic, this.password1)
         );
         await this._setAccounts([
           {
-            mnemonicPath: acc0.keyPath,
-            name: "Account 0",
-            address: acc0.address,
+            ...account.public,
             signers: [],
           },
         ]);
@@ -60,9 +58,8 @@ export default {
         this.$store.state.mnemonic = this.mnemonic;
         this.$store.state.accounts = [
           {
-            privateKey: acc0.privateKey,
-            name: "Account 0",
-            address: acc0.address,
+            ...account.public,
+            ...account.private,
             signers: [],
           },
         ];

@@ -1,7 +1,7 @@
 export interface Account {
-  mnemonicPath?: string;
-  encryptedPrivateKey?: string;
   name: string;
+  keyPath?: string;
+  encryptedPrivateKey?: string;
   address: string;
 }
 

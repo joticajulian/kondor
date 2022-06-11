@@ -53,20 +53,21 @@ export default {
         const hdKoinos = new HDKoinos(mnemonic);
         const accIndex = this.$store.state.currentIndexAccount;
         const newIndex = this.signers.length;
-        const signerAcc = hdKoinos.deriveKeySigner(accIndex, newIndex);
+        const signerAcc = hdKoinos.deriveKeySigner(
+          accIndex,
+          newIndex,
+          `signer ${newIndex}`
+        );
 
         this.$store.state.accounts[accIndex].signers.push({
-          privateKey: signerAcc.privateKey,
-          name: `signer ${newIndex}`,
-          address: signerAcc.address,
+          ...signerAcc.public,
+          ...signerAcc.private,
         });
 
         const encryptedAccounts = await this._getAccounts();
         if (encryptedAccounts[accIndex].signers) {
           encryptedAccounts[accIndex].signers.push({
-            mnemonicPath: signerAcc.keyPath,
-            name: `signer ${newIndex}`,
-            address: signerAcc.address,
+            ...signerAcc.public,
           });
         } else {
           encryptedAccounts[accIndex].signers = [];

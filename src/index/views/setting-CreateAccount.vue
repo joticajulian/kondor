@@ -37,18 +37,17 @@ export default {
         if (!this.name) throw new Error("No name defined");
         const hdKoinos = new HDKoinos(mnemonic);
         const newIndex = this.$store.state.accounts.length;
-        const acc = hdKoinos.deriveKeyAccount(newIndex);
+        const account = hdKoinos.deriveKeyAccount(newIndex, this.name);
         this.$store.state.accounts.push({
-          privateKey: acc.privateKey,
-          name: this.name,
-          address: acc.address,
+          ...account.public,
+          ...account.private,
+          signers: [],
         });
 
         const encryptedAccounts = await this._getAccounts();
         encryptedAccounts.push({
-          mnemonicPath: acc.keyPath,
-          name: this.name,
-          address: acc.address,
+          ...account.public,
+          signers: [],
         });
         await this._setAccounts(encryptedAccounts);
         this.$store.state.currentIndexAccount = newIndex;

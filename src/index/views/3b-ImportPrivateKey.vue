@@ -52,11 +52,11 @@ export default {
         await this._setMnemonic(null);
         await this._setAccounts([
           {
+            name: "Account 0",
             encryptedPrivateKey: await this.encrypt(
               this.privateKey,
               this.password1
             ),
-            name: "Account 0",
             address: signer.getAddress(),
             signers: [],
           },
@@ -65,8 +65,8 @@ export default {
         this.$store.state.mnemonic = null;
         this.$store.state.accounts = [
           {
-            privateKey: this.privateKey,
             name: "Account 0",
+            privateKey: this.privateKey,
             address: signer.getAddress(),
             signers: [],
           },
