@@ -9,9 +9,9 @@
       <Unlock @onUnlock="unlock()" @onError="alertDanger($event)" />
     </div>
     <div class="welcome-message" v-if="!hasAccounts">
-      Welcome to kondor!
-      <br />the first of its kind wallet for the first of its kind blockchain,
-      koinos
+      Welcome to Kondor!
+      <br />The first of its kind wallet for the first of its kind blockchain,
+      Koinos.
     </div>
     <router-link to="/newWallet" class="link">
       <div v-if="hasAccounts" class="recover">Recover Wallet</div>

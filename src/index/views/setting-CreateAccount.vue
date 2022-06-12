@@ -7,8 +7,8 @@
       v-model="name"
       placeholder="Name"
     />
-    <button @click="accept" class="link">accept</button>
-    <button @click="cancel" class="link">cancel</button>
+    <button @click="accept" class="">accept</button>
+    <button @click="cancel" class="">cancel</button>
   </div>
 </template>
 
@@ -70,3 +70,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+.container {
+  min-height: 20em;
+  margin: 4em 2em;
+}
+</style>

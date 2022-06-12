@@ -1,18 +1,24 @@
 <template>
   <div class="center-column">
-    <div class="">
-      <div>Get accounts</div>
-      <div>{{ requester.origin }}</div>
+    <div class="accounts-information">
+      <h2>Get accounts</h2>
+      <!-- <div>{{ requester.origin }}</div> -->
       <div>{{ requester.origin }} wants to know your address</div>
-      <label v-for="(account, index) in accounts" :key="index">
-        <span>{{ account.name }} - {{ account.address }}</span>
-        <input type="checkbox" v-model="inputs[index]" />
-      </label>
+      <br />
+      <div class="accounts-list">
+        <label v-for="(account, index) in accounts" :key="index">
+          <div class="account-checkbox">
+            <input type="checkbox" v-model="inputs[index]" class="checkbox" />
+            <span class="account-name">{{ account.name }}</span>
+          </div>
+          <div class="account-address">{{ account.address }}</div>
+        </label>
+      </div>
     </div>
     <div>
       <div class="buttons">
-        <button class="link" @click="accept">Accept</button>
-        <button class="link" @click="cancel">Cancel</button>
+        <button class="" @click="accept">Accept</button>
+        <button class="" @click="cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -95,6 +101,17 @@ export default {
 };
 </script>
 <style scoped>
+label {
+  padding: 1em 0;
+}
+.center-column {
+  width: 75%;
+  color: white;
+  font-weight: 400;
+}
+.checkbox {
+  all: revert;
+}
 .container {
   width: 90%;
   padding: 2em 0;
@@ -107,5 +124,21 @@ export default {
   display: flex;
   justify-content: space-evenly;
   width: 90%;
+}
+.accounts-information {
+  margin: 2em 0;
+}
+.account-name {
+  padding-left: .5em;
+  font-size: 1.2em;
+  line-height: 2em;
+}
+.account-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.account-address {
+  color: #929191;
 }
 </style>
