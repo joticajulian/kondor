@@ -21,7 +21,7 @@
         type="password"
         placeholder="Confirm password"
       />
-      <button @click="importKey" class="link">import now</button>
+      <button @click="importKey" class="">import now</button>
     </div>
   </div>
 </template>
@@ -83,16 +83,25 @@ export default {
 };
 </script>
 <style scoped>
+input {
+  margin-bottom: 1em;
+}
+h1 {
+  margin: 1em 0;
+}
 .container {
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80%;
+  margin: 4em;
 }
 .middle {
   display: flex;
   justify-content: center;
   text-transform: none;
 }
+
+
 </style>
