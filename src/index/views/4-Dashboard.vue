@@ -190,7 +190,7 @@ input {
 }
 .info {
   text-transform: none;
-  font-weight: 300;
+  font-weight: 400;
 }
 .tkoin {
   font-size: 0.5em;
@@ -201,5 +201,8 @@ input {
 }
 .transfer {
   margin-bottom: 3em;
+}
+.address-container {
+  font-weight: 400;
 }
 </style>
