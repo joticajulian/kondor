@@ -52,7 +52,7 @@ h3 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: "Roboto", monospace;
-  font-weight: 300;
+  font-weight: 400;
   background-color: var(--secondary-color);
   color: var(--primary-color);
   padding: 20px;
@@ -153,7 +153,7 @@ button:disabled {
 }
 .container {
   font-family: "Roboto", sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;

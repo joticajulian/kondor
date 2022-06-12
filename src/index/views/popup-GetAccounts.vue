@@ -116,7 +116,7 @@ label {
   width: 90%;
   padding: 2em 0;
   font-family: "Roboto", sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   text-transform: none;
   align-items: flex-start;
 }
@@ -129,7 +129,7 @@ label {
   margin: 2em 0;
 }
 .account-name {
-  padding-left: .5em;
+  padding-left: 0.5em;
   font-size: 1.2em;
   line-height: 2em;
 }
