@@ -1,8 +1,11 @@
 <template>
-  <div>
-    <button @click="toggleDropdown()" class="link">
-      {{ currentAccount }}
-    </button>
+  <div class="dropdown-container">
+    <div @click="toggleDropdown()" class="link">
+      <div class="link-item">
+        {{ currentAccount }}
+      </div>
+    </div>
+
     <div v-if="showDropdown" class="dropdown-content">
       <div
         class="dropdown-item"
@@ -67,36 +70,57 @@ export default {
 </script>
 
 <style scoped>
+.dropdown-container {
+  display: flex;
+  justify-content: center;
+  padding: 2em 0;
+}
 .dropdown-content,
 .dropdown-content:hover {
-  float: left;
-  overflow: hidden;
-  position: absolute;
   min-width: 160px;
-  background-color: var(--kondor-light);
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  color: var(--kondor-light);
+  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
   top: 48px;
-  right: 0px;
+  right: 0;
   border: none;
+  position: absolute;
+  width: 100%;
+  margin-top: 4em;
+  height: 100vh;
+  background: var(--secondary-color);
 }
 
 .dropdown-item {
   float: none;
-  color: black;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
   text-align: left;
   border: none;
+  padding-left: 2em;
 }
 
 .dropdown-item:hover {
   background: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 .separator {
   margin-top: 8px;
   border-top: 1px solid #666;
   padding: 0;
+}
+.link,
+.link:hover {
+  display: flex;
+  flex-direction: row;
+  border: none;
+}
+.link-item {
+  padding-right: 1em;
+  text-transform: capitalize;
+  font-weight: 500;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 </style>

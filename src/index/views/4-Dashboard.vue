@@ -2,8 +2,10 @@
   <div class="container">
     <div class="column">
       <div class="info container">
-        <router-link to="/signers" class="link">Signers</router-link>
-        <span>{{ address }}</span>
+        <div class="address-container">
+          <span>{{ address }}</span>
+          <router-link to="/signers" class="signers">Signers</router-link>
+        </div>
         <div class="balance">
           <div class="heading"></div>
           <div class="amount">
@@ -13,14 +15,16 @@
         </div>
       </div>
       <div class="transfer container">
-        <input v-model="toAddress" type="text" placeholder="To address" />
+        <label>Send to address</label>
+        <input v-model="toAddress" type="text" placeholder="Enter address to send to ..." />
+        <label>Send to amount</label>
         <input
           @keyup.enter="transfer"
           v-model="amount"
           type="text"
-          placeholder="Amount"
+          placeholder="Enter amount to send ..."
         />
-        <button @click="transfer" class="link">transfer</button>
+        <button @click="transfer" class="">transfer</button>
       </div>
     </div>
   </div>
@@ -148,6 +152,14 @@ export default {
 };
 </script>
 <style scoped>
+label {
+  width: 100%;
+  margin-left: -2em;
+}
+input {
+  background: rgb(226 183 236 / 20%);
+  border: none;
+}
 .column {
   display: flex;
   flex-direction: column;
@@ -178,9 +190,19 @@ input {
 }
 .info {
   text-transform: none;
-  font-weight: 300;
+  font-weight: 400;
 }
 .tkoin {
   font-size: 0.5em;
+}
+.signers {
+  font-size: 0.8em;
+  padding-left: 0.7em;
+}
+.transfer {
+  margin-bottom: 3em;
+}
+.address-container {
+  font-weight: 400;
 }
 </style>

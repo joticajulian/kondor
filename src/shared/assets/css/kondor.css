@@ -1,26 +1,62 @@
 :root {
   --primary-color: #e2b7ec;
   --secondary-color: #110020;
-  --kondor-light: #f7dcbf;
+  --kondor-light: #ffffff;
+  /* --kondor-light: #f7dcbf; */
   --kondor-gray: #828282;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Roboto:wght@100;300;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Roboto:wght@100;400;500;600&display=swap");
+
+button {
+  all: initial;
+  font: inherit;
+  color: inherit;
+}
+
+input {
+  all: unset;
+}
 
 body {
   margin: 0px;
   background: var(--secondary-color);
+  color: var(--kondor-light);
+  font-family: "Roboto", sans-serif;
+}
+
+h1 {
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+
+h2 {
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+}
+h3 {
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.25rem;
+}
+.subtitle {
+  font-size:  1rem;
+  font-weight:  400;
+  line-height:  1.5rem;
 }
 
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Major Mono Display", monospace;
+  font-family: "Roboto", monospace;
+  font-weight: 400;
   background-color: var(--secondary-color);
   color: var(--primary-color);
   padding: 20px;
-  text-transform: lowercase;
+  width: 357px;
 }
 
 #sandbox {
@@ -43,12 +79,12 @@ a:visited {
 
 input,
 textarea {
-  background-color: var(--kondor-light) !important;
   width: 100%;
-  color: var(--secondary-color);
+  color: var(--kondor-light);
   padding: 1em;
-  margin: 0.5em 0 1em 0;
-  border: 1px solid var(--kondor-light);
+  text-align: left;
+  background: rgba(226, 183, 236, 0.2);
+  border-radius: 4px;
 }
 
 input,
@@ -56,27 +92,30 @@ label,
 select,
 button,
 textarea {
-  /*margin:0;
-	border:0;
-	padding:0;*/
   display: inline-block;
   vertical-align: middle;
   white-space: normal;
-  background: none;
   line-height: 1;
   font-size: 12px;
   font-family: "Roboto", sans-serif;
 }
 button {
-  padding: 0.8em 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+  gap: 8px;
+  border: 1px solid #fff;
+  border-radius: 2px;
   color: var(--kondor-light);
-  border-width: 0;
-  font-family: "Major Mono Display", monospace;
-  cursor: pointer;
-  text-transform: lowercase;
+  text-transform: capitalize;
+  width: 96%;
+  margin: 1em 0;
 }
 button:hover {
   opacity: 0.5;
+  cursor: pointer;
 }
 button:disabled {
   background: #a28f7a;
@@ -103,7 +142,6 @@ button:disabled {
   font-size: 0.8em;
   padding-bottom: 1em;
   line-height: 1.5em;
-  width: 80%;
   text-align: center;
 }
 .section {
@@ -115,7 +153,7 @@ button:disabled {
 }
 .container {
   font-family: "Roboto", sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;

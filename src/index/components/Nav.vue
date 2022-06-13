@@ -1,8 +1,8 @@
 <template>
   <div>
-    <button v-if="$store.state.showBackButton" @click="back">
+    <div v-if="$store.state.showBackButton" @click="back" class="back-button">
       <span>&#8592;</span>
-    </button>
+    </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />
   </div>
 </template>
@@ -21,3 +21,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.back-button {
+  cursor: pointer;
+}
+</style>
