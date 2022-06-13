@@ -1,4 +1,9 @@
+@import url(../../shared/assets/css/kondor.css);
 #app {
-  height: 500px;
-  width: 309px;
+  max-height: 600px;
+  width: 357px;
 }
+
+
+
+

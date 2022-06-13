@@ -33,7 +33,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 269px;
+  width: 80%;
   border-radius: 6px;
   padding: 8px 20px;
   text-align: left;
