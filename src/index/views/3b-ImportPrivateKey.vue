@@ -102,6 +102,4 @@ h1 {
   justify-content: center;
   text-transform: none;
 }
-
-
 </style>

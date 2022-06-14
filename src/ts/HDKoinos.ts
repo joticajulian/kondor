@@ -49,6 +49,23 @@ export class HDKoinos {
     );
   }
 
+  static parsePath(keyPath: string): {
+    accountIndex: string;
+    signerIndex?: string;
+  } {
+    const matchs = keyPath.match(
+      /^m\/44'\/659'\/([0-9]*)'\/([0-9]*)\/([0-9]*)/
+    );
+    if (!matchs) throw new Error(`Invalid keyPath ${keyPath}`);
+    const [, accountIndex, change, signerIndex] = matchs;
+    if (change !== "0" && change !== "1")
+      throw new Error(`Invalid 'change' in keyPath ${keyPath}`);
+    return {
+      accountIndex,
+      ...(change === "1" && { signerIndex }),
+    };
+  }
+
   deriveKey(account: { name: string; keyPath: string; address?: string }): {
     public: {
       name: string;
