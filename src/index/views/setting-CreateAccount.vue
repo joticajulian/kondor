@@ -36,7 +36,10 @@ export default {
         if (!mnemonic) throw new Error("No seed phrase found");
         if (!this.name) throw new Error("No name defined");
         const hdKoinos = new HDKoinos(mnemonic);
-        const newIndex = this.$store.state.accounts.length;
+        let newIndex = 0;
+        this.$store.state.accounts.forEach((acc) => {
+          if (acc.keyPath) newIndex += 1;
+        });
         const account = hdKoinos.deriveKeyAccount(newIndex, this.name);
         this.$store.state.accounts.push({
           ...account.public,

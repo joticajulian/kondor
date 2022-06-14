@@ -16,7 +16,11 @@
       </div>
       <div class="transfer container">
         <label>Send to address</label>
-        <input v-model="toAddress" type="text" placeholder="Enter address to send to ..." />
+        <input
+          v-model="toAddress"
+          type="text"
+          placeholder="Enter address to send to ..."
+        />
         <label>Send to amount</label>
         <input
           @keyup.enter="transfer"
