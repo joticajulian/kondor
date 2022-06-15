@@ -53,7 +53,8 @@ export default {
           signers: [],
         });
         await this._setAccounts(encryptedAccounts);
-        this.$store.state.currentIndexAccount = newIndex;
+        this.$store.state.currentIndexAccount =
+          this.$store.state.accounts.length - 1;
         router.back();
       } catch (error) {
         this.alertDanger(error.message);
