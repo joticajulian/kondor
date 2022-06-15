@@ -51,10 +51,11 @@ export default {
         if (!mnemonic) throw new Error("No seed phrase found");
         // if (!this.name) throw new Error("No name defined");
         const hdKoinos = new HDKoinos(mnemonic);
-        const { keyPath } =
-          this.$store.state.accounts[this.$store.state.currentIndexAccount];
+        const accIndex = this.$store.state.currentIndexAccount;
+        const { keyPath } = this.$store.state.accounts[accIndex];
         const { accountIndex, signerIndex } = HDKoinos.parsePath(keyPath);
-        if (signerIndex) throw new Error(`Invalid keyPath ${key} for accounts`);
+        if (signerIndex)
+          throw new Error(`Invalid keyPath ${keyPath} for accounts`);
         let newIndex = 0;
         this.signers.forEach((sig) => {
           if (sig.keyPath) newIndex += 1;

@@ -53,6 +53,8 @@ export class HDKoinos {
     accountIndex: string;
     signerIndex?: string;
   } {
+    if (!keyPath) throw new Error("Account not derived from a seed");
+
     const matchs = keyPath.match(
       /^m\/44'\/659'\/([0-9]*)'\/([0-9]*)\/([0-9]*)/
     );
