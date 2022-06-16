@@ -8,15 +8,19 @@
       </div>
       <textarea rows="3" id="seed" v-model="mnemonic" disabled />
       <label>
-        <span>I have taken a copy of these 12 words</span>
-        <input type="checkbox" v-model="seedConsent1" />
+        <div class="item-checkbox">
+          <input type="checkbox" v-model="seedConsent1" class="checkbox"/>
+          <span class="label-checkbox">I have taken a copy of these 12 words</span>
+        </div>
       </label>
       <label>
-        <span
-          >I understand that I must not share this seed with anyone or else I
-          may lose my assets</span
-        >
-        <input type="checkbox" v-model="seedConsent2" />
+        <div class="item-checkbox">
+          <input type="checkbox" v-model="seedConsent2" class="checkbox"/>
+          <span class="label-checkbox"
+            >I understand that I must not share this seed with anyone or else I
+            may lose my assets</span
+          >
+        </div>
       </label>
       <div v-if="$route.query.privateKeyExist">
         <span>Existing password</span>
