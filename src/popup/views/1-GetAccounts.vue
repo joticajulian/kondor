@@ -7,9 +7,9 @@
       <br />
       <div class="accounts-list">
         <label v-for="(account, index) in accounts" :key="index">
-          <div class="account-checkbox">
+          <div class="item-checkbox">
             <input type="checkbox" v-model="inputs[index]" class="checkbox" />
-            <span class="account-name">{{ account.name }}</span>
+            <span class="label-checkbox">{{ account.name }}</span>
           </div>
           <div class="account-address">{{ account.address }}</div>
         </label>
@@ -109,9 +109,6 @@ label {
   color: white;
   font-weight: 400;
 }
-.checkbox {
-  all: revert;
-}
 .container {
   width: 90%;
   padding: 2em 0;
@@ -127,16 +124,6 @@ label {
 }
 .accounts-information {
   margin: 2em 0;
-}
-.account-name {
-  padding-left: 0.5em;
-  font-size: 1.2em;
-  line-height: 2em;
-}
-.account-checkbox {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 }
 .account-address {
   color: #929191;
