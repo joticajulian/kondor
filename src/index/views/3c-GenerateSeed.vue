@@ -25,12 +25,7 @@
         </div>
       </label>
       <div v-if="$route.query.privateKeyExist">
-        <span>Existing password</span>
-        <Unlock
-          labelButton="Add seed"
-          @onUnlock="addSeed($event)"
-          @onError="alertDanger($event)"
-        />
+        <button @click="addSeed" class="link">Add seed</button>
       </div>
       <div v-else>
         <input
@@ -59,9 +54,6 @@ import { HDKoinos } from "../../../lib/HDKoinos";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
-// components
-import Unlock from "@/shared/components/Unlock.vue";
-
 export default {
   data() {
     return {
@@ -75,8 +67,6 @@ export default {
   },
 
   mixins: [Storage, ViewHelper],
-
-  components: { Unlock },
 
   created() {
     if (this.$route.query.privateKeyExist) {
@@ -99,9 +89,10 @@ export default {
         );
     },
 
-    async addSeed(password) {
+    async addSeed() {
       try {
         this.checkConsents();
+        const password = this.$store.state.password;
         const encryptedMnemonic = await this._getMnemonic();
         const encryptedAccounts = (await this._getAccounts()) || [];
         if (encryptedMnemonic)
@@ -122,6 +113,7 @@ export default {
           ...account.private,
           signers: [],
         });
+        this.$store.state.password = this.password;
 
         this.alertClose();
         router.push("/dashboard");
@@ -156,6 +148,7 @@ export default {
             signers: [],
           },
         ];
+        this.$store.state.password = this.password1;
 
         this.alertClose();
         router.push("/dashboard");

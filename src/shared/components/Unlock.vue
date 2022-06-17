@@ -96,6 +96,7 @@ export default {
 
         this.$store.state.mnemonic = mnemonic;
         this.$store.state.accounts = accounts;
+        this.$store.state.password = this.password;
 
         this.$emit("onUnlock", this.password);
       } catch (error) {

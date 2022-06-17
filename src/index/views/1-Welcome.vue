@@ -37,7 +37,6 @@ export default {
   data() {
     return {
       hasAccounts: false,
-      password: "",
     };
   },
   mixins: [Storage, ViewHelper],
