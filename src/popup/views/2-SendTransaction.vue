@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Footnote v-if="footnoteMessage" :message="footnoteMessage" />
     <div>Signature request</div>
     <div>{{ requester.origin }}</div>
     <div>signer: {{ signerData }}</div>
@@ -24,6 +25,7 @@ import Message from "@/shared/mixins/Message";
 
 // components
 import Unlock from "@/shared/components/Unlock.vue";
+import Footnote from "@/shared/components/Footnote.vue";
 
 export default {
   name: "Send transaction",
@@ -32,16 +34,19 @@ export default {
       data: "",
       signerData: "",
       requester: "",
+      footnoteMessage: "",
       account: null,
       unlocked: !!this.$store.state.accounts.length > 0,
       numErrors: 0,
       request: null,
+      isOldKoilib: false,
+      isOldKondor: false,
     };
   },
 
   mixins: [Storage, Sandbox, ViewHelper, Message],
 
-  components: { Unlock },
+  components: { Unlock, Footnote },
 
   mounted() {
     const requests = this.$store.state.requests.filter(
@@ -65,6 +70,7 @@ export default {
           console.warn(
             `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.0`
           );
+          this.isOldKondor = true;
           this.signerData = "undefined";
         }
         const { operations } = this.request.args.tx;
@@ -84,6 +90,7 @@ export default {
             console.warn(
               "koilib 3 will be deprecated in the future. Please use koilib version >= 4.0.0"
             );
+            this.isOldKoilib = true;
             contract = new koilib3.Contract({
               id: contractId,
               abi,
@@ -101,6 +108,13 @@ export default {
             call_contract: { contractId, name, args },
           });
         }
+
+        if (this.isOldKoilib || this.isOldKondor)
+          this.footnoteMessage = `This website is using an old version of ${
+            this.isOldKondor ? "kondor" : ""
+          }${this.isOldKondor && this.isOldKoilib ? " and" : ""}${
+            this.isOldKoilib ? "koilib" : ""
+          }. Its support will be deprecated in a future release`;
 
         this.data = JSON.stringify(decodedOperations, null, 2);
         // TODO: check nonce and limit mana
