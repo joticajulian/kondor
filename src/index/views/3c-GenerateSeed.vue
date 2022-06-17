@@ -9,13 +9,15 @@
       <textarea rows="3" id="seed" v-model="mnemonic" disabled />
       <label>
         <div class="item-checkbox">
-          <input type="checkbox" v-model="seedConsent1" class="checkbox"/>
-          <span class="label-checkbox">I have taken a copy of these 12 words</span>
+          <input type="checkbox" v-model="seedConsent1" class="checkbox" />
+          <span class="label-checkbox"
+            >I have taken a copy of these 12 words</span
+          >
         </div>
       </label>
       <label>
         <div class="item-checkbox">
-          <input type="checkbox" v-model="seedConsent2" class="checkbox"/>
+          <input type="checkbox" v-model="seedConsent2" class="checkbox" />
           <span class="label-checkbox"
             >I understand that I must not share this seed with anyone or else I
             may lose my assets</span
