@@ -73,9 +73,7 @@ export default {
       try {
         const rpcNodes = await this._getRpcNodes();
         this.provider = new Provider(rpcNodes);
-
         const currentAccount = this.$store.state.accounts[index];
-
         this.signer = Signer.fromWif(currentAccount.privateKey, true);
         this.signer.provider = this.provider;
         this.address = this.signer.getAddress();
@@ -84,14 +82,20 @@ export default {
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
           abi: utils.tokenAbi,
           signer: this.signer,
-          serializer: await this.newSandboxSerializer(utils.tokenAbi.types),
+          serializer: await this.newSandboxSerializer(
+            utils.tokenAbi.koilib_types
+          ),
         });
-        this.koinContract.abi.methods.balanceOf.preformatInput = (owner) => ({
+        this.koinContract.abi.methods.balanceOf.preformat_argument = (
+          owner
+        ) => ({
           owner,
         });
-        this.koinContract.abi.methods.balanceOf.preformatOutput = (res) =>
+        this.koinContract.abi.methods.balanceOf.preformat_return = (res) =>
           utils.formatUnits(res.value, 8);
-        this.koinContract.abi.methods.transfer.preformatInput = (input) => ({
+        this.koinContract.abi.methods.transfer.preformat_argument = (
+          input
+        ) => ({
           from: this.address,
           to: input.to,
           value: utils.parseUnits(input.value, 8),

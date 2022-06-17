@@ -14,6 +14,7 @@
 
 <script>
 import { Signer, Contract, Provider } from "koilib";
+import * as koilib3 from "koilib3";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -57,39 +58,56 @@ export default {
 
   methods: {
     async decodeTransaction() {
-      if (this.request.args.signerAddress) {
-        this.signerData = this.request.args.signerAddress;
-      } else {
-        console.warn(
-          `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.0`
-        );
-        this.signerData = "undefined";
-      }
-      const { operations } = this.request.args.tx;
-      const decodedOperations = [];
-      for (let i = 0; i < operations.length; i += 1) {
-        const op = operations[i];
-        if (!op.call_contract) {
-          // upload contract or set system call don't
-          // require an extra decode
-          decodedOperations.push(op);
-          return;
+      try {
+        if (this.request.args.signerAddress) {
+          this.signerData = this.request.args.signerAddress;
+        } else {
+          console.warn(
+            `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.0`
+          );
+          this.signerData = "undefined";
         }
-        const contractId = op.call_contract.contract_id;
-        const abi = this.request.args.abis[contractId];
-        const contract = new Contract({
-          id: contractId,
-          abi,
-          serializer: await this.newSandboxSerializer(abi.types),
-        });
-        const { name, args } = await contract.decodeOperation(op);
-        decodedOperations.push({
-          call_contract: { contractId, name, args },
-        });
-      }
+        const { operations } = this.request.args.tx;
+        const decodedOperations = [];
+        for (let i = 0; i < operations.length; i += 1) {
+          const op = operations[i];
+          if (!op.call_contract) {
+            // upload contract or set system call don't
+            // require an extra decode
+            decodedOperations.push(op);
+            return;
+          }
+          const contractId = op.call_contract.contract_id;
+          const abi = this.request.args.abis[contractId];
+          let contract;
+          if (typeof abi.types === "object") {
+            console.warn(
+              "koilib 3 will be deprecated in the future. Please use koilib version >= 4.0.0"
+            );
+            contract = new koilib3.Contract({
+              id: contractId,
+              abi,
+              serializer: await this.newSandboxSerializer(abi.types),
+            });
+          } else if (typeof abi.koilib_types === "object") {
+            contract = new Contract({
+              id: contractId,
+              abi,
+              serializer: await this.newSandboxSerializer(abi.koilib_types),
+            });
+          }
+          const { name, args } = await contract.decodeOperation(op);
+          decodedOperations.push({
+            call_contract: { contractId, name, args },
+          });
+        }
 
-      this.data = JSON.stringify(decodedOperations, null, 2);
-      // TODO: check nonce and limit mana
+        this.data = JSON.stringify(decodedOperations, null, 2);
+        // TODO: check nonce and limit mana
+      } catch (error) {
+        this.alertDanger(error.message);
+        throw error;
+      }
     },
 
     afterUnlocked() {
