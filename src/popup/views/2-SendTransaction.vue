@@ -112,7 +112,7 @@ export default {
         if (this.isOldKoilib || this.isOldKondor)
           this.footnoteMessage = `This website is using an old version of ${
             this.isOldKondor ? "kondor" : ""
-          }${this.isOldKondor && this.isOldKoilib ? " and" : ""}${
+          }${this.isOldKondor && this.isOldKoilib ? " and " : ""}${
             this.isOldKoilib ? "koilib" : ""
           }. Its support will be deprecated in a future release`;
 

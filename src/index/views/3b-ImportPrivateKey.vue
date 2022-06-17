@@ -71,6 +71,7 @@ export default {
             signers: [],
           },
         ];
+        this.$store.state.password = this.password1;
 
         this.alertClose();
         router.push("/dashboard");
