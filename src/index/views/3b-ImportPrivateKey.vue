@@ -3,7 +3,7 @@
     <div class="container">
       <h1>Import Private Key</h1>
       <img src="" alt="" />
-      <input
+      <textarea
         id="private-key"
         v-model="privateKey"
         type="password"
@@ -84,9 +84,6 @@ export default {
 };
 </script>
 <style scoped>
-input {
-  margin-bottom: 1em;
-}
 h1 {
   margin: 1em 0;
 }
@@ -96,11 +93,10 @@ h1 {
   flex-direction: column;
   align-items: center;
   width: 80%;
-  margin: 4em;
 }
 .middle {
   display: flex;
   justify-content: center;
-  text-transform: none;
+  margin: 1em 0;
 }
 </style>

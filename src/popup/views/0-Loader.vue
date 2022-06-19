@@ -36,11 +36,9 @@ export default {
   flex-direction: column;
 }
 .link {
-  border-bottom: 1px dotted white;
   padding-bottom: 8px;
 }
 .link:hover {
-  border-bottom: 2px solid white;
   color: white;
 }
 .recover {

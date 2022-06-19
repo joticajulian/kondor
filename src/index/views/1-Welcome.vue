@@ -61,9 +61,6 @@ export default {
 
 <style scoped>
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   height: 100%;
 }
 .welcome-message {
@@ -79,14 +76,6 @@ export default {
   padding-top: 4em;
   align-items: center;
   width: 100%;
-}
-.link {
-  border-bottom: 1px dotted white;
-  padding-bottom: 8px;
-}
-.link:hover {
-  border-bottom: 2px solid white;
-  color: white;
 }
 .recover {
   margin-top: 3em;
