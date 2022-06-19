@@ -17,8 +17,8 @@
     </div>
     <div>
       <div class="buttons">
-        <button class="" @click="accept">Accept</button>
-        <button class="" @click="cancel">Cancel</button>
+        <button class="cancel-button" @click="cancel">Cancel</button>
+        <button class="accept-button" @click="accept">Accept</button>
       </div>
     </div>
   </div>
@@ -127,5 +127,14 @@ label {
 }
 .account-address {
   color: #929191;
+}
+.cancel-button {
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.accept-button {
+  background: var(--kondor-light);
+  color: var(--secondary-color);
 }
 </style>

@@ -1,40 +1,51 @@
 <template>
   <div class="middle">
     <div class="container">
-      <h1>{{ title }}</h1>
-      <img src="" alt="" />
+      <h1 class="heading">{{ title }}</h1>
       <div>
-        New generated seed. Please write it down and save it in safe place
+        <img src="" alt="" />
+        <p>
+          This is a newly generated seed phrase. Please write it down and keep it in safe place.
+        </p>
+        <textarea
+          class="width-96"
+          rows="3"
+          id="seed"
+          v-model="mnemonic"
+          disabled
+        />
       </div>
-      <textarea rows="3" id="seed" v-model="mnemonic" disabled />
-      <label>
+      <div class="mb-1">
         <div class="item-checkbox">
           <input type="checkbox" v-model="seedConsent1" class="checkbox" />
           <span class="label-checkbox"
-            >I have taken a copy of these 12 words</span
+            >I have stored the seed phrase in a safe place</span
           >
         </div>
-      </label>
-      <label>
-        <div class="item-checkbox">
-          <input type="checkbox" v-model="seedConsent2" class="checkbox" />
-          <span class="label-checkbox"
-            >I understand that I must not share this seed with anyone or else I
-            may lose my assets</span
-          >
-        </div>
-      </label>
+
+        <label>
+          <div class="item-checkbox">
+            <input type="checkbox" v-model="seedConsent2" class="checkbox" />
+            <span class="label-checkbox"
+              >I understand that I must not share this seed phrase with anyone or else
+              I may lose my assets</span
+            >
+          </div>
+        </label>
+      </div>
       <div v-if="$route.query.privateKeyExist">
         <button @click="addSeed" class="link">Add seed</button>
       </div>
       <div v-else>
         <input
+          class="width-96"
           id="password1"
           v-model="password1"
           type="password"
           placeholder="Set password"
         />
         <input
+          class="width-96"
           id="password2"
           v-model="password2"
           type="password"
@@ -162,15 +173,28 @@ export default {
 </script>
 <style scoped>
 .container {
-  font-family: Arial, Helvetica, sans-serif;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 80%;
 }
+.heading {
+  text-align: center;
+}
 .middle {
   display: flex;
   justify-content: center;
+  margin: 1em 0;
+}
+
+.width-96 {
+  width: 96%;
+}
+.item-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 1em;
 }
 </style>

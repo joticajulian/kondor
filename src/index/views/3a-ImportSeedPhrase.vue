@@ -3,7 +3,7 @@
     <div class="container">
       <h1>Import Seed Phrase</h1>
       <img src="" alt="" />
-      <input id="seed" v-model="mnemonic" placeholder="Seed phrase" />
+      <textarea id="seed" v-model="mnemonic" placeholder="Seed phrase" />
       <input
         id="password1"
         v-model="password1"
@@ -76,14 +76,11 @@ export default {
 };
 </script>
 <style scoped>
-input {
-  margin-bottom: 2em;
-}
+
 h1 {
   margin-bottom: 1em;
 }
 .container {
-  font-family: Arial, Helvetica, sans-serif;
   color: var(--kondor-light);
   display: flex;
   flex-direction: column;
@@ -93,6 +90,6 @@ h1 {
 .middle {
   display: flex;
   justify-content: center;
-  margin: 2em 0;
+  margin: 1em 0;
 }
 </style>
