@@ -45,7 +45,6 @@ export default {
       footnoteMessage: "",
       account: null,
       unlocked: !!this.$store.state.accounts.length > 0,
-      numErrors: 0,
       request: null,
       isOldKoilib: false,
       isOldKondor: false,
@@ -90,7 +89,7 @@ export default {
             // upload contract or set system call don't
             // require an extra decode
             decodedOperations.push(op);
-            return;
+            continue;
           }
           const contractId = op.call_contract.contract_id;
           const abi = this.request.args.abis[contractId];
@@ -147,10 +146,6 @@ export default {
       // TODO: throw error if there are requests.length > 1
       const rpcNodes = await this._getRpcNodes();
       const provider = new Provider(rpcNodes);
-      provider.onError = () => {
-        this.numErrors += 1;
-        return this.numErrors > 20;
-      };
       const signer = Signer.fromWif(this.account.privateKey);
       signer.provider = provider;
       let message = { id: this.request.id };
@@ -161,7 +156,7 @@ export default {
           message.result = await signer.signTransaction(this.request.args.tx);
         }
       } catch (err) {
-        message.error = err;
+        message.error = err.message;
       }
       this.sendResponse("extension", message, this.request.sender);
       window.close();

@@ -188,10 +188,10 @@ const messenger = new Messenger({
           break;
         }
         case "signer:prepareTransaction": {
-          preparePopup(sender);
           const { transaction } = args as { transaction: TransactionJson };
           if (!transaction.header || !transaction.header.payer)
             throw new Error("Please define a payer for the transaction");
+          preparePopup(sender);
           if (!transaction.header.chain_id) {
             let chainId = await storage.getChainId(false);
             if (!chainId) {
