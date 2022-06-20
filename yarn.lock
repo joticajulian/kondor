@@ -6125,6 +6125,7 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
 "koilib3@npm:koilib@3.1.1", koilib@^3.1.1:
+  name koilib3
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/koilib/-/koilib-3.1.1.tgz#cb94d7ad064b6ea97240a9483326214c7c8d492a"
   integrity sha512-Xmu0nniDRwMZ7ajnUbhgUisIJQT5QioeKaAgArhgpHnx2id3aNKlWDJvxXZIKd0aot5Qrn/s9kMb1b5RmLUtjQ==
@@ -6135,10 +6136,10 @@ kind-of@^6.0.0, kind-of@^6.0.2:
     multibase "^4.0.6"
     protobufjs "^6.11.2"
 
-koilib@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-4.0.0.tgz#94a00ee4fcbd9f432b38f80f40d692ea92a5f4c9"
-  integrity sha512-elqU0LiQ28DxtcoL+pmE13QxCDWWgJP/LUzTN7EQDMf/KD7g4qzDkfP+tSx7UC+j8lp5xuH+V1X3P2UQNykPlA==
+koilib@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-4.1.0.tgz#c2927b1ef04d3a3e01adb0a810b35b2de0b0858e"
+  integrity sha512-bBA0IjZliCyqH1TrXsEmdX8U7QU1zn0y1duiH+sujI8k+OfkhDElYuvp+MbJNmQvvPWalALk58vul7nPPNOgbQ==
   dependencies:
     "@noble/hashes" "^1.0.0"
     "@noble/secp256k1" "^1.5.0"
