@@ -5,7 +5,8 @@
       <div>
         <img src="" alt="" />
         <p>
-          This is a newly generated seed phrase. Please write it down and keep it in safe place.
+          This is a newly generated seed phrase. Please write it down and keep
+          it in safe place.
         </p>
         <textarea
           class="width-96"
@@ -27,8 +28,8 @@
           <div class="item-checkbox">
             <input type="checkbox" v-model="seedConsent2" class="checkbox" />
             <span class="label-checkbox"
-              >I understand that I must not share this seed phrase with anyone or else
-              I may lose my assets</span
+              >I understand that I must not share this seed phrase with anyone
+              or else I may lose my assets</span
             >
           </div>
         </label>
