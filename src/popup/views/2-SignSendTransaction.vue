@@ -18,17 +18,25 @@ import { Signer, Contract, Provider } from "koilib";
 import * as koilib3 from "koilib3";
 
 // mixins
+import Message from "@/popup/mixins/Message";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
-import Message from "@/shared/mixins/Message";
 
 // components
 import Unlock from "@/shared/components/Unlock.vue";
 import Footnote from "@/shared/components/Footnote.vue";
 
 export default {
-  name: "Send transaction",
+  name: "Sign Send transaction",
+
+  props: {
+    send: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
   data: function () {
     return {
       data: "",
@@ -49,9 +57,10 @@ export default {
   components: { Unlock, Footnote },
 
   mounted() {
-    const requests = this.$store.state.requests.filter(
-      (r) => r.command === "signer:sendTransaction"
-    );
+    const requests = this.$store.state.requests.filter((r) => {
+      if (this.send) return r.command === "signer:sendTransaction";
+      return r.command === "signer:signTransaction";
+    });
     /**
      * TODO: for several requests create a list of requesters
      * and ask to the user to select one to see the details
@@ -146,8 +155,11 @@ export default {
       signer.provider = provider;
       let message = { id: this.request.id };
       try {
-        const transaction = await signer.sendTransaction(this.request.args.tx);
-        message.result = transaction;
+        if (this.send) {
+          message.result = await signer.sendTransaction(this.request.args.tx);
+        } else {
+          message.result = await signer.signTransaction(this.request.args.tx);
+        }
       } catch (err) {
         message.error = err;
       }

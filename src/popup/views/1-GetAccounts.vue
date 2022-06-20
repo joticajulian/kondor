@@ -26,9 +26,9 @@
 
 <script>
 // mixins
+import Message from "@/popup/mixins/Message";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
-import Message from "@/shared/mixins/Message";
 
 export default {
   name: "Get accounts",

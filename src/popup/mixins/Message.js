@@ -59,7 +59,7 @@ export default {
           case "signer:signTransaction": {
             this.$store.state.requests.push(request);
             this.messenger.removeListeners();
-            router.push("/getAccounts");
+            router.push("/signTransaction");
             return { _derived: true };
           }
           case "signer:sendTransaction": {

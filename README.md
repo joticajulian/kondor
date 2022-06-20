@@ -98,3 +98,9 @@ The compiled application will be located in the folder `dist`. Open chrome and g
 #### NOTE
 
 The Koinos Blockchain is currenlty available only as a test network and is prone to bugs and crashes, tKOIN has absolutely no value. To learn more about Koinos visit their website at [koinos.io](https://koinos.io)
+
+## Acknowledgments
+
+Many thanks to the sponsors of this extension: @levineam, @Amikob, @motoeng, @isaacdozier, @imjwalker, and the private sponsors.
+
+If you would like to contribute to the development of this extension consider becoming a sponsor in https://github.com/sponsors/joticajulian.

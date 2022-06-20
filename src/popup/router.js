@@ -4,8 +4,7 @@ import Loader from "./views/0-Loader.vue";
 import GetAccounts from "./views/1-GetAccounts.vue";
 // import SignHash from "./views/popup-SignHash.vue";
 // import SignMessage from "./views/popup-SignMessage.vue";
-// import SignTransaction from "./views/popup-SignTransaction.vue";
-import SendTransaction from "./views/2-SendTransaction.vue";
+import SignSendTransaction from "./views/2-SignSendTransaction.vue";
 
 Vue.use(Router);
 
@@ -30,16 +29,18 @@ export default new Router({
       path: "/signMessage",
       name: "Sign Message",
       component: SignMessage,
-    },
+    },*/
     {
       path: "/signTransaction",
       name: "Sign Transaction",
-      component: SignTransaction,
-    },*/
+      component: SignSendTransaction,
+      props: () => ({ send: false }),
+    },
     {
       path: "/sendTransaction",
       name: "Send Transaction",
-      component: SendTransaction,
+      component: SignSendTransaction,
+      props: () => ({ send: true }),
     },
   ],
 });

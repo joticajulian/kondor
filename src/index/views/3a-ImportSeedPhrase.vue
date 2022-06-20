@@ -76,7 +76,6 @@ export default {
 };
 </script>
 <style scoped>
-
 h1 {
   margin-bottom: 1em;
 }
