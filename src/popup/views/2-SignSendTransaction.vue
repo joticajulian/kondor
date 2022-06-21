@@ -1,7 +1,7 @@
 <template>
   <div>
     <Footnote v-if="footnoteMessage" :message="footnoteMessage" />
-    <div>Signature request</div>
+    <div>Signature request {{ send ? "with broadcast" : "" }}</div>
     <div>{{ requester.origin }}</div>
     <div>signer: {{ signerData }}</div>
     <div>{{ data }}</div>

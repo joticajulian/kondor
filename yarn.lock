@@ -6136,10 +6136,10 @@ kind-of@^6.0.0, kind-of@^6.0.2:
     multibase "^4.0.6"
     protobufjs "^6.11.2"
 
-koilib@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-4.1.0.tgz#c2927b1ef04d3a3e01adb0a810b35b2de0b0858e"
-  integrity sha512-bBA0IjZliCyqH1TrXsEmdX8U7QU1zn0y1duiH+sujI8k+OfkhDElYuvp+MbJNmQvvPWalALk58vul7nPPNOgbQ==
+koilib@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-4.1.1.tgz#9d995a3a947a359a654188734857c0a8c0b6057f"
+  integrity sha512-Gd9E0ft8/jsZha6rg2LIjTbRH1ceRaYYg+KQBrq79DrHBXVbNYvDvRWlLc6vjeXc41JoNASb0m+eKrBTVPEggw==
   dependencies:
     "@noble/hashes" "^1.0.0"
     "@noble/secp256k1" "^1.5.0"
@@ -6147,10 +6147,10 @@ koilib@^4.1.0:
     multibase "^4.0.6"
     protobufjs "^6.11.2"
 
-kondor-js@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.2.1.tgz#4c2cccbe23344ac1e82bfe134e7ca74d537d9b3c"
-  integrity sha512-zQH0Mf2sYu8LUKi4EoQTy9ix5wRUT3PMCuUS6ZMYLbicd0CYzy3Vho5fT83yNs/Cs/sgF0q5k+rZDJXYw75ajQ==
+kondor-js@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.2.3.tgz#f2c1a01958d8c7141b85e4a8488ef3886690dde1"
+  integrity sha512-KVB797hrZAxpvqN0vSo+44osvU+7oLBm1cxlnTy9s+t5pcDsoBCB8zFq5Dk36ZzEmd0SGQG0gj6FvntGVt5nwA==
   dependencies:
     koilib "^3.1.1"
 
