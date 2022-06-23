@@ -81,7 +81,7 @@ export default {
           this.isOldKondor = true;
           this.signerData = "undefined";
         }
-        const { operations } = this.request.args.tx;
+        const { operations } = this.request.args.transaction;
         const decodedOperations = [];
         for (let i = 0; i < operations.length; i += 1) {
           const op = operations[i];
@@ -151,9 +151,9 @@ export default {
       let message = { id: this.request.id };
       try {
         if (this.send) {
-          message.result = await signer.sendTransaction(this.request.args.tx);
+          message.result = await signer.sendTransaction(this.request.args.transaction);
         } else {
-          message.result = await signer.signTransaction(this.request.args.tx);
+          message.result = await signer.signTransaction(this.request.args.transaction);
         }
       } catch (err) {
         message.error = err.message;
