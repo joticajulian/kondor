@@ -14,9 +14,9 @@
   "dependencies": {
     "core-js": "^3.20.3",
     "ethers": "^5.6.2",
-    "koilib": "^4.1.1",
+    "koilib": "^4.1.2",
     "koilib3": "npm:koilib@3.1.1",
-    "kondor-js": "^0.2.3",
+    "kondor-js": "^0.2.6",
     "vue": "^2.6.14",
     "vue-loader": "^15.9.8",
     "vue-router": "^3.5.3",

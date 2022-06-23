@@ -58,16 +58,11 @@
           }).functions;
 
           // transfer
-          const { transaction, receipt } = await koin.transfer(
-            {
-              from: inputFrom.value,
-              to: inputTo.value,
-              value: utils.parseUnits(inputValue.value, 8),
-            },
-            {
-              payer: inputFrom.value,
-            }
-          );
+          const { transaction, receipt } = await koin.transfer({
+            from: inputFrom.value,
+            to: inputTo.value,
+            value: utils.parseUnits(inputValue.value, 8),
+          });
           console.log(`transaction ${transaction.id} submitted. Receipt:`);
           console.log(receipt);
 
