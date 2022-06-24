@@ -76,12 +76,23 @@ export default {
           this.signerData = this.request.args.signerAddress;
         } else {
           console.warn(
-            `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.0`
+            `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.6`
           );
           this.isOldKondor = true;
           this.signerData = "undefined";
         }
-        const { operations } = this.request.args.transaction;
+        let operations;
+        if (this.request.args.transaction) {
+          operations = this.request.args.transaction.operations;
+          console.warn(
+            `you are using an old version of kondor. It will be deprecated in the future. Please upgrade to a version >=0.2.6`
+          );
+          this.isOldKondor = true;
+        } else {
+          operations = this.request.args.tx.operations;
+        }
+        // TODO: remove next comment when the support to the old kondor is finished
+        // const { operations } = this.request.args.transaction;
         const decodedOperations = [];
         for (let i = 0; i < operations.length; i += 1) {
           const op = operations[i];
@@ -151,9 +162,15 @@ export default {
       let message = { id: this.request.id };
       try {
         if (this.send) {
-          message.result = await signer.sendTransaction(this.request.args.transaction);
+          // TODO: update when the support to the old kondor is finished
+          message.result = await signer.sendTransaction(
+            this.request.args.transaction || this.request.args.tx
+          );
         } else {
-          message.result = await signer.signTransaction(this.request.args.transaction);
+          // TODO: update when the support to the old kondor is finished
+          message.result = await signer.signTransaction(
+            this.request.args.transaction || this.request.args.tx
+          );
         }
       } catch (err) {
         message.error = err.message;
