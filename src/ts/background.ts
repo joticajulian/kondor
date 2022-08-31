@@ -171,8 +171,11 @@ const messenger = new Messenger({
           break;
         }
         case "provider:sendTransaction": {
-          const { transaction } = args as { transaction: TransactionJson };
-          result = await provider.sendTransaction(transaction);
+          const { transaction, broadcast } = args as {
+            transaction: TransactionJson;
+            broadcast: boolean;
+          };
+          result = await provider.sendTransaction(transaction, broadcast);
           break;
         }
         case "provider:submitBlock": {

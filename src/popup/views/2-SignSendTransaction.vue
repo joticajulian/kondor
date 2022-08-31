@@ -1,7 +1,10 @@
 <template>
   <div>
     <Footnote v-if="footnoteMessage" :message="footnoteMessage" />
-    <div>Signature request {{ send ? "with broadcast" : "" }}</div>
+    <div>
+      Signature request {{ send ? "and send" : "" }}
+      {{ broadcast ? "" : "but not broadcast (testing)" }}
+    </div>
     <div>{{ requester.origin }}</div>
     <div>signer: {{ signerData }}</div>
     <div>{{ data }}</div>
@@ -40,6 +43,7 @@ export default {
   data: function () {
     return {
       data: "",
+      broadcast: true,
       signerData: "",
       requester: "",
       footnoteMessage: "",
@@ -81,18 +85,12 @@ export default {
           this.isOldKondor = true;
           this.signerData = "undefined";
         }
-        let operations;
-        if (this.request.args.transaction) {
-          operations = this.request.args.transaction.operations;
-          console.warn(
-            `you are using an old version of kondor. It will be deprecated in the future. Please upgrade to a version >=0.2.6`
-          );
-          this.isOldKondor = true;
-        } else {
-          operations = this.request.args.tx.operations;
+
+        if (this.request.args.broadcast === false) {
+          this.broadcast = false;
         }
-        // TODO: remove next comment when the support to the old kondor is finished
-        // const { operations } = this.request.args.transaction;
+
+        const { operations } = this.request.args.transaction;
         const decodedOperations = [];
         for (let i = 0; i < operations.length; i += 1) {
           const op = operations[i];
@@ -164,7 +162,8 @@ export default {
         if (this.send) {
           // TODO: update when the support to the old kondor is finished
           message.result = await signer.sendTransaction(
-            this.request.args.transaction || this.request.args.tx
+            this.request.args.transaction || this.request.args.tx,
+            this.request.args.broadcast
           );
         } else {
           // TODO: update when the support to the old kondor is finished
