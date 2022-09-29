@@ -11,6 +11,7 @@
     <div v-if="!unlocked">
       <Unlock @onUnlock="afterUnlocked()" @onError="alertDanger($event)" />
     </div>
+    <Footnote v-if="footnoteMessage2" :message="footnoteMessage2" />
     <button @click="sign" :disabled="!unlocked">Sign</button>
     <button @click="cancel">Cancel</button>
   </div>
@@ -18,7 +19,6 @@
 
 <script>
 import { Signer, Contract, Provider } from "koilib";
-import * as koilib3 from "koilib3";
 
 // mixins
 import Message from "@/popup/mixins/Message";
@@ -47,6 +47,7 @@ export default {
       signerData: "",
       requester: "",
       footnoteMessage: "",
+      footnoteMessage2: "",
       account: null,
       unlocked: !!this.$store.state.accounts.length > 0,
       request: null,
@@ -101,29 +102,25 @@ export default {
             continue;
           }
           const contractId = op.call_contract.contract_id;
-          const abi = this.request.args.abis[contractId];
-          let contract;
-          if (typeof abi.types === "object") {
-            console.warn(
-              "koilib 3 will be deprecated in the future. Please use koilib version >= 4.0.0"
-            );
-            this.isOldKoilib = true;
-            contract = new koilib3.Contract({
-              id: contractId,
-              abi,
-              serializer: await this.newSandboxSerializer(abi.types),
-            });
-          } else if (typeof abi.koilib_types === "object") {
-            contract = new Contract({
+          try {
+            const abi = this.request.args.abis[contractId];
+            const contract = new Contract({
               id: contractId,
               abi,
               serializer: await this.newSandboxSerializer(abi.koilib_types),
             });
+            const { name, args } = await contract.decodeOperation(op);
+            decodedOperations.push({
+              call_contract: { contractId, name, args },
+            });
+          } catch (error) {
+            decodedOperations.push(op);
+            this.footnoteMessage2 = [
+              "Warning: Some of the operations could not be decoded.",
+              "Only continue if you trust in",
+              this.requester.origin,
+            ].join(" ");
           }
-          const { name, args } = await contract.decodeOperation(op);
-          decodedOperations.push({
-            call_contract: { contractId, name, args },
-          });
         }
 
         if (this.isOldKoilib || this.isOldKondor)
