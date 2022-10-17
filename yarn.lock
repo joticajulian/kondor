@@ -6119,10 +6119,10 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-koilib@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.0.0.tgz#26bd7113a447b5f8a6f9584b7b4206e3ed1bb39d"
-  integrity sha512-GqBl5ixi/VjBXZNKlUHycKXCFSl2rFH23JrGlRsLx8Mb87LGok9XN1sWu9a9668xIV2wMV7C3MRQcaaW95IOPQ==
+koilib@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.2.0.tgz#6970268b3eb701542b661d361cfa6c17b90e8fbd"
+  integrity sha512-15gFUyQ6dBtWlYDoeuxvw9lW53HYpIN6O8HMTcyEgV8/fV5+PbT4bcjFClMOKObGMLoHjofQhTMKibpuue4MSg==
   dependencies:
     "@noble/hashes" "^1.1.2"
     "@noble/secp256k1" "^1.6.3"
@@ -6130,23 +6130,12 @@ koilib@^5.0.0:
     multibase "^4.0.6"
     protobufjs "^7.0.0"
 
-koilib@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.1.0.tgz#50795f4825ee95bd69ad2a9bf864fa016c5ad161"
-  integrity sha512-hPXJ4ZOK7DHvxRaOABjEMXabWMeDrvl3m2pfCcaYP1IIUuPq6qfosZMb2j9CyZGDGpIhTHD+EmfgO8j0lmHC1g==
+kondor-js@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.3.2.tgz#aab2a263cdc624b41bcf36c207ea61a35a661bec"
+  integrity sha512-8mqMwv5Ce/0F+rS/bq7nSZmY9wntb+JLrkrDe4ZRIwzU7v65GX9AqlqqyL0sXqHic+lDnoSeVyOKhFROZ8mN/Q==
   dependencies:
-    "@noble/hashes" "^1.1.2"
-    "@noble/secp256k1" "^1.6.3"
-    cross-fetch "^3.1.5"
-    multibase "^4.0.6"
-    protobufjs "^7.0.0"
-
-kondor-js@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.3.1.tgz#1cf5da440da40e191c4b1da240ab1c696a6dfbc0"
-  integrity sha512-K3KZGH+SIInCJZGefhoVYiU5BcHnejGAapibg6Rahd5S2uf+txok96NYZbS7fVKjr0rgFzyGpWnK+hBkgVUJVw==
-  dependencies:
-    koilib "^5.0.0"
+    koilib "^5.2.0"
 
 launch-editor-middleware@^2.2.1:
   version "2.3.0"
