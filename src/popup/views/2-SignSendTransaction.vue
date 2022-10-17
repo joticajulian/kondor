@@ -87,7 +87,10 @@ export default {
           this.signerData = "undefined";
         }
 
-        if (this.request.args.broadcast === false) {
+        if (
+          this.request.args.optsSend &&
+          this.request.args.optsSend.broadcast === false
+        ) {
           this.broadcast = false;
         }
 
@@ -103,7 +106,9 @@ export default {
           }
           const contractId = op.call_contract.contract_id;
           try {
-            const abi = this.request.args.abis[contractId];
+            const abi = this.send
+              ? this.request.args.optsSend.abis[contractId]
+              : this.request.args.abis[contractId];
             const contract = new Contract({
               id: contractId,
               abi,
@@ -120,6 +125,7 @@ export default {
               "Only continue if you trust in",
               this.requester.origin,
             ].join(" ");
+            console.log(error);
           }
         }
 
@@ -160,7 +166,7 @@ export default {
           // TODO: update when the support to the old kondor is finished
           message.result = await signer.sendTransaction(
             this.request.args.transaction || this.request.args.tx,
-            this.request.args.broadcast
+            this.request.args.optsSend
           );
         } else {
           // TODO: update when the support to the old kondor is finished
