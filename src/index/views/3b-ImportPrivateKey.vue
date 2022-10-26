@@ -88,7 +88,6 @@ h1 {
   margin: 1em 0;
 }
 .container {
-  color: var(--kondor-light);
   display: flex;
   flex-direction: column;
   align-items: center;

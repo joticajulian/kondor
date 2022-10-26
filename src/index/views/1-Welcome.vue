@@ -13,9 +13,9 @@
       <br />The first of its kind wallet for the first of its kind blockchain,
       Koinos.
     </div>
-    <router-link to="/newWallet" class="link">
-      <div v-if="hasAccounts" class="recover">Recover Wallet</div>
-      <div v-else>New Wallet</div>
+    <router-link to="/newWallet" class="">
+      <button v-if="hasAccounts" class="recover">Recover Wallet</button>
+      <button v-else>New Wallet</button>
     </router-link>
   </div>
 </template>
@@ -67,7 +67,7 @@ export default {
   width: 77%;
   margin: 2em 0;
   line-height: 1.2em;
-  color: var(--kondor-light);
+  color: var(--primary-color);
   text-align: center;
 }
 .logo {

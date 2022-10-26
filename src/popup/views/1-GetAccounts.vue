@@ -112,7 +112,7 @@ label {
 .container {
   width: 90%;
   padding: 2em 0;
-  font-family: "Roboto", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 400;
   text-transform: none;
   align-items: flex-start;

@@ -11,7 +11,7 @@
     <div class="message">
       {{ message }}
     </div>
-    <div @click="$emit('onClose')" class="close">X</div>
+    <div @click="$emit('onClose')" class="close">x</div>
   </div>
 </template>
 
@@ -34,11 +34,11 @@ export default {
   align-items: center;
   justify-content: space-between;
   width: 80%;
-  border-radius: 6px;
+  border-radius: 4px;
   padding: 8px 20px;
   text-align: left;
   transition: all 0.3s;
-  font-family: "Roboto" sans-serif !important;
+  font-family: "Inter" sans-serif !important;
   background: #292929;
   color: #f7d4d4;
 }

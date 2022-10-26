@@ -1,5 +1,5 @@
 @import url(../../shared/assets/css/kondor.css);
 #app {
-  max-height: 600px;
+  height: 600px;
   width: 357px;
 }

@@ -6,7 +6,7 @@
       v-model="password"
       placeholder="Password"
     />
-    <button @click="unlock" class="link">{{ labelButton }}</button>
+    <button @click="unlock" class="">{{ labelButton }}</button>
   </div>
 </template>
 
