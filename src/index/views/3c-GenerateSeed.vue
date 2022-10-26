@@ -52,7 +52,7 @@
           type="password"
           placeholder="Confirm password"
         />
-        <button @click="createNewWallet" class="link">create wallet</button>
+        <button @click="createNewWallet" class="">create wallet</button>
       </div>
     </div>
   </div>
@@ -174,7 +174,6 @@ export default {
 </script>
 <style scoped>
 .container {
-  color: var(--kondor-light);
   display: flex;
   flex-direction: column;
   align-items: center;

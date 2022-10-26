@@ -24,5 +24,6 @@ export default {
 <style scoped>
 .back-button {
   cursor: pointer;
+  color: #000;
 }
 </style>

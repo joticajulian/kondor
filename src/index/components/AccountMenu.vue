@@ -2,17 +2,23 @@
   <div class="dropdown-container">
     <div @click="toggleDropdown()" class="link">
       <div class="link-item">
-        {{ currentAccount }}
+        {{ currentAccount }} ▾
       </div>
     </div>
 
     <div v-if="showDropdown" class="dropdown-content">
+      <div class="dropdown-info">
+        <span class="heading">Available accounts</span>
+      </div>
       <div
         class="dropdown-item"
         v-for="(account, index) in $store.state.accounts"
         :key="index"
       >
-        <div @click="selectAccount(index)">{{ account.name }}</div>
+        <div @click="selectAccount(index)">
+          <span>{{ account.name }}</span>
+          <div class="address">{{ account.address }}</div>
+        </div>
       </div>
       <div disabled class="separator"></div>
       <div v-if="$store.state.mnemonic">
@@ -74,11 +80,22 @@ export default {
   display: flex;
   justify-content: center;
   padding: 2em 0;
+  color: var(--kondor-purple);
+}
+.dropdown-container .link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.5em 1em;
+  border-radius: 0.5em;
+  widows: 100vw;
+  background-color: var(--kondor-dark);
+  color: var(--kondor-light);
 }
 .dropdown-content,
 .dropdown-content:hover {
   min-width: 160px;
-  color: var(--kondor-light);
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
   top: 48px;
   right: 0;
@@ -87,34 +104,39 @@ export default {
   width: 100%;
   margin-top: 4em;
   height: 100vh;
-  background: var(--secondary-color);
+  background: var(--kondor-light);
 }
 
 .dropdown-item {
   float: none;
-  padding: 12px 16px;
+  padding: 1em 3em;
   text-decoration: none;
   display: block;
   text-align: left;
   border: none;
-  padding-left: 2em;
+  cursor: pointer;
+  margin-top: 0.5em;
 }
 
 .dropdown-item:hover {
-  background: var(--primary-color);
-  color: var(--secondary-color);
+  color: var(--kondor-light);
+  background-color: var(--kondor-purple);
+  font-weight: 700;
 }
 
 .separator {
   margin-top: 8px;
   border-top: 1px solid #666;
   padding: 0;
+  height: 1em;
 }
 .link,
 .link:hover {
   display: flex;
   flex-direction: row;
   border: none;
+  color: var(--kondor-light);
+  font-size: 1.2em;
 }
 .link-item {
   padding-right: 1em;
@@ -122,5 +144,13 @@ export default {
   font-weight: 500;
   font-size: 1.2em;
   cursor: pointer;
+  color: #000;
+}
+.address {
+  font-size: 0.8em;
+  color: gray;
+}
+.dropdown-info {
+  padding: 2em 3em;
 }
 </style>

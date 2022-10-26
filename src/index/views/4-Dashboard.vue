@@ -2,15 +2,20 @@
   <div class="container">
     <div class="column">
       <div class="info container">
-        <div class="address-container">
-          <span>{{ address }}</span>
-          <router-link to="/signers" class="signers">Signers</router-link>
-        </div>
         <div class="balance">
-          <div class="heading"></div>
+          <div class="heading">Balance</div>
           <div class="amount">
             <div class="balance">{{ balanceFormatted }}</div>
             <div class="tkoin">(t)KOIN</div>
+          </div>
+        </div>
+        <div class="address-container">
+          <div class="address-info">
+            <div class="addr">{{ address }}</div>
+            <div class="addr-links">
+              <router-link to="/signers" class="signer-links">Signers</router-link>
+              <span class="signer-links">Copy</span>
+            </div>
           </div>
         </div>
       </div>
@@ -35,12 +40,12 @@
 </template>
 
 <script>
-import { Contract, Provider, Signer, utils } from "koilib";
+import { Contract, Provider, Signer, utils } from "koilib"
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
-import Sandbox from "@/shared/mixins/Sandbox";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
+import Sandbox from "@/shared/mixins/Sandbox"
 
 export default {
   data() {
@@ -53,30 +58,30 @@ export default {
       koin: null,
       toAddress: "",
       amount: "",
-    };
+    }
   },
 
   mixins: [Storage, Sandbox, ViewHelper],
 
   mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount);
+    this.loadAccount(this.$store.state.currentIndexAccount)
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount(this.$store.state.currentIndexAccount);
+      this.loadAccount(this.$store.state.currentIndexAccount)
     },
   },
 
   methods: {
     async loadAccount(index) {
       try {
-        const rpcNodes = await this._getRpcNodes();
-        this.provider = new Provider(rpcNodes);
-        const currentAccount = this.$store.state.accounts[index];
-        this.signer = Signer.fromWif(currentAccount.privateKey, true);
-        this.signer.provider = this.provider;
-        this.address = this.signer.getAddress();
+        const rpcNodes = await this._getRpcNodes()
+        this.provider = new Provider(rpcNodes)
+        const currentAccount = this.$store.state.accounts[index]
+        this.signer = Signer.fromWif(currentAccount.privateKey, true)
+        this.signer.provider = this.provider
+        this.address = this.signer.getAddress()
 
         this.koinContract = new Contract({
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
@@ -85,44 +90,44 @@ export default {
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        });
+        })
         this.koinContract.abi.methods.balanceOf.preformat_argument = (
           owner
         ) => ({
           owner,
-        });
+        })
         this.koinContract.abi.methods.balanceOf.preformat_return = (res) =>
-          utils.formatUnits(res.value, 8);
+          utils.formatUnits(res.value, 8)
         this.koinContract.abi.methods.transfer.preformat_argument = (
           input
         ) => ({
           from: this.address,
           to: input.to,
           value: utils.parseUnits(input.value, 8),
-        });
-        this.koin = this.koinContract.functions;
+        })
+        this.koin = this.koinContract.functions
       } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
+        this.alertDanger(error.message)
+        throw error
       }
-      await this.loadBalance();
+      await this.loadBalance()
     },
     async loadBalance() {
       try {
-        const { result } = await this.koin.balanceOf(this.address);
-        this.balance = result.toLocaleString("en");
+        const { result } = await this.koin.balanceOf(this.address)
+        this.balance = result.toLocaleString("en")
       } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
+        this.alertDanger(error.message)
+        throw error
       }
     },
     async transfer() {
-      let interval;
+      let interval
       try {
-        let chainId = await this._getChainId(false);
+        let chainId = await this._getChainId(false)
         if (!chainId) {
-          chainId = await this.provider.getChainId();
-          await this._setChainId(chainId);
+          chainId = await this.provider.getChainId()
+          await this._setChainId(chainId)
         }
         const { transaction, receipt } = await this.koin.transfer(
           {
@@ -130,39 +135,41 @@ export default {
             value: this.amount,
           },
           { chainId }
-        );
-        this.alertSuccess("Sent. Waiting to be mined ...");
-        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
-        console.log(receipt);
-        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
+        )
+        this.alertSuccess("Sent. Waiting to be mined ...")
+        console.log(`Transaction id ${transaction.id} submitted. Receipt:`)
+        console.log(receipt)
+        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`)
         interval = setInterval(() => {
-          console.log("firing interval");
-          this.loadBalance();
-        }, 2000);
-        const blockNumber = await transaction.wait();
-        clearInterval(interval);
-        console.log("block number " + blockNumber);
-        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
-        this.toAddress = "";
-        this.amount = "";
+          console.log("firing interval")
+          this.loadBalance()
+        }, 2000)
+        const blockNumber = await transaction.wait()
+        clearInterval(interval)
+        console.log("block number " + blockNumber)
+        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`)
+        this.toAddress = ""
+        this.amount = ""
       } catch (error) {
-        clearInterval(interval);
-        this.alertDanger(error.message);
-        throw error;
+        clearInterval(interval)
+        this.alertDanger(error.message)
+        throw error
       }
     },
   },
   computed: {
     balanceFormatted() {
-      return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
+      return this.balance
     },
   },
-};
+}
 </script>
 <style scoped>
 label {
   width: 100%;
   margin-left: -2em;
+  text-align: left;
 }
 input {
   background: rgb(226 183 236 / 20%);
@@ -181,8 +188,8 @@ input {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  font-weight: 100;
-  font-size: 2.5rem;
+  font-size: 1.5em;
+  font-weight: bold;
 }
 .amount {
   display: flex;
@@ -199,18 +206,34 @@ input {
 .info {
   text-transform: none;
   font-weight: 400;
+  color: #000;
+  height: 16em;
+  width: 100vw;
 }
 .tkoin {
   font-size: 0.5em;
 }
-.signers {
+.signer-links {
   font-size: 0.8em;
-  padding-left: 0.7em;
+  color: var(--kondor-purple);
+  margin-top: 0.4em;
 }
 .transfer {
   margin-bottom: 3em;
 }
 .address-container {
   font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+.addr {
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+.addr-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

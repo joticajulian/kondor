@@ -1,5 +1,5 @@
 body {
-  font-family: sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .group {
@@ -10,7 +10,7 @@ body {
   margin-top: 30px;
   width: 100%;
   padding: 8px 20px;
-  border-radius: 8px;
+  border-radius: 4px;
   box-sizing: border-box;
   background-color: rgb(224, 224, 224);
 }

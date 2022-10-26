@@ -28,7 +28,7 @@ export default {
   width: 77%;
   margin: 2em 0;
   line-height: 1.2em;
-  color: var(--kondor-light);
+  color: var(--primary-color);
   text-align: center;
 }
 .logo {

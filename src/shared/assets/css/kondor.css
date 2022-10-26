@@ -1,13 +1,13 @@
 :root {
-  --primary-color: #e2b7ec;
-  --secondary-color: #110020;
+  --primary-color: #110020;
+  --secondary-color: #e2b7ec;
   --kondor-light: #ffffff;
   /* --kondor-light: #f7dcbf; */
   --kondor-gray: #828282;
+  --kondor-purple: #7161EF;
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Roboto:wght@100;400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700&display=swap');
 
 button {
   all: initial;
@@ -21,9 +21,10 @@ input {
 
 body {
   margin: 0px;
-  background: var(--secondary-color);
-  color: var(--kondor-light);
-  font-family: "Roboto", sans-serif;
+  background: var(--kondor-light);
+  color: var(--secondary-color);
+  font-family: "Inter", sans-serif;
+  max-width: 40em;
 }
 
 h1 {
@@ -51,9 +52,9 @@ h3 {
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Roboto", monospace;
+  font-family: "Inter", monospace;
   font-weight: 400;
-  background-color: var(--secondary-color);
+  background: var(--kondor-light);
   color: var(--primary-color);
   padding: 20px;
   width: 357px;
@@ -79,8 +80,8 @@ a:visited {
 
 input,
 textarea {
-  width: 100%;
-  color: var(--kondor-light);
+  width: 97%;
+  color: var(--primary-color);
   padding: 1em;
   text-align: left;
   background: rgba(226, 183, 236, 0.2);
@@ -103,21 +104,23 @@ textarea {
   white-space: normal;
   line-height: 1;
   font-size: 12px;
-  font-family: "Roboto", sans-serif;
+  font-family: "Inter", sans-serif;
+  max-width: 20em;
+  text-align: center;
 }
 button {
-  display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   padding: 1em;
   gap: 8px;
-  border: 1px solid #fff;
-  border-radius: 2px;
-  color: var(--kondor-light);
+  border: 1px solid var(--kondor-purple);
+  border-radius: 4px;
+  color: white;
   text-transform: capitalize;
   width: 96%;
   margin: 1em 0;
+  background: var(--kondor-purple);
 }
 button:hover {
   opacity: 0.5;
@@ -156,9 +159,8 @@ button:disabled {
   width: 100%;
 }
 .container {
-  font-family: "Roboto", sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 400;
-  color: var(--kondor-light);
   display: flex;
   flex-direction: column;
   align-items: center;

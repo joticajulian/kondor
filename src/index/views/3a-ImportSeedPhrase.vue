@@ -80,7 +80,6 @@ h1 {
   margin-bottom: 1em;
 }
 .container {
-  color: var(--kondor-light);
   display: flex;
   flex-direction: column;
   align-items: center;
