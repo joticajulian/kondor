@@ -44,6 +44,7 @@ export default {
     return {
       data: "",
       broadcast: true,
+      abis: null,
       signerData: "",
       requester: "",
       footnoteMessage: "",
@@ -87,8 +88,18 @@ export default {
           this.signerData = "undefined";
         }
 
-        if (this.request.args.broadcast === false) {
+        if (
+          (this.request.args.optsSend &&
+            this.request.args.optsSend.broadcast === false) ||
+          this.request.args.broadcast === false
+        ) {
           this.broadcast = false;
+        }
+
+        if (this.request.args.optsSend && this.request.args.optsSend.abis) {
+          this.abis = this.request.args.optsSend.abis;
+        } else if (this.request.args.abis) {
+          this.abis = this.request.args.abis;
         }
 
         const { operations } = this.request.args.transaction;
@@ -103,7 +114,7 @@ export default {
           }
           const contractId = op.call_contract.contract_id;
           try {
-            const abi = this.request.args.abis[contractId];
+            const abi = this.abis[contractId];
             const contract = new Contract({
               id: contractId,
               abi,
@@ -120,6 +131,7 @@ export default {
               "Only continue if you trust in",
               this.requester.origin,
             ].join(" ");
+            console.log(error);
           }
         }
 
@@ -155,12 +167,14 @@ export default {
       const signer = Signer.fromWif(this.account.privateKey);
       signer.provider = provider;
       let message = { id: this.request.id };
+      const optsSend = { broadcast: this.broadcast };
+
       try {
         if (this.send) {
           // TODO: update when the support to the old kondor is finished
           message.result = await signer.sendTransaction(
             this.request.args.transaction || this.request.args.tx,
-            this.request.args.broadcast
+            optsSend
           );
         } else {
           // TODO: update when the support to the old kondor is finished
