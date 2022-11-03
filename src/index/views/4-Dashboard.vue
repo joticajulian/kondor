@@ -8,6 +8,8 @@
             <div class="balance">{{ balanceFormatted }}</div>
             <div class="tkoin">(t)KOIN</div>
           </div>
+          <div>mana available {{ mana }}</div>
+          <div>time to recharge {{ timeRechargeMana }}</div>
         </div>
         <div class="address-container">
           <div class="address-info">
@@ -47,6 +49,33 @@ import ViewHelper from "@/shared/mixins/ViewHelper"
 import Storage from "@/shared/mixins/Storage"
 import Sandbox from "@/shared/mixins/Sandbox"
 
+const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
+
+function deltaTimeToString(milliseconds) {
+  var seconds = Math.floor(milliseconds / 1000);
+  var interval = seconds / 31536000;
+  if (interval > 1) {
+    return Math.floor(interval) + " years";
+  }
+  interval = seconds / 2592000;
+  if (interval > 2) {
+    return Math.floor(interval) + " months";
+  }
+  interval = seconds / 86400;
+  if (interval > 2) {
+    return Math.floor(interval) + " days";
+  }
+  interval = seconds / 3600;
+  if (interval > 2) {
+    return Math.floor(interval) + " hours";
+  }
+  interval = seconds / 60;
+  if (interval > 2) {
+    return Math.floor(interval) + " minutes";
+  }
+  return Math.floor(seconds) + " seconds";
+}
+
 export default {
   data() {
     return {
@@ -58,6 +87,10 @@ export default {
       koin: null,
       toAddress: "",
       amount: "",
+      intervalMana: null,
+      mana: "",
+      lastUpdateMana: 0,
+      timeRechargeMana: 0,
     }
   },
 
@@ -116,6 +149,22 @@ export default {
       try {
         const { result } = await this.koin.balanceOf(this.address)
         this.balance = result.toLocaleString("en")
+
+        const balance = Number(this.balance);
+        const rc = await this.provider.getAccountRc(this.address);
+        const initialMana = Number(rc)/1e8;
+        this.mana = initialMana;
+        this.lastUpdateMana = Date.now();
+        this.timeRechargeMana = deltaTimeToString((balance - this.mana) * FIVE_DAYS / balance);
+
+        clearInterval(this.intervalMana);
+        this.intervalMana = setInterval(() => {
+          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
+          const manaUpdated = initialMana + delta * balance / FIVE_DAYS;
+          this.mana = Math.min(manaUpdated, balance);
+          this.timeRechargeMana = deltaTimeToString((balance - this.mana) * FIVE_DAYS / balance);
+        }, 1000);
+
       } catch (error) {
         this.alertDanger(error.message)
         throw error
