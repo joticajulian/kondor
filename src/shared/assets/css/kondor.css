@@ -53,6 +53,7 @@ h3 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: "Inter", monospace;
+  word-break: break-all;
   font-weight: 400;
   background: var(--kondor-light);
   color: var(--primary-color);
