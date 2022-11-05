@@ -12,8 +12,10 @@
       <Unlock @onUnlock="afterUnlocked()" @onError="alertDanger($event)" />
     </div>
     <Footnote v-if="footnoteMessage2" :message="footnoteMessage2" />
-    <button @click="sign" :disabled="!unlocked">Sign</button>
-    <button @click="cancel">Cancel</button>
+    <div class="container">
+      <button @click="sign" :disabled="!unlocked">Sign</button>
+      <button @click="cancel">Cancel</button>
+    </div>
   </div>
 </template>
 
