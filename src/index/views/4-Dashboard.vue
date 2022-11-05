@@ -114,7 +114,7 @@ export default {
         this.address = this.signer.getAddress()
 
         this.koinContract = new Contract({
-          id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+          id: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
           abi: utils.tokenAbi,
           signer: this.signer,
           serializer: await this.newSandboxSerializer(
