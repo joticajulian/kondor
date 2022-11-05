@@ -1,4 +1,4 @@
 #app {
-  height: 500px;
-  width: 309px;
+  height: 600px;
+  min-width: 500px;
 }
