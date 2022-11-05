@@ -193,7 +193,7 @@ export default {
           console.log("firing interval")
           this.loadBalance()
         }, 2000)
-        const blockNumber = await transaction.wait()
+        const { blockNumber } = await transaction.wait()
         clearInterval(interval)
         console.log("block number " + blockNumber)
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`)
