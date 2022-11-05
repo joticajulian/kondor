@@ -1,4 +1,5 @@
 <template>
+<div class="wrapper">
   <div class="center-column">
     <div class="accounts-information">
       <h2>Get accounts</h2>
@@ -22,6 +23,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -104,9 +106,15 @@ export default {
 label {
   padding: 1em 0;
 }
+.wrapper {
+  display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    width: 50%;
+}
 .center-column {
   width: 75%;
-  color: white;
   font-weight: 400;
 }
 .container {
@@ -119,8 +127,9 @@ label {
 }
 .buttons {
   display: flex;
-  justify-content: space-evenly;
-  width: 90%;
+    justify-content: center;
+    width: 100%;
+    gap: 1em;
 }
 .accounts-information {
   margin: 2em 0;
@@ -129,12 +138,9 @@ label {
   color: #929191;
 }
 .cancel-button {
-  border: none;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.accept-button {
   background: var(--kondor-light);
   color: var(--secondary-color);
+}
+.accept-button {
 }
 </style>
