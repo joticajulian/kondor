@@ -3,38 +3,32 @@
     <div class="column">
       <div class="info container">
         <div class="balance">
-          <div class="heading">Balance</div>
+          <div class="heading">KOIN</div>
           <div class="amount">
-            <div class="balance">{{ balanceFormatted }}</div>
-            <div class="tkoin">(t)KOIN</div>
-          </div>
-          <div>mana available {{ mana }}</div>
-          <div>time to recharge {{ timeRechargeMana }}</div>
-        </div>
-        <div class="address-container">
-          <div class="address-info">
-            <div class="addr">{{ address }}</div>
-            <div class="addr-links">
-              <router-link to="/signers" class="signer-links">Signers</router-link>
-              <span class="signer-links">Copy</span>
+            <div class="balance" :data-tooltip="satoshis">
+              {{ balanceFormatted }}
+            </div>
+            <div>
+              <router-link to="/signers" class="signer-links"
+                >Signers</router-link
+              >
             </div>
           </div>
         </div>
+        <div class="mana-container">
+          <div class="mana-title">MANA</div>
+          <div class="mana-info">
+            <div class="title-gray">Available </div>
+            <div class="mana-available">{{ mana }}</div>
+          </div>
+        </div>
+        <div class="recharge">Recharge {{ timeRechargeMana }}</div>
       </div>
       <div class="transfer container">
         <label>Send to address</label>
-        <input
-          v-model="toAddress"
-          type="text"
-          placeholder="Enter address to send to ..."
-        />
+        <input v-model="toAddress" type="text" />
         <label>Send to amount</label>
-        <input
-          @keyup.enter="transfer"
-          v-model="amount"
-          type="text"
-          placeholder="Enter amount to send ..."
-        />
+        <input @keyup.enter="transfer" v-model="amount" type="text" />
         <button @click="transfer" class="">transfer</button>
       </div>
     </div>
@@ -49,31 +43,31 @@ import ViewHelper from "@/shared/mixins/ViewHelper"
 import Storage from "@/shared/mixins/Storage"
 import Sandbox from "@/shared/mixins/Sandbox"
 
-const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
+const FIVE_DAYS = 432e6 // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
-  var seconds = Math.floor(milliseconds / 1000);
-  var interval = seconds / 31536000;
+  var seconds = Math.floor(milliseconds / 1000)
+  var interval = seconds / 31536000
   if (interval > 1) {
-    return Math.floor(interval) + " years";
+    return Math.floor(interval) + " years"
   }
-  interval = seconds / 2592000;
+  interval = seconds / 2592000
   if (interval > 2) {
-    return Math.floor(interval) + " months";
+    return Math.floor(interval) + " months"
   }
-  interval = seconds / 86400;
+  interval = seconds / 86400
   if (interval > 2) {
-    return Math.floor(interval) + " days";
+    return Math.floor(interval) + " days"
   }
-  interval = seconds / 3600;
+  interval = seconds / 3600
   if (interval > 2) {
-    return Math.floor(interval) + " hours";
+    return Math.floor(interval) + " hours"
   }
-  interval = seconds / 60;
+  interval = seconds / 60
   if (interval > 2) {
-    return Math.floor(interval) + " minutes";
+    return Math.floor(interval) + " minutes"
   }
-  return Math.floor(seconds) + " seconds";
+  return Math.floor(seconds) + " seconds"
 }
 
 export default {
@@ -150,21 +144,24 @@ export default {
         const { result } = await this.koin.balanceOf(this.address)
         this.balance = result.toLocaleString("en")
 
-        const balance = Number(this.balance);
-        const rc = await this.provider.getAccountRc(this.address);
-        const initialMana = Number(rc)/1e8;
-        this.mana = initialMana;
-        this.lastUpdateMana = Date.now();
-        this.timeRechargeMana = deltaTimeToString((balance - this.mana) * FIVE_DAYS / balance);
+        const balance = Number(this.balance)
+        const rc = await this.provider.getAccountRc(this.address)
+        const initialMana = Number(rc) / 1e8
+        this.mana = initialMana
+        this.lastUpdateMana = Date.now()
+        this.timeRechargeMana = deltaTimeToString(
+          ((balance - this.mana) * FIVE_DAYS) / balance
+        )
 
-        clearInterval(this.intervalMana);
+        clearInterval(this.intervalMana)
         this.intervalMana = setInterval(() => {
-          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
-          const manaUpdated = initialMana + delta * balance / FIVE_DAYS;
-          this.mana = Math.min(manaUpdated, balance);
-          this.timeRechargeMana = deltaTimeToString((balance - this.mana) * FIVE_DAYS / balance);
-        }, 1000);
-
+          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS)
+          const manaUpdated = initialMana + (delta * balance) / FIVE_DAYS
+          this.mana = Math.min(manaUpdated, balance)
+          this.timeRechargeMana = deltaTimeToString(
+            ((balance - this.mana) * FIVE_DAYS) / balance
+          )
+        }, 1000)
       } catch (error) {
         this.alertDanger(error.message)
         throw error
@@ -208,7 +205,11 @@ export default {
   },
   computed: {
     balanceFormatted() {
+      const balanceNumber = Number(this.balance)
       // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
+      return balanceNumber.toLocaleString("en")
+    },
+    satoshis() {
       return this.balance
     },
   },
@@ -219,10 +220,6 @@ label {
   width: 100%;
   margin-left: -2em;
   text-align: left;
-}
-input {
-  background: rgb(226 183 236 / 20%);
-  border: none;
 }
 .column {
   display: flex;
@@ -247,10 +244,11 @@ input {
   align-items: center;
   width: 100%;
   font-weight: 100;
-  margin: 1em 0;
+  margin: 0.3em 0 1em 0;
 }
 .heading {
-  font-size: 0.8em;
+  font-size: 0.7em;
+  font-weight: 300;
 }
 .info {
   text-transform: none;
@@ -260,7 +258,8 @@ input {
   width: 100vw;
 }
 .tkoin {
-  font-size: 0.5em;
+  font-size: 0.7em;
+  color: rgb(91, 91, 91);
 }
 .signer-links {
   font-size: 0.8em;
@@ -284,5 +283,84 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.mana {
+  font-size: 0.8em;
+  font-weight: 400;
+  display: flex;
+  flex-direction: row;
+}
+.mana-container {
+  display: flex;
+  width: 88vw;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.mana-info {
+  text-align: right;
+}
+.mana-title {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+.mana-available {
+  font-size: 1.2em;
+  font-weight: 400;
+}
+.title-gray {
+  color: var(--kondor-lighter);
+}
+.recharge {
+  width: 88vw;
+  background-color: var(--kondor-purple);
+  color: white;
+  font-size: .5em;
+}
+
+
+
+/* TOOLTIP */
+/* Add this attribute to the element that needs a tooltip */
+[data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Hide the tooltip content by default */
+[data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Position tooltip above the element */
+[data-tooltip]:before {
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  margin-bottom: 5px;
+  margin-left: -90px;
+  padding: 7px;
+  width: 160px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background-color: var(--kondor-purple);
+  color: #fff;
+  content: attr(data-tooltip);
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* Show tooltip content on hover */
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
 }
 </style>

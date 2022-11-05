@@ -1,8 +1,26 @@
 <template>
   <div class="dropdown-container">
-    <div @click="toggleDropdown()" class="link">
+    <div>
       <div class="link-item">
-        {{ currentAccount }} ▾
+        <div>
+          <div class="current-account">{{ currentAccount }}</div>
+          <div class="current-address">
+            {{ currentAddress }}
+          </div>
+        </div>
+        <div @click="toggleDropdown()" class="link">
+          <svg
+            width="23"
+            height="4"
+            viewBox="0 0 23 4"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="2.85486" cy="2" r="2" fill="#514E54" />
+            <circle cx="10.8549" cy="2" r="2" fill="#514E54" />
+            <circle cx="18.8549" cy="2" r="2" fill="#514E54" />
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -33,53 +51,54 @@
 </template>
 
 <script>
-import router from "@/index/router";
+import router from "@/index/router"
 
 export default {
   data() {
     return {
       currentAccount: "",
+      currentAddress: "",
       showDropdown: false,
-    };
+    }
   },
-
   mounted() {
-    this.loadAccount();
+    this.loadAccount()
   },
 
   methods: {
     toggleDropdown() {
-      this.showDropdown = !this.showDropdown;
+      this.showDropdown = !this.showDropdown
     },
 
     selectAccount(index) {
-      this.$store.state.currentIndexAccount = index;
-      this.showDropdown = false;
-      this.loadAccount();
+      this.$store.state.currentIndexAccount = index
+      this.showDropdown = false
+      this.loadAccount()
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return;
-      const index = this.$store.state.currentIndexAccount;
-      this.currentAccount = this.$store.state.accounts[index].name;
+      if (this.$store.state.accounts.length === 0) return
+      const index = this.$store.state.currentIndexAccount
+      this.currentAccount = this.$store.state.accounts[index].name
+      this.currentAddress = this.$store.state.accounts[index].address
     },
 
     createAccount() {
-      router.push("/createAccount");
+      router.push("/createAccount")
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true");
+      router.push("/generateSeed?privateKeyExist=true")
     },
   },
-};
+}
 </script>
 
 <style scoped>
 .dropdown-container {
   display: flex;
   justify-content: center;
-  padding: 2em 0;
+  padding: 2em 0 0 0;
   color: var(--kondor-purple);
 }
 .dropdown-container .link {
@@ -87,9 +106,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0.5em 1em;
+  padding: 0.5em 0;
   border-radius: 0.5em;
-  widows: 100vw;
   background-color: var(--kondor-dark);
   color: var(--kondor-light);
 }
@@ -105,6 +123,7 @@ export default {
   margin-top: 4em;
   height: 100vh;
   background: var(--kondor-light);
+  z-index: 10;
 }
 
 .dropdown-item {
@@ -139,16 +158,26 @@ export default {
   font-size: 1.2em;
 }
 .link-item {
-  padding-right: 1em;
   text-transform: capitalize;
-  font-weight: 500;
-  font-size: 1.2em;
-  cursor: pointer;
-  color: #000;
+    font-weight: 500;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #000;
+    width: 88vw;
+    display: flex;
+    justify-content: space-between;
 }
 .address {
   font-size: 0.8em;
   color: gray;
+}
+.current-address {
+  font-size: .8em;
+  font-weight: 600;
+  color: #C8C1D1;
+}
+current-account {
+  font-size: 1.2em;
 }
 .dropdown-info {
   padding: 2em 3em;
