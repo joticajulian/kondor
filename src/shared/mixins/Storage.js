@@ -64,7 +64,7 @@ export default {
         rpcNodes =
           process.env.VUE_APP_ENV === "test"
             ? ["http://localhost:8081/jsonrpc"]
-            : ["http://api.koinos.io:8080"];
+            : ["https://api.koinos.io"];
         await this._setRpcNodes(rpcNodes);
         rpcNodes = await this._read("rpcNodes", true);
       }
