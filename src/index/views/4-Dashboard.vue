@@ -15,14 +15,17 @@
             </div>
           </div>
         </div>
+        <!-- <div class="recharge-bar" :class="timeRechargeMana != 0 ? red : green"></div> -->
         <div class="mana-container">
-          <div class="mana-title">MANA</div>
+          <div class="recharge-container">
+            <div class="mana-title">MANA</div>
+            <div class="recharge-time">{{ timeRechargeMana }}</div>
+          </div>
           <div class="mana-info">
-            <div class="title-gray">Available </div>
+            <div class="title-gray">Available</div>
             <div class="mana-available">{{ mana }}</div>
           </div>
         </div>
-        <div class="recharge">Recharge {{ timeRechargeMana }}</div>
       </div>
       <div class="transfer container">
         <label>Send to address</label>
@@ -262,9 +265,11 @@ input {
   color: rgb(91, 91, 91);
 }
 .signer-links {
-  font-size: 0.8em;
+  font-size: 0.5em;
   color: var(--kondor-purple);
+  font-weight: 500;
   margin-top: 0.4em;
+  text-decoration: underline;
 }
 .transfer {
   margin-bottom: 3em;
@@ -294,7 +299,7 @@ input {
   display: flex;
   width: 88vw;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 .mana-info {
   text-align: right;
@@ -310,15 +315,27 @@ input {
 .title-gray {
   color: var(--kondor-lighter);
 }
-.recharge {
-  width: 88vw;
-  background-color: var(--kondor-purple);
-  color: white;
-  font-size: .5em;
+.recharge-container {
+  margin-bottom: 2em;
 }
-
-
-
+.recharge-bar {
+  width: 88vw;
+  height: 0.4em;
+  background-color: rgb(15, 201, 142);
+  color: white;
+  font-size: 0.5em;
+}
+.recharge-time {
+  font-size: 0.5em;
+  font-weight: 400;
+  color: var(--kondor-lighter);
+}
+.green {
+  background-color: rgb(15, 201, 142);
+}
+.red {
+  background-color: rgb(223, 57, 57);
+}
 /* TOOLTIP */
 /* Add this attribute to the element that needs a tooltip */
 [data-tooltip] {

@@ -84,6 +84,9 @@ input {
   margin-top: 1em;
   background: none;
   color: var(--kondor-purple);
+  margin-left: -0.7em;
+  text-decoration: underline;
+  border: none;
 }
 .unlock {
   width: 70%;
