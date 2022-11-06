@@ -7,15 +7,15 @@
         {{ broadcast ? "" : "but not broadcast (testing)" }}
       </div>
       <div>{{ requester.origin }}</div>
-      <div>signer: {{ signerData }}</div>
-      <div>{{ data }}</div>
+      <div>signer: {{ signerData }}</div> <br>
+      <div>Data: {{ data }}</div> <br>
       <div v-if="!unlocked">
         <Unlock @onUnlock="afterUnlocked()" @onError="alertDanger($event)" />
       </div>
       <Footnote v-if="footnoteMessage2" :message="footnoteMessage2" />
       <div class="container">
         <button @click="sign" :disabled="!unlocked">Sign</button>
-        <button @click="cancel">Cancel</button>
+        <button @click="cancel" class="cancel-button">Cancel</button>
       </div>
     </div>
   </div>
@@ -216,7 +216,7 @@ export default {
 }
 
 .container {
-  ont-family: Inter, sans-serif;
+  font-family: Inter, sans-serif;
   font-weight: 400;
   display: flex;
   margin: 0;
@@ -224,5 +224,11 @@ export default {
 
 input {
   margin-top: 2em;
+}
+.cancel-button {
+  border: none;
+  text-decoration: underline;
+  color: var(--kondor-purple);
+  background-color: transparent;
 }
 </style>

@@ -107,15 +107,12 @@ label {
   padding: 1em 0;
 }
 .wrapper {
-  display: flex;
-    justify-content: flex-start;
-    align-items: center;
     height: 100%;
-    width: 50%;
 }
 .center-column {
   width: 75%;
   font-weight: 400;
+  display: flex;
 }
 .container {
   width: 90%;
