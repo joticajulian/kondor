@@ -5,6 +5,7 @@
       type="password"
       v-model="password"
       placeholder="Password"
+      autofocus
     />
     <button @click="unlock" class="">{{ labelButton }}</button>
   </div>
