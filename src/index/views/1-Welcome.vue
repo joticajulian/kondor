@@ -13,7 +13,7 @@
       <br />The first of its kind wallet for the first of its kind blockchain,
       Koinos.
     </div>
-    <router-link to="/newWallet" class="">
+    <router-link to="/newWallet" class="button">
       <button v-if="hasAccounts" class="recover">Recover Wallet</button>
       <button v-else>New Wallet</button>
     </router-link>
@@ -21,23 +21,23 @@
 </template>
 
 <script>
-import router from "@/index/router"
+import router from "@/index/router";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
 
 // components
-import Unlock from "@/shared/components/Unlock.vue"
-import Logo from "@/shared/components/Logo"
-import LogoText from "@/shared/components/LogoText"
+import Unlock from "@/shared/components/Unlock.vue";
+import Logo from "@/shared/components/Logo";
+import LogoText from "@/shared/components/LogoText";
 
 export default {
   name: "Welcome",
   data() {
     return {
       hasAccounts: false,
-    }
+    };
   },
   mixins: [Storage, ViewHelper],
 
@@ -45,18 +45,18 @@ export default {
 
   mounted() {
     (async () => {
-      const encAccounts = await this._getAccounts()
-      this.hasAccounts = encAccounts && encAccounts.length > 0
-    })()
+      const encAccounts = await this._getAccounts();
+      this.hasAccounts = encAccounts && encAccounts.length > 0;
+    })();
   },
 
   methods: {
     async unlock() {
-      this.alertClose()
-      router.push("/dashboard")
+      this.alertClose();
+      router.push("/dashboard");
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -65,6 +65,10 @@ input {
 }
 .container {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .welcome-message {
   width: 77%;
@@ -90,5 +94,10 @@ input {
 }
 .unlock {
   width: 70%;
+}
+.button {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
 }
 </style>
