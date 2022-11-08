@@ -8,7 +8,9 @@
     "build:webpack": "webpack --mode=production --config webpack.config.js && copyfiles -u 2 public/js/* dist/js",
     "build:3rdpage": "copyfiles -u 3 node_modules/koilib/dist/koinos.min.js 3rdpage/js && copyfiles -u 3 node_modules/kondor-js/dist/kondor.min.js 3rdpage/js",
     "build:vue": "node manifest.js && copyfiles -u 3 node_modules/koilib/dist/koinos.js public/js && vue-cli-service build --mode production",
+    "build:vue:dev": "node manifest.js development && copyfiles -u 3 node_modules/koilib/dist/koinos.js public/js && vue-cli-service build --mode production",
     "build": "yarn build:ts && yarn build:webpack && yarn build:vue",
+    "build:test": "yarn build:ts && yarn build:webpack && yarn build:vue:dev",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
