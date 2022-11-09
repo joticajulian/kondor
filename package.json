@@ -10,7 +10,7 @@
     "build:vue": "node manifest.js && copyfiles -u 3 node_modules/koilib/dist/koinos.js public/js && vue-cli-service build --mode production",
     "build:vue:dev": "node manifest.js development && copyfiles -u 3 node_modules/koilib/dist/koinos.js public/js && vue-cli-service build --mode production",
     "build": "yarn build:ts && yarn build:webpack && yarn build:vue",
-    "build:test": "yarn build:ts && yarn build:webpack && yarn build:vue:dev",
+    "build:dev": "yarn build:ts && yarn build:webpack && yarn build:vue:dev",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
