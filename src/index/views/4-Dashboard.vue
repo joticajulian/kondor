@@ -178,6 +178,11 @@ export default {
           chainId = await this.provider.getChainId()
           await this._setChainId(chainId)
         }
+
+        if (!utils.isChecksumAddress(this.toAddress)) {
+          throw new Error(`${this.toAddress} is an invalid address`);
+        }
+
         const { transaction, receipt } = await this.koin.transfer(
           {
             to: this.toAddress,
