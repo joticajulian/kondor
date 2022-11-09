@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import router from "@/index/router"
+import router from "@/index/router";
 
 export default {
   data() {
@@ -59,39 +59,39 @@ export default {
       currentAccount: "",
       currentAddress: "",
       showDropdown: false,
-    }
+    };
   },
   mounted() {
-    this.loadAccount()
+    this.loadAccount();
   },
 
   methods: {
     toggleDropdown() {
-      this.showDropdown = !this.showDropdown
+      this.showDropdown = !this.showDropdown;
     },
 
     selectAccount(index) {
-      this.$store.state.currentIndexAccount = index
-      this.showDropdown = false
-      this.loadAccount()
+      this.$store.state.currentIndexAccount = index;
+      this.showDropdown = false;
+      this.loadAccount();
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return
-      const index = this.$store.state.currentIndexAccount
-      this.currentAccount = this.$store.state.accounts[index].name
-      this.currentAddress = this.$store.state.accounts[index].address
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAccount = this.$store.state.accounts[index].name;
+      this.currentAddress = this.$store.state.accounts[index].address;
     },
 
     createAccount() {
-      router.push("/createAccount")
+      router.push("/createAccount");
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true")
+      router.push("/generateSeed?privateKeyExist=true");
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -159,22 +159,22 @@ export default {
 }
 .link-item {
   text-transform: capitalize;
-    font-weight: 500;
-    font-size: 1.2em;
-    cursor: pointer;
-    color: #000;
-    width: 88vw;
-    display: flex;
-    justify-content: space-between;
+  font-weight: 500;
+  font-size: 1.2em;
+  cursor: pointer;
+  color: #000;
+  width: 88vw;
+  display: flex;
+  justify-content: space-between;
 }
 .address {
   font-size: 0.8em;
   color: gray;
 }
 .current-address {
-  font-size: .8em;
+  font-size: 0.8em;
   font-weight: 600;
-  color: #C8C1D1;
+  color: #c8c1d1;
 }
 current-account {
   font-size: 1.2em;

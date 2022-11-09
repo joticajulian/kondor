@@ -194,33 +194,33 @@
 </template>
 
 <script>
-import router from "@/index/router"
+import router from "@/index/router";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
+import ViewHelper from "@/shared/mixins/ViewHelper";
 
 export default {
   data() {
     return {
       publicPath: process.env.BASE_URL,
-    }
+    };
   },
   mixins: [ViewHelper],
   methods: {
     async importPrivateKey() {
-      this.alertClose()
-      router.push("/importPrivateKey")
+      this.alertClose();
+      router.push("/importPrivateKey");
     },
     async importSeedPhrase() {
-      this.alertClose()
-      router.push("/importSeedPhrase")
+      this.alertClose();
+      router.push("/importSeedPhrase");
     },
     async generateSeed() {
-      this.alertClose()
-      router.push("/generateSeed")
+      this.alertClose();
+      router.push("/generateSeed");
     },
   },
-}
+};
 </script>
 <style scoped>
 .container {

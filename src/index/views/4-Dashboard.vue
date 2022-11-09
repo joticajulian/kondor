@@ -39,38 +39,38 @@
 </template>
 
 <script>
-import { Contract, Provider, Signer, utils } from "koilib"
+import { Contract, Provider, Signer, utils } from "koilib";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Sandbox from "@/shared/mixins/Sandbox"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
 
-const FIVE_DAYS = 432e6 // 5 * 24 * 60 * 60 * 1000
+const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
-  var seconds = Math.floor(milliseconds / 1000)
-  var interval = seconds / 31536000
+  var seconds = Math.floor(milliseconds / 1000);
+  var interval = seconds / 31536000;
   if (interval > 1) {
-    return Math.floor(interval) + " years"
+    return Math.floor(interval) + " years";
   }
-  interval = seconds / 2592000
+  interval = seconds / 2592000;
   if (interval > 2) {
-    return Math.floor(interval) + " months"
+    return Math.floor(interval) + " months";
   }
-  interval = seconds / 86400
+  interval = seconds / 86400;
   if (interval > 2) {
-    return Math.floor(interval) + " days"
+    return Math.floor(interval) + " days";
   }
-  interval = seconds / 3600
+  interval = seconds / 3600;
   if (interval > 2) {
-    return Math.floor(interval) + " hours"
+    return Math.floor(interval) + " hours";
   }
-  interval = seconds / 60
+  interval = seconds / 60;
   if (interval > 2) {
-    return Math.floor(interval) + " minutes"
+    return Math.floor(interval) + " minutes";
   }
-  return Math.floor(seconds) + " seconds"
+  return Math.floor(seconds) + " seconds";
 }
 
 export default {
@@ -88,30 +88,30 @@ export default {
       mana: "",
       lastUpdateMana: 0,
       timeRechargeMana: 0,
-    }
+    };
   },
 
   mixins: [Storage, Sandbox, ViewHelper],
 
   mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount)
+    this.loadAccount(this.$store.state.currentIndexAccount);
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount(this.$store.state.currentIndexAccount)
+      this.loadAccount(this.$store.state.currentIndexAccount);
     },
   },
 
   methods: {
     async loadAccount(index) {
       try {
-        const rpcNodes = await this._getRpcNodes()
-        this.provider = new Provider(rpcNodes)
-        const currentAccount = this.$store.state.accounts[index]
-        this.signer = Signer.fromWif(currentAccount.privateKey, true)
-        this.signer.provider = this.provider
-        this.address = this.signer.getAddress()
+        const rpcNodes = await this._getRpcNodes();
+        this.provider = new Provider(rpcNodes);
+        const currentAccount = this.$store.state.accounts[index];
+        this.signer = Signer.fromWif(currentAccount.privateKey, true);
+        this.signer.provider = this.provider;
+        this.address = this.signer.getAddress();
 
         this.koinContract = new Contract({
           id: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
@@ -120,63 +120,63 @@ export default {
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        })
+        });
         this.koinContract.abi.methods.balanceOf.preformat_argument = (
           owner
         ) => ({
           owner,
-        })
+        });
         this.koinContract.abi.methods.balanceOf.preformat_return = (res) =>
-          utils.formatUnits(res.value, 8)
+          utils.formatUnits(res.value, 8);
         this.koinContract.abi.methods.transfer.preformat_argument = (
           input
         ) => ({
           from: this.address,
           to: input.to,
           value: utils.parseUnits(input.value, 8),
-        })
-        this.koin = this.koinContract.functions
+        });
+        this.koin = this.koinContract.functions;
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
-      await this.loadBalance()
+      await this.loadBalance();
     },
     async loadBalance() {
       try {
-        const { result } = await this.koin.balanceOf(this.address)
-        this.balance = result.toLocaleString("en")
+        const { result } = await this.koin.balanceOf(this.address);
+        this.balance = result.toLocaleString("en");
 
-        const balance = Number(this.balance)
-        const rc = await this.provider.getAccountRc(this.address)
-        const initialMana = Number(rc) / 1e8
-        this.mana = initialMana
-        this.lastUpdateMana = Date.now()
+        const balance = Number(this.balance);
+        const rc = await this.provider.getAccountRc(this.address);
+        const initialMana = Number(rc) / 1e8;
+        this.mana = initialMana;
+        this.lastUpdateMana = Date.now();
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
-        )
+        );
 
-        clearInterval(this.intervalMana)
+        clearInterval(this.intervalMana);
         this.intervalMana = setInterval(() => {
-          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS)
-          const manaUpdated = initialMana + (delta * balance) / FIVE_DAYS
-          this.mana = Math.min(manaUpdated, balance)
+          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
+          const manaUpdated = initialMana + (delta * balance) / FIVE_DAYS;
+          this.mana = Math.min(manaUpdated, balance);
           this.timeRechargeMana = deltaTimeToString(
             ((balance - this.mana) * FIVE_DAYS) / balance
-          )
-        }, 1000)
+          );
+        }, 1000);
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
     async transfer() {
-      let interval
+      let interval;
       try {
-        let chainId = await this._getChainId(false)
+        let chainId = await this._getChainId(false);
         if (!chainId) {
-          chainId = await this.provider.getChainId()
-          await this._setChainId(chainId)
+          chainId = await this.provider.getChainId();
+          await this._setChainId(chainId);
         }
 
         if (!utils.isChecksumAddress(this.toAddress)) {
@@ -189,39 +189,39 @@ export default {
             value: this.amount,
           },
           { chainId }
-        )
-        this.alertSuccess("Sent. Waiting to be mined ...")
-        console.log(`Transaction id ${transaction.id} submitted. Receipt:`)
-        console.log(receipt)
-        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`)
+        );
+        this.alertSuccess("Sent. Waiting to be mined ...");
+        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
+        console.log(receipt);
+        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
         interval = setInterval(() => {
-          console.log("firing interval")
-          this.loadBalance()
-        }, 2000)
-        const { blockNumber } = await transaction.wait()
-        clearInterval(interval)
-        console.log("block number " + blockNumber)
-        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`)
-        this.toAddress = ""
-        this.amount = ""
+          console.log("firing interval");
+          this.loadBalance();
+        }, 2000);
+        const { blockNumber } = await transaction.wait();
+        clearInterval(interval);
+        console.log("block number " + blockNumber);
+        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
+        this.toAddress = "";
+        this.amount = "";
       } catch (error) {
-        clearInterval(interval)
-        this.alertDanger(error.message)
-        throw error
+        clearInterval(interval);
+        this.alertDanger(error.message);
+        throw error;
       }
     },
   },
   computed: {
     balanceFormatted() {
-      const balanceNumber = Number(this.balance)
+      const balanceNumber = Number(this.balance);
       // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
-      return balanceNumber.toLocaleString("en")
+      return balanceNumber.toLocaleString("en");
     },
     satoshis() {
-      return this.balance
+      return this.balance;
     },
   },
-}
+};
 </script>
 <style scoped>
 label {

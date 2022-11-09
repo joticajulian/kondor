@@ -1,29 +1,29 @@
 <template>
-<div class="wrapper">
-  <div class="center-column">
-    <div class="accounts-information">
-      <h2>Get accounts</h2>
-      <!-- <div>{{ requester.origin }}</div> -->
-      <div>{{ requester.origin }} wants to know your address</div>
-      <br />
-      <div class="accounts-list">
-        <label v-for="(account, index) in accounts" :key="index">
-          <div class="item-checkbox">
-            <input type="checkbox" v-model="inputs[index]" class="checkbox" />
-            <span class="label-checkbox">{{ account.name }}</span>
-          </div>
-          <div class="account-address">{{ account.address }}</div>
-        </label>
+  <div class="wrapper">
+    <div class="center-column">
+      <div class="accounts-information">
+        <h2>Get accounts</h2>
+        <!-- <div>{{ requester.origin }}</div> -->
+        <div>{{ requester.origin }} wants to know your address</div>
+        <br />
+        <div class="accounts-list">
+          <label v-for="(account, index) in accounts" :key="index">
+            <div class="item-checkbox">
+              <input type="checkbox" v-model="inputs[index]" class="checkbox" />
+              <span class="label-checkbox">{{ account.name }}</span>
+            </div>
+            <div class="account-address">{{ account.address }}</div>
+          </label>
+        </div>
       </div>
-    </div>
-    <div>
-      <div class="buttons">
-        <button class="cancel-button" @click="cancel">Cancel</button>
-        <button class="accept-button" @click="accept">Accept</button>
+      <div>
+        <div class="buttons">
+          <button class="cancel-button" @click="cancel">Cancel</button>
+          <button class="accept-button" @click="accept">Accept</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -107,7 +107,7 @@ label {
   padding: 1em 0;
 }
 .wrapper {
-    height: 100%;
+  height: 100%;
 }
 .center-column {
   width: 75%;
@@ -124,9 +124,9 @@ label {
 }
 .buttons {
   display: flex;
-    justify-content: center;
-    width: 100%;
-    gap: 1em;
+  justify-content: center;
+  width: 100%;
+  gap: 1em;
 }
 .accounts-information {
   margin: 2em 0;
