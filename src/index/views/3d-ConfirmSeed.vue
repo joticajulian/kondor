@@ -4,9 +4,7 @@
       <h1 class="heading">Confirm seed</h1>
       <div>
         <img src="" alt="" />
-        <p>
-          Please select the words of the seed in the correct order.
-        </p>
+        <p>Please select the words of the seed in the correct order.</p>
         <textarea
           class="width-96"
           rows="3"
@@ -16,7 +14,14 @@
         />
       </div>
       <div class="mb-1">
-        <button v-for="(word) in words" :key="word" class="word-button" @click="addWord(word)">{{word}}</button>
+        <button
+          v-for="word in words"
+          :key="word"
+          class="word-button"
+          @click="addWord(word)"
+        >
+          {{ word }}
+        </button>
       </div>
       <div class="mb-1">
         <button @click="confirmSeed">confirm</button>
@@ -58,7 +63,7 @@ export default {
       try {
         if (this.mnemonic !== this.$store.state.mnemonic)
           throw new Error("The words are not in the correct order");
-        
+
         await this._setMnemonic(
           await this.encrypt(this.mnemonic, this.$store.state.password)
         );
