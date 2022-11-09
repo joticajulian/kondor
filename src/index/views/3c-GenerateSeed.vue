@@ -52,7 +52,7 @@
           type="password"
           placeholder="Confirm password"
         />
-        <button @click="createNewWallet" class="">create wallet</button>
+        <button @click="createNewWallet" class="">next</button>
       </div>
     </div>
   </div>
@@ -86,7 +86,17 @@ export default {
     } else {
       this.title = "New wallet";
     }
-    this.mnemonic = HDKoinos.randomMnemonic();
+    if (this.$store.state.mnemonic) {
+      this.mnemonic = this.$store.state.mnemonic;
+      this.seedConsent1 = true;
+      this.seedConsent2 = true;
+    } else {
+      this.mnemonic = HDKoinos.randomMnemonic();
+    }
+    if (this.$store.state.password) {
+      this.password1 = this.$store.state.password;
+      this.password2 = this.$store.state.password;
+    }
   },
 
   methods: {
@@ -142,15 +152,6 @@ export default {
           throw new Error("password mismatch");
         const hdKoinos = new HDKoinos(this.mnemonic);
         const account = hdKoinos.deriveKeyAccount(0, "Account 0");
-        await this._setMnemonic(
-          await this.encrypt(this.mnemonic, this.password1)
-        );
-        await this._setAccounts([
-          {
-            ...account.public,
-            signers: [],
-          },
-        ]);
 
         this.$store.state.mnemonic = this.mnemonic;
         this.$store.state.accounts = [
@@ -163,7 +164,7 @@ export default {
         this.$store.state.password = this.password1;
 
         this.alertClose();
-        router.push("/dashboard");
+        router.push("/confirmSeed");
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
