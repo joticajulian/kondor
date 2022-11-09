@@ -6130,6 +6130,17 @@ koilib@^5.2.0:
     multibase "^4.0.6"
     protobufjs "^7.0.0"
 
+koilib@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.2.2.tgz#87d76acdaf5b39d40374f832ddec2559962cdb75"
+  integrity sha512-fxT98KDH3wELYlZ5wa63lGdnIRktXVW1jq4xdfhSlDwZLbnczSO0t8bOaR4jCaQWK978tGy4PdvLc0PmXojACQ==
+  dependencies:
+    "@noble/hashes" "^1.1.2"
+    "@noble/secp256k1" "^1.6.3"
+    cross-fetch "^3.1.5"
+    multibase "^4.0.6"
+    protobufjs "^7.0.0"
+
 kondor-js@^0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/kondor-js/-/kondor-js-0.3.2.tgz#aab2a263cdc624b41bcf36c207ea61a35a661bec"
