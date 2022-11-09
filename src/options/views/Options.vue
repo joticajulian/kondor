@@ -7,10 +7,15 @@
       <div>Set Chain Id</div>
       <input v-model="chainId" type="text" />
       <button @click="setChainId">Set Chain Id</button>
-      <div>
+      <!--
+        removing the button to delete the wallet until
+        the UX is improved in order to protect the lose
+        of keys.
+      -->
+      <!--<div>
         Delete wallet: Remove all private keys and accounts from this wallet
       </div>
-      <button @click="deleteWallet">Delete wallet</button>
+      <button @click="deleteWallet">Delete wallet</button>-->
       <div>View seed and private keys</div>
       <Unlock
         labelButton="View seed and private keys"
