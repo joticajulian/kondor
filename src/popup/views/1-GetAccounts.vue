@@ -113,6 +113,7 @@ label {
   width: 75%;
   font-weight: 400;
   display: flex;
+  flex-direction: column;
 }
 .container {
   width: 90%;
@@ -125,8 +126,8 @@ label {
 .buttons {
   display: flex;
   justify-content: center;
+  flex-direction: column-reverse;
   width: 100%;
-  gap: 1em;
 }
 .accounts-information {
   margin: 2em 0;
@@ -135,9 +136,9 @@ label {
   color: #929191;
 }
 .cancel-button {
-  background: var(--kondor-light);
-  color: var(--secondary-color);
-}
-.accept-button {
+  background: none;
+  color: var(--kondor-purple);
+  text-decoration: underline;
+  border: none;
 }
 </style>
