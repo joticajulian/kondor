@@ -8,6 +8,9 @@
       autofocus
     />
     <button @click="unlock" class="">{{ labelButton }}</button>
+    <router-link v-if="!hasAccounts" to="/newWallet" class="button">
+      <button>Recover Wallet</button>
+    </router-link>
   </div>
 </template>
 
@@ -111,5 +114,17 @@ export default {
 .container {
   margin-top: 3em;
   margin-bottom: 2em;
+}
+.button {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+.button button {
+  background: none;
+  text-decoration: underline;
+  color: var(--kondor-purple);
+  border: none;
+  margin-left: -8px;
 }
 </style>
