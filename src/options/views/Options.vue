@@ -8,44 +8,50 @@
         </div>
       </header>
       <div class="top content">
-        <div>
-          <h2>Chain</h2>
+        <div class="heading">
+          <h1>Chain</h1>
           <p>Here you can set the RPC and Chain ID information.</p>
         </div>
         <div class="wide">
           <div class="input-group">
-            <label
-              >Set RPC Nodes separated by commas
-              <input v-model="rpcNodes" type="text"
-            /></label>
-            <button @click="setRpcNodes">Set RPC Nodes</button>
+            <div class="description">Set RPC Nodes</div>
+            <div class="input-button">
+              <input v-model="rpcNodes" type="text" />
+              <button @click="setRpcNodes">Set RPC Nodes</button>
+            </div>
           </div>
           <div class="input-group">
-            <label>Set Chain Id <input v-model="chainId" type="text" /></label>
-            <button @click="setChainId">Set Chain Id</button>
+            <div class="description">Set Chain Id</div>
+            <div class="input-button">
+              <input v-model="chainId" type="text" />
+              <button @click="setChainId">Set Chain Id</button>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="bottom content">
-        <div>
-          <h2>Wallet</h2>
-          <p>
-            Here you can view your wallet's seed and private keys, and delete
-            your wallet.
-          </p>
+        <div class="heading">
+          <h1>Wallet</h1>
+          <p>Here you can view your wallet's seed and private keys.</p>
         </div>
-        <div>View seed and private keys</div>
-        <Unlock
-          labelButton="View seed and private keys"
-          @onUnlock="viewSecrets"
-          @onError="alertDanger($event)"
-        />
-        <div>{{ secrets }}</div>
-        <div>
-          Delete wallet: Remove all private keys and accounts from this wallet
+        <div class="two-column">
+          <div class="left">
+            <p class="description">View seed and private keys</p>
+            <Unlock
+              labelButton="View seed and private keys"
+              @onUnlock="viewSecrets"
+              @onError="alertDanger($event)"
+            />
+          </div>
+          <div class="right">{{ secrets }}</div>
         </div>
-        <button @click="deleteWallet" class="warning">Delete wallet</button>
+        <!-- <div>
+          <div>
+            Delete wallet: Remove all private keys and accounts from this wallet
+          </div>
+          <button @click="deleteWallet" class="warning">Delete wallet</button>
+        </div> -->
       </div>
     </div>
   </div>
@@ -125,13 +131,26 @@ export default {
 }
 </script>
 <style scoped>
+input {
+  margin-bottom: 0;
+}
 button {
-  margin-bottom: 4em;
-  border-bottom: 0.5px dashed;
+  margin: 0;
+  width: auto;
+}
+h1 {
+  margin: 0;
+  font-size: 2em;
+  font-weight: bold;
 }
 #app {
   width: 100% !important;
 }
+.container {
+  margin: 0;
+  display: block;
+}
+
 .options-container {
   width: 100vw;
   padding-top: 4em;
@@ -156,9 +175,13 @@ button {
 }
 .input-group {
   display: flex;
+  flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  gap: 3em;
+  width: 100vw;
+  padding: 1em 0;
+  margin-top: 1em;
+  gap: 0.5em;
 }
 .content {
   display: flex;
@@ -168,12 +191,25 @@ button {
   width: 100%;
   display: flex;
   flex-direction: row;
+  gap: 2em;
 }
-.input-group label {
-  width: 100vw;
-  padding: 1em 0;
+.input-button {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1em;
 }
-.input-group input {
-  margin-top: 1em;
+.description {
+}
+.heading {
+  margin-top: 2em;
+}
+.two-column {
+  display: flex;
+  flex-direction: row;
+  gap: 2em;
+}
+.right {
+  padding: 3em;
 }
 </style>
