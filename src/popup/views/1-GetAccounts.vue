@@ -7,13 +7,13 @@
         <div>{{ requester.origin }} wants to know your address</div>
         <br />
         <div class="accounts-list">
-          <label v-for="(account, index) in accounts" :key="index">
+          <div v-for="(account, index) in accounts" :key="index">
             <div class="item-checkbox">
               <input type="checkbox" v-model="inputs[index]" class="checkbox" />
               <span class="label-checkbox">{{ account.name }}</span>
             </div>
             <div class="account-address">{{ account.address }}</div>
-          </label>
+          </div>
         </div>
       </div>
       <div>
