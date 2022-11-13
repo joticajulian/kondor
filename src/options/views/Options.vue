@@ -3,12 +3,12 @@
     <div class="inside-container">
       <header>
         <div class="logo">
-          <img src="../../../public/images/kondor-icon.png" alt="kondor icon" />
-          <h2>Kondor Settings</h2>
+          <!-- <img src="../../../public/images/kondor-icon.png" alt="kondor icon" /> -->
+          <h1>Kondor Settings</h1><br>
         </div>
       </header>
       <div class="top content">
-        <div class="heading">
+        <div class="">
           <h1>Chain</h1>
           <p>Here you can set the RPC and Chain ID information.</p>
         </div>
@@ -31,9 +31,9 @@
       </div>
 
       <div class="bottom content">
-        <div class="heading">
+        <div class="">
           <h1>Wallet</h1>
-          <p>Here you can view your wallet's seed and private keys.</p>
+          <p>Here you can view your wallet's seed and private keys. <span class="warning">Note: this information is extremely sensitive! Keep it safe and make sure it doesn't fall into the wrong hands. It is your responsibility, there is no way to recover stolen funds.</span></p>
         </div>
         <div class="two-column">
           <div class="left">
@@ -44,7 +44,31 @@
               @onError="alertDanger($event)"
             />
           </div>
-          <div class="right">{{ secrets }}</div>
+          <div class="right">
+            <div class="key">
+              Mnemonic:
+            </div> 
+            <div class="value">
+              {{ mnemonic }}
+            </div> <br />
+            <div class="title">
+              Accounts
+            </div>
+            <div v-for="account in accounts" :key="account" class="">
+              <span class="key big">{{ account.name }}</span> <br>
+              <span class="key">Key Path:</span> <span class="value">{{ account.keyPath }}</span> <br>
+              <span class="key">Address:</span> <span class="value">{{ account.address }}</span> <br>
+              <span class="key">Private Key: </span> <span class="value">{{ account.privateKey }}</span> <br>
+              <div class="signers">
+                <div v-for="signer in account.signers" :key="signer.name">
+                  {{ signer.name }} <br>
+                  {{ signer.keyPath }} <br>
+                  {{ signer.address }} <br>
+                  {{ signer.privateKey }} <br>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <!-- <div>
           <div>
@@ -71,6 +95,8 @@ export default {
       rpcNodes: "",
       chainId: "",
       secrets: "",
+      nmemonic: "",
+      accounts: "",
     }
   },
 
@@ -123,6 +149,9 @@ export default {
         mnemonic: this.$store.state.mnemonic,
         accounts: this.$store.state.accounts,
       })
+      this.mnemonic = this.$store.state.mnemonic
+      this.accounts = this.$store.state.accounts
+
       this.alertSuccess(
         "Secrets are visible, be careful not to expose them to third parties"
       )
@@ -211,5 +240,19 @@ h1 {
 }
 .right {
   padding: 3em;
+}
+.key {
+  font-weight: bold;
+}
+.value {
+  font-weight: normal;
+}
+.big {
+  font-size: 1.5em;
+}
+.warning {
+  color: rgb(207, 27, 27);
+  background: none;
+  font-weight: bold; 
 }
 </style>
