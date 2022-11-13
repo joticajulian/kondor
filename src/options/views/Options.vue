@@ -94,8 +94,7 @@ export default {
     return {
       rpcNodes: "",
       chainId: "",
-      secrets: "",
-      nmemonic: "",
+      mnemonic: "",
       accounts: "",
     }
   },
@@ -145,10 +144,6 @@ export default {
     },
 
     async viewSecrets() {
-      this.secrets = JSON.stringify({
-        mnemonic: this.$store.state.mnemonic,
-        accounts: this.$store.state.accounts,
-      })
       this.mnemonic = this.$store.state.mnemonic
       this.accounts = this.$store.state.accounts
 

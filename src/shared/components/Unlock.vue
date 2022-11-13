@@ -8,9 +8,6 @@
       autofocus
     />
     <button @click="unlock" class="">{{ labelButton }}</button>
-    <router-link v-if="!hasAccounts" to="/newWallet" class="button">
-      <button>Recover Wallet</button>
-    </router-link>
   </div>
 </template>
 
