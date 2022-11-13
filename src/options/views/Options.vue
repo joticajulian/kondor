@@ -221,6 +221,7 @@ h1 {
   display: flex;
   flex-direction: row;
   gap: 2em;
+  flex-wrap: wrap;
 }
 .input-button {
   display: flex;
