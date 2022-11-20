@@ -71,6 +71,7 @@ input {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 1em 0;
 }
 .welcome-message {
   width: 77%;
@@ -101,6 +102,7 @@ input {
   width: 100%;
   margin: 0 auto;
   text-align: center;
+  margin-bottom: 2em;
 }
 
 .button button {
