@@ -25,6 +25,7 @@ export default {
 .back-button {
   cursor: pointer;
   color: #000;
-  padding-top: 20px;
+  margin-top: 20px;
+  padding: 0 2em;
 }
 </style>
