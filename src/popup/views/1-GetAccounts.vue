@@ -114,6 +114,7 @@ label {
   font-weight: 400;
   display: flex;
   flex-direction: column;
+  margin: auto;
 }
 .container {
   width: 90%;
@@ -135,10 +136,14 @@ label {
 .account-address {
   color: #929191;
 }
+.accept-button {
+  width: auto;
+}
 .cancel-button {
   background: none;
   color: var(--kondor-purple);
   text-decoration: underline;
   border: none;
+  width: auto;
 }
 </style>
