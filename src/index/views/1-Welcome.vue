@@ -13,7 +13,10 @@
       <br />The first of its kind wallet for the first of its kind blockchain,
       Koinos.
     </div>
-    <router-link v-if="!hasAccounts" to="/newWallet" class="button">
+    <router-link v-if="hasAccounts" to="/importSeedPhrase" class="button">
+      <button>Forgot password?</button>
+    </router-link>
+    <router-link v-else to="/newWallet">
       <button>New Wallet</button>
     </router-link>
   </div>
@@ -98,5 +101,13 @@ input {
   width: 100%;
   margin: 0 auto;
   text-align: center;
+}
+
+.button button {
+  background: none;
+  text-decoration: underline;
+  color: var(--kondor-purple);
+  border: none;
+  margin-left: -8px;
 }
 </style>
