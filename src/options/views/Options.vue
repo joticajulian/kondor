@@ -60,13 +60,17 @@
             <br />
             <div class="title">Accounts</div>
             <div v-for="account in accounts" :key="account" class="">
-              <div class="key big">{{ account.name }}</div> <br />
+              <div class="key big">{{ account.name }}</div>
+              <br />
               <div class="key">Key Path:</div>
-              <div class="value">{{ account.keyPath }}</div> <br />
+              <div class="value">{{ account.keyPath }}</div>
+              <br />
               <div class="key">Address:</div>
-              <div class="value">{{ account.address }}</div> <br />
-              <div class="key">Private Key: </div>
-              <div class="value">{{ account.privateKey }}</div> <br />
+              <div class="value">{{ account.address }}</div>
+              <br />
+              <div class="key">Private Key:</div>
+              <div class="value">{{ account.privateKey }}</div>
+              <br />
               <div class="signers">
                 <div v-for="signer in account.signers" :key="signer.name">
                   {{ signer.name }} <br />
@@ -163,7 +167,6 @@ export default {
 };
 </script>
 <style scoped>
-
 input {
   margin-bottom: 0;
 }
