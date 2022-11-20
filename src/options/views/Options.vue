@@ -10,7 +10,7 @@
       </header>
       <div class="top content">
         <div class="">
-          <h1>Chain</h1>
+          <h2>Chain</h2>
           <p>Here you can set the RPC and Chain ID information.</p>
         </div>
         <div class="wide">
@@ -33,7 +33,7 @@
 
       <div class="bottom content">
         <div class="">
-          <h1>Wallet</h1>
+          <h2>Wallet</h2>
           <p>
             Here you can view your wallet's seed and private keys.
             <span class="warning"
@@ -60,13 +60,13 @@
             <br />
             <div class="title">Accounts</div>
             <div v-for="account in accounts" :key="account" class="">
-              <span class="key big">{{ account.name }}</span> <br />
-              <span class="key">Key Path:</span>
-              <span class="value">{{ account.keyPath }}</span> <br />
-              <span class="key">Address:</span>
-              <span class="value">{{ account.address }}</span> <br />
-              <span class="key">Private Key: </span>
-              <span class="value">{{ account.privateKey }}</span> <br />
+              <div class="key big">{{ account.name }}</div> <br />
+              <div class="key">Key Path:</div>
+              <div class="value">{{ account.keyPath }}</div> <br />
+              <div class="key">Address:</div>
+              <div class="value">{{ account.address }}</div> <br />
+              <div class="key">Private Key: </div>
+              <div class="value">{{ account.privateKey }}</div> <br />
               <div class="signers">
                 <div v-for="signer in account.signers" :key="signer.name">
                   {{ signer.name }} <br />
@@ -163,6 +163,7 @@ export default {
 };
 </script>
 <style scoped>
+
 input {
   margin-bottom: 0;
 }
@@ -175,8 +176,12 @@ h1 {
   font-size: 2em;
   font-weight: bold;
 }
-#app {
-  width: 100% !important;
+h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+p {
+  width: 80%;
 }
 .container {
   margin: 0;
@@ -194,7 +199,8 @@ h1 {
 .inside-container {
   width: 60%;
   margin: 0 auto;
-  padding: 2em;
+  padding: 4em;
+  background-color: #f5f5f5;
 }
 .logo {
   display: flex;
@@ -210,7 +216,7 @@ h1 {
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  width: 100vw;
+  width: 45%;
   padding: 1em 0;
   margin-top: 1em;
   gap: 0.5em;
