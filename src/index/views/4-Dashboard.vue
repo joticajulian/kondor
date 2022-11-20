@@ -113,8 +113,25 @@ export default {
         this.signer.provider = this.provider;
         this.address = this.signer.getAddress();
 
+        /**
+         * Temporal solution to be able to load the balance
+         * and make transfers in testnet
+         * TODO: Define networks
+         */
+        let chainId = await this._getChainId(false);
+        if (!chainId) {
+          chainId = await this.provider.getChainId();
+          await this._setChainId(chainId);
+        }
+        const CHAIN_ID_TESTNET =
+          "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==";
+        const koinContractId =
+          chainId === CHAIN_ID_TESTNET
+            ? "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ"
+            : "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+
         this.koinContract = new Contract({
-          id: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+          id: koinContractId,
           abi: utils.tokenAbi,
           signer: this.signer,
           serializer: await this.newSandboxSerializer(
