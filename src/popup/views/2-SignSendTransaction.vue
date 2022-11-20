@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div>
+    <div class="center-column">
       <Footnote v-if="footnoteMessage" :message="footnoteMessage" />
       <div class="title">
         Signature request {{ send ? "and send" : "" }}
@@ -215,6 +215,14 @@ export default {
 .wrapper {
   width: 75%;
   margin-top: 2em;
+}
+
+.center-column {
+  width: 75%;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  margin: auto;
 }
 
 .container {
