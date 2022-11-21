@@ -269,7 +269,6 @@ p {
   font-weight: bold;
 }
 @media (max-width: 768px) {
-
   .inside-container {
     width: 90%;
   }
@@ -286,5 +285,4 @@ p {
     flex-direction: column;
   }
 }
-  
 </style>

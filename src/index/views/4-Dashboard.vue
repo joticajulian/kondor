@@ -19,7 +19,9 @@
         <div class="mana-container">
           <div class="recharge-container">
             <div class="mana-title">MANA</div>
-            <div v-if="timeRechargeMana > 0" class="recharge-time">{{ timeRechargeMana }}</div>
+            <div v-if="timeRechargeMana > 0" class="recharge-time">
+              {{ timeRechargeMana }}
+            </div>
             <div v-else class="recharge-time">0</div>
           </div>
           <div class="mana-info">
