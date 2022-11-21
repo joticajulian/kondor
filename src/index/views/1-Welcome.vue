@@ -65,6 +65,9 @@ export default {
 input {
   margin: 0 !important;
 }
+button {
+  margin-left: -8px !important;
+}
 .container {
   height: 100%;
   display: flex;
