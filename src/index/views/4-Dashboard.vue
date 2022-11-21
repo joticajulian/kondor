@@ -50,15 +50,7 @@ const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
   var seconds = Math.floor(milliseconds / 1000);
-  var interval = seconds / 31536000;
-  if (interval > 1) {
-    return Math.floor(interval) + " years";
-  }
-  interval = seconds / 2592000;
-  if (interval > 2) {
-    return Math.floor(interval) + " months";
-  }
-  interval = seconds / 86400;
+  var interval = seconds / 86400;
   if (interval > 2) {
     return Math.floor(interval) + " days";
   }
