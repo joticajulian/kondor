@@ -29,11 +29,10 @@ export default {
 .alert {
   position: fixed;
   bottom: -150px;
-  margin-bottom: 15px;
+  margin: 0px 12px 15px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 80%;
   border-radius: 4px;
   padding: 8px 20px;
   text-align: left;
