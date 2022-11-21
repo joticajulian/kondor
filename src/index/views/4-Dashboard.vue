@@ -8,11 +8,11 @@
             <div class="balance" :data-tooltip="satoshis">
               {{ balanceFormatted }}
             </div>
-            <div>
+            <!-- <div>
               <router-link to="/signers" class="signer-links"
                 >Signers</router-link
               >
-            </div>
+            </div> -->
           </div>
         </div>
         <!-- <div class="recharge-bar" :class="timeRechargeMana != 0 ? red : green"></div> -->
@@ -262,7 +262,6 @@ input {
   text-transform: none;
   font-weight: 400;
   color: #000;
-  height: 16em;
   width: 100vw;
 }
 .tkoin {
@@ -310,7 +309,6 @@ input {
   text-align: right;
 }
 .mana-title {
-  font-size: 1.5em;
   font-weight: 700;
 }
 .mana-available {
@@ -318,6 +316,7 @@ input {
   font-weight: 400;
 }
 .title-gray {
+  font-size: 0.8em;
   color: var(--kondor-lighter);
 }
 .recharge-container {

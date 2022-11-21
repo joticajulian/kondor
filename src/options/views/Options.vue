@@ -268,4 +268,23 @@ p {
   background: none;
   font-weight: bold;
 }
+@media (max-width: 768px) {
+
+  .inside-container {
+    width: 90%;
+  }
+  .input-group {
+    width: 100%;
+  }
+  .two-column {
+    flex-direction: column;
+  }
+  .right {
+    padding: 0;
+  }
+  .content .wide {
+    flex-direction: column;
+  }
+}
+  
 </style>
