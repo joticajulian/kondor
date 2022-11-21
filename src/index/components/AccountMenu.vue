@@ -46,12 +46,15 @@
         <div @click="addSeed" class="dropdown-item">+ Add seed to wallet</div>
       </div>
       <div class="dropdown-item">+ Import account</div>
+      <router-link to="/signers" class="signer-links dropdown-item"
+        >+ Signers</router-link
+      >
     </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
+import router from "@/index/router"
 
 export default {
   data() {
@@ -59,39 +62,39 @@ export default {
       currentAccount: "",
       currentAddress: "",
       showDropdown: false,
-    };
+    }
   },
   mounted() {
-    this.loadAccount();
+    this.loadAccount()
   },
 
   methods: {
     toggleDropdown() {
-      this.showDropdown = !this.showDropdown;
+      this.showDropdown = !this.showDropdown
     },
 
     selectAccount(index) {
-      this.$store.state.currentIndexAccount = index;
-      this.showDropdown = false;
-      this.loadAccount();
+      this.$store.state.currentIndexAccount = index
+      this.showDropdown = false
+      this.loadAccount()
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return;
-      const index = this.$store.state.currentIndexAccount;
-      this.currentAccount = this.$store.state.accounts[index].name;
-      this.currentAddress = this.$store.state.accounts[index].address;
+      if (this.$store.state.accounts.length === 0) return
+      const index = this.$store.state.currentIndexAccount
+      this.currentAccount = this.$store.state.accounts[index].name
+      this.currentAddress = this.$store.state.accounts[index].address
     },
 
     createAccount() {
-      router.push("/createAccount");
+      router.push("/createAccount")
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true");
+      router.push("/generateSeed?privateKeyExist=true")
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -120,9 +123,9 @@ export default {
   border: none;
   position: absolute;
   width: 100%;
-  margin-top: 4em;
+  margin-top: 6em;
   height: 100vh;
-  background: var(--kondor-light);
+  background: var(--primary-color);
   z-index: 10;
 }
 
@@ -168,11 +171,11 @@ export default {
   justify-content: space-between;
 }
 .address {
-  font-size: 0.8em;
-  color: gray;
+  font-size: 0.6em;
+  color: white;
 }
 .current-address {
-  font-size: 0.8em;
+  font-size: 0.6em;
   font-weight: 600;
   color: #c8c1d1;
 }
@@ -180,6 +183,14 @@ current-account {
   font-size: 1.2em;
 }
 .dropdown-info {
-  padding: 2em 3em;
+  padding: 1.2em 1em;
+}
+.heading {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.signer-links {
+  color: var(--kondor-purple);
+  text-decoration: none;
 }
 </style>
