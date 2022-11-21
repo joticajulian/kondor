@@ -46,9 +46,6 @@
         <div @click="addSeed" class="dropdown-item">+ Add seed to wallet</div>
       </div>
       <div class="dropdown-item">+ Import account</div>
-      <router-link to="/signers" class="signer-links dropdown-item"
-        >+ Signers</router-link
-      >
     </div>
   </div>
 </template>
@@ -124,9 +121,10 @@ export default {
   position: absolute;
   width: 100%;
   margin-top: 6em;
-  height: 100vh;
+  height: 60vh;
   background: var(--primary-color);
   z-index: 10;
+  overflow-y: scroll;
 }
 
 .dropdown-item {
