@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import router from "@/index/router"
+import router from "@/index/router";
 
 export default {
   data() {
@@ -59,39 +59,39 @@ export default {
       currentAccount: "",
       currentAddress: "",
       showDropdown: false,
-    }
+    };
   },
   mounted() {
-    this.loadAccount()
+    this.loadAccount();
   },
 
   methods: {
     toggleDropdown() {
-      this.showDropdown = !this.showDropdown
+      this.showDropdown = !this.showDropdown;
     },
 
     selectAccount(index) {
-      this.$store.state.currentIndexAccount = index
-      this.showDropdown = false
-      this.loadAccount()
+      this.$store.state.currentIndexAccount = index;
+      this.showDropdown = false;
+      this.loadAccount();
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return
-      const index = this.$store.state.currentIndexAccount
-      this.currentAccount = this.$store.state.accounts[index].name
-      this.currentAddress = this.$store.state.accounts[index].address
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAccount = this.$store.state.accounts[index].name;
+      this.currentAddress = this.$store.state.accounts[index].address;
     },
 
     createAccount() {
-      router.push("/createAccount")
+      router.push("/createAccount");
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true")
+      router.push("/generateSeed?privateKeyExist=true");
     },
   },
-}
+};
 </script>
 
 <style scoped>
