@@ -13,6 +13,7 @@ export default new Vuex.Store({
     alertMessage: "",
     alertType: "",
     requests: [],
+    network: "",
     testData: {
       /*
        * Test Data

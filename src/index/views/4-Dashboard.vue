@@ -49,22 +49,22 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 
+const CHAIN_ID_TESTNET = "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==";
+const CHAIN_ID_MAINNET = "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==";
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
   var seconds = Math.floor(milliseconds / 1000);
+
   var interval = seconds / 86400;
-  if (interval > 2) {
-    return Math.floor(interval) + " days";
-  }
+  if (interval > 2) return Math.floor(interval) + " days";
+
   interval = seconds / 3600;
-  if (interval > 2) {
-    return Math.floor(interval) + " hours";
-  }
+  if (interval > 2) return Math.floor(interval) + " hours";
+
   interval = seconds / 60;
-  if (interval > 2) {
-    return Math.floor(interval) + " minutes";
-  }
+  if (interval > 2) return Math.floor(interval) + " minutes";
+
   return Math.floor(seconds) + " seconds";
 }
 
@@ -118,12 +118,18 @@ export default {
           chainId = await this.provider.getChainId();
           await this._setChainId(chainId);
         }
-        const CHAIN_ID_TESTNET =
-          "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==";
-        const koinContractId =
-          chainId === CHAIN_ID_TESTNET
-            ? "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ"
-            : "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+
+        let koinContractId;
+        if (chainId === CHAIN_ID_MAINNET) {
+          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+          this.$store.state.network = "Koinos Mainnet";
+        } else if (chainId === CHAIN_ID_TESTNET) {
+          koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
+          this.$store.state.network = "Koinos Testnet";
+        } else {
+          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+          this.$store.state.network = "Unknown network";
+        }
 
         this.koinContract = new Contract({
           id: koinContractId,
