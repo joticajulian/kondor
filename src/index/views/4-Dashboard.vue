@@ -19,7 +19,8 @@
         <div class="mana-container">
           <div class="recharge-container">
             <div class="mana-title">MANA</div>
-            <div class="recharge-time">{{ timeRechargeMana }}</div>
+            <div v-if="timeRechargeMana > 0" class="recharge-time">{{ timeRechargeMana }}</div>
+            <div v-else class="recharge-time">0</div>
           </div>
           <div class="mana-info">
             <div class="title-gray">Available</div>
@@ -262,7 +263,6 @@ input {
   text-transform: none;
   font-weight: 400;
   color: #000;
-  height: 16em;
   width: 100vw;
 }
 .tkoin {
@@ -310,7 +310,6 @@ input {
   text-align: right;
 }
 .mana-title {
-  font-size: 1.5em;
   font-weight: 700;
 }
 .mana-available {
@@ -331,7 +330,6 @@ input {
   font-size: 0.5em;
 }
 .recharge-time {
-  font-size: 0.5em;
   font-weight: 400;
   color: var(--kondor-lighter);
 }
