@@ -172,7 +172,7 @@ export default {
   color: gray;
 }
 .current-address {
-  font-size: 0.8em;
+  font-size: 0.6em;
   font-weight: 600;
   color: #c8c1d1;
 }
