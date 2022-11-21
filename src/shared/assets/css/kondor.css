@@ -25,7 +25,6 @@ body {
   background: var(--kondor-light);
   color: var(--secondary-color);
   font-family: "Inter", sans-serif;
-  font-size: 16px;
 }
 
 h1 {
@@ -58,7 +57,6 @@ h3 {
   font-weight: 400;
   background: var(--kondor-light);
   color: var(--primary-color);
-  font-size: 16px;
   /* padding: 0 20px; */
   /* width: 357px; */
 }
