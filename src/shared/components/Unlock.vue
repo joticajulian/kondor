@@ -109,8 +109,7 @@ export default {
 </script>
 <style scoped>
 .container {
-  margin-top: 3em;
-  margin-bottom: 2em;
+  margin: 1em 0;
 }
 .button {
   width: 100%;
