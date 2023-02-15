@@ -12,18 +12,18 @@
 </template>
 
 <script>
-import router from "@/index/router"
-import AccountMenu from "@/index/components/AccountMenu.vue"
+import router from "@/index/router";
+import AccountMenu from "@/index/components/AccountMenu.vue";
 
 export default {
   components: { AccountMenu },
 
   methods: {
     back() {
-      router.back()
+      router.back();
     },
   },
-}
+};
 </script>
 <style scoped>
 .back-button {

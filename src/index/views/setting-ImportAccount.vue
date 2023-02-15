@@ -46,12 +46,12 @@
 </template>
 
 <script>
-import { Signer } from "koilib"
-import router from "@/index/router"
+import { Signer } from "koilib";
+import router from "@/index/router";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
 
 export default {
   data() {
@@ -60,7 +60,7 @@ export default {
       watchMode: false,
       address: "",
       privateKey: "",
-    }
+    };
   },
 
   mixins: [Storage, ViewHelper],
@@ -68,51 +68,51 @@ export default {
   methods: {
     async accept() {
       try {
-        if (!this.name) throw new Error("No name defined")
-        let privateKey = ""
-        let encryptedPrivateKey = ""
-        let address
+        if (!this.name) throw new Error("No name defined");
+        let privateKey = "";
+        let encryptedPrivateKey = "";
+        let address;
         if (this.watchMode) {
-          if (!this.address) throw new Error("No address defined")
-          address = this.address
+          if (!this.address) throw new Error("No address defined");
+          address = this.address;
         } else {
-          privateKey = this.privateKey
+          privateKey = this.privateKey;
           encryptedPrivateKey = await this.encrypt(
             this.privateKey,
             this.$store.state.password
-          )
-          const signer = Signer.fromWif(this.privateKey)
-          address = signer.getAddress()
+          );
+          const signer = Signer.fromWif(this.privateKey);
+          address = signer.getAddress();
         }
         this.$store.state.accounts.push({
           name: this.name,
           privateKey,
           address,
           signers: [],
-        })
+        });
 
-        const encryptedAccounts = await this._getAccounts()
+        const encryptedAccounts = await this._getAccounts();
         encryptedAccounts.push({
           name: this.name,
           encryptedPrivateKey,
           address,
           signers: [],
-        })
-        await this._setAccounts(encryptedAccounts)
+        });
+        await this._setAccounts(encryptedAccounts);
         this.$store.state.currentIndexAccount =
-          this.$store.state.accounts.length - 1
-        router.back()
+          this.$store.state.accounts.length - 1;
+        router.back();
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 
     cancel() {
-      router.back()
+      router.back();
     },
   },
-}
+};
 </script>
 <style scoped>
 input[type="checkbox"] {

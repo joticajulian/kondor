@@ -41,32 +41,32 @@
 </template>
 
 <script>
-import { Contract, Provider, Signer, utils } from "koilib"
+import { Contract, Provider, Signer, utils } from "koilib";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Sandbox from "@/shared/mixins/Sandbox"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
 
-const CHAIN_ID_TESTNET = "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ=="
-const CHAIN_ID_MAINNET = "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA=="
-const FIVE_DAYS = 432e6 // 5 * 24 * 60 * 60 * 1000
+const CHAIN_ID_TESTNET = "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==";
+const CHAIN_ID_MAINNET = "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==";
+const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
-  var seconds = Math.floor(milliseconds / 1000)
+  var seconds = Math.floor(milliseconds / 1000);
 
-  var interval = seconds / 86400
-  if (interval > 2) return Math.floor(interval) + " days"
+  var interval = seconds / 86400;
+  if (interval > 2) return Math.floor(interval) + " days";
 
-  interval = seconds / 3600
-  if (interval > 2) return Math.floor(interval) + " hours"
+  interval = seconds / 3600;
+  if (interval > 2) return Math.floor(interval) + " hours";
 
-  interval = seconds / 60
-  if (interval > 2) return Math.floor(interval) + " minutes"
+  interval = seconds / 60;
+  if (interval > 2) return Math.floor(interval) + " minutes";
 
-  interval = Math.floor(seconds)
-  if (interval === 0) return "Mana recharged"
-  return interval + " seconds"
+  interval = Math.floor(seconds);
+  if (interval === 0) return "Mana recharged";
+  return interval + " seconds";
 }
 
 export default {
@@ -85,18 +85,18 @@ export default {
       lastUpdateMana: 0,
       timeRechargeMana: "",
       watchMode: false,
-    }
+    };
   },
 
   mixins: [Storage, Sandbox, ViewHelper],
 
   mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount)
+    this.loadAccount(this.$store.state.currentIndexAccount);
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount(this.$store.state.currentIndexAccount)
+      this.loadAccount(this.$store.state.currentIndexAccount);
     },
   },
 
@@ -108,34 +108,34 @@ export default {
          * and make transfers in testnet
          * TODO: Define networks
          */
-        let chainId = await this._getChainId(false)
+        let chainId = await this._getChainId(false);
         if (!chainId) {
-          chainId = await this.provider.getChainId()
-          await this._setChainId(chainId)
+          chainId = await this.provider.getChainId();
+          await this._setChainId(chainId);
         }
 
-        let koinContractId
+        let koinContractId;
         if (chainId === CHAIN_ID_MAINNET) {
-          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL"
-          this.$store.state.network = "Koinos Mainnet"
+          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+          this.$store.state.network = "Koinos Mainnet";
         } else if (chainId === CHAIN_ID_TESTNET) {
-          koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ"
-          this.$store.state.network = "Koinos Testnet"
+          koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
+          this.$store.state.network = "Koinos Testnet";
         } else {
-          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL"
-          this.$store.state.network = "Unknown network"
+          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+          this.$store.state.network = "Unknown network";
         }
 
-        const rpcNodes = await this._getRpcNodes()
-        this.provider = new Provider(rpcNodes)
-        const currentAccount = this.$store.state.accounts[index]
-        this.address = currentAccount.address
-        this.signer = undefined
+        const rpcNodes = await this._getRpcNodes();
+        this.provider = new Provider(rpcNodes);
+        const currentAccount = this.$store.state.accounts[index];
+        this.address = currentAccount.address;
+        this.signer = undefined;
         if (currentAccount.privateKey) {
-          this.signer = Signer.fromWif(currentAccount.privateKey, true)
-          this.signer.provider = this.provider
+          this.signer = Signer.fromWif(currentAccount.privateKey, true);
+          this.signer.provider = this.provider;
         } else {
-          this.watchMode = true
+          this.watchMode = true;
         }
 
         this.koinContract = new Contract({
@@ -146,67 +146,67 @@ export default {
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        })
+        });
         this.koinContract.abi.methods.balanceOf.preformat_argument = (
           owner
         ) => ({
           owner,
-        })
+        });
         this.koinContract.abi.methods.balanceOf.preformat_return = (res) =>
-          utils.formatUnits(res.value, 8)
+          utils.formatUnits(res.value, 8);
         this.koinContract.abi.methods.transfer.preformat_argument = (
           input
         ) => ({
           from: this.address,
           to: input.to,
           value: utils.parseUnits(input.value, 8),
-        })
-        this.koin = this.koinContract.functions
+        });
+        this.koin = this.koinContract.functions;
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
-      await this.loadBalance()
+      await this.loadBalance();
     },
     async loadBalance() {
       try {
-        const { result } = await this.koin.balanceOf(this.address)
-        this.balance = result.toLocaleString("en")
+        const { result } = await this.koin.balanceOf(this.address);
+        this.balance = result.toLocaleString("en");
 
-        const balance = Number(this.balance)
-        const rc = await this.provider.getAccountRc(this.address)
-        const initialMana = Number(rc) / 1e8
-        this.mana = initialMana
-        this.lastUpdateMana = Date.now()
+        const balance = Number(this.balance);
+        const rc = await this.provider.getAccountRc(this.address);
+        const initialMana = Number(rc) / 1e8;
+        this.mana = initialMana;
+        this.lastUpdateMana = Date.now();
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
-        )
+        );
 
-        clearInterval(this.intervalMana)
+        clearInterval(this.intervalMana);
         this.intervalMana = setInterval(() => {
-          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS)
-          const manaUpdated = initialMana + (delta * balance) / FIVE_DAYS
-          this.mana = Math.min(manaUpdated, balance)
+          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
+          const manaUpdated = initialMana + (delta * balance) / FIVE_DAYS;
+          this.mana = Math.min(manaUpdated, balance);
           this.timeRechargeMana = deltaTimeToString(
             ((balance - this.mana) * FIVE_DAYS) / balance
-          )
-        }, 1000)
+          );
+        }, 1000);
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
     async transfer() {
-      let interval
+      let interval;
       try {
-        let chainId = await this._getChainId(false)
+        let chainId = await this._getChainId(false);
         if (!chainId) {
-          chainId = await this.provider.getChainId()
-          await this._setChainId(chainId)
+          chainId = await this.provider.getChainId();
+          await this._setChainId(chainId);
         }
 
         if (!utils.isChecksumAddress(this.toAddress)) {
-          throw new Error(`${this.toAddress} is an invalid address`)
+          throw new Error(`${this.toAddress} is an invalid address`);
         }
 
         const { transaction, receipt } = await this.koin.transfer(
@@ -215,39 +215,39 @@ export default {
             value: this.amount,
           },
           { chainId }
-        )
-        this.alertSuccess("Sent. Waiting to be mined ...")
-        console.log(`Transaction id ${transaction.id} submitted. Receipt:`)
-        console.log(receipt)
-        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`)
+        );
+        this.alertSuccess("Sent. Waiting to be mined ...");
+        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
+        console.log(receipt);
+        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
         interval = setInterval(() => {
-          console.log("firing interval")
-          this.loadBalance()
-        }, 2000)
-        const { blockNumber } = await transaction.wait()
-        clearInterval(interval)
-        console.log("block number " + blockNumber)
-        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`)
-        this.toAddress = ""
-        this.amount = ""
+          console.log("firing interval");
+          this.loadBalance();
+        }, 2000);
+        const { blockNumber } = await transaction.wait();
+        clearInterval(interval);
+        console.log("block number " + blockNumber);
+        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
+        this.toAddress = "";
+        this.amount = "";
       } catch (error) {
-        clearInterval(interval)
-        this.alertDanger(error.message)
-        throw error
+        clearInterval(interval);
+        this.alertDanger(error.message);
+        throw error;
       }
     },
   },
   computed: {
     balanceFormatted() {
-      const balanceNumber = Number(this.balance)
+      const balanceNumber = Number(this.balance);
       // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
-      return balanceNumber.toLocaleString("en")
+      return balanceNumber.toLocaleString("en");
     },
     satoshis() {
-      return this.balance
+      return this.balance;
     },
   },
-}
+};
 </script>
 <style scoped>
 label {
