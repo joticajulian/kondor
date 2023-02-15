@@ -79,6 +79,8 @@ const CHAIN_ID_MAINNET = "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==";
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
+  if (Number.isNaN(milliseconds)) return "";
+
   var seconds = Math.floor(milliseconds / 1000);
 
   var interval = seconds / 86400;
@@ -170,6 +172,7 @@ export default {
         if (currentAccount.privateKey) {
           this.signer = Signer.fromWif(currentAccount.privateKey, true);
           this.signer.provider = this.provider;
+          this.watchMode = false;
         } else {
           this.watchMode = true;
         }
@@ -212,7 +215,7 @@ export default {
         const balance = Number(this.balance);
         const rc = await this.provider.getAccountRc(this.address);
         const initialMana = Number(rc) / 1e8;
-        this.mana = initialMana;
+        this.mana = Number(initialMana.toFixed(8));
         this.lastUpdateMana = Date.now();
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
@@ -221,11 +224,12 @@ export default {
         clearInterval(this.intervalMana);
         this.intervalMana = setInterval(() => {
           const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
-          const manaUpdated = initialMana + (delta * balance) / FIVE_DAYS;
-          this.mana = Math.min(manaUpdated, balance);
+          let mana = initialMana + (delta * balance) / FIVE_DAYS;
+          mana = Math.min(mana, balance);
           this.timeRechargeMana = deltaTimeToString(
-            ((balance - this.mana) * FIVE_DAYS) / balance
+            ((balance - mana) * FIVE_DAYS) / balance
           );
+          this.mana = Number(mana.toFixed(8));
         }, 1000);
       } catch (error) {
         this.alertDanger(error.message);
