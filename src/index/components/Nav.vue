@@ -2,7 +2,7 @@
   <div>
     <div v-if="$store.state.showBackButton" class="header">
       <div @click="back" class="back-button">&#8592;</div>
-      <div v-if="$store.state.network">
+      <div v-if="$store.state.network" class="indicator-container">
         <span class="connection-indicator">&#9724;</span
         >{{ $store.state.network }}
       </div>
@@ -12,18 +12,18 @@
 </template>
 
 <script>
-import router from "@/index/router";
-import AccountMenu from "@/index/components/AccountMenu.vue";
+import router from "@/index/router"
+import AccountMenu from "@/index/components/AccountMenu.vue"
 
 export default {
   components: { AccountMenu },
 
   methods: {
     back() {
-      router.back();
+      router.back()
     },
   },
-};
+}
 </script>
 <style scoped>
 .back-button {
@@ -42,5 +42,8 @@ export default {
 }
 .connection-indicator {
   color: greenyellow;
+}
+.indicator-container {
+  margin-right: 1em;
 }
 </style>
