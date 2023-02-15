@@ -1,15 +1,20 @@
 <template>
   <div class="middle">
     <div class="container">
-      <h1 class="heading">Confirm seed</h1>
+      <h1 class="heading">
+        Confirm seed
+      </h1>
       <div>
-        <img src="" alt="" />
+        <img
+          src=""
+          alt=""
+        >
         <p>Please select the words of the seed in the correct order.</p>
         <textarea
-          class="width-96"
-          rows="3"
           id="seed"
           v-model="mnemonic"
+          class="width-96"
+          rows="3"
           disabled
         />
       </div>
@@ -24,7 +29,9 @@
         </button>
       </div>
       <div class="mb-1">
-        <button @click="confirmSeed">confirm</button>
+        <button @click="confirmSeed">
+          confirm
+        </button>
       </div>
     </div>
   </div>
@@ -38,14 +45,14 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       mnemonic: "",
       words: [],
     };
   },
-
-  mixins: [Storage, ViewHelper],
 
   created() {
     this.words = this.$store.state.mnemonic

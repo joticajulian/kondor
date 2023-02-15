@@ -5,7 +5,7 @@
         <div class="logo">
           <!-- <img src="../../../public/images/kondor-icon.png" alt="kondor icon" /> -->
           <h1>Kondor Settings</h1>
-          <br />
+          <br>
         </div>
       </header>
       <div class="top content">
@@ -15,17 +15,31 @@
         </div>
         <div class="wide">
           <div class="input-group">
-            <div class="description">Set RPC Nodes</div>
+            <div class="description">
+              Set RPC Nodes
+            </div>
             <div class="input-button">
-              <input v-model="rpcNodes" type="text" />
-              <button @click="setRpcNodes">Set RPC Nodes</button>
+              <input
+                v-model="rpcNodes"
+                type="text"
+              >
+              <button @click="setRpcNodes">
+                Set RPC Nodes
+              </button>
             </div>
           </div>
           <div class="input-group">
-            <div class="description">Set Chain Id</div>
+            <div class="description">
+              Set Chain Id
+            </div>
             <div class="input-button">
-              <input v-model="chainId" type="text" />
-              <button @click="setChainId">Set Chain Id</button>
+              <input
+                v-model="chainId"
+                type="text"
+              >
+              <button @click="setChainId">
+                Set Chain Id
+              </button>
             </div>
           </div>
         </div>
@@ -36,47 +50,74 @@
           <h2>Wallet</h2>
           <p>
             Here you can view your wallet's seed and private keys.
-            <span class="warning"
-              >Note: this information is extremely sensitive! Keep it safe and
+            <span
+              class="warning"
+            >Note: this information is extremely sensitive! Keep it safe and
               make sure it doesn't fall into the wrong hands. It is your
-              responsibility, there is no way to recover stolen funds.</span
-            >
+              responsibility, there is no way to recover stolen funds.</span>
           </p>
         </div>
         <div class="two-column">
           <div class="left">
-            <p class="description">View seed and private keys</p>
+            <p class="description">
+              View seed and private keys
+            </p>
             <Unlock
-              labelButton="View seed and private keys"
+              label-button="View seed and private keys"
               @onUnlock="viewSecrets"
               @onError="alertDanger($event)"
             />
           </div>
           <div class="right">
-            <div class="key">Mnemonic:</div>
+            <div class="key">
+              Mnemonic:
+            </div>
             <div class="value">
               {{ mnemonic }}
             </div>
-            <br />
-            <div class="title">Accounts</div>
-            <div v-for="account in accounts" :key="account" class="">
-              <div class="key big">{{ account.name }}</div>
-              <br />
-              <div class="key">Key Path:</div>
-              <div class="value">{{ account.keyPath }}</div>
-              <br />
-              <div class="key">Address:</div>
-              <div class="value">{{ account.address }}</div>
-              <br />
-              <div class="key">Private Key:</div>
-              <div class="value">{{ account.privateKey }}</div>
-              <br />
+            <br>
+            <div class="title">
+              Accounts
+            </div>
+            <div
+              v-for="account in accounts"
+              :key="account"
+              class=""
+            >
+              <div class="key big">
+                {{ account.name }}
+              </div>
+              <br>
+              <div class="key">
+                Key Path:
+              </div>
+              <div class="value">
+                {{ account.keyPath }}
+              </div>
+              <br>
+              <div class="key">
+                Address:
+              </div>
+              <div class="value">
+                {{ account.address }}
+              </div>
+              <br>
+              <div class="key">
+                Private Key:
+              </div>
+              <div class="value">
+                {{ account.privateKey }}
+              </div>
+              <br>
               <div class="signers">
-                <div v-for="signer in account.signers" :key="signer.name">
-                  {{ signer.name }} <br />
-                  {{ signer.keyPath }} <br />
-                  {{ signer.address }} <br />
-                  {{ signer.privateKey }} <br />
+                <div
+                  v-for="signer in account.signers"
+                  :key="signer.name"
+                >
+                  {{ signer.name }} <br>
+                  {{ signer.keyPath }} <br>
+                  {{ signer.address }} <br>
+                  {{ signer.privateKey }} <br>
                 </div>
               </div>
             </div>
@@ -102,6 +143,10 @@ import Storage from "@/shared/mixins/Storage";
 import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
+
+  components: { Unlock },
+
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       rpcNodes: "",
@@ -110,10 +155,6 @@ export default {
       accounts: "",
     };
   },
-
-  mixins: [Storage, ViewHelper],
-
-  components: { Unlock },
 
   mounted() {
     (async () => {

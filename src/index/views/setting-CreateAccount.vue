@@ -2,13 +2,23 @@
   <div class="container">
     <h1>New account</h1>
     <input
-      @keyup.enter="accept"
-      type="text"
       v-model="name"
+      type="text"
       placeholder="Name"
-    />
-    <button @click="accept" class="">accept</button>
-    <button @click="cancel" class="">cancel</button>
+      @keyup.enter="accept"
+    >
+    <button
+      class=""
+      @click="accept"
+    >
+      accept
+    </button>
+    <button
+      class=""
+      @click="cancel"
+    >
+      cancel
+    </button>
   </div>
 </template>
 
@@ -21,13 +31,13 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       name: "",
     };
   },
-
-  mixins: [Storage, ViewHelper],
 
   methods: {
     async accept() {

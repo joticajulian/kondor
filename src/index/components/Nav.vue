@@ -1,10 +1,17 @@
 <template>
   <div>
-    <div v-if="$store.state.showBackButton" class="header">
-      <div @click="back" class="back-button">&#8592;</div>
-      <div v-if="$store.state.network" class="indicator-container">
-        <span class="connection-indicator">&#9724;</span
-        >{{ $store.state.network }}
+    <div
+      v-if="$store.state.showBackButton"
+      class="header"
+    >
+      <div
+        class="back-button"
+        @click="back"
+      >
+        &#8592;
+      </div>
+      <div v-if="$store.state.network">
+        <span class="connection-indicator">&#9724;</span>{{ $store.state.network }}
       </div>
     </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />

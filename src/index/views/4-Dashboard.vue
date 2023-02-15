@@ -3,9 +3,14 @@
     <div class="column">
       <div class="info container">
         <div class="balance">
-          <div class="heading">KOIN</div>
+          <div class="heading">
+            KOIN
+          </div>
           <div class="amount">
-            <div class="balance" :data-tooltip="satoshis">
+            <div
+              class="balance"
+              :data-tooltip="satoshis"
+            >
               {{ balanceFormatted }}
             </div>
             <!-- <div>
@@ -18,23 +23,44 @@
         <!-- <div class="recharge-bar" :class="timeRechargeMana != 0 ? red : green"></div> -->
         <div class="mana-container">
           <div class="recharge-container">
-            <div class="mana-title">MANA</div>
+            <div class="mana-title">
+              MANA
+            </div>
             <div class="recharge-time">
               {{ timeRechargeMana }}
             </div>
           </div>
           <div class="mana-info">
-            <div class="title-gray">Available</div>
-            <div class="mana-available">{{ mana }}</div>
+            <div class="title-gray">
+              Available
+            </div>
+            <div class="mana-available">
+              {{ mana }}
+            </div>
           </div>
         </div>
       </div>
-      <div v-if="!watchMode" class="transfer container">
+      <div
+        v-if="!watchMode"
+        class="transfer container"
+      >
         <label>Send to address</label>
-        <input v-model="toAddress" type="text" />
+        <input
+          v-model="toAddress"
+          type="text"
+        >
         <label>Send to amount</label>
-        <input @keyup.enter="transfer" v-model="amount" type="text" />
-        <button @click="transfer" class="">transfer</button>
+        <input
+          v-model="amount"
+          type="text"
+          @keyup.enter="transfer"
+        >
+        <button
+          class=""
+          @click="transfer"
+        >
+          transfer
+        </button>
       </div>
     </div>
   </div>
@@ -70,6 +96,8 @@ function deltaTimeToString(milliseconds) {
 }
 
 export default {
+
+  mixins: [Storage, Sandbox, ViewHelper],
   data() {
     return {
       address: "loading ",
@@ -87,17 +115,25 @@ export default {
       watchMode: false,
     };
   },
-
-  mixins: [Storage, Sandbox, ViewHelper],
-
-  mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount);
+  computed: {
+    balanceFormatted() {
+      const balanceNumber = Number(this.balance);
+      // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
+      return balanceNumber.toLocaleString("en");
+    },
+    satoshis() {
+      return this.balance;
+    },
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
       this.loadAccount(this.$store.state.currentIndexAccount);
     },
+  },
+
+  mounted() {
+    this.loadAccount(this.$store.state.currentIndexAccount);
   },
 
   methods: {
@@ -235,16 +271,6 @@ export default {
         this.alertDanger(error.message);
         throw error;
       }
-    },
-  },
-  computed: {
-    balanceFormatted() {
-      const balanceNumber = Number(this.balance);
-      // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
-      return balanceNumber.toLocaleString("en");
-    },
-    satoshis() {
-      return this.balance;
     },
   },
 };

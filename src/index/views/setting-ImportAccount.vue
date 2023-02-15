@@ -1,47 +1,50 @@
 <template>
   <div class="container">
     <h1>Import account</h1>
-    <div class="inputs-container">
-      <div class="title">Account Name</div>
+    <input
+      v-model="name"
+      type="text"
+      placeholder="Name"
+      @keyup.enter="accept"
+    >
+    <input
+      id="watch-mode"
+      v-model="watchMode"
+      type="checkbox"
+      name="watch-mode"
+      value="watch-mode"
+    >
+    <label for="watch-mode">Import in watch mode (without private key)</label><br>
+    <div v-if="watchMode">
+      <div>Address</div>
       <input
-        @keyup.enter="accept"
+        v-model="address"
         type="text"
-        v-model="name"
-        placeholder="Name"
-      />
-      <div v-if="watchMode">
-        <div class="title">Address</div>
-        <input
-          @keyup.enter="accept"
-          type="text"
-          v-model="address"
-          placeholder="Address"
-        />
-      </div>
-      <div v-else>
-        <div class="title">Private key</div>
-        <input
-          @keyup.enter="accept"
-          type="text"
-          v-model="privateKey"
-          placeholder="Private Key"
-        />
-      </div>
-      <div class="check-box">
-        <input
-          type="checkbox"
-          id="watch-mode"
-          name="watch-mode"
-          value="watch-mode"
-          v-model="watchMode"
-        />
-        <span for="watch-mode">Import in watch mode (without private key)</span>
-      </div>
+        placeholder="Address"
+        @keyup.enter="accept"
+      >
     </div>
-    <div class="buttons-container">
-      <button @click="accept" class="">accept</button>
-      <button @click="cancel" class="button-cancel">cancel</button>
+    <div v-else>
+      <div>Private key</div>
+      <input
+        v-model="privateKey"
+        type="text"
+        placeholder="Private Key"
+        @keyup.enter="accept"
+      >
     </div>
+    <button
+      class=""
+      @click="accept"
+    >
+      accept
+    </button>
+    <button
+      class=""
+      @click="cancel"
+    >
+      cancel
+    </button>
   </div>
 </template>
 
@@ -54,6 +57,8 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       name: "",
@@ -62,8 +67,6 @@ export default {
       privateKey: "",
     };
   },
-
-  mixins: [Storage, ViewHelper],
 
   methods: {
     async accept() {
