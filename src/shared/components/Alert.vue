@@ -23,9 +23,18 @@
 <script>
 export default {
   props: {
-    type: String,
-    message: String,
-    show: Boolean,
+    type: {
+      type: String,
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    show: {
+      type: Boolean,
+      required: true,
+    },
   },
 };
 </script>
