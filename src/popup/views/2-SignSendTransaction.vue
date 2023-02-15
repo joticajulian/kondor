@@ -56,7 +56,7 @@ import Unlock from "@/shared/components/Unlock.vue";
 import Footnote from "@/shared/components/Footnote.vue";
 
 export default {
-  name: "Sign Send transaction",
+  name: "SignSendTransaction",
 
   components: { Unlock, Footnote },
 

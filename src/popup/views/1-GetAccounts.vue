@@ -52,7 +52,7 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
-  name: "Get accounts",
+  name: "GetAccounts",
 
   mixins: [Storage, ViewHelper, Message],
   data: function () {
