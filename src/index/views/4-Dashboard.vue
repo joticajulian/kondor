@@ -19,10 +19,9 @@
         <div class="mana-container">
           <div class="recharge-container">
             <div class="mana-title">MANA</div>
-            <div v-if="timeRechargeMana > 0" class="recharge-time">
+            <div class="recharge-time">
               {{ timeRechargeMana }}
             </div>
-            <div v-else class="recharge-time">0</div>
           </div>
           <div class="mana-info">
             <div class="title-gray">Available</div>
@@ -30,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div class="transfer container">
+      <div v-if="!watchMode" class="transfer container">
         <label>Send to address</label>
         <input v-model="toAddress" type="text" />
         <label>Send to amount</label>
@@ -65,7 +64,9 @@ function deltaTimeToString(milliseconds) {
   interval = seconds / 60;
   if (interval > 2) return Math.floor(interval) + " minutes";
 
-  return Math.floor(seconds) + " seconds";
+  interval = Math.floor(seconds);
+  if (interval === 0) return "Mana recharged";
+  return interval + " seconds";
 }
 
 export default {
@@ -82,7 +83,8 @@ export default {
       intervalMana: null,
       mana: "",
       lastUpdateMana: 0,
-      timeRechargeMana: 0,
+      timeRechargeMana: "",
+      watchMode: false,
     };
   },
 
@@ -101,13 +103,6 @@ export default {
   methods: {
     async loadAccount(index) {
       try {
-        const rpcNodes = await this._getRpcNodes();
-        this.provider = new Provider(rpcNodes);
-        const currentAccount = this.$store.state.accounts[index];
-        this.signer = Signer.fromWif(currentAccount.privateKey, true);
-        this.signer.provider = this.provider;
-        this.address = this.signer.getAddress();
-
         /**
          * Temporal solution to be able to load the balance
          * and make transfers in testnet
@@ -131,9 +126,22 @@ export default {
           this.$store.state.network = "Unknown network";
         }
 
+        const rpcNodes = await this._getRpcNodes();
+        this.provider = new Provider(rpcNodes);
+        const currentAccount = this.$store.state.accounts[index];
+        this.address = currentAccount.address;
+        this.signer = undefined;
+        if (currentAccount.privateKey) {
+          this.signer = Signer.fromWif(currentAccount.privateKey, true);
+          this.signer.provider = this.provider;
+        } else {
+          this.watchMode = true;
+        }
+
         this.koinContract = new Contract({
           id: koinContractId,
           abi: utils.tokenAbi,
+          provider: this.provider,
           signer: this.signer,
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
