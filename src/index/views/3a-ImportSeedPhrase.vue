@@ -2,21 +2,33 @@
   <div class="middle">
     <div class="container">
       <h1>Import Seed Phrase</h1>
-      <img src="" alt="" />
-      <textarea id="seed" v-model="mnemonic" placeholder="Seed phrase" />
+      <img
+        src=""
+        alt=""
+      >
+      <textarea
+        id="seed"
+        v-model="mnemonic"
+        placeholder="Seed phrase"
+      />
       <input
         id="password1"
         v-model="password1"
         type="password"
         placeholder="Set password"
-      />
+      >
       <input
         id="password2"
         v-model="password2"
         type="password"
         placeholder="Confirm password"
-      />
-      <button @click="importSeedPhrase" class="">import now</button>
+      >
+      <button
+        class=""
+        @click="importSeedPhrase"
+      >
+        import now
+      </button>
     </div>
   </div>
 </template>
@@ -30,6 +42,7 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       mnemonic: "",
@@ -37,7 +50,6 @@ export default {
       password2: "",
     };
   },
-  mixins: [Storage, ViewHelper],
   methods: {
     async importSeedPhrase() {
       try {

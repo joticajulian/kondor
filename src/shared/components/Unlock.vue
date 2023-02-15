@@ -1,13 +1,18 @@
 <template>
   <div class="container">
     <input
-      @keyup.enter="unlock"
-      type="password"
       v-model="password"
+      type="password"
       placeholder="Password"
       autofocus
-    />
-    <button @click="unlock" class="">{{ labelButton }}</button>
+      @keyup.enter="unlock"
+    >
+    <button
+      class=""
+      @click="unlock"
+    >
+      {{ labelButton }}
+    </button>
   </div>
 </template>
 
@@ -18,6 +23,7 @@ import { HDKoinos } from "../../../lib/HDKoinos";
 
 export default {
   name: "Unlock",
+  mixins: [Storage],
 
   props: {
     labelButton: {
@@ -31,7 +37,6 @@ export default {
       password: "",
     };
   },
-  mixins: [Storage],
 
   methods: {
     async unlock() {
@@ -87,12 +92,12 @@ export default {
               ...account.private,
               signers: encAccount.signers
                 ? encAccount.signers.map((s) => {
-                    const signerAcc = hdKoinos.deriveKey(s);
-                    return {
-                      ...signerAcc.public,
-                      ...signerAcc.private,
-                    };
-                  })
+                  const signerAcc = hdKoinos.deriveKey(s);
+                  return {
+                    ...signerAcc.public,
+                    ...signerAcc.private,
+                  };
+                })
                 : [],
             };
           })

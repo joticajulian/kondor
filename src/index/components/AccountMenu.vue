@@ -3,12 +3,17 @@
     <div>
       <div class="link-item">
         <div>
-          <div class="current-account">{{ currentAccount }}</div>
+          <div class="current-account">
+            {{ currentAccount }}
+          </div>
           <div class="current-address">
             {{ currentAddress }}
           </div>
         </div>
-        <div @click="toggleDropdown()" class="link">
+        <div
+          class="link"
+          @click="toggleDropdown()"
+        >
           <svg
             width="23"
             height="4"
@@ -16,36 +21,74 @@
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="2.85486" cy="2" r="2" fill="#514E54" />
-            <circle cx="10.8549" cy="2" r="2" fill="#514E54" />
-            <circle cx="18.8549" cy="2" r="2" fill="#514E54" />
+            <circle
+              cx="2.85486"
+              cy="2"
+              r="2"
+              fill="#514E54"
+            />
+            <circle
+              cx="10.8549"
+              cy="2"
+              r="2"
+              fill="#514E54"
+            />
+            <circle
+              cx="18.8549"
+              cy="2"
+              r="2"
+              fill="#514E54"
+            />
           </svg>
         </div>
       </div>
     </div>
 
-    <div v-if="showDropdown" class="dropdown-content">
+    <div
+      v-if="showDropdown"
+      class="dropdown-content"
+    >
       <div class="dropdown-info">
         <span class="heading">Available accounts</span>
       </div>
       <div
-        class="dropdown-item"
         v-for="(account, index) in $store.state.accounts"
         :key="index"
+        class="dropdown-item"
       >
         <div @click="selectAccount(index)">
           <span>{{ account.name }}</span>
-          <div class="address">{{ account.address }}</div>
+          <div class="address">
+            {{ account.address }}
+          </div>
         </div>
       </div>
-      <div disabled class="separator"></div>
+      <div
+        disabled
+        class="separator"
+      />
       <div v-if="$store.state.mnemonic">
-        <div @click="createAccount" class="dropdown-item">+ Create account</div>
+        <div
+          class="dropdown-item"
+          @click="createAccount"
+        >
+          + Create account
+        </div>
       </div>
       <div v-else>
-        <div @click="addSeed" class="dropdown-item">+ Add seed to wallet</div>
+        <div
+          class="dropdown-item"
+          @click="addSeed"
+        >
+          + Add seed to wallet
+        </div>
       </div>
-      <div @click="importAccount" class="dropdown-item">+ Import account</div>
+      <div
+        class="dropdown-item"
+        @click="importAccount"
+      >
+        + Import account
+      </div>
     </div>
   </div>
 </template>

@@ -2,7 +2,10 @@
   <div class="middle">
     <div class="container">
       <h1>Import Private Key</h1>
-      <img src="" alt="" />
+      <img
+        src=""
+        alt=""
+      >
       <textarea
         id="private-key"
         v-model="privateKey"
@@ -14,14 +17,19 @@
         v-model="password1"
         type="password"
         placeholder="Set password"
-      />
+      >
       <input
         id="password2"
         v-model="password2"
         type="password"
         placeholder="Confirm password"
-      />
-      <button @click="importKey" class="">import now</button>
+      >
+      <button
+        class=""
+        @click="importKey"
+      >
+        import now
+      </button>
     </div>
   </div>
 </template>
@@ -35,6 +43,7 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       privateKey: "",
@@ -42,7 +51,6 @@ export default {
       password2: "",
     };
   },
-  mixins: [Storage, ViewHelper],
   methods: {
     async importKey() {
       try {
