@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div class="proper heading">New to Kondor?</div>
+    <div class="proper heading">
+      New to Kondor?
+    </div>
     <div class="section">
       <div class="left-image">
         <svg
@@ -93,14 +95,26 @@
           </g>
         </svg>
       </div>
-      <div class="title">No, I have the secret information</div>
+      <div class="title">
+        No, I have the secret information
+      </div>
       <div class="body">
         Import your existing wallet using your 12 word seed phrase or private
         key
       </div>
-      <button @click="importSeedPhrase" class="">12 word phrase</button>
+      <button
+        class=""
+        @click="importSeedPhrase"
+      >
+        12 word phrase
+      </button>
 
-      <button @click="importPrivateKey" class="">use private key</button>
+      <button
+        class=""
+        @click="importPrivateKey"
+      >
+        use private key
+      </button>
     </div>
     <div class="section">
       <div class="left-image">
@@ -185,10 +199,22 @@
           />
         </svg>
       </div>
-      <img src alt />
-      <div class="proper title">Yes, let's setup a new wallet</div>
-      <div class="body">This will create a new wallet and seed phrase</div>
-      <button @click="generateSeed" class="link">new wallet</button>
+      <img
+        src
+        alt
+      >
+      <div class="proper title">
+        Yes, let's setup a new wallet
+      </div>
+      <div class="body">
+        This will create a new wallet and seed phrase
+      </div>
+      <button
+        class="link"
+        @click="generateSeed"
+      >
+        new wallet
+      </button>
     </div>
   </div>
 </template>
@@ -200,12 +226,12 @@ import router from "@/index/router";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 
 export default {
+  mixins: [ViewHelper],
   data() {
     return {
       publicPath: process.env.BASE_URL,
     };
   },
-  mixins: [ViewHelper],
   methods: {
     async importPrivateKey() {
       this.alertClose();

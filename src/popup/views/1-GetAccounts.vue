@@ -5,21 +5,40 @@
         <h2>Get accounts</h2>
         <!-- <div>{{ requester.origin }}</div> -->
         <div>{{ requester.origin }} wants to know your address</div>
-        <br />
+        <br>
         <div class="accounts-list">
-          <div v-for="(account, index) in accounts" :key="index">
+          <div
+            v-for="(account, index) in accounts"
+            :key="index"
+          >
             <div class="item-checkbox">
-              <input type="checkbox" v-model="inputs[index]" class="checkbox" />
+              <input
+                v-model="inputs[index]"
+                type="checkbox"
+                class="checkbox"
+              >
               <span class="label-checkbox">{{ account.name }}</span>
             </div>
-            <div class="account-address">{{ account.address }}</div>
+            <div class="account-address">
+              {{ account.address }}
+            </div>
           </div>
         </div>
       </div>
       <div>
         <div class="buttons">
-          <button class="cancel-button" @click="cancel">Cancel</button>
-          <button class="accept-button" @click="accept">Accept</button>
+          <button
+            class="cancel-button"
+            @click="cancel"
+          >
+            Cancel
+          </button>
+          <button
+            class="accept-button"
+            @click="accept"
+          >
+            Accept
+          </button>
         </div>
       </div>
     </div>
@@ -34,6 +53,8 @@ import Storage from "@/shared/mixins/Storage";
 
 export default {
   name: "Get accounts",
+
+  mixins: [Storage, ViewHelper, Message],
   data: function () {
     return {
       requester: "",
@@ -42,8 +63,6 @@ export default {
       accounts: [],
     };
   },
-
-  mixins: [Storage, ViewHelper, Message],
 
   mounted() {
     const requests = this.$store.state.requests.filter(
@@ -73,11 +92,11 @@ export default {
             address: account.address,
             signers: account.signers
               ? account.signers.map((signer) => {
-                  return {
-                    name: signer.name,
-                    address: signer.address,
-                  };
-                })
+                return {
+                  name: signer.name,
+                  address: signer.address,
+                };
+              })
               : [],
           };
         })

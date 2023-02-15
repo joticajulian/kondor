@@ -2,21 +2,37 @@
   <div class="container">
     <div class="logo">
       <div><Logo /></div>
-      <br />
+      <br>
       <div><LogoText /></div>
     </div>
-    <div v-if="hasAccounts" class="unlock">
-      <Unlock @onUnlock="unlock()" @onError="alertDanger($event)" />
+    <div
+      v-if="hasAccounts"
+      class="unlock"
+    >
+      <Unlock
+        @onUnlock="unlock()"
+        @onError="alertDanger($event)"
+      />
     </div>
-    <div class="welcome-message" v-if="!hasAccounts">
+    <div
+      v-if="!hasAccounts"
+      class="welcome-message"
+    >
       Welcome to Kondor!
-      <br />The first of its kind wallet for the first of its kind blockchain,
+      <br>The first of its kind wallet for the first of its kind blockchain,
       Koinos.
     </div>
-    <router-link v-if="hasAccounts" to="/importSeedPhrase" class="button">
+    <router-link
+      v-if="hasAccounts"
+      to="/importSeedPhrase"
+      class="button"
+    >
       <button>Forgot password?</button>
     </router-link>
-    <router-link v-else to="/newWallet">
+    <router-link
+      v-else
+      to="/newWallet"
+    >
       <button>New Wallet</button>
     </router-link>
   </div>
@@ -36,14 +52,14 @@ import LogoText from "@/shared/components/LogoText";
 
 export default {
   name: "Welcome",
+
+  components: { Logo, LogoText, Unlock },
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       hasAccounts: false,
     };
   },
-  mixins: [Storage, ViewHelper],
-
-  components: { Logo, LogoText, Unlock },
 
   mounted() {
     (async () => {

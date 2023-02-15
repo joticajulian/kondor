@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <iframe id="sandbox" src="sandbox.html"></iframe>
+    <iframe
+      id="sandbox"
+      src="sandbox.html"
+    />
     <Nav />
     <router-view />
     <Alert

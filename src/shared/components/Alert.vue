@@ -11,7 +11,12 @@
     <div class="message">
       {{ message }}
     </div>
-    <div @click="$emit('onClose')" class="close">x</div>
+    <div
+      class="close"
+      @click="$emit('onClose')"
+    >
+      x
+    </div>
   </div>
 </template>
 

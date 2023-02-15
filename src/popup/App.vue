@@ -4,7 +4,7 @@
       id="sandbox"
       src="sandbox.html"
       @load="$store.state.sandboxLoaded = true"
-    ></iframe>
+    />
     <Nav />
     <router-view />
     <Alert

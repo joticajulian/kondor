@@ -1,10 +1,15 @@
 <template>
   <div class="container">
-    <div v-for="(signer, index) in signers" :key="index">
+    <div
+      v-for="(signer, index) in signers"
+      :key="index"
+    >
       {{ signer.name }}
       {{ signer.address }}
     </div>
-    <button @click="addSigner">Add signer</button>
+    <button @click="addSigner">
+      Add signer
+    </button>
   </div>
 </template>
 
@@ -16,22 +21,22 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+
+  mixins: [Storage, ViewHelper],
   data() {
     return {
       signers: [],
     };
   },
 
-  mixins: [Storage, ViewHelper],
-
-  mounted() {
-    this.loadSigners(this.$store.state.currentIndexAccount);
-  },
-
   watch: {
     "$store.state.currentIndexAccount": function () {
       this.loadSigners(this.$store.state.currentIndexAccount);
     },
+  },
+
+  mounted() {
+    this.loadSigners(this.$store.state.currentIndexAccount);
   },
 
   methods: {

@@ -1,23 +1,42 @@
 <template>
   <div class="wrapper">
     <div class="center-column">
-      <Footnote v-if="footnoteMessage" :message="footnoteMessage" />
+      <Footnote
+        v-if="footnoteMessage"
+        :message="footnoteMessage"
+      />
       <div class="title">
         Signature request {{ send ? "and send" : "" }}
         {{ broadcast ? "" : "but not broadcast (testing)" }}
       </div>
       <div>{{ requester.origin }}</div>
       <div>signer: {{ signerData }}</div>
-      <br />
+      <br>
       <div>Data: {{ data }}</div>
-      <br />
+      <br>
       <div v-if="!unlocked">
-        <Unlock @onUnlock="afterUnlocked()" @onError="alertDanger($event)" />
+        <Unlock
+          @onUnlock="afterUnlocked()"
+          @onError="alertDanger($event)"
+        />
       </div>
-      <Footnote v-if="footnoteMessage2" :message="footnoteMessage2" />
+      <Footnote
+        v-if="footnoteMessage2"
+        :message="footnoteMessage2"
+      />
       <div class="container">
-        <button @click="sign" :disabled="!unlocked">Sign</button>
-        <button @click="cancel" class="cancel-button">Cancel</button>
+        <button
+          :disabled="!unlocked"
+          @click="sign"
+        >
+          Sign
+        </button>
+        <button
+          class="cancel-button"
+          @click="cancel"
+        >
+          Cancel
+        </button>
       </div>
     </div>
   </div>
@@ -38,6 +57,10 @@ import Footnote from "@/shared/components/Footnote.vue";
 
 export default {
   name: "Sign Send transaction",
+
+  components: { Unlock, Footnote },
+
+  mixins: [Storage, Sandbox, ViewHelper, Message],
 
   props: {
     send: {
@@ -62,10 +85,6 @@ export default {
       isOldKondor: false,
     };
   },
-
-  mixins: [Storage, Sandbox, ViewHelper, Message],
-
-  components: { Unlock, Footnote },
 
   mounted() {
     const requests = this.$store.state.requests.filter((r) => {

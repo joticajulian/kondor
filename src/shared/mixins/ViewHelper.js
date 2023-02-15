@@ -13,18 +13,18 @@ export default {
 
   created() {
     switch (router.currentRoute.path) {
-      case "/":
-        this.$store.state.showAccountMenu = false;
-        this.$store.state.showBackButton = false;
-        break;
-      case "/dashboard":
-        this.$store.state.showAccountMenu = true;
-        this.$store.state.showBackButton = true;
-        break;
-      default:
-        this.$store.state.showAccountMenu = false;
-        this.$store.state.showBackButton = true;
-        break;
+    case "/":
+      this.$store.state.showAccountMenu = false;
+      this.$store.state.showBackButton = false;
+      break;
+    case "/dashboard":
+      this.$store.state.showAccountMenu = true;
+      this.$store.state.showBackButton = true;
+      break;
+    default:
+      this.$store.state.showAccountMenu = false;
+      this.$store.state.showBackButton = true;
+      break;
     }
   },
 
