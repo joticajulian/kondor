@@ -36,7 +36,7 @@
     "axios": "^0.25.0",
     "babel-eslint": "^10.1.0",
     "copyfiles": "^2.4.1",
-    "eslint": "^6.7.2",
+    "eslint": "^7.1.0",
     "eslint-plugin-vue": "^7.0.0",
     "fastify": "^3.26.0",
     "fastify-static": "^4.5.0",
@@ -51,13 +51,17 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
-      "eslint:recommended"
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:vue/recommended"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "@typescript-eslint/no-var-requires": "off",
+      "indent": ["error", 2]
+    }
   },
   "browserslist": [
     "> 1%",
