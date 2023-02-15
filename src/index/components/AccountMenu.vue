@@ -45,7 +45,7 @@
       <div v-else>
         <div @click="addSeed" class="dropdown-item">+ Add seed to wallet</div>
       </div>
-      <div class="dropdown-item">+ Import account</div>
+      <div @click="importAccount" class="dropdown-item">+ Import account</div>
     </div>
   </div>
 </template>
@@ -85,6 +85,10 @@ export default {
 
     createAccount() {
       router.push("/createAccount");
+    },
+
+    importAccount() {
+      router.push("/importAccount");
     },
 
     addSeed() {

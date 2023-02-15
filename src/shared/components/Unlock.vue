@@ -54,27 +54,30 @@ export default {
             if (encAccount.keyPath) {
               account = hdKoinos.deriveKey(encAccount);
             } else {
-              const privateKey = await this.decrypt(
-                encAccount.encryptedPrivateKey,
-                this.password
-              );
-              const sig = Signer.fromWif(privateKey);
-
-              if (sig.getAddress() !== encAccount.address) {
-                throw new Error(
-                  `Error in "${encAccount.name}". Expected address: ${
-                    encAccount.address
-                  }. Derived: ${sig.getAddress()}`
+              let privateKey = "";
+              if (encAccount.encryptedPrivateKey) {
+                privateKey = await this.decrypt(
+                  encAccount.encryptedPrivateKey,
+                  this.password
                 );
+
+                const sig = Signer.fromWif(privateKey);
+                if (sig.getAddress() !== encAccount.address) {
+                  throw new Error(
+                    `Error in "${encAccount.name}". Expected address: ${
+                      encAccount.address
+                    }. Derived: ${sig.getAddress()}`
+                  );
+                }
               }
 
               account = {
                 public: {
                   name: encAccount.name,
-                  address: sig.getAddress(),
+                  address: encAccount.address,
                 },
                 private: {
-                  privateKey: sig.getPrivateKey("wif", false),
+                  privateKey,
                 },
               };
             }

@@ -34,6 +34,11 @@ export default new Vuex.Store({
           address: "1M1mXKrtB5QDscNmb1tVGfJeAW2G2aawgB",
         },
         {
+          name: "Imported Account 1",
+          encryptedPrivateKey: "",
+          address: "1ALMyHELPNfRNanBFS2F6rdG9q1Tuy3PCS",
+        },
+        {
           name: "Account 2",
           keyPath: "m/44'/659'/2'/0/0",
           address: "13uM85E2sNUhjuyk98F3EftxNZT7uetynP",
