@@ -35,7 +35,6 @@
 
 <script>
 import router from "@/index/router";
-import { HDKoinos } from "../../../lib/HDKoinos";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -55,26 +54,7 @@ export default {
       try {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        const hdKoinos = new HDKoinos(this.mnemonic);
-        const account = hdKoinos.deriveKeyAccount(0, "Account 0");
-        await this._setMnemonic(
-          await this.encrypt(this.mnemonic, this.password1)
-        );
-        await this._setAccounts([
-          {
-            ...account.public,
-            signers: [],
-          },
-        ]);
-
-        this.$store.state.mnemonic = this.mnemonic;
-        this.$store.state.accounts = [
-          {
-            ...account.public,
-            ...account.private,
-            signers: [],
-          },
-        ];
+        await this._setSeedPhrase(this.mnemonic, this.password1, "Account 0");
         this.$store.state.password = this.password1;
 
         this.alertClose();

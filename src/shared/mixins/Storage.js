@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import * as storage from "../../../lib/storage";
+import { HDKoinos } from "../../../lib/HDKoinos";
 
 function toUint8Array(hexString) {
   return new Uint8Array(
@@ -77,6 +78,29 @@ export default {
 
     async _getChainId(strict = false) {
       return this._read("chainId", strict);
+    },
+
+    async _setSeedPhrase(mnemonic, password, accountName) {
+      const hdKoinos = new HDKoinos(mnemonic);
+      const account = hdKoinos.deriveKeyAccount(0, accountName);
+      await this._setMnemonic(
+        await this.encrypt(mnemonic, password)
+      );
+      await this._setAccounts([
+        {
+          ...account.public,
+          signers: [],
+        },
+      ]);
+
+      this.$store.state.mnemonic = mnemonic;
+      this.$store.state.accounts = [
+        {
+          ...account.public,
+          ...account.private,
+          signers: [],
+        },
+      ];
     },
 
     // TODO: remove the following functions and replace them
