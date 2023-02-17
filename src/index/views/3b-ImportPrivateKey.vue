@@ -56,30 +56,8 @@ export default {
       try {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        const signer = Signer.fromWif(this.privateKey);
-        await this._setMnemonic(null);
-        await this._setAccounts([
-          {
-            name: "Account 0",
-            encryptedPrivateKey: await this.encrypt(
-              this.privateKey,
-              this.password1
-            ),
-            address: signer.getAddress(),
-            signers: [],
-          },
-        ]);
 
-        this.$store.state.mnemonic = null;
-        this.$store.state.accounts = [
-          {
-            name: "Account 0",
-            privateKey: this.privateKey,
-            address: signer.getAddress(),
-            signers: [],
-          },
-        ];
-        this.$store.state.password = this.password1;
+        await this._importPrivateKey(this.privateKey, this.password1, "Account 0");
 
         this.alertClose();
         router.push("/dashboard");
