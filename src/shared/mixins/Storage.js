@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import { Signer } from "koilib";
 import * as storage from "../../../lib/storage";
 import { HDKoinos } from "../../../lib/HDKoinos";
 
@@ -80,27 +81,82 @@ export default {
       return this._read("chainId", strict);
     },
 
-    async _setSeedPhrase(mnemonic, password, accountName) {
-      const hdKoinos = new HDKoinos(mnemonic);
-      const account = hdKoinos.deriveKeyAccount(0, accountName);
-      await this._setMnemonic(
-        await this.encrypt(mnemonic, password)
-      );
-      await this._setAccounts([
-        {
-          ...account.public,
-          signers: [],
-        },
-      ]);
+    async _deleteWallet() {
+      await this._setMnemonic(null);
+      await this._setAccounts([]);
+      this.$store.state.mnemonic = "";
+      this.$store.state.accounts = [];
+      this.$store.state.password = "";
+    },
 
-      this.$store.state.mnemonic = mnemonic;
+    async _savePrivateKeyInMemory(privateKey, password, accountName) {
+      const signer = Signer.fromWif(privateKey);
+      this.$store.state.mnemonic = null;
       this.$store.state.accounts = [
         {
-          ...account.public,
-          ...account.private,
+          name: accountName,
+          privateKey,
+          address: signer.getAddress(),
           signers: [],
         },
       ];
+      this.$store.state.password = password;
+    },
+
+    async _saveSeedPhraseInMemory(mnemonic, password, accountName) {
+      if (await this._getMnemonic())
+        throw new Error("a seed phrase already exist");
+      
+      const hdKoinos = new HDKoinos(mnemonic);
+      const account = hdKoinos.deriveKeyAccount(0, accountName);
+      
+      this.$store.state.mnemonic = mnemonic;
+      this.$store.state.accounts.push({
+        ...account.public,
+        ...account.private,
+        signers: [],
+      });
+      this.$store.state.password = password;
+    },
+
+    async _storeSeedPhraseAndAccounts() {
+      let encryptedMnemonic = null;
+      if (this.mnemonic) {
+        encryptedMnemonic = await this.encrypt(this.mnemonic, this.$store.state.password);
+      }
+
+      await this._setMnemonic(encryptedMnemonic);
+
+      const encryptedAccounts = await Promise.all(this.$store.state.accounts.map(async (acc) => {
+        // eslint-disable-next-line
+        const { privateKey, ...account } = acc;
+
+        // account derived from a seed phrase
+        if (account.keyPath) {
+          return account;
+        }
+
+        // account with custom private key
+        return {
+          encryptedPrivateKey: await this.encrypt(
+            privateKey,
+            this.$store.state.password
+          ),
+          ...account,
+        };
+        
+      }));
+      await this._setAccounts(encryptedAccounts);
+    },
+
+    async _addSeedPhrase(mnemonic, password, accountName) {
+      await this._saveSeedPhraseInMemory(mnemonic, password, accountName);
+      await this._storeSeedPhraseAndAccounts();
+    },
+
+    async _importPrivateKey(privateKey, password, accountName) {
+      await this._savePrivateKeyInMemory(privateKey, password, accountName);
+      await this._storeSeedPhraseAndAccounts();
     },
 
     // TODO: remove the following functions and replace them

@@ -71,12 +71,7 @@ export default {
         if (this.mnemonic !== this.$store.state.mnemonic)
           throw new Error("The words are not in the correct order");
 
-        await this._setMnemonic(
-          await this.encrypt(this.mnemonic, this.$store.state.password)
-        );
-        // eslint-disable-next-line
-        const { privateKey, ...account } = this.$store.state.accounts[0];
-        await this._setAccounts([account]);
+        await this._storeSeedPhraseAndAccounts();
 
         this.alertClose();
         router.push("/dashboard");

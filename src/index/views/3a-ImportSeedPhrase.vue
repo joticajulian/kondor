@@ -54,8 +54,9 @@ export default {
       try {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        await this._setSeedPhrase(this.mnemonic, this.password1, "Account 0");
-        this.$store.state.password = this.password1;
+
+        await this._deleteWallet();
+        await this._addSeedPhrase(this.mnemonic, this.password1, "Account 0");
 
         this.alertClose();
         router.push("/dashboard");

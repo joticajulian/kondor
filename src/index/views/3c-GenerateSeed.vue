@@ -138,27 +138,7 @@ export default {
       try {
         this.checkConsents();
         const password = this.$store.state.password;
-        const encryptedMnemonic = await this._getMnemonic();
-        const encryptedAccounts = (await this._getAccounts()) || [];
-        if (encryptedMnemonic)
-          throw new Error("Internal error: the seed already exist");
-
-        const hdKoinos = new HDKoinos(this.mnemonic);
-        const account = hdKoinos.deriveKeyAccount(0, "Account seed 0");
-        await this._setMnemonic(await this.encrypt(this.mnemonic, password));
-        encryptedAccounts.push({
-          ...account.public,
-          signers: [],
-        });
-        await this._setAccounts(encryptedAccounts);
-
-        this.$store.state.mnemonic = this.mnemonic;
-        this.$store.state.accounts.push({
-          ...account.public,
-          ...account.private,
-          signers: [],
-        });
-        this.$store.state.password = this.password;
+        await this._addSeedPhrase(this.mnemonic, password, "Account seed 0");        
 
         this.alertClose();
         router.push("/dashboard");
@@ -173,18 +153,8 @@ export default {
         this.checkConsents();
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
-        const hdKoinos = new HDKoinos(this.mnemonic);
-        const account = hdKoinos.deriveKeyAccount(0, "Account 0");
 
-        this.$store.state.mnemonic = this.mnemonic;
-        this.$store.state.accounts = [
-          {
-            ...account.public,
-            ...account.private,
-            signers: [],
-          },
-        ];
-        this.$store.state.password = this.password1;
+        this._saveSeedPhraseInMemory(this.mnemonic, this.password1, "Account 0");
 
         this.alertClose();
         router.push("/confirmSeed");
