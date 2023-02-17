@@ -31,7 +31,6 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
-
   mixins: [Storage, ViewHelper],
   data() {
     return {

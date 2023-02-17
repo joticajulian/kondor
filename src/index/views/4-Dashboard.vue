@@ -98,7 +98,6 @@ function deltaTimeToString(milliseconds) {
 }
 
 export default {
-
   mixins: [Storage, Sandbox, ViewHelper],
   data() {
     return {
