@@ -143,7 +143,6 @@ import Storage from "@/shared/mixins/Storage";
 import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
-
   components: { Unlock },
 
   mixins: [Storage, ViewHelper],

@@ -57,7 +57,11 @@ export default {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
 
-        await this._importPrivateKey(this.privateKey, this.password1, "Account 0");
+        await this._importPrivateKey(
+          this.privateKey,
+          this.password1,
+          "Account 0"
+        );
 
         this.alertClose();
         router.push("/dashboard");

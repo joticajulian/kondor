@@ -58,10 +58,15 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "ignorePatterns": ["lib/*.js"],
+    "ignorePatterns": [
+      "lib/*.js"
+    ],
     "rules": {
       "@typescript-eslint/no-var-requires": "off",
-      "indent": ["error", 2]
+      "indent": [
+        "error",
+        2
+      ]
     }
   },
   "browserslist": [

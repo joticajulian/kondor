@@ -90,7 +90,6 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
-
   mixins: [Storage, ViewHelper],
   data() {
     return {
@@ -138,7 +137,7 @@ export default {
       try {
         this.checkConsents();
         const password = this.$store.state.password;
-        await this._addSeedPhrase(this.mnemonic, password, "Account seed 0");        
+        await this._addSeedPhrase(this.mnemonic, password, "Account seed 0");
 
         this.alertClose();
         router.push("/dashboard");
@@ -154,7 +153,11 @@ export default {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
 
-        this._saveSeedPhraseInMemory(this.mnemonic, this.password1, "Account 0");
+        this._saveSeedPhraseInMemory(
+          this.mnemonic,
+          this.password1,
+          "Account 0"
+        );
 
         this.alertClose();
         router.push("/confirmSeed");
