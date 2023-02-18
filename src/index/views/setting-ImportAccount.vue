@@ -49,7 +49,6 @@
 </template>
 
 <script>
-import { Signer } from "koilib";
 import router from "@/index/router";
 
 // mixins
@@ -70,6 +69,10 @@ export default {
   methods: {
     async accept() {
       try {
+        // TODO: define watch mode in _addAccount
+        await this._addAccount(this.name, this.privateKey);
+
+        /*
         if (!this.name) throw new Error("No name defined");
         let privateKey = "";
         let encryptedPrivateKey = "";
@@ -101,6 +104,7 @@ export default {
           signers: [],
         });
         await this._setAccounts(encryptedAccounts);
+        */
         this.$store.state.currentIndexAccount =
           this.$store.state.accounts.length - 1;
         router.back();

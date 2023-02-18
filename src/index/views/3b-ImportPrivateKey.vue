@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import { Signer } from "koilib";
 import router from "@/index/router";
 
 // mixins
@@ -57,11 +56,11 @@ export default {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
 
-        await this._importPrivateKey(
-          this.privateKey,
-          this.password1,
-          "Account 0"
-        );
+        if (!this.privateKey) throw new Error("private key not defined");
+
+        await this._deleteWallet();
+        this._savePasswordInMemory(this.password1);
+        await this._addAccount("Account 0", this.privateKey);
 
         this.alertClose();
         router.push("/dashboard");

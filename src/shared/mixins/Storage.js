@@ -89,78 +89,125 @@ export default {
       this.$store.state.password = "";
     },
 
-    async _savePrivateKeyInMemory(privateKey, password, accountName) {
-      const signer = Signer.fromWif(privateKey);
-      this.$store.state.mnemonic = null;
-      this.$store.state.accounts = [
-        {
-          name: accountName,
-          privateKey,
-          address: signer.getAddress(),
-          signers: [],
-        },
-      ];
+    _savePasswordInMemory(password) {
       this.$store.state.password = password;
     },
 
-    async _saveSeedPhraseInMemory(mnemonic, password, accountName) {
+    async _saveSeedPhraseInMemory(mnemonic) {
       if (await this._getMnemonic())
         throw new Error("a seed phrase already exist");
 
-      const hdKoinos = new HDKoinos(mnemonic);
-      const account = hdKoinos.deriveKeyAccount(0, accountName);
-
       this.$store.state.mnemonic = mnemonic;
-      this.$store.state.accounts.push({
-        ...account.public,
-        ...account.private,
-        signers: [],
-      });
-      this.$store.state.password = password;
     },
 
-    async _storeSeedPhraseAndAccounts() {
+    async _storeSeedPhrase() {
       let encryptedMnemonic = null;
-      if (this.mnemonic) {
+      if (this.$store.state.mnemonic) {
         encryptedMnemonic = await this.encrypt(
-          this.mnemonic,
+          this.$store.state.mnemonic,
           this.$store.state.password
         );
       }
-
       await this._setMnemonic(encryptedMnemonic);
+    },
 
-      const encryptedAccounts = await Promise.all(
-        this.$store.state.accounts.map(async (acc) => {
-          // eslint-disable-next-line
-          const { privateKey, ...account } = acc;
+    async _addAccount(name, privateKey) {
+      if (!name) throw new Error("No name defined");
+      const encryptedAccounts = (await this._getAccounts()) || [];
 
-          // account derived from a seed phrase
-          if (account.keyPath) {
-            return account;
-          }
+      if (privateKey) {
+        // custom private key, not derived from mnemonic
+        const signer = Signer.fromWif(privateKey);
+        this.$store.state.accounts.push({
+          name,
+          privateKey,
+          address: signer.getAddress(),
+          signers: [],
+        });
 
-          // account with custom private key
-          return {
-            encryptedPrivateKey: await this.encrypt(
-              privateKey,
-              this.$store.state.password
-            ),
-            ...account,
-          };
-        })
-      );
+        encryptedAccounts.push({
+          name,
+          encryptedPrivateKey: await this.encrypt(
+            privateKey,
+            this.$store.state.password
+          ),
+          address: signer.getAddress(),
+          signers: [],
+        });
+      } else {
+        // derived from the mnemonic
+        const { mnemonic } = this.$store.state;
+        if (!mnemonic) throw new Error("No seed phrase found");
+        const hdKoinos = new HDKoinos(mnemonic);
+        let newIndex = 0;
+        this.$store.state.accounts.forEach((acc) => {
+          if (acc.keyPath) newIndex += 1;
+        });
+        const account = hdKoinos.deriveKeyAccount(newIndex, name);
+        this.$store.state.accounts.push({
+          ...account.public,
+          ...account.private,
+          signers: [],
+        });
+        encryptedAccounts.push({
+          ...account.public,
+          signers: [],
+        });
+      }
       await this._setAccounts(encryptedAccounts);
     },
 
-    async _addSeedPhrase(mnemonic, password, accountName) {
-      await this._saveSeedPhraseInMemory(mnemonic, password, accountName);
-      await this._storeSeedPhraseAndAccounts();
-    },
+    async _addSigner(name, accIndex, privateKey) {
+      if (!name) throw new Error("No name defined");
+      const encryptedAccounts = await this._getAccounts();
 
-    async _importPrivateKey(privateKey, password, accountName) {
-      await this._savePrivateKeyInMemory(privateKey, password, accountName);
-      await this._storeSeedPhraseAndAccounts();
+      if (privateKey) {
+        // custom private key, not derived from mnemonic
+        const signer = Signer.fromWif(privateKey);
+        this.$store.state.accounts[accIndex].signers.push({
+          name,
+          privateKey,
+          address: signer.getAddress(),
+        });
+
+        encryptedAccounts[accIndex].signers.push({
+          name,
+          encryptedPrivateKey: await this.encrypt(
+            privateKey,
+            this.$store.state.password
+          ),
+          address: signer.getAddress(),
+        });
+      } else {
+        // derived from the mnemonic
+        const { mnemonic } = this.$store.state;
+        if (!mnemonic) throw new Error("No seed phrase found");
+        const hdKoinos = new HDKoinos(mnemonic);
+        const { keyPath, signers } = this.$store.state.accounts[accIndex];
+        const { accountIndex, signerIndex } = HDKoinos.parsePath(keyPath);
+        if (signerIndex)
+          throw new Error(`Invalid keyPath ${keyPath} for accounts`);
+
+        let newIndex = 0;
+        signers.forEach((sig) => {
+          if (sig.keyPath) newIndex += 1;
+        });
+
+        const signerAcc = hdKoinos.deriveKeySigner(
+          accountIndex,
+          newIndex,
+          name
+        );
+
+        this.$store.state.accounts[accIndex].signers.push({
+          ...signerAcc.public,
+          ...signerAcc.private,
+        });
+        encryptedAccounts[accIndex].signers.push({
+          ...signerAcc.public,
+        });
+      }
+      await this._setAccounts(encryptedAccounts);
     },
 
     // TODO: remove the following functions and replace them

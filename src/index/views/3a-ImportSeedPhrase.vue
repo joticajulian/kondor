@@ -56,7 +56,10 @@ export default {
           throw new Error("password mismatch");
 
         await this._deleteWallet();
-        await this._addSeedPhrase(this.mnemonic, this.password1, "Account 0");
+        this._savePasswordInMemory(this.password1);
+        await this._saveSeedPhraseInMemory(this.mnemonic);
+        await this._storeSeedPhrase();
+        await this._addAccount("Account 0");
 
         this.alertClose();
         router.push("/dashboard");
