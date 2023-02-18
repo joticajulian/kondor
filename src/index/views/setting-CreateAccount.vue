@@ -24,7 +24,6 @@
 
 <script>
 import router from "@/index/router";
-import { HDKoinos } from "../../../lib/HDKoinos";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -41,27 +40,7 @@ export default {
   methods: {
     async accept() {
       try {
-        const mnemonic = this.$store.state.mnemonic;
-        if (!mnemonic) throw new Error("No seed phrase found");
-        if (!this.name) throw new Error("No name defined");
-        const hdKoinos = new HDKoinos(mnemonic);
-        let newIndex = 0;
-        this.$store.state.accounts.forEach((acc) => {
-          if (acc.keyPath) newIndex += 1;
-        });
-        const account = hdKoinos.deriveKeyAccount(newIndex, this.name);
-        this.$store.state.accounts.push({
-          ...account.public,
-          ...account.private,
-          signers: [],
-        });
-
-        const encryptedAccounts = await this._getAccounts();
-        encryptedAccounts.push({
-          ...account.public,
-          signers: [],
-        });
-        await this._setAccounts(encryptedAccounts);
+        await this._addAccount(this.name);
         this.$store.state.currentIndexAccount =
           this.$store.state.accounts.length - 1;
         router.back();
