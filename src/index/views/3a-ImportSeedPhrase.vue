@@ -59,7 +59,7 @@ export default {
         this._savePasswordInMemory(this.password1);
         await this._saveSeedPhraseInMemory(this.mnemonic);
         await this._storeSeedPhrase();
-        await this._addAccount("Account 0");
+        await this._addAccount({ name: "Account 0" });
 
         this.alertClose();
         router.push("/dashboard");

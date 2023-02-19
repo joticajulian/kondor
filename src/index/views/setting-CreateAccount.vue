@@ -40,7 +40,7 @@ export default {
   methods: {
     async accept() {
       try {
-        await this._addAccount(this.name);
+        await this._addAccount({ name: this.name });
         this.$store.state.currentIndexAccount =
           this.$store.state.accounts.length - 1;
         router.back();

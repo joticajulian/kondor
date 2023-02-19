@@ -138,7 +138,9 @@ export default {
         this.checkConsents();
         await this._saveSeedPhraseInMemory(this.mnemonic);
         await this._storeSeedPhrase();
-        await this._addAccount("Account seed 0");
+        await this._addAccount({
+          name: "Account seed 0",
+        });
 
         this.alertClose();
         router.push("/dashboard");

@@ -111,11 +111,26 @@ export default {
       await this._setMnemonic(encryptedMnemonic);
     },
 
-    async _addAccount(name, privateKey) {
+    async _addAccount(params) {
+      let { name, privateKey, watchMode, address } = params;
       if (!name) throw new Error("No name defined");
       const encryptedAccounts = (await this._getAccounts()) || [];
 
-      if (privateKey) {
+      if (watchMode) {
+        // account in watch mode
+        if (!address) throw new Error("No address defined for watch mode");
+        this.$store.state.accounts.push({
+          name,
+          address,
+          signers: [],
+        });
+
+        encryptedAccounts.push({
+          name,
+          address,
+          signers: [],
+        });
+      } else if (privateKey) {
         // custom private key, not derived from mnemonic
         const signer = Signer.fromWif(privateKey);
         this.$store.state.accounts.push({
