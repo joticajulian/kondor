@@ -69,42 +69,13 @@ export default {
   methods: {
     async accept() {
       try {
-        // TODO: define watch mode in _addAccount
-        await this._addAccount(this.name, this.privateKey);
-
-        /*
-        if (!this.name) throw new Error("No name defined");
-        let privateKey = "";
-        let encryptedPrivateKey = "";
-        let address;
-        if (this.watchMode) {
-          if (!this.address) throw new Error("No address defined");
-          address = this.address;
-        } else {
-          privateKey = this.privateKey;
-          encryptedPrivateKey = await this.encrypt(
-            this.privateKey,
-            this.$store.state.password
-          );
-          const signer = Signer.fromWif(this.privateKey);
-          address = signer.getAddress();
-        }
-        this.$store.state.accounts.push({
+        await this._addAccount({
           name: this.name,
-          privateKey,
-          address,
-          signers: [],
+          privateKey: this.privateKey,
+          watchMode: this.watchMode,
+          address: this.address,
         });
 
-        const encryptedAccounts = await this._getAccounts();
-        encryptedAccounts.push({
-          name: this.name,
-          encryptedPrivateKey,
-          address,
-          signers: [],
-        });
-        await this._setAccounts(encryptedAccounts);
-        */
         this.$store.state.currentIndexAccount =
           this.$store.state.accounts.length - 1;
         router.back();

@@ -60,7 +60,10 @@ export default {
 
         await this._deleteWallet();
         this._savePasswordInMemory(this.password1);
-        await this._addAccount("Account 0", this.privateKey);
+        await this._addAccount({
+          name: "Account 0",
+          privateKey: this.privateKey,
+        });
 
         this.alertClose();
         router.push("/dashboard");
