@@ -114,33 +114,25 @@ export default {
     async _addAccount(params) {
       let { name, privateKey, watchMode, address } = params;
       if (!name) throw new Error("No name defined");
-      const encryptedAccounts = (await this._getAccounts()) || [];
 
+      let privateKeyInMemory;
+      let accountStorage;
       if (watchMode) {
         // account in watch mode
         if (!address) throw new Error("No address defined for watch mode");
-        this.$store.state.accounts.push({
-          name,
-          address,
-          signers: [],
-        });
 
-        encryptedAccounts.push({
+        privateKeyInMemory = "";
+        accountStorage = {
           name,
           address,
           signers: [],
-        });
+        };
       } else if (privateKey) {
         // custom private key, not derived from mnemonic
         const signer = Signer.fromWif(privateKey);
-        this.$store.state.accounts.push({
-          name,
-          privateKey,
-          address: signer.getAddress(),
-          signers: [],
-        });
 
-        encryptedAccounts.push({
+        privateKeyInMemory = privateKey;
+        accountStorage = {
           name,
           encryptedPrivateKey: await this.encrypt(
             privateKey,
@@ -148,27 +140,34 @@ export default {
           ),
           address: signer.getAddress(),
           signers: [],
-        });
+        };
       } else {
         // derived from the mnemonic
         const { mnemonic } = this.$store.state;
         if (!mnemonic) throw new Error("No seed phrase found");
-        const hdKoinos = new HDKoinos(mnemonic);
         let newIndex = 0;
         this.$store.state.accounts.forEach((acc) => {
           if (acc.keyPath) newIndex += 1;
         });
+        const hdKoinos = new HDKoinos(mnemonic);
         const account = hdKoinos.deriveKeyAccount(newIndex, name);
-        this.$store.state.accounts.push({
-          ...account.public,
-          ...account.private,
-          signers: [],
-        });
-        encryptedAccounts.push({
+
+        privateKeyInMemory = account.private.privateKey;
+        accountStorage = {
           ...account.public,
           signers: [],
-        });
+        };
       }
+
+      // save new account in memory
+      this.$store.state.accounts.push({
+        ...accountStorage,
+        privateKey: privateKeyInMemory,
+      });
+
+      // save new account in storage
+      const encryptedAccounts = (await this._getAccounts()) || [];
+      encryptedAccounts.push(accountStorage);
       await this._setAccounts(encryptedAccounts);
     },
 
