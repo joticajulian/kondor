@@ -136,10 +136,11 @@ export default {
     async addSeed() {
       try {
         this.checkConsents();
-        await this._saveSeedPhraseInMemory(this.mnemonic);
-        await this._storeSeedPhrase();
+        await this._saveSeedPhraseInMemory(0, this.mnemonic);
+        await this._storeSeedPhrase(0);
         await this._addAccount({
           name: "Account seed 0",
+          passwordId: 0,
         });
 
         this.alertClose();
@@ -156,8 +157,8 @@ export default {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
 
-        this._savePasswordInMemory(this.password1);
-        await this._saveSeedPhraseInMemory(this.mnemonic);
+        this._savePasswordInMemory(0, this.password1);
+        await this._saveSeedPhraseInMemory(0, this.mnemonic);
 
         this.alertClose();
         router.push("/confirmSeed");

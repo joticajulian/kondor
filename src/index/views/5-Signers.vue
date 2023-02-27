@@ -53,6 +53,7 @@ export default {
         await this._addSigner({
           name,
           accIndex: this.$store.state.currentIndexAccount,
+          passwordId: 0,
         });
         this.loadSigners(this.$store.state.currentIndexAccount);
       } catch (error) {

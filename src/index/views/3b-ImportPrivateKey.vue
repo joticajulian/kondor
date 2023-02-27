@@ -59,10 +59,11 @@ export default {
         if (!this.privateKey) throw new Error("private key not defined");
 
         await this._deleteWallet();
-        this._savePasswordInMemory(this.password1);
+        this._savePasswordInMemory(0, this.password1);
         await this._addAccount({
           name: "Account 0",
           privateKey: this.privateKey,
+          passwordId: 0,
         });
 
         this.alertClose();

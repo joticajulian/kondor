@@ -184,10 +184,7 @@ export default {
 
     async deleteWallet() {
       try {
-        await this._setMnemonic(null);
-        await this._setAccounts([]);
-        // await this._setRpcNodes(null);
-        // await this._setChainId(null);
+        await this._deleteWallet(null);
         this.alertSuccess("Wallet deleted");
       } catch (error) {
         this.alertDanger(error.message);

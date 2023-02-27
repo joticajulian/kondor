@@ -39,12 +39,29 @@ export default {
       return storage.read(key, strict);
     },
 
-    async _setMnemonic(encrypted) {
-      return this._write("mnemonic", encrypted);
+    async _setMnemonic(id, encrypted) {
+      const _id = id ? id : "";
+      return this._write(`mnemonic${_id}`, encrypted);
     },
 
-    async _getMnemonic(strict = false) {
-      return this._read("mnemonic", strict);
+    async _getMnemonic(id, strict = false) {
+      const _id = id ? id : "";
+      return this._read(`mnemonic${_id}`, strict);
+    },
+
+    async _setPasswordLabels(passwordLabels) {
+      return this._write("passwordLabels", passwordLabels);
+    },
+
+    async _getPasswordLabels(strict = false) {
+      const passwordLabels = await this._read("passwordLabels", strict);
+      if (!passwordLabels)
+        return [
+          {
+            label: "main",
+          },
+        ];
+      return passwordLabels;
     },
 
     async _setAccounts(encrypted) {
@@ -82,37 +99,40 @@ export default {
     },
 
     async _deleteWallet() {
-      await this._setMnemonic(null);
+      const passwordLabels = await this._getPasswordLabels();
+      for (let i = 0; i < passwordLabels.length; i += 1) {
+        await this._setMnemonic(i, null);
+        this.$store.state[`mnemonic${i}`] = "";
+        this.$store.state[`password${i}`] = "";
+      }
       await this._setAccounts([]);
-      this.$store.state.mnemonic = "";
       this.$store.state.accounts = [];
-      this.$store.state.password = "";
     },
 
-    _savePasswordInMemory(password) {
-      this.$store.state.password = password;
+    _savePasswordInMemory(id, password) {
+      this.$store.state[`password${id}`] = password;
     },
 
-    async _saveSeedPhraseInMemory(mnemonic) {
-      if (await this._getMnemonic())
-        throw new Error("a seed phrase already exist");
+    async _saveSeedPhraseInMemory(id, mnemonic) {
+      if (await this._getMnemonic(id))
+        throw new Error(`the seed phrase #${id} already exist`);
 
-      this.$store.state.mnemonic = mnemonic;
+      this.$store.state[`mnemonic${id}`] = mnemonic;
     },
 
-    async _storeSeedPhrase() {
+    async _storeSeedPhrase(id) {
       let encryptedMnemonic = null;
-      if (this.$store.state.mnemonic) {
+      if (this.$store.state[`mnemonic${id}`]) {
         encryptedMnemonic = await this.encrypt(
-          this.$store.state.mnemonic,
-          this.$store.state.password
+          this.$store.state[`mnemonic${id}`],
+          this.$store.state[`password${id}`]
         );
       }
-      await this._setMnemonic(encryptedMnemonic);
+      await this._setMnemonic(id, encryptedMnemonic);
     },
 
     async _addAccount(params) {
-      let { name, privateKey, watchMode, address } = params;
+      let { name, privateKey, passwordId, watchMode, address } = params;
       if (!name) throw new Error("No name defined");
 
       let privateKeyInMemory;
@@ -136,14 +156,17 @@ export default {
           name,
           encryptedPrivateKey: await this.encrypt(
             privateKey,
-            this.$store.state.password
+            this.$store.state[`password${passwordId}`]
           ),
+          passwordId,
           address: signer.getAddress(),
           signers: [],
         };
       } else {
         // derived from the mnemonic
-        const { mnemonic } = this.$store.state;
+        // Note: "mnemonic${passwordId}" is not used because by design
+        // all accounts are derived from mnemonic0
+        const mnemonic = this.$store.state.mnemonic0;
         if (!mnemonic) throw new Error("No seed phrase found");
         const { accounts } = this.$store.state;
         let accountIndex = 0;
@@ -173,7 +196,8 @@ export default {
     },
 
     async _addSigner(params) {
-      let { name, accIndex, privateKey, watchMode, address } = params;
+      let { name, accIndex, privateKey, passwordId, watchMode, address } =
+        params;
       if (!name) throw new Error("No name defined");
 
       let privateKeyInMemory;
@@ -187,8 +211,7 @@ export default {
           name,
           address,
         };
-      }
-      if (privateKey) {
+      } else if (privateKey) {
         // custom private key, not derived from mnemonic
         const signer = Signer.fromWif(privateKey);
 
@@ -197,18 +220,19 @@ export default {
           name,
           encryptedPrivateKey: await this.encrypt(
             privateKey,
-            this.$store.state.password
+            this.$store.state[`password${passwordId}`]
           ),
+          passwordId,
           address: signer.getAddress(),
         };
       } else {
         // derived from the mnemonic
-        const { mnemonic } = this.$store.state;
+        const mnemonic = this.$store.state[`mnemonic${passwordId}`];
         if (!mnemonic) throw new Error("No seed phrase found");
         const { keyPath, signers } = this.$store.state.accounts[accIndex];
         let signerIndex = 0;
         signers.forEach((sig) => {
-          if (sig.keyPath) signerIndex += 1;
+          if (sig.keyPath && sig.passwordId === passwordId) signerIndex += 1;
         });
 
         const hdKoinos = new HDKoinos(mnemonic);
@@ -224,7 +248,10 @@ export default {
         );
 
         privateKeyInMemory = signerAcc.private.privateKey;
-        signerStorage = signerAcc.public;
+        signerStorage = {
+          ...signerAcc.public,
+          passwordId,
+        };
       }
 
       // save new signer in memory
