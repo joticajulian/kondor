@@ -108,16 +108,16 @@ export default {
     } else {
       this.title = "New wallet";
     }
-    if (this.$store.state.mnemonic) {
-      this.mnemonic = this.$store.state.mnemonic;
+    if (this.$store.state.mnemonic0) {
+      this.mnemonic = this.$store.state.mnemonic0;
       this.seedConsent1 = true;
       this.seedConsent2 = true;
     } else {
       this.mnemonic = HDKoinos.randomMnemonic();
     }
-    if (this.$store.state.password) {
-      this.password1 = this.$store.state.password;
-      this.password2 = this.$store.state.password;
+    if (this.$store.state.password0) {
+      this.password1 = this.$store.state.password0;
+      this.password2 = this.$store.state.password0;
     }
   },
 

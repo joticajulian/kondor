@@ -193,7 +193,7 @@ export default {
     },
 
     async viewSecrets() {
-      this.mnemonic = this.$store.state.mnemonic;
+      this.mnemonic = this.$store.state.mnemonic0;
       this.accounts = this.$store.state.accounts;
 
       this.alertSuccess(
