@@ -145,12 +145,13 @@ export default {
         // derived from the mnemonic
         const { mnemonic } = this.$store.state;
         if (!mnemonic) throw new Error("No seed phrase found");
-        let newIndex = 0;
-        this.$store.state.accounts.forEach((acc) => {
-          if (acc.keyPath) newIndex += 1;
+        const { accounts } = this.$store.state;
+        let accountIndex = 0;
+        accounts.forEach((acc) => {
+          if (acc.keyPath) accountIndex += 1;
         });
         const hdKoinos = new HDKoinos(mnemonic);
-        const account = hdKoinos.deriveKeyAccount(newIndex, name);
+        const account = hdKoinos.deriveKeyAccount(accountIndex, name);
 
         privateKeyInMemory = account.private.privateKey;
         accountStorage = {
@@ -171,56 +172,70 @@ export default {
       await this._setAccounts(encryptedAccounts);
     },
 
-    async _addSigner(name, accIndex, privateKey) {
+    async _addSigner(params) {
+      let { name, accIndex, privateKey, watchMode, address } = params;
       if (!name) throw new Error("No name defined");
-      const encryptedAccounts = await this._getAccounts();
 
+      let privateKeyInMemory;
+      let signerStorage;
+      if (watchMode) {
+        // signer in watch mode
+        if (!address) throw new Error("No address defined for watch mode");
+
+        privateKeyInMemory = "";
+        signerStorage = {
+          name,
+          address,
+        };
+      }
       if (privateKey) {
         // custom private key, not derived from mnemonic
         const signer = Signer.fromWif(privateKey);
-        this.$store.state.accounts[accIndex].signers.push({
-          name,
-          privateKey,
-          address: signer.getAddress(),
-        });
 
-        encryptedAccounts[accIndex].signers.push({
+        privateKeyInMemory = privateKey;
+        signerStorage = {
           name,
           encryptedPrivateKey: await this.encrypt(
             privateKey,
             this.$store.state.password
           ),
           address: signer.getAddress(),
-        });
+        };
       } else {
         // derived from the mnemonic
         const { mnemonic } = this.$store.state;
         if (!mnemonic) throw new Error("No seed phrase found");
-        const hdKoinos = new HDKoinos(mnemonic);
         const { keyPath, signers } = this.$store.state.accounts[accIndex];
-        const { accountIndex, signerIndex } = HDKoinos.parsePath(keyPath);
-        if (signerIndex)
-          throw new Error(`Invalid keyPath ${keyPath} for accounts`);
-
-        let newIndex = 0;
+        let signerIndex = 0;
         signers.forEach((sig) => {
-          if (sig.keyPath) newIndex += 1;
+          if (sig.keyPath) signerIndex += 1;
         });
+
+        const hdKoinos = new HDKoinos(mnemonic);
+        const { accountIndex, signerIndex: zeroIndex } =
+          HDKoinos.parsePath(keyPath);
+        if (zeroIndex)
+          throw new Error(`Invalid keyPath ${keyPath} for accounts`);
 
         const signerAcc = hdKoinos.deriveKeySigner(
           accountIndex,
-          newIndex,
+          signerIndex,
           name
         );
 
-        this.$store.state.accounts[accIndex].signers.push({
-          ...signerAcc.public,
-          ...signerAcc.private,
-        });
-        encryptedAccounts[accIndex].signers.push({
-          ...signerAcc.public,
-        });
+        privateKeyInMemory = signerAcc.private.privateKey;
+        signerStorage = signerAcc.public;
       }
+
+      // save new signer in memory
+      this.$store.state.accounts[accIndex].signers.push({
+        ...signerStorage,
+        privateKey: privateKeyInMemory,
+      });
+
+      // save new signer in storage
+      const encryptedAccounts = await this._getAccounts();
+      encryptedAccounts[accIndex].signers.push(signerStorage);
       await this._setAccounts(encryptedAccounts);
     },
 
