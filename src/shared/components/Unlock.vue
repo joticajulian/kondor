@@ -41,7 +41,7 @@ export default {
   methods: {
     async unlock() {
       try {
-        const encryptedMnemonic = await this._getMnemonic();
+        const encryptedMnemonic = await this._getMnemonic(0);
         const encryptedAccounts = await this._getAccounts();
         let accounts = [];
         let mnemonic = null;

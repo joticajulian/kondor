@@ -70,8 +70,11 @@ export default {
         if (this.mnemonic !== this.$store.state.mnemonic)
           throw new Error("The words are not in the correct order");
 
-        await this._storeSeedPhrase();
-        await this._addAccount({ name: "Account 0" });
+        await this._storeSeedPhrase(0);
+        await this._addAccount({
+          name: "Account 0",
+          passwordId: 0,
+        });
 
         this.alertClose();
         router.push("/dashboard");

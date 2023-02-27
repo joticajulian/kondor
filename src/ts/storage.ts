@@ -1,10 +1,3 @@
-export interface Account {
-  name: string;
-  keyPath?: string;
-  encryptedPrivateKey?: string;
-  address: string;
-}
-
 /* eslint-disable no-undef */
 export async function write(key: string, value: unknown): Promise<void> {
   return new Promise((resolve) => {
@@ -27,22 +20,6 @@ export async function read<T = unknown>(
       return resolve(undefined);
     });
   });
-}
-
-export async function setMnemonic(encrypted: string): Promise<void> {
-  return write("mnemonic", encrypted);
-}
-
-export async function getMnemonic(strict = true): Promise<string> {
-  return read("mnemonic", strict) as Promise<string>;
-}
-
-export async function setAccounts(encrypted: Account[]): Promise<void> {
-  return write("accounts", encrypted);
-}
-
-export async function getAccounts(strict = true): Promise<string> {
-  return read("accounts", strict) as Promise<string>;
 }
 
 export async function setRpcNodes(rpcNodes: string[]): Promise<void> {

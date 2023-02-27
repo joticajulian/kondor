@@ -72,6 +72,7 @@ export default {
         await this._addAccount({
           name: this.name,
           privateKey: this.privateKey,
+          passwordId: 0,
           watchMode: this.watchMode,
           address: this.address,
         });
