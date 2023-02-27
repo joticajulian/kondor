@@ -67,7 +67,7 @@
         disabled
         class="separator"
       />
-      <div v-if="$store.state.mnemonic">
+      <div v-if="$store.state.mnemonic0">
         <div
           class="dropdown-item"
           @click="createAccount"

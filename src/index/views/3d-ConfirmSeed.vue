@@ -54,7 +54,7 @@ export default {
   },
 
   created() {
-    this.words = this.$store.state.mnemonic
+    this.words = this.$store.state.mnemonic0
       .split(" ")
       .sort(() => (Math.random() > 0.5 ? 1 : -1));
   },
@@ -67,7 +67,7 @@ export default {
 
     async confirmSeed() {
       try {
-        if (this.mnemonic !== this.$store.state.mnemonic)
+        if (this.mnemonic !== this.$store.state.mnemonic0)
           throw new Error("The words are not in the correct order");
 
         await this._storeSeedPhrase(0);
