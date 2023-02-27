@@ -50,7 +50,10 @@ export default {
     async addSigner() {
       try {
         const name = "todo - set signer name";
-        await this._addSigner(name, this.$store.state.currentIndexAccount);
+        await this._addSigner({
+          name,
+          accIndex: this.$store.state.currentIndexAccount,
+        });
         this.loadSigners(this.$store.state.currentIndexAccount);
       } catch (error) {
         this.alertDanger(error.message);
