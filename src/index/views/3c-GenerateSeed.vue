@@ -157,7 +157,7 @@ export default {
         if (this.password1 !== this.password2)
           throw new Error("password mismatch");
 
-        this._savePasswordInMemory(0, this.password1);
+        await this._savePasswordInMemory(0, this.password1);
         await this._saveSeedPhraseInMemory(0, this.mnemonic);
 
         this.alertClose();

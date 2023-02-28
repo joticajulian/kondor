@@ -56,7 +56,7 @@ export default {
           throw new Error("password mismatch");
 
         await this._deleteWallet();
-        this._savePasswordInMemory(0, this.password1);
+        await this._savePasswordInMemory(0, this.password1);
         await this._saveSeedPhraseInMemory(0, this.mnemonic);
         await this._storeSeedPhrase(0);
         await this._addAccount({

@@ -14,6 +14,7 @@ export default new Vuex.Store({
     alertType: "",
     requests: [],
     network: "",
+    testDataSession: {},
     testData: {
       /*
        * Test Data
