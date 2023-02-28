@@ -39,6 +39,37 @@ export default {
       return storage.read(key, strict);
     },
 
+    async _writeSession(key, value) {
+      if (process.env.VUE_APP_ENV === "test") {
+        this.$store.state.testDataSession[key] = value;
+        return;
+      }
+      return new Promise((resolve) => {
+        const data = {};
+        data[key] = value;
+        chrome.storage.session.set(data, function () {
+          resolve();
+        });
+      });
+    },
+
+    async _readSession(key, strict) {
+      if (process.env.VUE_APP_ENV === "test") {
+        if (typeof this.$store.state.testDataSession[key] !== "undefined")
+          return this.$store.state.testDataSession[key];
+        if (strict) throw new Error(`${key} not found, it is undefined`);
+        return undefined;
+      }
+      return new Promise((resolve, reject) => {
+        chrome.storage.session.get([key], function (result) {
+          if (Object.keys(result).length !== 0) return resolve(result[key]);
+          if (strict)
+            return reject(new Error(`${key} not found, it is undefined`));
+          return resolve(undefined);
+        });
+      });
+    },
+
     async _setMnemonic(id, encrypted) {
       const _id = id ? id : "";
       return this._write(`mnemonic${_id}`, encrypted);
@@ -103,14 +134,15 @@ export default {
       for (let i = 0; i < passwordLabels.length; i += 1) {
         await this._setMnemonic(i, null);
         this.$store.state[`mnemonic${i}`] = "";
-        this.$store.state[`password${i}`] = "";
+        await this._savePasswordInMemory(i, "");
       }
       await this._setAccounts([]);
       this.$store.state.accounts = [];
     },
 
-    _savePasswordInMemory(id, password) {
+    async _savePasswordInMemory(id, password) {
       this.$store.state[`password${id}`] = password;
+      await this._writeSession(`password${id}`, password);
     },
 
     async _saveSeedPhraseInMemory(id, mnemonic) {

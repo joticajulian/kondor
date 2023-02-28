@@ -38,6 +38,16 @@ export default {
     };
   },
 
+  created() {
+    (async () => {
+      const password = await this._readSession("password0");
+      if (password) {
+        this.password = password;
+        this.unlock();
+      }
+    })();
+  },
+
   methods: {
     async unlock() {
       try {
@@ -105,7 +115,7 @@ export default {
 
         this.$store.state.mnemonic0 = mnemonic;
         this.$store.state.accounts = accounts;
-        this.$store.state.password0 = this.password;
+        await this._savePasswordInMemory(0, this.password);
 
         this.$emit("onUnlock", this.password);
       } catch (error) {
