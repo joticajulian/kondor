@@ -1,18 +1,24 @@
 <template>
   <div class="container">
-    <input
-      v-model="password"
-      type="password"
-      placeholder="Password"
-      autofocus
-      @keyup.enter="unlock"
-    >
-    <button
-      class=""
-      @click="unlock"
-    >
-      {{ labelButton }}
-    </button>
+    <div
+      v-if="loadingSession"
+      class="loader"
+    />
+    <div v-else>
+      <input
+        v-model="password"
+        type="password"
+        placeholder="Password"
+        autofocus
+        @keyup.enter="unlock"
+      >
+      <button
+        class=""
+        @click="unlock"
+      >
+        {{ labelButton }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -34,6 +40,7 @@ export default {
 
   data() {
     return {
+      loadingSession: true,
       password: "",
     };
   },
@@ -43,8 +50,9 @@ export default {
       const password = await this._readSession("password0");
       if (password) {
         this.password = password;
-        this.unlock();
+        await this.unlock();
       }
+      this.loadingSession = false;
     })();
   },
 
