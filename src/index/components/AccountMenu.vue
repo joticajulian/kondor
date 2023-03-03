@@ -8,6 +8,9 @@
           </div>
           <div class="current-address">
             {{ currentAddress }}
+            <button @click="copyAddress()">
+              <i class="material-icons">content_copy</i>
+            </button>
           </div>
         </div>
         <div
@@ -136,6 +139,10 @@ export default {
 
     addSeed() {
       router.push("/generateSeed?privateKeyExist=true");
+    },
+
+    copyAddress() {
+      navigator.clipboard.writeText(this.currentAddress);
     },
   },
 };

@@ -74,8 +74,6 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 
-const CHAIN_ID_TESTNET = "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==";
-const CHAIN_ID_MAINNET = "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==";
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
@@ -114,6 +112,7 @@ export default {
       lastUpdateMana: 0,
       timeRechargeMana: "",
       watchMode: false,
+      network: {},
     };
   },
   computed: {
@@ -140,31 +139,9 @@ export default {
   methods: {
     async loadAccount(index) {
       try {
-        /**
-         * Temporal solution to be able to load the balance
-         * and make transfers in testnet
-         * TODO: Define networks
-         */
-        let chainId = await this._getChainId(false);
-        if (!chainId) {
-          chainId = await this.provider.getChainId();
-          await this._setChainId(chainId);
-        }
-
-        let koinContractId;
-        if (chainId === CHAIN_ID_MAINNET) {
-          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
-          this.$store.state.network = "Koinos Mainnet";
-        } else if (chainId === CHAIN_ID_TESTNET) {
-          koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
-          this.$store.state.network = "Koinos Testnet";
-        } else {
-          koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
-          this.$store.state.network = "Unknown network";
-        }
-
-        const rpcNodes = await this._getRpcNodes();
-        this.provider = new Provider(rpcNodes);
+        const networks = await this._getNetworks();
+        this.network = networks[this.$store.state.currentNetwork];
+        this.provider = new Provider(this.network.rpcNodes);
         const currentAccount = this.$store.state.accounts[index];
         this.address = currentAccount.address;
         this.signer = undefined;
@@ -177,27 +154,13 @@ export default {
         }
 
         this.koinContract = new Contract({
-          id: koinContractId,
+          id: this.network.koinContractId,
           abi: utils.tokenAbi,
           provider: this.provider,
           signer: this.signer,
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        });
-        this.koinContract.abi.methods.balanceOf.preformat_argument = (
-          owner
-        ) => ({
-          owner,
-        });
-        this.koinContract.abi.methods.balanceOf.preformat_return = (res) =>
-          utils.formatUnits(res.value, 8);
-        this.koinContract.abi.methods.transfer.preformat_argument = (
-          input
-        ) => ({
-          from: this.address,
-          to: input.to,
-          value: utils.parseUnits(input.value, 8),
         });
         this.koin = this.koinContract.functions;
       } catch (error) {
@@ -208,8 +171,8 @@ export default {
     },
     async loadBalance() {
       try {
-        const { result } = await this.koin.balanceOf(this.address);
-        this.balance = result.toLocaleString("en");
+        const { result } = await this.koin.balanceOf({ owner: this.address });
+        this.balance = utils.formatUnits(result.value, 8).toLocaleString("en");
 
         const balance = Number(this.balance);
         const rc = await this.provider.getAccountRc(this.address);
@@ -238,22 +201,17 @@ export default {
     async transfer() {
       let interval;
       try {
-        let chainId = await this._getChainId(false);
-        if (!chainId) {
-          chainId = await this.provider.getChainId();
-          await this._setChainId(chainId);
-        }
-
         if (!utils.isChecksumAddress(this.toAddress)) {
           throw new Error(`${this.toAddress} is an invalid address`);
         }
 
         const { transaction, receipt } = await this.koin.transfer(
           {
+            from: this.address,
             to: this.toAddress,
-            value: this.amount,
+            value: utils.parseUnits(this.amount, 8),
           },
-          { chainId }
+          { chainId: this.network.chainId }
         );
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);

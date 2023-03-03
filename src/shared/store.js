@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import { utils } from "koilib";
 
 Vue.use(Vuex);
 
@@ -13,7 +14,7 @@ export default new Vuex.Store({
     alertMessage: "",
     alertType: "",
     requests: [],
-    network: "",
+    currentNetwork: 0,
     testDataSession: {},
     testData: {
       /*
@@ -49,6 +50,24 @@ export default new Vuex.Store({
       mnemonic:
         "741828937c26cc018ff9a272b1191b4e6531f237a6ccea80d6b34eaaa8be7bc0450ac99fc1599a4e3c7dbebe313f685a58b8aed317bec1a2d693bc9d8e32418df57fd459a2677fe0c207f7473df661bb0cb374994ac56352dbc1",
       salt: "89c31dbb0175c54f2642ee582c610ff3",
+      networks: [
+        {
+          name: "Koinos Mainnet",
+          tag: "mainnet",
+          chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
+          rpcNodes: ["http://localhost:8081/jsonrpc"],
+          koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+        },
+        {
+          name: "Koinos Harbinger",
+          tag: "harbinger",
+          chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+          rpcNodes: ["http://localhost:8081/jsonrpc"],
+          koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+        },
+      ],
+      "mainnet-abi-15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": utils.tokenAbi,
+      "harbinger-abi-19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ": utils.tokenAbi,
     },
     sandboxLoaded: false,
 
