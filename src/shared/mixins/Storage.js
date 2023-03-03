@@ -129,6 +129,39 @@ export default {
       return this._read("chainId", strict);
     },
 
+    async _getNetworks(strict = false) {
+      let networks = await this._read("networks", strict);
+      if (!networks || networks.length === 0) {
+        // store default value
+        networks = [
+          {
+            name: "Koinos Mainnet",
+            tag: "mainnet",
+            chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
+            rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
+            koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+          },
+          {
+            name: "Koinos Harbinger",
+            tag: "harbinger",
+            chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+            rpcNodes: [
+              "https://harbinger-api.koinos.io",
+              "https://testnet.koinosblocks.com",
+            ],
+            koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+          },
+        ];
+        await this._setNetworks(networks);
+        networks = await this._read("networks", true);
+      }
+      return networks;
+    },
+
+    async _setNetworks(networks) {
+      return this._write("networks", networks);
+    },
+
     async _deleteWallet() {
       const passwordLabels = await this._getPasswordLabels();
       for (let i = 0; i < passwordLabels.length; i += 1) {
