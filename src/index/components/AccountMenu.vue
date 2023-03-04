@@ -1,56 +1,52 @@
 <template>
   <div class="dropdown-container">
-    <div>
-      <div class="link-item">
-        <div>
-          <div class="current-account">
-            {{ currentAccount }}
-          </div>
+    <div class="link-item">
+      <div>
+        <div class="current-account">
+          {{ currentAccount }}
+        </div>
+        <div class="address-container">
           <div class="current-address">
             {{ currentAddress }}
-            <button @click="copyAddress()">
-              <i class="material-icons">content_copy</i>
-            </button>
           </div>
+          <button @click="copyAddress()" title="copy address">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="12"
+              viewBox="0 96 960 960"
+              width="12"
+            >
+              <path
+                d="M180 975q-24 0-42-18t-18-42V312h60v603h474v60H180Zm120-120q-24 0-42-18t-18-42V235q0-24 18-42t42-18h440q24 0 42 18t18 42v560q0 24-18 42t-42 18H300Zm0-60h440V235H300v560Zm0 0V235v560Z"
+              />
+            </svg>
+          </button>
         </div>
-        <div
-          class="link"
-          @click="toggleDropdown()"
+      </div>
+      <div class="link" @click="toggleDropdown()">
+        <svg
+          width="20"
+          height="20"
+          version="1.1"
+          viewBox="0 0 1200 1200"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          <svg
-            width="23"
-            height="4"
-            viewBox="0 0 23 4"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="2.85486"
-              cy="2"
-              r="2"
-              fill="#514E54"
+          <g>
+            <path
+              d="m720 180c0 66.273-53.727 120-120 120s-120-53.727-120-120 53.727-120 120-120 120 53.727 120 120"
             />
-            <circle
-              cx="10.8549"
-              cy="2"
-              r="2"
-              fill="#514E54"
+            <path
+              d="m720 1020c0 66.273-53.727 120-120 120s-120-53.727-120-120 53.727-120 120-120 120 53.727 120 120"
             />
-            <circle
-              cx="18.8549"
-              cy="2"
-              r="2"
-              fill="#514E54"
+            <path
+              d="m720 600c0 66.273-53.727 120-120 120s-120-53.727-120-120 53.727-120 120-120 120 53.727 120 120"
             />
-          </svg>
-        </div>
+          </g>
+        </svg>
       </div>
     </div>
 
-    <div
-      v-if="showDropdown"
-      class="dropdown-content"
-    >
+    <div v-if="showDropdown" class="dropdown-content">
       <div class="dropdown-info">
         <span class="heading">Available accounts</span>
       </div>
@@ -66,38 +62,20 @@
           </div>
         </div>
       </div>
-      <div
-        disabled
-        class="separator"
-      />
+      <div disabled class="separator" />
       <div v-if="$store.state.mnemonic0">
-        <div
-          class="dropdown-item"
-          @click="createAccount"
-        >
-          + Create account
-        </div>
+        <div class="dropdown-item" @click="createAccount">+ Create account</div>
       </div>
       <div v-else>
-        <div
-          class="dropdown-item"
-          @click="addSeed"
-        >
-          + Add seed to wallet
-        </div>
+        <div class="dropdown-item" @click="addSeed">+ Add seed to wallet</div>
       </div>
-      <div
-        class="dropdown-item"
-        @click="importAccount"
-      >
-        + Import account
-      </div>
+      <div class="dropdown-item" @click="importAccount">+ Import account</div>
     </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
+import router from "@/index/router"
 
 export default {
   data() {
@@ -105,53 +83,51 @@ export default {
       currentAccount: "",
       currentAddress: "",
       showDropdown: false,
-    };
+    }
   },
   mounted() {
-    this.loadAccount();
+    this.loadAccount()
   },
 
   methods: {
     toggleDropdown() {
-      this.showDropdown = !this.showDropdown;
+      this.showDropdown = !this.showDropdown
     },
 
     selectAccount(index) {
-      this.$store.state.currentIndexAccount = index;
-      this.showDropdown = false;
-      this.loadAccount();
+      this.$store.state.currentIndexAccount = index
+      this.showDropdown = false
+      this.loadAccount()
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return;
-      const index = this.$store.state.currentIndexAccount;
-      this.currentAccount = this.$store.state.accounts[index].name;
-      this.currentAddress = this.$store.state.accounts[index].address;
+      if (this.$store.state.accounts.length === 0) return
+      const index = this.$store.state.currentIndexAccount
+      this.currentAccount = this.$store.state.accounts[index].name
+      this.currentAddress = this.$store.state.accounts[index].address
     },
 
     createAccount() {
-      router.push("/createAccount");
+      router.push("/createAccount")
     },
 
     importAccount() {
-      router.push("/importAccount");
+      router.push("/importAccount")
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true");
+      router.push("/generateSeed?privateKeyExist=true")
     },
 
     copyAddress() {
-      navigator.clipboard.writeText(this.currentAddress);
+      navigator.clipboard.writeText(this.currentAddress)
     },
   },
-};
+}
 </script>
 
 <style scoped>
 .dropdown-container {
-  display: flex;
-  justify-content: center;
   padding: 2em 0 0 0;
   color: var(--kondor-purple);
 }
@@ -179,6 +155,7 @@ export default {
   background: var(--primary-color);
   z-index: 10;
   overflow-y: scroll;
+  height: 79%;
 }
 
 .dropdown-item {
@@ -216,10 +193,10 @@ export default {
   text-transform: capitalize;
   font-weight: 500;
   font-size: 1.2em;
-  cursor: pointer;
   color: #000;
   display: flex;
   justify-content: space-between;
+  padding: 0 2em;
 }
 .address {
   font-size: 0.6em;
@@ -243,5 +220,16 @@ current-account {
 .signer-links {
   color: var(--kondor-purple);
   text-decoration: none;
+}
+.address-container {
+  display: flex;
+  align-items: center;
+}
+.address-container button {
+  all: unset;
+  cursor: pointer;
+}
+.address-container svg {
+  margin-left: 0.5em;
 }
 </style>

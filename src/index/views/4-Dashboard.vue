@@ -3,16 +3,12 @@
     <div class="column">
       <div class="info container">
         <div class="balance">
-          <div class="heading">
-            KOIN
-          </div>
+          <div class="heading">KOIN</div>
           <div class="amount">
-            <div
-              class="balance"
-              :data-tooltip="satoshis"
-            >
+            <div class="balance" :data-tooltip="satoshis">
               {{ balanceFormatted }}
             </div>
+            <div class="usd">$100.00 USD</div>
             <!-- <div>
               <router-link to="/signers" class="signer-links"
                 >Signers</router-link
@@ -23,76 +19,57 @@
         <!-- <div class="recharge-bar" :class="timeRechargeMana != 0 ? red : green"></div> -->
         <div class="mana-container">
           <div class="recharge-container">
-            <div class="mana-title">
-              MANA
-            </div>
+            <div class="mana-title">MANA</div>
             <div class="recharge-time">
               {{ timeRechargeMana }}
             </div>
           </div>
           <div class="mana-info">
-            <div class="title-gray">
-              Available
-            </div>
+            <div class="title-gray">Available</div>
             <div class="mana-available">
               {{ mana }}
             </div>
           </div>
         </div>
       </div>
-      <div
-        v-if="!watchMode"
-        class="transfer container"
-      >
+      <div v-if="!watchMode" class="transfer container">
         <label>Send to address</label>
-        <input
-          v-model="toAddress"
-          type="text"
-        >
+        <input v-model="toAddress" type="text" />
         <label>Send to amount</label>
-        <input
-          v-model="amount"
-          type="text"
-          @keyup.enter="transfer"
-        >
-        <button
-          class=""
-          @click="transfer"
-        >
-          transfer
-        </button>
+        <input v-model="amount" type="text" @keyup.enter="transfer" />
+        <button class="" @click="transfer">transfer</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { Contract, Provider, Signer, utils } from "koilib";
+import { Contract, Provider, Signer, utils } from "koilib"
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
-import Sandbox from "@/shared/mixins/Sandbox";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
+import Sandbox from "@/shared/mixins/Sandbox"
 
-const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
+const FIVE_DAYS = 432e6 // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
-  if (Number.isNaN(milliseconds)) return "";
+  if (Number.isNaN(milliseconds)) return ""
 
-  var seconds = Math.floor(milliseconds / 1000);
+  var seconds = Math.floor(milliseconds / 1000)
 
-  var interval = seconds / 86400;
-  if (interval > 2) return Math.floor(interval) + " days";
+  var interval = seconds / 86400
+  if (interval > 2) return Math.floor(interval) + " days"
 
-  interval = seconds / 3600;
-  if (interval > 2) return Math.floor(interval) + " hours";
+  interval = seconds / 3600
+  if (interval > 2) return Math.floor(interval) + " hours"
 
-  interval = seconds / 60;
-  if (interval > 2) return Math.floor(interval) + " minutes";
+  interval = seconds / 60
+  if (interval > 2) return Math.floor(interval) + " minutes"
 
-  interval = Math.floor(seconds);
-  if (interval === 0) return "Mana recharged";
-  return interval + " seconds";
+  interval = Math.floor(seconds)
+  if (interval === 0) return "Mana recharged"
+  return interval + " seconds"
 }
 
 export default {
@@ -113,44 +90,44 @@ export default {
       timeRechargeMana: "",
       watchMode: false,
       network: {},
-    };
+    }
   },
   computed: {
     balanceFormatted() {
-      const balanceNumber = Number(this.balance);
+      const balanceNumber = Number(this.balance)
       // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
-      return balanceNumber.toLocaleString("en");
+      return balanceNumber.toLocaleString("en")
     },
     satoshis() {
-      return this.balance;
+      return this.balance
     },
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount(this.$store.state.currentIndexAccount);
+      this.loadAccount(this.$store.state.currentIndexAccount)
     },
   },
 
   mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount);
+    this.loadAccount(this.$store.state.currentIndexAccount)
   },
 
   methods: {
     async loadAccount(index) {
       try {
-        const networks = await this._getNetworks();
-        this.network = networks[this.$store.state.currentNetwork];
-        this.provider = new Provider(this.network.rpcNodes);
-        const currentAccount = this.$store.state.accounts[index];
-        this.address = currentAccount.address;
-        this.signer = undefined;
+        const networks = await this._getNetworks()
+        this.network = networks[this.$store.state.currentNetwork]
+        this.provider = new Provider(this.network.rpcNodes)
+        const currentAccount = this.$store.state.accounts[index]
+        this.address = currentAccount.address
+        this.signer = undefined
         if (currentAccount.privateKey) {
-          this.signer = Signer.fromWif(currentAccount.privateKey, true);
-          this.signer.provider = this.provider;
-          this.watchMode = false;
+          this.signer = Signer.fromWif(currentAccount.privateKey, true)
+          this.signer.provider = this.provider
+          this.watchMode = false
         } else {
-          this.watchMode = true;
+          this.watchMode = true
         }
 
         this.koinContract = new Contract({
@@ -161,48 +138,48 @@ export default {
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        });
-        this.koin = this.koinContract.functions;
+        })
+        this.koin = this.koinContract.functions
       } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
+        this.alertDanger(error.message)
+        throw error
       }
-      await this.loadBalance();
+      await this.loadBalance()
     },
     async loadBalance() {
       try {
-        const { result } = await this.koin.balanceOf({ owner: this.address });
-        this.balance = utils.formatUnits(result.value, 8).toLocaleString("en");
+        const { result } = await this.koin.balanceOf({ owner: this.address })
+        this.balance = utils.formatUnits(result.value, 8).toLocaleString("en")
 
-        const balance = Number(this.balance);
-        const rc = await this.provider.getAccountRc(this.address);
-        const initialMana = Number(rc) / 1e8;
-        this.mana = Number(initialMana.toFixed(8));
-        this.lastUpdateMana = Date.now();
+        const balance = Number(this.balance)
+        const rc = await this.provider.getAccountRc(this.address)
+        const initialMana = Number(rc) / 1e8
+        this.mana = Number(initialMana.toFixed(8))
+        this.lastUpdateMana = Date.now()
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
-        );
+        )
 
-        clearInterval(this.intervalMana);
+        clearInterval(this.intervalMana)
         this.intervalMana = setInterval(() => {
-          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
-          let mana = initialMana + (delta * balance) / FIVE_DAYS;
-          mana = Math.min(mana, balance);
+          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS)
+          let mana = initialMana + (delta * balance) / FIVE_DAYS
+          mana = Math.min(mana, balance)
           this.timeRechargeMana = deltaTimeToString(
             ((balance - mana) * FIVE_DAYS) / balance
-          );
-          this.mana = Number(mana.toFixed(8));
-        }, 1000);
+          )
+          this.mana = Number(mana.toFixed(8))
+        }, 1000)
       } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
+        this.alertDanger(error.message)
+        throw error
       }
     },
     async transfer() {
-      let interval;
+      let interval
       try {
         if (!utils.isChecksumAddress(this.toAddress)) {
-          throw new Error(`${this.toAddress} is an invalid address`);
+          throw new Error(`${this.toAddress} is an invalid address`)
         }
 
         const { transaction, receipt } = await this.koin.transfer(
@@ -212,29 +189,29 @@ export default {
             value: utils.parseUnits(this.amount, 8),
           },
           { chainId: this.network.chainId }
-        );
-        this.alertSuccess("Sent. Waiting to be mined ...");
-        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
-        console.log(receipt);
-        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
+        )
+        this.alertSuccess("Sent. Waiting to be mined ...")
+        console.log(`Transaction id ${transaction.id} submitted. Receipt:`)
+        console.log(receipt)
+        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`)
         interval = setInterval(() => {
-          console.log("firing interval");
-          this.loadBalance();
-        }, 2000);
-        const { blockNumber } = await transaction.wait();
-        clearInterval(interval);
-        console.log("block number " + blockNumber);
-        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
-        this.toAddress = "";
-        this.amount = "";
+          console.log("firing interval")
+          this.loadBalance()
+        }, 2000)
+        const { blockNumber } = await transaction.wait()
+        clearInterval(interval)
+        console.log("block number " + blockNumber)
+        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`)
+        this.toAddress = ""
+        this.amount = ""
       } catch (error) {
-        clearInterval(interval);
-        this.alertDanger(error.message);
-        throw error;
+        clearInterval(interval)
+        this.alertDanger(error.message)
+        throw error
       }
     },
   },
-};
+}
 </script>
 <style scoped>
 label {
@@ -289,7 +266,7 @@ input {
   text-decoration: underline;
 }
 .transfer {
-  margin-bottom: 3em;
+  margin-top: 3em;
 }
 .address-container {
   font-weight: 400;
@@ -317,7 +294,7 @@ input {
   flex-direction: row;
   box-sizing: border-box;
   width: var(--app-width);
-  padding: 0 20px;
+  padding: 0 2em;
   justify-content: space-between;
   align-items: flex-start;
 }
@@ -354,6 +331,11 @@ input {
 }
 .red {
   background-color: rgb(223, 57, 57);
+}
+.usd {
+  font-size: 0.8em;
+  padding-top: 0.3em;
+  color: var(--kondor-gray);
 }
 /* TOOLTIP */
 /* Add this attribute to the element that needs a tooltip */
