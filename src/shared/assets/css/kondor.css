@@ -26,6 +26,7 @@ body {
   background: var(--kondor-light);
   color: var(--secondary-color);
   font-family: "Inter", sans-serif;
+  font-size: 75%;
 }
 
 h1 {
