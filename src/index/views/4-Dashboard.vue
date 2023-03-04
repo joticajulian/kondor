@@ -314,7 +314,10 @@ input {
 }
 .mana-container {
   display: flex;
-  width: 88vw;
+  flex-direction: row;
+  box-sizing: border-box;
+  width: var(--app-width);
+  padding: 0 20px;
   justify-content: space-between;
   align-items: flex-start;
 }

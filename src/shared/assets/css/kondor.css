@@ -6,6 +6,7 @@
   --kondor-gray: #828282;
   --kondor-purple: #7161ef;
   --kondor-lighter: #c8c1d1;
+  --app-width: 357px;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700&display=swap");
@@ -57,8 +58,6 @@ h3 {
   font-weight: 400;
   background: var(--kondor-light);
   color: var(--primary-color);
-  /* padding: 0 20px; */
-  /* width: 357px; */
 }
 
 #sandbox {
@@ -81,7 +80,7 @@ a:visited {
 
 input,
 textarea {
-  width: 97%;
+  width: 96%;
   color: var(--primary-color);
   padding: 1em;
   text-align: left;
@@ -159,13 +158,17 @@ button:disabled {
   margin: 1.5em 0;
   width: 100%;
 }
+
 .container {
   font-family: "Inter", sans-serif;
   font-weight: 400;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  margin: 0px 10px;
 }
+
 .heading {
   font-size: 1.4em;
 }
