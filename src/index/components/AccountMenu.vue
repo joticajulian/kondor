@@ -9,7 +9,10 @@
           <div class="current-address">
             {{ currentAddress }}
           </div>
-          <button @click="copyAddress()" title="copy address">
+          <button
+            title="copy address"
+            @click="copyAddress()"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="12"
@@ -23,7 +26,10 @@
           </button>
         </div>
       </div>
-      <div class="link" @click="toggleDropdown()">
+      <div
+        class="link"
+        @click="toggleDropdown()"
+      >
         <svg
           width="20"
           height="20"
@@ -46,7 +52,10 @@
       </div>
     </div>
 
-    <div v-if="showDropdown" class="dropdown-content">
+    <div
+      v-if="showDropdown"
+      class="dropdown-content"
+    >
       <div class="dropdown-info">
         <span class="heading">Available accounts</span>
       </div>
@@ -62,20 +71,38 @@
           </div>
         </div>
       </div>
-      <div disabled class="separator" />
+      <div
+        disabled
+        class="separator"
+      />
       <div v-if="$store.state.mnemonic0">
-        <div class="dropdown-item" @click="createAccount">+ Create account</div>
+        <div
+          class="dropdown-item"
+          @click="createAccount"
+        >
+          + Create account
+        </div>
       </div>
       <div v-else>
-        <div class="dropdown-item" @click="addSeed">+ Add seed to wallet</div>
+        <div
+          class="dropdown-item"
+          @click="addSeed"
+        >
+          + Add seed to wallet
+        </div>
       </div>
-      <div class="dropdown-item" @click="importAccount">+ Import account</div>
+      <div
+        class="dropdown-item"
+        @click="importAccount"
+      >
+        + Import account
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router"
+import router from "@/index/router";
 
 export default {
   data() {
@@ -83,47 +110,47 @@ export default {
       currentAccount: "",
       currentAddress: "",
       showDropdown: false,
-    }
+    };
   },
   mounted() {
-    this.loadAccount()
+    this.loadAccount();
   },
 
   methods: {
     toggleDropdown() {
-      this.showDropdown = !this.showDropdown
+      this.showDropdown = !this.showDropdown;
     },
 
     selectAccount(index) {
-      this.$store.state.currentIndexAccount = index
-      this.showDropdown = false
-      this.loadAccount()
+      this.$store.state.currentIndexAccount = index;
+      this.showDropdown = false;
+      this.loadAccount();
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return
-      const index = this.$store.state.currentIndexAccount
-      this.currentAccount = this.$store.state.accounts[index].name
-      this.currentAddress = this.$store.state.accounts[index].address
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAccount = this.$store.state.accounts[index].name;
+      this.currentAddress = this.$store.state.accounts[index].address;
     },
 
     createAccount() {
-      router.push("/createAccount")
+      router.push("/createAccount");
     },
 
     importAccount() {
-      router.push("/importAccount")
+      router.push("/importAccount");
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true")
+      router.push("/generateSeed?privateKeyExist=true");
     },
 
     copyAddress() {
-      navigator.clipboard.writeText(this.currentAddress)
+      navigator.clipboard.writeText(this.currentAddress);
     },
   },
-}
+};
 </script>
 
 <style scoped>
