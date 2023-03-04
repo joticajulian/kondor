@@ -14,7 +14,7 @@
               {{ balanceFormatted }}
             </div>
             <div class="usd">
-              $100.00 USD
+              {{ balanceUSD }}
             </div>
             <!-- <div>
               <router-link to="/signers" class="signer-links"
@@ -70,6 +70,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import { Contract, Provider, Signer, utils } from "koilib";
 
 // mixins
@@ -104,6 +105,7 @@ export default {
     return {
       address: "loading ",
       balance: "loading...",
+      balanceUSD: "",
       signer: null,
       provider: null,
       koinContract: null,
@@ -172,10 +174,29 @@ export default {
       }
       await this.loadBalance();
     },
+
+    async loadBalanceInUsd() {
+      try {
+        const response = await axios.get(
+          "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
+        );
+        const price = Number(response.data.data[0].last);
+        const balanceKoin = Number(this.balance);
+        const balanceUSD = balanceKoin * price;
+        this.balanceUSD = `$${balanceUSD.toFixed(2)} USD`;
+      } catch (error) {
+        console.error("Error when loading price from MEXC");
+        console.error(error);
+        this.balanceUSD = "Error";
+      }
+    },
+
     async loadBalance() {
       try {
         const { result } = await this.koin.balanceOf({ owner: this.address });
         this.balance = utils.formatUnits(result.value, 8).toLocaleString("en");
+
+        this.loadBalanceInUsd();
 
         const balance = Number(this.balance);
         const rc = await this.provider.getAccountRc(this.address);
