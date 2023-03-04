@@ -84,14 +84,11 @@ input {
 button {
   margin-left: -8px !important;
 }
+
 .container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin: 1em 0;
 }
+
 .welcome-message {
   width: 77%;
   margin: 2em 0;

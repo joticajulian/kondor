@@ -4,7 +4,10 @@
       v-if="loadingSession"
       class="loader"
     />
-    <div v-else>
+    <div
+      v-else
+      class="container"
+    >
       <input
         v-model="password"
         type="password"

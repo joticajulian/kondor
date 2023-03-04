@@ -170,12 +170,12 @@ export default {
   min-width: 160px;
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
   top: 48px;
-  right: 0;
+  left: 0;
   border: none;
   position: absolute;
-  width: 100%;
+  width: var(--app-width);
   margin-top: 6em;
-  height: 60vh;
+  height: 60%;
   background: var(--primary-color);
   z-index: 10;
   overflow-y: scroll;
@@ -218,7 +218,6 @@ export default {
   font-size: 1.2em;
   cursor: pointer;
   color: #000;
-  width: 88vw;
   display: flex;
   justify-content: space-between;
 }
