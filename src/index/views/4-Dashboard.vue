@@ -13,6 +13,9 @@
             >
               {{ balanceFormatted }}
             </div>
+            <div class="usd">
+              $100.00 USD
+            </div>
             <!-- <div>
               <router-link to="/signers" class="signer-links"
                 >Signers</router-link
@@ -289,7 +292,7 @@ input {
   text-decoration: underline;
 }
 .transfer {
-  margin-bottom: 3em;
+  margin-top: 3em;
 }
 .address-container {
   font-weight: 400;
@@ -317,7 +320,7 @@ input {
   flex-direction: row;
   box-sizing: border-box;
   width: var(--app-width);
-  padding: 0 20px;
+  padding: 0 2em;
   justify-content: space-between;
   align-items: flex-start;
 }
@@ -354,6 +357,11 @@ input {
 }
 .red {
   background-color: rgb(223, 57, 57);
+}
+.usd {
+  font-size: 0.8em;
+  padding-top: 0.3em;
+  color: var(--kondor-gray);
 }
 /* TOOLTIP */
 /* Add this attribute to the element that needs a tooltip */

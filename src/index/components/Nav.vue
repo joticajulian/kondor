@@ -10,6 +10,9 @@
       >
         &#8592;
       </div>
+      <div class="lock-button">
+        Lock
+      </div>
       <div v-if="$store.state.network">
         <span class="connection-indicator">&#9724;</span>{{ $store.state.network }}
       </div>
@@ -49,5 +52,14 @@ export default {
 }
 .connection-indicator {
   color: greenyellow;
+}
+.lock-button {
+  cursor: pointer;
+  color: white;
+  padding-right: 1em;
+  font-weight: bold;
+}
+.lock-button:hover {
+  color: rgb(246, 151, 19);
 }
 </style>
