@@ -1,60 +1,75 @@
 <template>
   <div>
-    <div
-      v-if="$store.state.showBackButton"
-      class="header"
-    >
-      <div
-        class="back-button"
-        @click="back"
-      >
-        &#8592;
+    <div v-if="$store.state.showBackButton" class="header">
+      <div class="back-button" @click="back">&#8592;</div>
+      <!-- <div v-if="$store.state.networks.length">
+        {{ $store.state.networks[$store.state.currentNetwork].name }}
+      </div> -->
+      <div class="network-select">
+        <select v-model="$store.state.currentNetwork">
+          <option v-for="(network, index) in $store.state.networks" :value="index" :key="index">
+            {{ network.name }}
+          </option>
+        </select>
       </div>
-      <div v-if="$store.state.networks.length">
-        <span class="connection-indicator">&#9724;</span>{{ $store.state.networks[$store.state.currentNetwork].name }}
-      </div>
-      <div
-        class="lock-button"
-        @click="lock()"
-      >
-        Lock
-      </div>
+      <div class="lock-button" @click="lock()">Lock</div>
     </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
-import AccountMenu from "@/index/components/AccountMenu.vue";
+import router from "@/index/router"
+import AccountMenu from "@/index/components/AccountMenu.vue"
 
 // mixins
-import Storage from "@/shared/mixins/Storage";
+import Storage from "@/shared/mixins/Storage"
 
 export default {
   components: { AccountMenu },
+
+  data() {
+    return {
+      showBackButton: false,
+    }
+  },
 
   mixins: [Storage],
 
   methods: {
     back() {
-      router.back();
+      router.back()
     },
 
     async lock() {
-      await this._removePasswordsFromSession();
-      router.push("/");
+      await this._removePasswordsFromSession()
+      router.push("/")
     },
   },
-};
+}
 </script>
+
 <style scoped>
+select,
+select:focus-visible,
+select:focus {
+  background: var(--kondor-purple);
+  color: white;
+  border: none !important;
+  font-size: 1em;
+  padding: 0.5em;
+  margin: 0;
+  border: unset !important;
+}
+
+
 .back-button {
   cursor: pointer;
   color: white;
   /* margin-top: 20px; */
   padding: 1em;
 }
+
 .header {
   background: var(--kondor-purple);
   color: white;
@@ -63,16 +78,19 @@ export default {
   align-items: center;
   padding: 0 1em;
 }
+
 .connection-indicator {
   color: greenyellow;
 }
+
 .lock-button {
   cursor: pointer;
   color: white;
   padding-right: 1em;
   font-weight: bold;
 }
+
 .lock-button:hover {
-  color: rgb(246, 151, 19);
+  color: #adff2f;
 }
 </style>

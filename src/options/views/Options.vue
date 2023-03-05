@@ -8,15 +8,12 @@
           <br>
         </div>
       </header>
-      <div class="top content">
-        <div class="">
-          <h2>Networks</h2>
-          <p>Networks configured in the wallet.</p>
-        </div>
-        <div
-          v-for="network in networks"
-          :key="network.name"
-        >
+      <div class="">
+        <h2>Networks</h2>
+        <p>Networks configured in the wallet.</p>
+      </div>
+      <div class="top content two-column">
+        <div v-for="network in networks" :key="network.name" class="network-column">
           <div class="key big">
             {{ network.name }}
           </div>
@@ -26,10 +23,7 @@
                 RPC Nodes
               </div>
               <div class="input-button">
-                <input
-                  v-model="network.rpcNodes"
-                  type="text"
-                >
+                <input v-model="network.rpcNodes" type="text">
               </div>
             </div>
             <div class="input-group">
@@ -37,27 +31,22 @@
                 Set Chain Id
               </div>
               <div class="input-button">
-                <input
-                  v-model="network.chainId"
-                  type="text"
-                >
+                <input v-model="network.chainId" type="text">
               </div>
             </div>
           </div>
         </div>
-        <button @click="updateNetworks()">
-          Update Networks
-        </button>
       </div>
-
+      <button @click="updateNetworks()">
+        Update Networks
+      </button>
+      <hr>
       <div class="bottom content">
         <div class="">
           <h2>Wallet</h2>
           <p>
             Here you can view your wallet's seed and private keys.
-            <span
-              class="warning"
-            >Note: this information is extremely sensitive! Keep it safe and
+            <span class="warning">Note: this information is extremely sensitive! Keep it safe and
               make sure it doesn't fall into the wrong hands. It is your
               responsibility, there is no way to recover stolen funds.</span>
           </p>
@@ -67,11 +56,7 @@
             <p class="description">
               View seed and private keys
             </p>
-            <Unlock
-              label-button="View seed and private keys"
-              @onUnlock="viewSecrets"
-              @onError="alertDanger($event)"
-            />
+            <Unlock label-button="View seed and private keys" @onUnlock="viewSecrets" @onError="alertDanger($event)" />
           </div>
           <div class="right">
             <div class="key">
@@ -84,11 +69,7 @@
             <div class="title">
               Accounts
             </div>
-            <div
-              v-for="account in accounts"
-              :key="account"
-              class=""
-            >
+            <div v-for="account in accounts" :key="account" class="">
               <div class="key big">
                 {{ account.name }}
               </div>
@@ -115,10 +96,7 @@
               </div>
               <br>
               <div class="signers">
-                <div
-                  v-for="signer in account.signers"
-                  :key="signer.name"
-                >
+                <div v-for="signer in account.signers" :key="signer.name">
                   {{ signer.name }} <br>
                   {{ signer.keyPath }} <br>
                   {{ signer.address }} <br>
@@ -197,23 +175,34 @@ export default {
 <style scoped>
 input {
   margin-bottom: 0;
+  max-width: 100%;
 }
+
 button {
   margin: 0;
   width: auto;
+  margin-top: 2em;
 }
+
 h1 {
   margin: 0;
   font-size: 2em;
   font-weight: bold;
 }
+
 h2 {
   font-size: 1.5em;
   font-weight: bold;
 }
+
 p {
   width: 80%;
 }
+
+hr {
+  margin: 2em 0;
+}
+
 .container {
   margin: 0;
   display: block;
@@ -227,89 +216,111 @@ p {
   flex-direction: column;
   align-items: center;
 }
+
 .inside-container {
   width: 60%;
   margin: 0 auto;
   padding: 4em;
   background-color: #f5f5f5;
 }
+
 .logo {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1em;
 }
+
 .warning {
   background-color: red;
 }
+
 .input-group {
   display: flex;
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  width: 45%;
-  padding: 1em 0;
-  margin-top: 1em;
+  width: 100%;
   gap: 0.5em;
 }
+
 .content {
   display: flex;
   flex-direction: column;
 }
+
 .content .wide {
   width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 2em;
   flex-wrap: wrap;
 }
+
 .input-button {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1em;
 }
-.description {
-}
+
 .heading {
   margin-top: 2em;
 }
+
 .two-column {
   display: flex;
   flex-direction: row;
   gap: 2em;
 }
+
 .right {
   padding: 3em;
 }
+
 .key {
   font-weight: bold;
 }
+
 .value {
   font-weight: normal;
 }
+
 .big {
   font-size: 1.5em;
   margin-top: 30px;
 }
+
 .warning {
   color: rgb(207, 27, 27);
   background: none;
   font-weight: bold;
 }
+
+.network-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .inside-container {
     width: 90%;
   }
+
   .input-group {
     width: 100%;
   }
+
   .two-column {
     flex-direction: column;
   }
+
   .right {
     padding: 0;
   }
+
   .content .wide {
     flex-direction: column;
   }
