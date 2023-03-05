@@ -15,7 +15,7 @@
       value="watch-mode"
     >
     <label for="watch-mode">Import in watch mode (without private key)</label><br>
-    <div v-if="watchMode">
+    <div v-if="watchMode" class="todo-class">
       <div>Address</div>
       <input
         v-model="address"
@@ -24,7 +24,7 @@
         @keyup.enter="accept"
       >
     </div>
-    <div v-else>
+    <div v-else class="todo-class">
       <div>Private key</div>
       <input
         v-model="privateKey"
@@ -99,5 +99,10 @@ input[type="checkbox"] {
 .container {
   min-height: 20em;
   margin: 4em 2em;
+}
+
+.todo-class {
+  width: 100%;
+  margin-left: 3.5em;
 }
 </style>
