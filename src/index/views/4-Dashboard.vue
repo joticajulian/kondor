@@ -117,7 +117,6 @@ export default {
       lastUpdateMana: 0,
       timeRechargeMana: "",
       watchMode: false,
-      network: {},
     };
   },
   computed: {
@@ -144,8 +143,9 @@ export default {
   methods: {
     async loadAccount(index) {
       try {
-        const networks = await this._getNetworks();
-        this.network = networks[this.$store.state.currentNetwork];
+        this.$store.state.networks = await this._getNetworks();
+        this.network =
+          this.$store.state.networks[this.$store.state.currentNetwork];
         this.provider = new Provider(this.network.rpcNodes);
         const currentAccount = this.$store.state.accounts[index];
         this.address = currentAccount.address;
@@ -383,49 +383,5 @@ input {
   font-size: 0.8em;
   padding-top: 0.3em;
   color: var(--kondor-gray);
-}
-/* TOOLTIP */
-/* Add this attribute to the element that needs a tooltip */
-[data-tooltip] {
-  position: relative;
-  z-index: 2;
-  cursor: pointer;
-}
-
-/* Hide the tooltip content by default */
-[data-tooltip]:before,
-[data-tooltip]:after {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Position tooltip above the element */
-[data-tooltip]:before {
-  position: absolute;
-  bottom: 115%;
-  left: 50%;
-  margin-bottom: 5px;
-  margin-left: -90px;
-  padding: 7px;
-  width: 160px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  background-color: var(--kondor-purple);
-  color: #fff;
-  content: attr(data-tooltip);
-  text-align: center;
-  font-size: 14px;
-  line-height: 1.2;
-}
-
-/* Show tooltip content on hover */
-[data-tooltip]:hover:before,
-[data-tooltip]:hover:after {
-  visibility: visible;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
 }
 </style>
