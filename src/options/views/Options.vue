@@ -10,39 +10,44 @@
       </header>
       <div class="top content">
         <div class="">
-          <h2>Chain</h2>
-          <p>Here you can set the RPC and Chain ID information.</p>
+          <h2>Networks</h2>
+          <p>Networks configured in the wallet.</p>
         </div>
-        <div class="wide">
-          <div class="input-group">
-            <div class="description">
-              Set RPC Nodes
-            </div>
-            <div class="input-button">
-              <input
-                v-model="rpcNodes"
-                type="text"
-              >
-              <button @click="setRpcNodes">
-                Set RPC Nodes
-              </button>
-            </div>
+        <div
+          v-for="network in networks"
+          :key="network.name"
+        >
+          <div class="key big">
+            {{ network.name }}
           </div>
-          <div class="input-group">
-            <div class="description">
-              Set Chain Id
+          <div class="wide">
+            <div class="input-group">
+              <div class="description">
+                RPC Nodes
+              </div>
+              <div class="input-button">
+                <input
+                  v-model="network.rpcNodes"
+                  type="text"
+                >
+              </div>
             </div>
-            <div class="input-button">
-              <input
-                v-model="chainId"
-                type="text"
-              >
-              <button @click="setChainId">
+            <div class="input-group">
+              <div class="description">
                 Set Chain Id
-              </button>
+              </div>
+              <div class="input-button">
+                <input
+                  v-model="network.chainId"
+                  type="text"
+                >
+              </div>
             </div>
           </div>
         </div>
+        <button @click="updateNetworks()">
+          Update Networks
+        </button>
       </div>
 
       <div class="bottom content">
@@ -151,35 +156,21 @@ export default {
       rpcNodes: "",
       chainId: "",
       mnemonic: "",
-      accounts: "",
+      accounts: [],
+      networks: [],
     };
   },
 
   mounted() {
     (async () => {
-      this.rpcNodes = (await this._getRpcNodes()).join(",");
-      this.chainId = await this._getChainId();
+      this.networks = await this._getNetworks();
     })();
   },
-  methods: {
-    async setRpcNodes() {
-      try {
-        await this._setRpcNodes(this.rpcNodes.split(","));
-        this.alertSuccess("RPC Node set");
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
-    },
 
-    async setChainId() {
-      try {
-        await this._setChainId(this.chainId);
-        this.alertSuccess("Chain Id set");
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
+  methods: {
+    async updateNetworks() {
+      await this._setNetworks(this.networks);
+      this.alertSuccess("Networks updated");
     },
 
     async deleteWallet() {
@@ -299,6 +290,7 @@ p {
 }
 .big {
   font-size: 1.5em;
+  margin-top: 30px;
 }
 .warning {
   color: rgb(207, 27, 27);

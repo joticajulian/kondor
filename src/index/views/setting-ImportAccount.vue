@@ -15,7 +15,10 @@
       value="watch-mode"
     >
     <label for="watch-mode">Import in watch mode (without private key)</label><br>
-    <div v-if="watchMode" class="todo-class">
+    <div
+      v-if="watchMode"
+      class="todo-class"
+    >
       <div>Address</div>
       <input
         v-model="address"
@@ -24,7 +27,10 @@
         @keyup.enter="accept"
       >
     </div>
-    <div v-else class="todo-class">
+    <div
+      v-else
+      class="todo-class"
+    >
       <div>Private key</div>
       <input
         v-model="privateKey"
