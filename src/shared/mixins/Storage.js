@@ -178,6 +178,11 @@ export default {
       await this._writeSession(`password${id}`, password);
     },
 
+    async _removePasswordsFromSession() {
+      // TODO: Get the whole list of passwords using getPasswordLabels
+      await this._writeSession("password0", null);
+    },
+
     async _saveSeedPhraseInMemory(id, mnemonic) {
       if (await this._getMnemonic(id))
         throw new Error(`the seed phrase #${id} already exist`);

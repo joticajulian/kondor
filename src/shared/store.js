@@ -14,6 +14,7 @@ export default new Vuex.Store({
     alertMessage: "",
     alertType: "",
     requests: [],
+    networks: [],
     currentNetwork: 0,
     testDataSession: {},
     testData: {

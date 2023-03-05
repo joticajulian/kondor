@@ -9,21 +9,23 @@
           <div class="current-address">
             {{ currentAddress }}
           </div>
-          <button
-            title="copy address"
-            @click="copyAddress()"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="12"
-              viewBox="0 96 960 960"
-              width="12"
+          <div :data-tooltip="msgCopy">
+            <button
+              :data-tooltip="msgCopy"
+              @click="copyAddress()"
             >
-              <path
-                d="M180 975q-24 0-42-18t-18-42V312h60v603h474v60H180Zm120-120q-24 0-42-18t-18-42V235q0-24 18-42t42-18h440q24 0 42 18t18 42v560q0 24-18 42t-42 18H300Zm0-60h440V235H300v560Zm0 0V235v560Z"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="12"
+                viewBox="0 96 960 960"
+                width="12"
+              >
+                <path
+                  d="M180 975q-24 0-42-18t-18-42V312h60v603h474v60H180Zm120-120q-24 0-42-18t-18-42V235q0-24 18-42t42-18h440q24 0 42 18t18 42v560q0 24-18 42t-42 18H300Zm0-60h440V235H300v560Zm0 0V235v560Z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
       <div
@@ -107,11 +109,13 @@ import router from "@/index/router";
 export default {
   data() {
     return {
+      msgCopy: "copy address",
       currentAccount: "",
       currentAddress: "",
       showDropdown: false,
     };
   },
+
   mounted() {
     this.loadAccount();
   },
@@ -148,6 +152,10 @@ export default {
 
     copyAddress() {
       navigator.clipboard.writeText(this.currentAddress);
+      this.msgCopy = "copied!";
+      setTimeout(() => {
+        this.msgCopy = "copy address";
+      }, 2000);
     },
   },
 };

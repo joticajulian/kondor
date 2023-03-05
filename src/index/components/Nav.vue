@@ -10,11 +10,14 @@
       >
         &#8592;
       </div>
-      <div class="lock-button">
-        Lock
+      <div v-if="$store.state.networks.length">
+        <span class="connection-indicator">&#9724;</span>{{ $store.state.networks[$store.state.currentNetwork].name }}
       </div>
-      <div v-if="$store.state.network">
-        <span class="connection-indicator">&#9724;</span>{{ $store.state.network }}
+      <div
+        class="lock-button"
+        @click="lock()"
+      >
+        Lock
       </div>
     </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />
@@ -25,12 +28,22 @@
 import router from "@/index/router";
 import AccountMenu from "@/index/components/AccountMenu.vue";
 
+// mixins
+import Storage from "@/shared/mixins/Storage";
+
 export default {
   components: { AccountMenu },
+
+  mixins: [Storage],
 
   methods: {
     back() {
       router.back();
+    },
+
+    async lock() {
+      await this._removePasswordsFromSession();
+      router.push("/");
     },
   },
 };
