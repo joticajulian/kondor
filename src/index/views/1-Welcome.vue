@@ -2,53 +2,37 @@
   <div class="container">
     <div class="logo">
       <div><Logo /></div>
-      <br>
+      <br />
       <div><LogoText /></div>
     </div>
-    <div
-      v-if="hasAccounts"
-      class="unlock"
-    >
-      <Unlock
-        @onUnlock="unlock()"
-        @onError="alertDanger($event)"
-      />
+    <div v-if="hasAccounts" class="unlock">
+      <Unlock @onUnlock="unlock()" @onError="alertDanger($event)" />
     </div>
-    <div
-      v-if="!hasAccounts"
-      class="welcome-message"
-    >
+    <div v-if="!hasAccounts" class="welcome-message">
       Welcome to Kondor!
-      <br>The first of its kind wallet for the first of its kind blockchain,
+      <br />The first of its kind wallet for the first of its kind blockchain,
       Koinos.
     </div>
-    <router-link
-      v-if="hasAccounts"
-      to="/importSeedPhrase"
-      class="button"
-    >
+    <router-link v-if="hasAccounts" to="/importSeedPhrase" class="button">
       <button>Forgot password?</button>
     </router-link>
-    <router-link
-      v-else
-      to="/newWallet"
-    >
+    <router-link v-else to="/newWallet">
       <button>New Wallet</button>
     </router-link>
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
+import router from "@/index/router"
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
 
 // components
-import Unlock from "@/shared/components/Unlock.vue";
-import Logo from "@/shared/components/Logo";
-import LogoText from "@/shared/components/LogoText";
+import Unlock from "@/shared/components/Unlock.vue"
+import Logo from "@/shared/components/Logo"
+import LogoText from "@/shared/components/LogoText"
 
 export default {
   name: "Welcome",
@@ -58,23 +42,23 @@ export default {
   data() {
     return {
       hasAccounts: false,
-    };
+    }
   },
 
   mounted() {
     (async () => {
-      const encAccounts = await this._getAccounts();
-      this.hasAccounts = encAccounts && encAccounts.length > 0;
-    })();
+      const encAccounts = await this._getAccounts()
+      this.hasAccounts = encAccounts && encAccounts.length > 0
+    })()
   },
 
   methods: {
     async unlock() {
-      this.alertClose();
-      router.push("/dashboard");
+      this.alertClose()
+      router.push("/dashboard")
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -87,6 +71,8 @@ button {
 
 .container {
   align-items: center;
+  width: 100%;
+  margin: 0;
 }
 
 .welcome-message {

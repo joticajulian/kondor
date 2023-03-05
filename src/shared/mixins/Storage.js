@@ -142,7 +142,7 @@ export default {
             koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
           },
           {
-            name: "Koinos Harbinger",
+            name: "Koinos Harbinger (testnet)",
             tag: "harbinger",
             chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
             rpcNodes: [
