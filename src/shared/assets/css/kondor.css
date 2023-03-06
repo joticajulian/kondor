@@ -219,21 +219,20 @@ button:disabled {
 /* Position tooltip above the element */
 [data-tooltip]:before {
   position: absolute;
-  bottom: 115%;
-  left: 50%;
+  bottom: 100%;
+  left: 240%;
   margin-bottom: 5px;
   margin-left: -90px;
-  padding: 7px;
-  width: 160px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
+  padding: 1em;
+  width: 8em;
   border-radius: 3px;
-  background-color: var(--kondor-purple);
-  color: #fff;
+  background-color: #444;
+  color: white;
   content: attr(data-tooltip);
   text-align: center;
-  font-size: 14px;
+  font-size: 0.7em;
   line-height: 1.2;
+  transition: all 0.5s ease-in-out;
 }
 
 /* Show tooltip content on hover */

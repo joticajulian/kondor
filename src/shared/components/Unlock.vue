@@ -16,7 +16,7 @@
         @keyup.enter="unlock"
       >
       <button
-        class=""
+        class="button"
         @click="unlock"
       >
         {{ labelButton }}
@@ -138,12 +138,14 @@ export default {
 </script>
 <style scoped>
 .container {
-  margin: 1em 0;
+  margin: 3em 0;
+  width: 100%;
 }
 .button {
   width: 100%;
   margin: 0 auto;
   text-align: center;
+  margin-left: -8px;
 }
 .button button {
   background: none;

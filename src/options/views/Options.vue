@@ -8,14 +8,15 @@
           <br>
         </div>
       </header>
-      <div class="top content">
-        <div class="">
-          <h2>Networks</h2>
-          <p>Networks configured in the wallet.</p>
-        </div>
+      <div class="">
+        <h2>Networks</h2>
+        <p>Networks configured in the wallet.</p>
+      </div>
+      <div class="top content two-column">
         <div
           v-for="network in networks"
           :key="network.name"
+          class="network-column"
         >
           <div class="key big">
             {{ network.name }}
@@ -45,11 +46,11 @@
             </div>
           </div>
         </div>
-        <button @click="updateNetworks()">
-          Update Networks
-        </button>
       </div>
-
+      <button @click="updateNetworks()">
+        Update Networks
+      </button>
+      <hr>
       <div class="bottom content">
         <div class="">
           <h2>Wallet</h2>
@@ -197,23 +198,34 @@ export default {
 <style scoped>
 input {
   margin-bottom: 0;
+  max-width: 100%;
 }
+
 button {
   margin: 0;
   width: auto;
+  margin-top: 2em;
 }
+
 h1 {
   margin: 0;
   font-size: 2em;
   font-weight: bold;
 }
+
 h2 {
   font-size: 1.5em;
   font-weight: bold;
 }
+
 p {
   width: 80%;
 }
+
+hr {
+  margin: 2em 0;
+}
+
 .container {
   margin: 0;
   display: block;
@@ -227,89 +239,111 @@ p {
   flex-direction: column;
   align-items: center;
 }
+
 .inside-container {
   width: 60%;
   margin: 0 auto;
   padding: 4em;
   background-color: #f5f5f5;
 }
+
 .logo {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 1em;
 }
+
 .warning {
   background-color: red;
 }
+
 .input-group {
   display: flex;
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  width: 45%;
-  padding: 1em 0;
-  margin-top: 1em;
+  width: 100%;
   gap: 0.5em;
 }
+
 .content {
   display: flex;
   flex-direction: column;
 }
+
 .content .wide {
   width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 2em;
   flex-wrap: wrap;
 }
+
 .input-button {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1em;
 }
-.description {
-}
+
 .heading {
   margin-top: 2em;
 }
+
 .two-column {
   display: flex;
   flex-direction: row;
   gap: 2em;
 }
+
 .right {
   padding: 3em;
 }
+
 .key {
   font-weight: bold;
 }
+
 .value {
   font-weight: normal;
 }
+
 .big {
   font-size: 1.5em;
   margin-top: 30px;
 }
+
 .warning {
   color: rgb(207, 27, 27);
   background: none;
   font-weight: bold;
 }
+
+.network-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .inside-container {
     width: 90%;
   }
+
   .input-group {
     width: 100%;
   }
+
   .two-column {
     flex-direction: column;
   }
+
   .right {
     padding: 0;
   }
+
   .content .wide {
     flex-direction: column;
   }
