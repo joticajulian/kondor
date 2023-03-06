@@ -13,7 +13,11 @@
         <p>Networks configured in the wallet.</p>
       </div>
       <div class="top content two-column">
-        <div v-for="network in networks" :key="network.name" class="network-column">
+        <div
+          v-for="network in networks"
+          :key="network.name"
+          class="network-column"
+        >
           <div class="key big">
             {{ network.name }}
           </div>
@@ -23,7 +27,10 @@
                 RPC Nodes
               </div>
               <div class="input-button">
-                <input v-model="network.rpcNodes" type="text">
+                <input
+                  v-model="network.rpcNodes"
+                  type="text"
+                >
               </div>
             </div>
             <div class="input-group">
@@ -31,7 +38,10 @@
                 Set Chain Id
               </div>
               <div class="input-button">
-                <input v-model="network.chainId" type="text">
+                <input
+                  v-model="network.chainId"
+                  type="text"
+                >
               </div>
             </div>
           </div>
@@ -46,7 +56,9 @@
           <h2>Wallet</h2>
           <p>
             Here you can view your wallet's seed and private keys.
-            <span class="warning">Note: this information is extremely sensitive! Keep it safe and
+            <span
+              class="warning"
+            >Note: this information is extremely sensitive! Keep it safe and
               make sure it doesn't fall into the wrong hands. It is your
               responsibility, there is no way to recover stolen funds.</span>
           </p>
@@ -56,7 +68,11 @@
             <p class="description">
               View seed and private keys
             </p>
-            <Unlock label-button="View seed and private keys" @onUnlock="viewSecrets" @onError="alertDanger($event)" />
+            <Unlock
+              label-button="View seed and private keys"
+              @onUnlock="viewSecrets"
+              @onError="alertDanger($event)"
+            />
           </div>
           <div class="right">
             <div class="key">
@@ -69,7 +85,11 @@
             <div class="title">
               Accounts
             </div>
-            <div v-for="account in accounts" :key="account" class="">
+            <div
+              v-for="account in accounts"
+              :key="account"
+              class=""
+            >
               <div class="key big">
                 {{ account.name }}
               </div>
@@ -96,7 +116,10 @@
               </div>
               <br>
               <div class="signers">
-                <div v-for="signer in account.signers" :key="signer.name">
+                <div
+                  v-for="signer in account.signers"
+                  :key="signer.name"
+                >
                   {{ signer.name }} <br>
                   {{ signer.keyPath }} <br>
                   {{ signer.address }} <br>
