@@ -87,6 +87,8 @@ button {
 
 .container {
   align-items: center;
+  width: 100%;
+  margin: 0;
 }
 
 .welcome-message {
