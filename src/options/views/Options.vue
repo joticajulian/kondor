@@ -70,6 +70,7 @@
             </p>
             <Unlock
               label-button="View seed and private keys"
+              :autocomplete="false"
               @onUnlock="viewSecrets"
               @onError="alertDanger($event)"
             />

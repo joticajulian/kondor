@@ -39,6 +39,10 @@ export default {
       type: String,
       default: "unlock",
     },
+    autocomplete: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data() {
@@ -50,10 +54,12 @@ export default {
 
   created() {
     (async () => {
-      const password = await this._readSession("password0");
-      if (password) {
-        this.password = password;
-        await this.unlock();
+      if (this.autocomplete) {
+        const password = await this._readSession("password0");
+        if (password) {
+          this.password = password;
+          await this.unlock();
+        }
       }
       this.loadingSession = false;
     })();
