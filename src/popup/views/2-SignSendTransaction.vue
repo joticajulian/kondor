@@ -24,6 +24,9 @@
           {{ requester.origin }}
         </div>
       </div>
+      <div class="subtitle">
+        Headers
+      </div>
       <div class="tx-header">
         <div class="group-input">
           <label for="network">Network</label>
@@ -68,16 +71,23 @@
       <div
         v-for="(op, i) in operations"
         :key="i"
+        class="operation"
       >
-        <div class="op-header">
+        <div
+          class="op-header"
+          :class="op.style"
+        >
           <div
             v-if="op.call_contract"
             class="contract-id"
           >
-            {{ op.call_contract.contractId }}
+            {{ op.contractId }}
           </div>
           <div class="op-title">
             {{ op.title }}
+          </div>
+          <div class="op-subtitle">
+            {{ op.subtitle }}
           </div>
         </div>
         <div class="op-body">
@@ -105,10 +115,6 @@
           @onError="alertDanger($event)"
         />
       </div>
-      <Footnote
-        v-if="footnoteMessage2"
-        :message="footnoteMessage2"
-      />
       <div class="container">
         <button
           :disabled="!unlocked"
@@ -128,7 +134,7 @@
 </template>
 
 <script>
-import { Signer, Contract, Provider } from "koilib";
+import { Signer, Contract, Provider, utils } from "koilib";
 
 // mixins
 import Message from "@/popup/mixins/Message";
@@ -172,7 +178,6 @@ export default {
       nonce: "",
       operations: [],
       footnoteMessage: "",
-      footnoteMessage2: "",
       account: null,
       unlocked: !!this.$store.state.accounts.length > 0,
       request: null,
@@ -197,6 +202,24 @@ export default {
                     args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
                     contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
                     entry_point: 670398154,
+                  },
+                },
+                {
+                  call_contract: {
+                    args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
+                    contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                    entry_point: 6703981540,
+                  },
+                },
+                {
+                  upload_contract: {
+                    contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                    bytecode:
+                      "TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQgY29uc2VjdGV0dXIgYWRpcGlzaWNpbmcgZWxpdC4gTWF4aW1lIG1vbGxpdGlhLAptb2xlc3RpYWUgcXVhcyB2ZWwgc2ludCBjb21tb2RpIHJlcHVkaWFuZGFlIGNvbnNlcXV1bnR1ciB2b2x1cHRhdHVtIGxhYm9ydW0KbnVtcXVhbSBibGFuZGl0aWlzIGhhcnVtIHF1aXNxdWFtIGVpdXMgc2VkIG9kaXQgZnVnaWF0IGl1c3RvIGZ1Z2EgcHJhZXNlbnRpdW0Kb3B0aW8sIGVhcXVlIHJlcnVtISBQcm92aWRlbnQgc2ltaWxpcXVlIGFjY3VzYW50aXVtIG5lbW8gYXV0ZW0uIFZlcml0YXRpcwpvYmNhZWNhdGkgdGVuZXR1ciBpdXJlIGVpdXMgZWFydW0gdXQgbW9sZXN0aWFzIGFyY2hpdGVjdG8gdm9sdXB0YXRlIGFsaXF1YW0KbmloaWwsIGV2ZW5pZXQgYWxpcXVpZCBjdWxwYSBvZmZpY2lhIGF1dCEgSW1wZWRpdCBzaXQgc3VudCBxdWFlcmF0LCBvZGl0LAp0ZW5ldHVyIGVycm9yLCBoYXJ1bSBuZXNjaXVudCBpcHN1bSBkZWJpdGlzIHF1YXMgYWxpcXVpZC4gUmVwcmVoZW5kZXJpdCwKcXVpYS4gUXVvIG5lcXVlIGVycm9yIHJlcHVkaWFuZGFlIGZ1Z2E_IElwc2EgbGF1ZGFudGl1bSBtb2xlc3RpYXMgZW9zIApzYXBpZW50ZSBvZmZpY2lpcyBtb2RpIGF0IHN1bnQgZXhjZXB0dXJpIGV4cGVkaXRhIHNpbnQ_IFNlZCBxdWlidXNkYW0KcmVjdXNhbmRhZSBhbGlhcyBlcnJvciBoYXJ1bSBtYXhpbWUgYWRpcGlzY2kgYW1ldCBsYWJvcnVtLiBQZXJzcGljaWF0",
+                    abi: "{}",
+                    authorizes_call_contract: true,
+                    authorizes_transaction_application: true,
+                    authorizes_upload_contract: false,
                   },
                 },
               ],
@@ -616,13 +639,55 @@ export default {
             // upload contract or set system call don't
             // require an extra decode
             let title = "";
-            if (op.upload_contract) title = "Upload contract";
-            else if (op.set_system_call) title = "Set system call";
-            else if (op.set_system_contract) title = "Set system contract";
+            if (op.upload_contract) title = "Upload contract 😎";
+            else if (op.set_system_call) title = "Set system call ⚙️";
+            else if (op.set_system_contract) title = "Set system contract ⚙️";
             else title = "Unknown operation";
+            const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
+            const authMessage = (a) =>
+              a
+                ? "Managed by the contract"
+                : "Managed by the private key of the contract ID";
             this.operations.push({
-              ...op,
+              upload_contract: true,
               title,
+              args: [
+                {
+                  field: "Contract ID",
+                  data: op.upload_contract.contract_id,
+                },
+                {
+                  field: "Bytecode size",
+                  data: bytecode.length,
+                },
+                {
+                  field: "SHA256",
+                  data: utils.toHexString(
+                    new Uint8Array(
+                      await crypto.subtle.digest("SHA-256", bytecode)
+                    )
+                  ),
+                },
+                {
+                  field: "Authority to approve contract calls",
+                  data: authMessage(
+                    op.upload_contract.authorizes_call_contract
+                  ),
+                },
+                {
+                  field: "Authority to manage mana",
+                  data: authMessage(
+                    op.upload_contract.authorizes_transaction_application
+                  ),
+                },
+                {
+                  field: "Authority to update the contract",
+                  data: authMessage(
+                    op.upload_contract.authorizes_upload_contract
+                  ),
+                },
+              ],
+              style: { bgUploadContract: true },
             });
             continue;
           }
@@ -636,20 +701,32 @@ export default {
             });
             const { name, args } = await contract.decodeOperation(op);
             this.operations.push({
-              call_contract: { contractId, name, args },
+              call_contract: true,
+              contractId,
               title: firstUpperCase(name),
               args: Object.keys(args).map((arg) => ({
                 field: firstUpperCase(arg),
                 data: args[arg],
               })),
+              style: { red: false },
             });
           } catch (error) {
-            this.operations.push(op);
-            this.footnoteMessage2 = [
-              "Warning: Some of the operations could not be decoded.",
-              "Only continue if you trust in",
-              this.requester.origin,
-            ].join(" ");
+            this.operations.push({
+              call_contract: true,
+              contractId,
+              title: op.call_contract.entry_point,
+              subtitle:
+                "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
+              args: [
+                {
+                  field: "Args",
+                  data: op.call_contract.args,
+                },
+              ],
+              style: {
+                red: true,
+              },
+            });
             console.log(error);
           }
         }
@@ -726,7 +803,7 @@ export default {
 .subtitle {
   font-size: 1.2em;
   font-weight: 600;
-  margin-top: 0.5em;
+  margin: 1em 0em 0.5em 0em;
 }
 
 .wrapper {
@@ -756,10 +833,6 @@ input {
   margin: 5px 0px;
 }
 
-.tx-header {
-  margin-top: 15px;
-}
-
 .group-input {
   display: flex;
   align-items: center;
@@ -774,6 +847,10 @@ input {
   margin: 5px 0px;
 }
 
+.operation {
+  margin-bottom: 1em;
+}
+
 .op-header {
   background: var(--kondor-purple);
   padding: 8px 6px;
@@ -781,18 +858,33 @@ input {
   margin-top: 0.5em;
 }
 
+.red {
+  background: #dd3d3d;
+}
+
+.bgUploadContract {
+  background: #308b9b;
+}
+
 .op-header .contract-id {
   font-size: 0.8em;
 }
 
 .op-header .op-title {
-  margin-top: 6px;
+  margin-top: 0.5em;
   font-size: 1.2em;
+}
+
+.op-header .op-subtitle {
+  margin-top: 0.5em;
+  font-size: 0.8em;
+  word-break: break-all;
 }
 
 .op-body {
   background: #dedede;
   padding: 1px 6px 8px 6px;
+  word-break: break-all;
 }
 
 .op-body .field-name {
