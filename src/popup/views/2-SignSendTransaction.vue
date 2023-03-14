@@ -107,8 +107,29 @@
       <div class="subtitle">
         Signatures
       </div>
+      <div
+        v-for="(signer, i) in signers"
+        :key="i"
+        class="signature"
+      >
+        <div class="sig-details">
+          <div class="name">
+            {{ signer.name }}
+          </div>
+          <div class="address">
+            {{ signer.address }}
+          </div>
+        </div>
+        <div
+          class="sig-delete"
+          @click="removeSigner(i)"
+        >
+          <div class="x">
+            X
+          </div>
+        </div>
+      </div>
 
-      <div>signer: {{ signerData }}</div>
       <div v-if="!unlocked">
         <Unlock
           @onUnlock="afterUnlocked()"
@@ -169,14 +190,15 @@ export default {
       data: "",
       broadcast: true,
       abis: null,
-      signerData: "",
       requester: "",
+      accounts: [],
       network: "mainnet",
       maxMana: "",
       payer: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
       payee: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
       nonce: "",
       operations: [],
+      signers: [],
       footnoteMessage: "",
       account: null,
       unlocked: !!this.$store.state.accounts.length > 0,
@@ -605,16 +627,36 @@ export default {
   },
 
   methods: {
+    addSigner(address) {
+      const acc = this.accounts.find((a) => a.address === address);
+      if (acc) {
+        this.signers.push({
+          name: acc.name,
+          address,
+        });
+      } else {
+        this.signers.push({
+          name: "Unknown address",
+          address,
+        });
+      }
+    },
+
+    removeSigner(i) {
+      this.signers.splice(i, 1);
+    },
+
     async decodeTransaction() {
+      this.accounts = await this._getAccounts();
       try {
         if (this.request.args.signerAddress) {
-          this.signerData = this.request.args.signerAddress;
+          this.addSigner(this.request.args.signerAddress);
         } else {
+          this.addSigner(this.accounts[0].address);
           console.warn(
             `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.6`
           );
           this.isOldKondor = true;
-          this.signerData = "undefined";
         }
 
         if (
@@ -635,14 +677,8 @@ export default {
         this.operations = [];
         for (let i = 0; i < operations.length; i += 1) {
           const op = operations[i];
-          if (!op.call_contract) {
-            // upload contract or set system call don't
-            // require an extra decode
-            let title = "";
-            if (op.upload_contract) title = "Upload contract 😎";
-            else if (op.set_system_call) title = "Set system call ⚙️";
-            else if (op.set_system_contract) title = "Set system contract ⚙️";
-            else title = "Unknown operation";
+          if (op.upload_contract) {
+            const title = "Upload contract 😎";
             const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
             const authMessage = (a) =>
               a
@@ -689,45 +725,79 @@ export default {
               ],
               style: { bgUploadContract: true },
             });
-            continue;
-          }
-          const contractId = op.call_contract.contract_id;
-          try {
-            const abi = this.abis[contractId];
-            const contract = new Contract({
-              id: contractId,
-              abi,
-              serializer: await this.newSandboxSerializer(abi.koilib_types),
-            });
-            const { name, args } = await contract.decodeOperation(op);
+          } else if (op.set_system_call) {
+            const title = "Set system call ⚙️";
             this.operations.push({
-              call_contract: true,
-              contractId,
-              title: firstUpperCase(name),
-              args: Object.keys(args).map((arg) => ({
-                field: firstUpperCase(arg),
-                data: args[arg],
-              })),
-              style: { red: false },
-            });
-          } catch (error) {
-            this.operations.push({
-              call_contract: true,
-              contractId,
-              title: op.call_contract.entry_point,
-              subtitle:
-                "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
+              set_system_call: true,
+              title,
               args: [
                 {
-                  field: "Args",
-                  data: op.call_contract.args,
+                  field: "Call ID",
+                  data: op.set_system_call.call_id,
+                },
+                {
+                  field: "Target",
+                  data: JSON.stringify(op.set_system_call.target),
                 },
               ],
-              style: {
-                red: true,
-              },
+              style: { bgUploadContract: true },
             });
-            console.log(error);
+          } else if (op.set_system_contract) {
+            const title = "Set system contract ⚙️";
+            this.operations.push({
+              set_system_contract: true,
+              title,
+              args: [
+                {
+                  field: "Contract ID",
+                  data: op.set_system_contract.contract_id,
+                },
+                {
+                  field: "System contract",
+                  data: op.set_system_contract.system_contract,
+                },
+              ],
+              style: { bgUploadContract: true },
+            });
+          } else {
+            const contractId = op.call_contract.contract_id;
+            try {
+              const abi = this.abis[contractId];
+              const contract = new Contract({
+                id: contractId,
+                abi,
+                serializer: await this.newSandboxSerializer(abi.koilib_types),
+              });
+              const { name, args } = await contract.decodeOperation(op);
+              this.operations.push({
+                call_contract: true,
+                contractId,
+                title: firstUpperCase(name),
+                args: Object.keys(args).map((arg) => ({
+                  field: firstUpperCase(arg),
+                  data: args[arg],
+                })),
+                style: { red: false },
+              });
+            } catch (error) {
+              this.operations.push({
+                call_contract: true,
+                contractId,
+                title: op.call_contract.entry_point,
+                subtitle:
+                  "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
+                args: [
+                  {
+                    field: "Args",
+                    data: op.call_contract.args,
+                  },
+                ],
+                style: {
+                  red: true,
+                },
+              });
+              console.log(error);
+            }
           }
         }
 
@@ -750,7 +820,6 @@ export default {
           !this.request.args.signerAddress ||
           a.address === this.request.args.signerAddress
       );
-      this.signerData = `${this.account.name} - ${this.account.address}`;
     },
 
     async sign() {
@@ -890,6 +959,38 @@ input {
 .op-body .field-name {
   margin: 9px 0 5px 0;
   color: gray;
+}
+
+.signature {
+  display: flex;
+  margin-bottom: 1em;
+}
+
+.sig-details {
+  flex: 8;
+  background: #dedede;
+  padding: 0.7em 0.5em;
+}
+
+.sig-details .name {
+  font-size: 1.2em;
+}
+
+.sig-details .address {
+  font-size: 0.8em;
+}
+
+.sig-delete {
+  flex: 1;
+  display: flex;
+  background: #dd3d3d;
+  font-size: 1.5em;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.sig-delete .x {
+  margin: auto;
 }
 
 .checkbox-wrapper-2 {
