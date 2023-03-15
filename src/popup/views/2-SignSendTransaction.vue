@@ -13,6 +13,7 @@
         Advanced
         <div class="checkbox-wrapper-2">
           <input
+            v-model="advanced"
             type="checkbox"
             class="sc-gJwTLC ikxBAC"
           >
@@ -24,10 +25,16 @@
           {{ requester.origin }}
         </div>
       </div>
-      <div class="subtitle">
+      <div
+        v-if="advanced"
+        class="subtitle"
+      >
         Headers
       </div>
-      <div class="tx-header">
+      <div
+        v-if="advanced"
+        class="tx-header"
+      >
         <div class="group-input">
           <label for="network">Network</label>
           <input
@@ -70,7 +77,7 @@
       </div>
       <div
         v-for="(op, i) in operations"
-        :key="i"
+        :key="'op' + i"
         class="operation"
       >
         <div
@@ -93,7 +100,7 @@
         <div class="op-body">
           <div
             v-for="(arg, j) in op.args"
-            :key="j"
+            :key="'f' + j"
           >
             <div class="field-name">
               {{ arg.field }}
@@ -109,7 +116,7 @@
       </div>
       <div
         v-for="(signer, i) in signers"
-        :key="i"
+        :key="'s' + i"
         class="signature"
       >
         <div class="sig-details">
@@ -128,6 +135,25 @@
             X
           </div>
         </div>
+      </div>
+
+      <div
+        v-if="advanced"
+        class="group-add-signer"
+      >
+        <select v-model="signerSelected">
+          <option
+            v-for="account in accounts"
+            :key="account.address"
+            :value="account.address"
+          >
+            {{ account.name }} - {{ account.address }}
+          </option>
+        </select>
+
+        <button @click="addSigner(signerSelected)">
+          Add signer
+        </button>
       </div>
 
       <div v-if="!unlocked">
@@ -187,11 +213,13 @@ export default {
 
   data: function () {
     return {
+      advanced: "true",
       data: "",
       broadcast: true,
       abis: null,
       requester: "",
       accounts: [],
+      signerSelected: null,
       network: "mainnet",
       maxMana: "",
       payer: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
@@ -200,7 +228,6 @@ export default {
       operations: [],
       signers: [],
       footnoteMessage: "",
-      account: null,
       unlocked: !!this.$store.state.accounts.length > 0,
       request: null,
       isOldKoilib: false,
@@ -682,8 +709,8 @@ export default {
             const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
             const authMessage = (a) =>
               a
-                ? "Managed by the contract"
-                : "Managed by the private key of the contract ID";
+                ? "The authorize function of the contract"
+                : "The private key of the contract ID";
             this.operations.push({
               upload_contract: true,
               title,
@@ -705,19 +732,19 @@ export default {
                   ),
                 },
                 {
-                  field: "Authority to approve contract calls",
+                  field: "Who approves contract calls?",
                   data: authMessage(
                     op.upload_contract.authorizes_call_contract
                   ),
                 },
                 {
-                  field: "Authority to manage mana",
+                  field: "Who approves consumption of mana?",
                   data: authMessage(
                     op.upload_contract.authorizes_transaction_application
                   ),
                 },
                 {
-                  field: "Authority to update the contract",
+                  field: "Who approves new contract updates?",
                   data: authMessage(
                     op.upload_contract.authorizes_upload_contract
                   ),
@@ -991,6 +1018,16 @@ input {
 
 .sig-delete .x {
   margin: auto;
+}
+
+.group-add-signer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.group-add-signer button {
+  width: 7em;
 }
 
 .checkbox-wrapper-2 {
