@@ -7,7 +7,6 @@
       />
       <div class="title">
         Signature request {{ send ? "and send" : "" }}
-        {{ broadcast ? "" : "but not broadcast (testing)" }}
       </div>
       <div class="advanced">
         Advanced
@@ -128,6 +127,7 @@
           </div>
         </div>
         <div
+          v-if="advanced"
           class="sig-delete"
           @click="removeSigner(i)"
         >
@@ -181,7 +181,7 @@
 </template>
 
 <script>
-import { Signer, Contract, Provider, utils } from "koilib";
+import { Signer, Contract, Provider, utils, Transaction } from "koilib";
 
 // mixins
 import Message from "@/popup/mixins/Message";
@@ -215,7 +215,6 @@ export default {
     return {
       advanced: "true",
       data: "",
-      broadcast: true,
       abis: null,
       requester: "",
       accounts: [],
@@ -225,6 +224,7 @@ export default {
       payer: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
       payee: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
       nonce: "",
+      transaction: null,
       operations: [],
       signers: [],
       footnoteMessage: "",
@@ -674,8 +674,16 @@ export default {
     },
 
     async decodeTransaction() {
-      this.accounts = await this._getAccounts();
       try {
+        this.accounts = await this._getAccounts();
+        const networks = await this._getNetworks();
+        const { header } = this.request.args.transaction;
+        const network = networks.find((n) => n.chainId === header.chain_id);
+        this.network = network ? network.name : "Unknown chain id";
+        this.maxMana = utils.formatUnits(header.rc_limit, 8);
+        this.nonce = header.nonce;
+        this.payer = header.payer;
+        this.payee = header.payee || "";
         if (this.request.args.signerAddress) {
           this.addSigner(this.request.args.signerAddress);
         } else {
@@ -684,14 +692,6 @@ export default {
             `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.6`
           );
           this.isOldKondor = true;
-        }
-
-        if (
-          (this.request.args.optsSend &&
-            this.request.args.optsSend.broadcast === false) ||
-          this.request.args.broadcast === false
-        ) {
-          this.broadcast = false;
         }
 
         if (this.request.args.optsSend && this.request.args.optsSend.abis) {
@@ -842,23 +842,38 @@ export default {
 
     afterUnlocked() {
       this.unlocked = true;
-      this.account = this.$store.state.accounts.find(
-        (a) =>
-          !this.request.args.signerAddress ||
-          a.address === this.request.args.signerAddress
-      );
     },
 
     async sign() {
       // TODO: throw error if there are requests.length > 1
       const rpcNodes = await this._getRpcNodes();
       const provider = new Provider(rpcNodes);
-      const signer = Signer.fromWif(this.account.privateKey);
-      signer.provider = provider;
+      this.transaction = new Transaction({
+        options: {
+          chainId: this.request.args.transaction.header.chain_id,
+          rcLimit: utils.parseUnits(this.maxMana, 8),
+          nonce: this.nonce,
+          payer: this.payer,
+          ...(this.payee && { payee: this.payee }),
+        },
+      });
+      this.transaction.transaction.operations =
+        this.request.args.transaction.operations;
+      await this.transaction.prepare();
+      await Promise.all(
+        this.signers.map(async (s) => {
+          const acc = this.$store.state.accounts.find(
+            (a) => a.address === s.address
+          );
+          const signer = Signer.fromWif(acc.privateKey);
+          await signer.signTransaction(this.transaction.transaction);
+        })
+      );
       let message = { id: this.request.id };
-      const optsSend = { broadcast: this.broadcast };
+      const optsSend = { broadcast: true };
+      return;
 
-      try {
+      /*try {
         if (this.send) {
           // TODO: update when the support to the old kondor is finished
           message.result = await signer.sendTransaction(
@@ -875,7 +890,7 @@ export default {
         message.error = err.message;
       }
       this.sendResponse("extension", message, this.request.sender);
-      window.close();
+      window.close();*/
     },
 
     cancel() {
