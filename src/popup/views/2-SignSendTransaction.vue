@@ -277,10 +277,13 @@ export default {
                 rc_limit: "0",
                 nonce: "KAE=",
                 operation_merkle_root:
-                  "EiA2MNjxw_XH8Vzh2HQB1jQRG7vuNNAjDvG4-sOZ84Hdqg==",
+                  "EiBCeHF0tLBk6Dq0yIrlZ2Z9CzO4tv5FsYv868D6fjHeAg==",
                 payer: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
               },
-              id: "0x122003f0aaaa1442106df056828b737e7ea43e5e804a2234e583aa19a3270900c60e",
+              signatures: [
+                "IEUp4G5lT_6kuCvCKEvq20ZvBZoiJd-U3vs4MdZ8u7XgKDm4X7gmyUugp8ggt0lX1hjvA3KJYVRfV63FWnko35A=",
+              ],
+              id: "0x1220d66c608bf375cdd310f021fc61d2c084f7bcc52734a688dfd302dce2daa6c2e3",
             },
             abis: {
               "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ": {
@@ -654,17 +657,19 @@ export default {
   },
 
   methods: {
-    addSigner(address) {
+    addSigner(address, signature = "") {
       const acc = this.accounts.find((a) => a.address === address);
       if (acc) {
         this.signers.push({
           name: acc.name,
           address,
+          signature,
         });
       } else {
         this.signers.push({
-          name: "Unknown address",
+          name: "Unknown account",
           address,
+          signature,
         });
       }
     },
@@ -694,6 +699,15 @@ export default {
           this.isOldKondor = true;
         }
 
+        if (this.request.args.transaction.signatures) {
+          const signerAddresses = await Signer.fromSeed("x").recoverAddresses(
+            this.request.args.transaction
+          );
+          signerAddresses.forEach((address, i) =>
+            this.addSigner(address, this.request.args.transaction.signatures[i])
+          );
+        }
+
         if (this.request.args.optsSend && this.request.args.optsSend.abis) {
           this.abis = this.request.args.optsSend.abis;
         } else if (this.request.args.abis) {
@@ -701,6 +715,7 @@ export default {
         }
 
         const { operations } = this.request.args.transaction;
+
         this.operations = [];
         for (let i = 0; i < operations.length; i += 1) {
           const op = operations[i];
@@ -845,32 +860,56 @@ export default {
     },
 
     async sign() {
-      // TODO: throw error if there are requests.length > 1
-      const rpcNodes = await this._getRpcNodes();
-      const provider = new Provider(rpcNodes);
-      this.transaction = new Transaction({
-        options: {
-          chainId: this.request.args.transaction.header.chain_id,
-          rcLimit: utils.parseUnits(this.maxMana, 8),
-          nonce: this.nonce,
-          payer: this.payer,
-          ...(this.payee && { payee: this.payee }),
-        },
-      });
-      this.transaction.transaction.operations =
-        this.request.args.transaction.operations;
-      await this.transaction.prepare();
-      await Promise.all(
-        this.signers.map(async (s) => {
-          const acc = this.$store.state.accounts.find(
-            (a) => a.address === s.address
-          );
-          const signer = Signer.fromWif(acc.privateKey);
-          await signer.signTransaction(this.transaction.transaction);
-        })
-      );
-      let message = { id: this.request.id };
-      const optsSend = { broadcast: true };
+      try {
+        // TODO: throw error if there are requests.length > 1
+        const rpcNodes = await this._getRpcNodes();
+        const provider = new Provider(rpcNodes);
+        this.transaction = new Transaction({
+          options: {
+            chainId: this.request.args.transaction.header.chain_id,
+            rcLimit: utils.parseUnits(this.maxMana, 8),
+            nonce: this.nonce,
+            payer: this.payer,
+            ...(this.payee && { payee: this.payee }),
+          },
+        });
+        this.transaction.transaction.operations =
+          this.request.args.transaction.operations;
+        await this.transaction.prepare();
+        await Promise.all(
+          this.signers.map(async (s) => {
+            const acc = this.$store.state.accounts.find(
+              (a) => a.address === s.address
+            );
+            if (acc) {
+              const signer = Signer.fromWif(acc.privateKey);
+              await signer.signTransaction(this.transaction.transaction);
+            } else {
+              if (!s.signature) {
+                throw new Error(`No signature for ${s.address}`);
+              }
+              const address = Signer.recoverAddress(
+                utils.toUint8Array(this.transaction.transaction.id.slice(6)),
+                utils.decodeBase64url(s.signature)
+              );
+              if (address !== s.address) {
+                throw new Error(
+                  `The transaction has changed and it's not possible to generate a new signature of ${s.address}`
+                );
+              }
+              if (!this.transaction.transaction.signatures) {
+                this.transaction.transaction.signatures = [];
+              }
+              this.transaction.transaction.signatures.push(s.signature);
+            }
+          })
+        );
+        let message = { id: this.request.id };
+        const optsSend = { broadcast: true };
+      } catch (error) {
+        this.alertDanger(error.message);
+        throw error;
+      }
       return;
 
       /*try {
