@@ -165,16 +165,52 @@
       <div class="container">
         <button
           :disabled="!unlocked"
-          @click="sign"
+          @click="checkEvents"
         >
-          Sign
+          Check events
         </button>
         <button
           class="cancel-button"
-          @click="cancel"
+          @click="skipEvents"
         >
-          Cancel
+          Skip
         </button>
+      </div>
+      <div class="subtitle">
+        Events
+      </div>
+      <div
+        v-for="(ev, i) in events"
+        :key="'ev' + i"
+        class="operation"
+      >
+        <div
+          class="op-header"
+          :class="ev.style"
+        >
+          <div class="contract-id">
+            {{ ev.source }}
+          </div>
+          <div class="op-title">
+            {{ ev.title }}
+          </div>
+          <div class="op-subtitle">
+            {{ ev.subtitle }}
+          </div>
+        </div>
+        <div class="op-body">
+          <div
+            v-for="(arg, j) in ev.args"
+            :key="'fe' + j"
+          >
+            <div class="field-name">
+              {{ arg.field }}
+            </div>
+            <div class="field-data">
+              {{ arg.data }}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -227,6 +263,7 @@ export default {
       transaction: null,
       operations: [],
       signers: [],
+      events: [],
       footnoteMessage: "",
       unlocked: !!this.$store.state.accounts.length > 0,
       request: null,
@@ -859,12 +896,13 @@ export default {
       this.unlocked = true;
     },
 
-    async sign() {
+    async checkEvents() {
       try {
         // TODO: throw error if there are requests.length > 1
         const rpcNodes = await this._getRpcNodes();
         const provider = new Provider(rpcNodes);
         this.transaction = new Transaction({
+          provider,
           options: {
             chainId: this.request.args.transaction.header.chain_id,
             rcLimit: utils.parseUnits(this.maxMana, 8),
@@ -904,15 +942,19 @@ export default {
             }
           })
         );
-        let message = { id: this.request.id };
-        const optsSend = { broadcast: true };
+        const receipt = await this.transaction.send({ broadcast: false });
+        console.log(receipt);
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
       }
       return;
 
-      /*try {
+      /*let message = { id: this.request.id };
+        const optsSend = { broadcast: true };
+      try {
+
+
         if (this.send) {
           // TODO: update when the support to the old kondor is finished
           message.result = await signer.sendTransaction(
@@ -930,6 +972,92 @@ export default {
       }
       this.sendResponse("extension", message, this.request.sender);
       window.close();*/
+    },
+
+    async skipEvents() {
+      console.log("skipped");
+      const receipt = {
+        id: "0x1220cf763bc42c18091fddf7a9d3c2963f95102b64a019d76c20215163ca9d900ff2",
+        payer: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
+        max_payer_rc: "930000000",
+        rc_limit: "930000000",
+        rc_used: "470895",
+        network_bandwidth_used: "311",
+        compute_bandwidth_used: "369509",
+        events: [
+          {
+            source: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+            name: "koinos.contracts.token.transfer_event",
+            data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
+            impacted: [
+              "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
+              "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
+            ],
+          },
+        ],
+      };
+      this.events = [];
+      const rpcNodes = await this._getRpcNodes();
+      const provider = new Provider(rpcNodes);
+      if (receipt.events) {
+        for (let i = 0; i < receipt.events.length; i += 1) {
+          const event = receipt.events[i];
+          try {
+            const contract = new Contract({
+              id: event.source,
+              provider,
+            });
+            const abi = await contract.fetcthAbi({
+              updateFunctions: false,
+              updateSerializer: false,
+            });
+            if (!abi) throw new Error(`no abi found for ${event.source}`);
+            Object.keys(abi.methods).forEach((m) => {
+              if (abi.methods[m].entry_point === undefined) {
+                abi.methods[m].entry_point = Number(
+                  abi.methods[m]["entry-point"]
+                );
+              }
+              if (abi.methods[m].read_only === undefined) {
+                abi.methods[m].read_only = abi.methods[m]["read-only"];
+              }
+            });
+            contract.abi = abi;
+            console.log(abi);
+            let types;
+            if (abi.koilib_types) types = abi.koilib_types;
+            else if (abi.types) types = abi.types;
+            else throw new Error(`no koilib_types or types defined in the abi`);
+            contract.serializer = await this.newSandboxSerializer(types);
+            const decodedEvent = await contract.decodeEvent(event);
+            this.events.push({
+              source: decodedEvent.source,
+              title: firstUpperCase(decodedEvent.name),
+              args: Object.keys(decodedEvent.args).map((arg) => ({
+                field: firstUpperCase(arg),
+                data: decodedEvent.args[arg],
+              })),
+              style: { red: false },
+            });
+          } catch (error) {
+            console.log(`error decoding event ${i}`);
+            console.log(error);
+            this.events.push({
+              source: event.source,
+              title: firstUpperCase(event.name),
+              subtitle:
+                "⚠️ This event couldn't be decoded. Only continue if you understand the risks.",
+              args: [
+                {
+                  field: "Args",
+                  data: event.data,
+                },
+              ],
+              style: { red: true },
+            });
+          }
+        }
+      }
     },
 
     cancel() {
