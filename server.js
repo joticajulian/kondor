@@ -3,7 +3,7 @@ const path = require("path");
 const axios = require("axios");
 
 // proxy jsonrpc to avoid cors issues
-const apiKoinos = "http://api.koinos.io:8080";
+const apiKoinos = "http://harbinger-api.koinos.io:8080";
 
 fastify.options("/jsonrpc", async (req, reply) => {
   reply.header("Access-Control-Allow-Origin", "*");
