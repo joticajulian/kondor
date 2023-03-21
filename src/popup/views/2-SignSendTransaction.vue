@@ -255,6 +255,7 @@ export default {
       requester: "",
       accounts: [],
       signerSelected: null,
+      provider: null,
       network: "mainnet",
       maxMana: "",
       payer: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
@@ -694,6 +695,125 @@ export default {
   },
 
   methods: {
+    async getAbi(contract) {
+      const contractId = contract.getId();
+      // try to get ABI from local storage
+      let abi = await this._getAbi(this.network, contractId);
+      if (abi) return abi;
+
+      // try to get ABI from the network
+      try {
+        abi = await contract.fetchAbi({
+          updateFunctions: false,
+          updateSerializer: false,
+        });
+      } catch (error) {
+        // empty
+      }
+      if (abi) return abi;
+
+      // try to get ABI from the request
+      return this.abis ? this.abis[contractId] : undefined;
+    },
+
+    /**
+     * decode and beautify an operation
+     * or an event
+     */
+    async beautifyAction(type, action) {
+      const isOperation = type === "operation";
+      const isEvent = type === "event";
+      if (!isOperation && !isEvent) throw new Error(`invalid type ${type}`);
+      const contractId = isOperation
+        ? action.call_contract.contract_id
+        : action.source;
+      try {
+        const contract = new Contract({
+          id: contractId,
+          provider: this.provider,
+        });
+        const abi = await this.getAbi(contract);
+        if (!abi) throw new Error(`no abi found for ${contractId}`);
+        Object.keys(abi.methods).forEach((m) => {
+          if (abi.methods[m].entry_point === undefined) {
+            abi.methods[m].entry_point = Number(abi.methods[m]["entry-point"]);
+          }
+          if (abi.methods[m].read_only === undefined) {
+            abi.methods[m].read_only = abi.methods[m]["read-only"];
+          }
+        });
+        contract.abi = abi;
+        let types;
+        if (abi.koilib_types) types = abi.koilib_types;
+        else if (abi.types) types = abi.types;
+        else throw new Error(`no koilib_types or types defined in the abi`);
+        contract.serializer = await this.newSandboxSerializer(types);
+
+        if (isOperation) {
+          const { name, args } = await contract.decodeOperation(action);
+          this.operations.push({
+            call_contract: true,
+            contractId,
+            title: firstUpperCase(name),
+            args: Object.keys(args).map((arg) => ({
+              field: firstUpperCase(arg),
+              data: args[arg],
+            })),
+            style: { red: false },
+          });
+        }
+
+        if (isEvent) {
+          const decodedEvent = await contract.decodeEvent(action);
+          this.events.push({
+            source: decodedEvent.source,
+            title: firstUpperCase(decodedEvent.name),
+            args: Object.keys(decodedEvent.args).map((arg) => ({
+              field: firstUpperCase(arg),
+              data: decodedEvent.args[arg],
+            })),
+            style: { red: false },
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        if (isOperation) {
+          this.operations.push({
+            call_contract: true,
+            contractId,
+            title: action.call_contract.entry_point,
+            subtitle:
+              "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
+            args: [
+              {
+                field: "Args",
+                data: action.call_contract.args,
+              },
+            ],
+            style: {
+              red: true,
+            },
+          });
+        }
+
+        if (isEvent) {
+          this.events.push({
+            source: action.source,
+            title: firstUpperCase(action.name),
+            subtitle:
+              "⚠️ This event couldn't be decoded. Only continue if you understand the risks.",
+            args: [
+              {
+                field: "Args",
+                data: action.data,
+              },
+            ],
+            style: { red: true },
+          });
+        }
+      }
+    },
+
     addSigner(address, signature = "") {
       const acc = this.accounts.find((a) => a.address === address);
       if (acc) {
@@ -719,6 +839,9 @@ export default {
       try {
         this.accounts = await this._getAccounts();
         const networks = await this._getNetworks();
+        const rpcNodes = await this._getRpcNodes();
+        this.provider = new Provider(rpcNodes);
+
         const { header } = this.request.args.transaction;
         const network = networks.find((n) => n.chainId === header.chain_id);
         this.network = network ? network.name : "Unknown chain id";
@@ -839,44 +962,7 @@ export default {
               style: { bgUploadContract: true },
             });
           } else {
-            const contractId = op.call_contract.contract_id;
-            try {
-              const abi = this.abis[contractId];
-              const contract = new Contract({
-                id: contractId,
-                abi,
-                serializer: await this.newSandboxSerializer(abi.koilib_types),
-              });
-              const { name, args } = await contract.decodeOperation(op);
-              this.operations.push({
-                call_contract: true,
-                contractId,
-                title: firstUpperCase(name),
-                args: Object.keys(args).map((arg) => ({
-                  field: firstUpperCase(arg),
-                  data: args[arg],
-                })),
-                style: { red: false },
-              });
-            } catch (error) {
-              this.operations.push({
-                call_contract: true,
-                contractId,
-                title: op.call_contract.entry_point,
-                subtitle:
-                  "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
-                args: [
-                  {
-                    field: "Args",
-                    data: op.call_contract.args,
-                  },
-                ],
-                style: {
-                  red: true,
-                },
-              });
-              console.log(error);
-            }
+            await this.beautifyAction("operation", op);
           }
         }
 
@@ -997,65 +1083,10 @@ export default {
         ],
       };
       this.events = [];
-      const rpcNodes = await this._getRpcNodes();
-      const provider = new Provider(rpcNodes);
       if (receipt.events) {
         for (let i = 0; i < receipt.events.length; i += 1) {
           const event = receipt.events[i];
-          try {
-            const contract = new Contract({
-              id: event.source,
-              provider,
-            });
-            const abi = await contract.fetcthAbi({
-              updateFunctions: false,
-              updateSerializer: false,
-            });
-            if (!abi) throw new Error(`no abi found for ${event.source}`);
-            Object.keys(abi.methods).forEach((m) => {
-              if (abi.methods[m].entry_point === undefined) {
-                abi.methods[m].entry_point = Number(
-                  abi.methods[m]["entry-point"]
-                );
-              }
-              if (abi.methods[m].read_only === undefined) {
-                abi.methods[m].read_only = abi.methods[m]["read-only"];
-              }
-            });
-            contract.abi = abi;
-            console.log(abi);
-            let types;
-            if (abi.koilib_types) types = abi.koilib_types;
-            else if (abi.types) types = abi.types;
-            else throw new Error(`no koilib_types or types defined in the abi`);
-            contract.serializer = await this.newSandboxSerializer(types);
-            const decodedEvent = await contract.decodeEvent(event);
-            this.events.push({
-              source: decodedEvent.source,
-              title: firstUpperCase(decodedEvent.name),
-              args: Object.keys(decodedEvent.args).map((arg) => ({
-                field: firstUpperCase(arg),
-                data: decodedEvent.args[arg],
-              })),
-              style: { red: false },
-            });
-          } catch (error) {
-            console.log(`error decoding event ${i}`);
-            console.log(error);
-            this.events.push({
-              source: event.source,
-              title: firstUpperCase(event.name),
-              subtitle:
-                "⚠️ This event couldn't be decoded. Only continue if you understand the risks.",
-              args: [
-                {
-                  field: "Args",
-                  data: event.data,
-                },
-              ],
-              style: { red: true },
-            });
-          }
+          await this.beautifyAction("event", event);
         }
       }
     },

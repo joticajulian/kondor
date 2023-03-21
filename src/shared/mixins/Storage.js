@@ -158,8 +158,12 @@ export default {
       return networks;
     },
 
-    async _setNetworks(networks) {
-      return this._write("networks", networks);
+    async _setAbi(network, contractId, abi) {
+      return this._write(`${network}-${contractId}`, abi);
+    },
+
+    async _getAbi(network, contractId, strict = false) {
+      return this._read(`${network}-${contractId}`, strict);
     },
 
     async _deleteWallet() {
