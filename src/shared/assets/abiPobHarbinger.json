@@ -1,6 +1,6 @@
 {
   "methods": {
-    "burn 🔥": {
+    "burn tKOIN 🔥": {
       "argument": "koinos.contracts.pob.burn_arguments",
       "return": "koinos.contracts.pob.burn_result",
       "entry-point": "0x859facc5",

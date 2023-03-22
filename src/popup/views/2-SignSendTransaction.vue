@@ -825,13 +825,15 @@ export default {
         if (isOperation) {
           let { name, args } = await contract.decodeOperation(action);
           const { beauty } = contract.abi.methods[name];
-          args = Object.keys(args).map((argName) => {
-            const field = firstUpperCase(argName);
-            return {
-              field,
-              data: this.applyBeauty(beauty, argName, args[argName]),
-            };
-          });
+          if (args) {
+            args = Object.keys(args).map((argName) => {
+              const field = firstUpperCase(argName);
+              return {
+                field,
+                data: this.applyBeauty(beauty, argName, args[argName]),
+              };
+            });
+          }
 
           this.operations.push({
             call_contract: true,
@@ -939,7 +941,7 @@ export default {
 
         const { header } = this.request.args.transaction;
         const network = networks.find((n) => n.chainId === header.chain_id);
-        this.network = network ? network.name : "Unknown chain id";
+        this.network = network ? network.tag : "Unknown chain id";
         this.maxMana = utils.formatUnits(header.rc_limit, 8);
         this.nonce = header.nonce;
         this.payer = header.payer;
