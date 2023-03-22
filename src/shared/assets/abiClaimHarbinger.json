@@ -1,0 +1,26 @@
+{
+  "methods": {
+    "claim 🤑": {
+      "argument": "koinos.contracts.claim.claim_arguments",
+      "return": "koinos.contracts.claim.claim_result",
+      "description": "Claim KOIN from the snapshot",
+      "entry-point": "0xdd1b3c31",
+      "read-only": false
+    },
+    "get_info": {
+      "argument": "koinos.contracts.claim.get_info_arguments",
+      "return": "koinos.contracts.claim.get_info_result",
+      "description": "Gets information on KOIN claims",
+      "entry-point": "0xbd7f6850",
+      "read-only": true
+    },
+    "check_claim": {
+      "argument": "koinos.contracts.claim.check_claim_arguments",
+      "return": "koinos.contracts.claim.check_claim_result",
+      "description": "Check the status of a KOIN claim",
+      "entry-point": "0x2ac66b4c",
+      "read-only": true
+    }
+  },
+  "types": "CqIGCiJrb2lub3MvY29udHJhY3RzL2NsYWltL2NsYWltLnByb3RvEhZrb2lub3MuY29udHJhY3RzLmNsYWltGhRrb2lub3Mvb3B0aW9ucy5wcm90byKuAQoKY2xhaW1faW5mbxIsChJ0b3RhbF9ldGhfYWNjb3VudHMYASABKA1SEHRvdGFsRXRoQWNjb3VudHMSMAoUZXRoX2FjY291bnRzX2NsYWltZWQYAiABKA1SEmV0aEFjY291bnRzQ2xhaW1lZBIdCgp0b3RhbF9rb2luGAMgASgEUgl0b3RhbEtvaW4SIQoMa29pbl9jbGFpbWVkGAQgASgEUgtrb2luQ2xhaW1lZCJPCgxjbGFpbV9zdGF0dXMSJQoMdG9rZW5fYW1vdW50GAEgASgEQgIwAVILdG9rZW5BbW91bnQSGAoHY2xhaW1lZBgCIAEoCFIHY2xhaW1lZCJ/Cg9jbGFpbV9hcmd1bWVudHMSJQoLZXRoX2FkZHJlc3MYASABKAxCBIC1GAJSCmV0aEFkZHJlc3MSJwoMa29pbl9hZGRyZXNzGAIgASgMQgSAtRgGUgtrb2luQWRkcmVzcxIcCglzaWduYXR1cmUYAyABKAxSCXNpZ25hdHVyZSIOCgxjbGFpbV9yZXN1bHQiFAoSZ2V0X2luZm9fYXJndW1lbnRzIksKD2dldF9pbmZvX3Jlc3VsdBI4CgV2YWx1ZRgBIAEoCzIiLmtvaW5vcy5jb250cmFjdHMuY2xhaW0uY2xhaW1faW5mb1IFdmFsdWUiPgoVY2hlY2tfY2xhaW1fYXJndW1lbnRzEiUKC2V0aF9hZGRyZXNzGAEgASgMQgSAtRgCUgpldGhBZGRyZXNzIlAKEmNoZWNrX2NsYWltX3Jlc3VsdBI6CgV2YWx1ZRgBIAEoCzIkLmtvaW5vcy5jb250cmFjdHMuY2xhaW0uY2xhaW1fc3RhdHVzUgV2YWx1ZUI+WjxnaXRodWIuY29tL2tvaW5vcy9rb2lub3MtcHJvdG8tZ29sYW5nL2tvaW5vcy9jb250cmFjdHMvY2xhaW1iBnByb3RvMw=="
+}

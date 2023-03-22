@@ -1,0 +1,54 @@
+{
+  "methods": {
+    "burn 🔥": {
+      "argument": "koinos.contracts.pob.burn_arguments",
+      "return": "koinos.contracts.pob.burn_result",
+      "entry-point": "0x859facc5",
+      "description": "Burn KOIN to receive VHP 🔥🤘",
+      "read-only": false,
+      "beauty": {
+        "token_amount": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    },
+    "register_public_key": {
+      "argument": "koinos.contracts.pob.register_public_key_arguments",
+      "return": "koinos.contracts.pob.register_public_key_result",
+      "entry-point": "0x53192be1",
+      "description": "Registers a block production public key to an address",
+      "read-only": false
+    },
+    "get_public_key": {
+      "argument": "koinos.contracts.pob.get_public_key_arguments",
+      "return": "koinos.contracts.pob.get_public_key_result",
+      "entry-point": "0x96634f68",
+      "description": "Gets the public key registered to a producer address",
+      "read-only": true
+    },
+    "get_metadata": {
+      "argument": "koinos.contracts.pob.get_metadata_arguments",
+      "return": "koinos.contracts.pob.get_metadata_result",
+      "entry-point": "0xfcf7a68f",
+      "description": "Returns PoB metadata",
+      "read-only": true
+    },
+    "get_consensus_parameters": {
+      "argument": "koinos.contracts.pob.get_consensus_parameters_arguments",
+      "return": "koinos.contracts.pob.get_consensus_parameters_result",
+      "entry-point": "0x5fd7ac0f",
+      "description": "Returns PoB consensus parameters",
+      "read-only": true
+    },
+    "update_consensus_parameters": {
+      "argument": "koinos.contracts.pob.update_consensus_parameters_arguments",
+      "return": "koinos.contracts.pob.update_consensus_parameters_result",
+      "entry-point": "0x793e7c30",
+      "description": "Returns PoB consensus parameters",
+      "read-only": false
+    }
+  },
+  "types": "CpQNCh5rb2lub3MvY29udHJhY3RzL3BvYi9wb2IucHJvdG8SFGtvaW5vcy5jb250cmFjdHMucG9iGhRrb2lub3Mvb3B0aW9ucy5wcm90byLiAQoUY29uc2Vuc3VzX3BhcmFtZXRlcnMSPwocdGFyZ2V0X2FubnVhbF9pbmZsYXRpb25fcmF0ZRgBIAEoDVIZdGFyZ2V0QW5udWFsSW5mbGF0aW9uUmF0ZRIuChN0YXJnZXRfYnVybl9wZXJjZW50GAIgASgNUhF0YXJnZXRCdXJuUGVyY2VudBIyChV0YXJnZXRfYmxvY2tfaW50ZXJ2YWwYAyABKA1SE3RhcmdldEJsb2NrSW50ZXJ2YWwSJQoOcXVhbnR1bV9sZW5ndGgYBCABKA1SDXF1YW50dW1MZW5ndGgiZgoRcHVibGljX2tleV9yZWNvcmQSIwoKcHVibGljX2tleRgBIAEoDEIEgLUYAFIJcHVibGljS2V5EiwKEHNldF9ibG9ja19oZWlnaHQYAiABKARCAjABUg5zZXRCbG9ja0hlaWdodCJ2CghtZXRhZGF0YRIYCgRzZWVkGAEgASgMQgSAtRgAUgRzZWVkEiQKCmRpZmZpY3VsdHkYAiABKAxCBIC1GABSCmRpZmZpY3VsdHkSKgoPbGFzdF9ibG9ja190aW1lGAMgASgEQgIwAVINbGFzdEJsb2NrVGltZSJ4Cg5zaWduYXR1cmVfZGF0YRIhCgl2cmZfcHJvb2YYASABKAxCBIC1GABSCHZyZlByb29mEh8KCHZyZl9oYXNoGAIgASgMQgSAtRgAUgd2cmZIYXNoEiIKCXNpZ25hdHVyZRgDIAEoDEIEgLUYAFIJc2lnbmF0dXJlIkoKC3ZyZl9wYXlsb2FkEhgKBHNlZWQYASABKAxCBIC1GABSBHNlZWQSIQoKYmxvY2tfdGltZRgCIAEoBEICMAFSCWJsb2NrVGltZSJmCh1yZWdpc3Rlcl9wdWJsaWNfa2V5X2FyZ3VtZW50cxIgCghwcm9kdWNlchgBIAEoDEIEgLUYBlIIcHJvZHVjZXISIwoKcHVibGljX2tleRgCIAEoDEIEgLUYAFIJcHVibGljS2V5IhwKGnJlZ2lzdGVyX3B1YmxpY19rZXlfcmVzdWx0IocBCg5idXJuX2FyZ3VtZW50cxIlCgx0b2tlbl9hbW91bnQYASABKARCAjABUgt0b2tlbkFtb3VudBInCgxidXJuX2FkZHJlc3MYAiABKAxCBIC1GAZSC2J1cm5BZGRyZXNzEiUKC3ZocF9hZGRyZXNzGAMgASgMQgSAtRgGUgp2aHBBZGRyZXNzIg0KC2J1cm5fcmVzdWx0IiQKImdldF9jb25zZW5zdXNfcGFyYW1ldGVyc19hcmd1bWVudHMiYwofZ2V0X2NvbnNlbnN1c19wYXJhbWV0ZXJzX3Jlc3VsdBJACgV2YWx1ZRgBIAEoCzIqLmtvaW5vcy5jb250cmFjdHMucG9iLmNvbnNlbnN1c19wYXJhbWV0ZXJzUgV2YWx1ZSIYChZnZXRfbWV0YWRhdGFfYXJndW1lbnRzIksKE2dldF9tZXRhZGF0YV9yZXN1bHQSNAoFdmFsdWUYASABKAsyHi5rb2lub3MuY29udHJhY3RzLnBvYi5tZXRhZGF0YVIFdmFsdWUiYAoZcmVnaXN0ZXJfcHVibGljX2tleV9ldmVudBIjCgpwdWJsaWNfa2V5GAEgASgMQgSAtRgAUglwdWJsaWNLZXkSHgoHYWRkcmVzcxgCIAEoDEIEgLUYBlIHYWRkcmVzcyI8ChhnZXRfcHVibGljX2tleV9hcmd1bWVudHMSIAoIcHJvZHVjZXIYASABKAxCBIC1GAZSCHByb2R1Y2VyIjMKFWdldF9wdWJsaWNfa2V5X3Jlc3VsdBIaCgV2YWx1ZRgBIAEoDEIEgLUYAFIFdmFsdWUiaQoldXBkYXRlX2NvbnNlbnN1c19wYXJhbWV0ZXJzX2FyZ3VtZW50cxJACgV2YWx1ZRgBIAEoCzIqLmtvaW5vcy5jb250cmFjdHMucG9iLmNvbnNlbnN1c19wYXJhbWV0ZXJzUgV2YWx1ZSIkCiJ1cGRhdGVfY29uc2Vuc3VzX3BhcmFtZXRlcnNfcmVzdWx0QjxaOmdpdGh1Yi5jb20va29pbm9zL2tvaW5vcy1wcm90by1nb2xhbmcva29pbm9zL2NvbnRyYWN0cy9wb2JiBnByb3RvMw=="
+}
