@@ -837,6 +837,7 @@ export default {
             call_contract: true,
             contractId,
             title: firstUpperCase(name),
+            subtitle: contract.abi.methods[name].description || "",
             args,
             style: { red: false },
           });
@@ -845,8 +846,10 @@ export default {
         if (isEvent) {
           let decodedEvent = await contract.decodeEvent(action);
           let beauty = null;
+          let subtitle = "";
           if (contract.abi.events && contract.abi.events[decodedEvent.name]) {
             beauty = contract.abi.events[decodedEvent.name].beauty;
+            subtitle = contract.abi.events[decodedEvent.name].description || "";
           }
           let args = Object.keys(decodedEvent.args).map((argName) => {
             const field = firstUpperCase(argName);
@@ -862,6 +865,7 @@ export default {
           this.events.push({
             source: decodedEvent.source,
             title: firstUpperCase(decodedEvent.name),
+            subtitle,
             args,
             style: { red: false },
           });

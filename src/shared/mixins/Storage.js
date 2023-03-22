@@ -2,6 +2,13 @@
 import { Signer } from "koilib";
 import * as storage from "../../../lib/storage";
 import { HDKoinos } from "../../../lib/HDKoinos";
+import abiClaimMainnet from "../assets/abiClaimMainnet.json";
+import abiKoinMainnet from "../assets/abiKoinMainnet.json";
+import abiKoinHarbinger from "../assets/abiKoinHarbinger.json";
+import abiPobMainnet from "../assets/abiPobMainnet.json";
+import abiPobHarbinger from "../assets/abiPobHarbinger.json";
+import abiVhpMainnet from "../assets/abiVhpMainnet.json";
+import abiVhpHarbinger from "../assets/abiVhpHarbinger.json";
 
 function toUint8Array(hexString) {
   return new Uint8Array(
@@ -163,6 +170,38 @@ export default {
     },
 
     async _getAbi(network, contractId, strict = false) {
+      switch (network) {
+      case "mainnet": {
+        switch (contractId) {
+        case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
+          return abiKoinMainnet;
+        case "1AdzuXSpC6K9qtXdCBgD5NUpDNwHjMgrc9":
+          return abiVhpMainnet;
+        case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
+          return abiPobMainnet;
+        case "18zw3ZokdfHtudzaWAUnU4tUvKzKiJeN76":
+          return abiClaimMainnet;
+        default:
+          break;
+        }
+        break;
+      }
+      case "harbinger": {
+        switch (contractId) {
+        case "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ":
+          return abiKoinHarbinger;
+        case "1JZqj7dDrK5LzvdJgufYBJNUFo88xBoWC8":
+          return abiVhpHarbinger;
+        case "198RuEouhgiiaQm7uGfaXS6jqZr6g6nyoR":
+          return abiPobHarbinger;
+        default:
+          break;
+        }
+        break;
+      }
+      default:
+        break;
+      }
       return this._read(`${network}-${contractId}`, strict);
     },
 
