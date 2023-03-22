@@ -81,9 +81,6 @@ export default {
 input {
   margin: 0 !important;
 }
-button {
-  margin-left: -8px !important;
-}
 
 .container {
   align-items: center;
@@ -115,6 +112,7 @@ button {
 }
 .unlock {
   width: 70%;
+  margin-top: 3em;
 }
 .button {
   width: 100%;
@@ -128,6 +126,5 @@ button {
   text-decoration: underline;
   color: var(--kondor-purple);
   border: none;
-  margin-left: -8px;
 }
 </style>

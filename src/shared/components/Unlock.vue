@@ -144,20 +144,13 @@ export default {
 </script>
 <style scoped>
 .container {
-  margin: 3em 0;
+  margin: auto;
   width: 100%;
-}
-.button {
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  margin-left: -8px;
 }
 .button button {
   background: none;
   text-decoration: underline;
   color: var(--kondor-purple);
   border: none;
-  margin-left: -8px;
 }
 </style>
