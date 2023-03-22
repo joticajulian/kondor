@@ -35,7 +35,7 @@
       "description": "Checks the balance at an address",
       "read-only": true
     },
-    "transfer 💰": {
+    "transfer tKOIN 💰": {
       "argument": "koinos.contracts.token.transfer_arguments",
       "return": "koinos.contracts.token.transfer_result",
       "entry-point": "0x27f576ca",
@@ -63,7 +63,7 @@
         }
       }
     },
-    "burn ⚠️": {
+    "burn tKOIN ⚠️": {
       "argument": "koinos.contracts.token.burn_arguments",
       "return": "koinos.contracts.token.burn_result",
       "entry-point": "0x859facc5",
