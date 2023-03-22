@@ -173,10 +173,13 @@
           class="cancel-button"
           @click="skipEvents"
         >
-          Skip
+          Skip <br><span class="not-recommended">(not recommended)</span>
         </button>
       </div>
-      <div class="subtitle">
+      <div
+        v-if="receipt"
+        class="subtitle"
+      >
         Events
       </div>
       <div
@@ -185,6 +188,7 @@
         class="operation"
       >
         <div
+          v-if="receipt"
           class="op-header"
           :class="ev.style"
         >
@@ -198,7 +202,10 @@
             {{ ev.subtitle }}
           </div>
         </div>
-        <div class="op-body">
+        <div
+          v-if="receipt"
+          class="op-body"
+        >
           <div
             v-for="(arg, j) in ev.args"
             :key="'fe' + j"
@@ -211,6 +218,12 @@
             </div>
           </div>
         </div>
+      </div>
+      <div
+        v-if="receipt"
+        class="mana-used"
+      >
+        Mana consumption: {{ manaUsed }}
       </div>
     </div>
   </div>
@@ -249,7 +262,7 @@ export default {
 
   data: function () {
     return {
-      advanced: "true",
+      advanced: false,
       data: "",
       abis: null,
       requester: "",
@@ -265,6 +278,8 @@ export default {
       operations: [],
       signers: [],
       events: [],
+      receipt: null,
+      manaUsed: "",
       footnoteMessage: "",
       unlocked: !!this.$store.state.accounts.length > 0,
       request: null,
@@ -373,6 +388,13 @@ export default {
                     description: "Transfers the token",
                     "read-only": false,
                     entry_point: 670398154,
+                    beauty: {
+                      value: {
+                        type: "number",
+                        decimals: 8,
+                        symbol: "KOIN",
+                      },
+                    },
                   },
                   mint: {
                     argument: "koinos.contracts.token.mint_arguments",
@@ -390,6 +412,18 @@ export default {
                     "read-only": false,
                     entry_point: 2241834181,
                   },
+                },
+                events: {
+                  "koinos.contracts.token.transfer_event": {
+                    argument: "koinos.contracts.token.transfer_event",
+                    beauty: {
+                      value: {
+                        type: "number",
+                        decimals: 8,
+                        symbol: "KOIN",
+                      },
+                    },
+                  }
                 },
                 koilib_types: {
                   nested: {
@@ -716,6 +750,27 @@ export default {
       return this.abis ? this.abis[contractId] : undefined;
     },
 
+    applyBeauty(beauty, argName, data) {
+      // display address names
+      const acc = this.accounts.find((a) => a.address === data);
+      if (acc) {
+        return `${acc.name} - ${data}`;
+      }
+
+      if (!beauty || !beauty[argName]) return data;
+
+      // beautify numbers
+      switch (beauty[argName].type) {
+      case "number": {
+        return `${utils.formatUnits(data, beauty[argName].decimals)} ${
+          beauty[argName].symbol
+        }`;
+      }
+      default:
+        return data;
+      }
+    },
+
     /**
      * decode and beautify an operation
      * or an event
@@ -748,30 +803,43 @@ export default {
         else if (abi.types) types = abi.types;
         else throw new Error(`no koilib_types or types defined in the abi`);
         contract.serializer = await this.newSandboxSerializer(types);
-
         if (isOperation) {
-          const { name, args } = await contract.decodeOperation(action);
+          let { name, args } = await contract.decodeOperation(action);
+          const { beauty } = contract.abi.methods[name];
+          args = Object.keys(args).map((argName) => {
+            const field = firstUpperCase(argName);
+            return {
+              field,
+              data: this.applyBeauty(beauty, argName, args[argName]),
+            };
+          });
+
           this.operations.push({
             call_contract: true,
             contractId,
             title: firstUpperCase(name),
-            args: Object.keys(args).map((arg) => ({
-              field: firstUpperCase(arg),
-              data: args[arg],
-            })),
+            args,
             style: { red: false },
           });
         }
 
         if (isEvent) {
-          const decodedEvent = await contract.decodeEvent(action);
+          let decodedEvent  = await contract.decodeEvent(action);
+          let beauty = null;
+          if (contract.abi.events && contract.abi.events[decodedEvent.name]) {
+            beauty = contract.abi.events[decodedEvent.name].beauty;
+          }
+          let args = Object.keys(decodedEvent.args).map((argName) => {
+            const field = firstUpperCase(argName);
+            return {
+              field,
+              data: this.applyBeauty(beauty, argName, decodedEvent.args[argName]),
+            };
+          });
           this.events.push({
             source: decodedEvent.source,
             title: firstUpperCase(decodedEvent.name),
-            args: Object.keys(decodedEvent.args).map((arg) => ({
-              field: firstUpperCase(arg),
-              data: decodedEvent.args[arg],
-            })),
+            args,
             style: { red: false },
           });
         }
@@ -991,7 +1059,7 @@ export default {
           provider,
           options: {
             chainId: this.request.args.transaction.header.chain_id,
-            rcLimit: utils.parseUnits(this.maxMana, 8),
+            rcLimit: utils.parseUnits(this.maxMana.replace("MANA","").trim(), 8),
             nonce: this.nonce,
             payer: this.payer,
             ...(this.payee && { payee: this.payee }),
@@ -1028,8 +1096,7 @@ export default {
             }
           })
         );
-        const receipt = await this.transaction.send({ broadcast: false });
-        console.log(receipt);
+        this.receipt = await this.transaction.send({ broadcast: false });
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
@@ -1089,6 +1156,7 @@ export default {
           await this.beautifyAction("event", event);
         }
       }
+      this.manaUsed = `${utils.formatUnits(receipt.rc_used, 8)} MANA`;
     },
 
     cancel() {
@@ -1128,6 +1196,10 @@ input {
   text-decoration: underline;
   color: var(--kondor-purple);
   background-color: transparent;
+}
+.cancel-button .not-recommended {
+  font-size: 0.8em;
+  text-transform: none;
 }
 
 .advanced {
@@ -1187,7 +1259,6 @@ input {
 .op-header .op-subtitle {
   margin-top: 0.5em;
   font-size: 0.8em;
-  word-break: break-all;
 }
 
 .op-body {
