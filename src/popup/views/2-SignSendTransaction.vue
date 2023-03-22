@@ -169,12 +169,12 @@
         >
           Check events
         </button>
-        <button
+        <div
           class="cancel-button"
           @click="skipEvents"
         >
           Skip <br><span class="not-recommended">(not recommended)</span>
-        </button>
+        </div>
       </div>
       <div
         v-if="receipt"
@@ -224,6 +224,23 @@
         class="mana-used"
       >
         Mana consumption: {{ manaUsed }}
+      </div>
+      <div
+        v-if="readyToSend"
+        class="container"
+      >
+        <button
+          :disabled="!unlocked"
+          @click="sendTransaction"
+        >
+          Send
+        </button>
+        <div
+          class="cancel-button"
+          @click="cancel"
+        >
+          Cancel
+        </div>
       </div>
     </div>
   </div>
@@ -275,11 +292,13 @@ export default {
       payee: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
       nonce: "",
       transaction: null,
+      transactionSigned: false,
       operations: [],
       signers: [],
       events: [],
       receipt: null,
       manaUsed: "",
+      readyToSend: false,
       footnoteMessage: "",
       unlocked: !!this.$store.state.accounts.length > 0,
       request: null,
@@ -423,7 +442,7 @@ export default {
                         symbol: "KOIN",
                       },
                     },
-                  }
+                  },
                 },
                 koilib_types: {
                   nested: {
@@ -824,7 +843,7 @@ export default {
         }
 
         if (isEvent) {
-          let decodedEvent  = await contract.decodeEvent(action);
+          let decodedEvent = await contract.decodeEvent(action);
           let beauty = null;
           if (contract.abi.events && contract.abi.events[decodedEvent.name]) {
             beauty = contract.abi.events[decodedEvent.name].beauty;
@@ -833,7 +852,11 @@ export default {
             const field = firstUpperCase(argName);
             return {
               field,
-              data: this.applyBeauty(beauty, argName, decodedEvent.args[argName]),
+              data: this.applyBeauty(
+                beauty,
+                argName,
+                decodedEvent.args[argName]
+              ),
             };
           });
           this.events.push({
@@ -1050,113 +1073,110 @@ export default {
       this.unlocked = true;
     },
 
+    async buildTransaction() {
+      this.transaction = new Transaction({
+        provider: this.provider,
+        options: {
+          chainId: this.request.args.transaction.header.chain_id,
+          rcLimit: utils.parseUnits(this.maxMana.replace("MANA", "").trim(), 8),
+          nonce: this.nonce,
+          payer: this.payer,
+          ...(this.payee && { payee: this.payee }),
+        },
+      });
+      this.transaction.transaction.operations =
+        this.request.args.transaction.operations;
+      await this.transaction.prepare();
+    },
+
+    async signTransaction() {
+      await Promise.all(
+        this.signers.map(async (s) => {
+          const acc = this.$store.state.accounts.find(
+            (a) => a.address === s.address
+          );
+          if (acc) {
+            const signer = Signer.fromWif(acc.privateKey);
+            await signer.signTransaction(this.transaction.transaction);
+          } else {
+            if (!s.signature) {
+              throw new Error(`No signature for ${s.address}`);
+            }
+            const address = Signer.recoverAddress(
+              utils.toUint8Array(this.transaction.transaction.id.slice(6)),
+              utils.decodeBase64url(s.signature)
+            );
+            if (address !== s.address) {
+              throw new Error(
+                `The transaction has changed and it's not possible to generate a new signature of ${s.address}`
+              );
+            }
+            if (!this.transaction.transaction.signatures) {
+              this.transaction.transaction.signatures = [];
+            }
+            this.transaction.transaction.signatures.push(s.signature);
+          }
+        })
+      );
+      this.transactionSigned = true;
+    },
+
     async checkEvents() {
       try {
         // TODO: throw error if there are requests.length > 1
-        const rpcNodes = await this._getRpcNodes();
-        const provider = new Provider(rpcNodes);
-        this.transaction = new Transaction({
-          provider,
-          options: {
-            chainId: this.request.args.transaction.header.chain_id,
-            rcLimit: utils.parseUnits(this.maxMana.replace("MANA","").trim(), 8),
-            nonce: this.nonce,
-            payer: this.payer,
-            ...(this.payee && { payee: this.payee }),
-          },
-        });
-        this.transaction.transaction.operations =
-          this.request.args.transaction.operations;
-        await this.transaction.prepare();
-        await Promise.all(
-          this.signers.map(async (s) => {
-            const acc = this.$store.state.accounts.find(
-              (a) => a.address === s.address
-            );
-            if (acc) {
-              const signer = Signer.fromWif(acc.privateKey);
-              await signer.signTransaction(this.transaction.transaction);
-            } else {
-              if (!s.signature) {
-                throw new Error(`No signature for ${s.address}`);
-              }
-              const address = Signer.recoverAddress(
-                utils.toUint8Array(this.transaction.transaction.id.slice(6)),
-                utils.decodeBase64url(s.signature)
-              );
-              if (address !== s.address) {
-                throw new Error(
-                  `The transaction has changed and it's not possible to generate a new signature of ${s.address}`
-                );
-              }
-              if (!this.transaction.transaction.signatures) {
-                this.transaction.transaction.signatures = [];
-              }
-              this.transaction.transaction.signatures.push(s.signature);
-            }
-          })
-        );
+        await this.buildTransaction();
+        await this.signTransaction();
+
         this.receipt = await this.transaction.send({ broadcast: false });
+        this.events = [];
+        if (this.receipt.events) {
+          for (let i = 0; i < this.receipt.events.length; i += 1) {
+            const event = this.receipt.events[i];
+            await this.beautifyAction("event", event);
+          }
+        }
+        this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} MANA`;
+        this.readyToSend = true;
       } catch (error) {
+        this.readyToSend = false;
         this.alertDanger(error.message);
         throw error;
       }
-      return;
+    },
 
-      /*let message = { id: this.request.id };
-        const optsSend = { broadcast: true };
+    async skipEvents() {
       try {
+        await this.buildTransaction();
+        this.readyToSend = true;
+      } catch (error) {
+        this.readyToSend = false;
+        this.alertDanger(error.message);
+        throw error;
+      }
+    },
 
+    async sendTransaction() {
+      let message = { id: this.request.id };
+
+      try {
+        if (!this.transactionSigned) {
+          await this.signTransaction();
+        }
 
         if (this.send) {
-          // TODO: update when the support to the old kondor is finished
-          message.result = await signer.sendTransaction(
-            this.request.args.transaction || this.request.args.tx,
-            optsSend
-          );
+          const receipt = await this.transaction.send({ broadcast: true });
+          message.result = {
+            receipt,
+            transaction: this.transaction.transaction,
+          };
         } else {
-          // TODO: update when the support to the old kondor is finished
-          message.result = await signer.signTransaction(
-            this.request.args.transaction || this.request.args.tx
-          );
+          message.result = this.transaction.transaction;
         }
       } catch (err) {
         message.error = err.message;
       }
       this.sendResponse("extension", message, this.request.sender);
-      window.close();*/
-    },
-
-    async skipEvents() {
-      console.log("skipped");
-      const receipt = {
-        id: "0x1220cf763bc42c18091fddf7a9d3c2963f95102b64a019d76c20215163ca9d900ff2",
-        payer: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
-        max_payer_rc: "930000000",
-        rc_limit: "930000000",
-        rc_used: "470895",
-        network_bandwidth_used: "311",
-        compute_bandwidth_used: "369509",
-        events: [
-          {
-            source: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-            name: "koinos.contracts.token.transfer_event",
-            data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
-            impacted: [
-              "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
-              "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
-            ],
-          },
-        ],
-      };
-      this.events = [];
-      if (receipt.events) {
-        for (let i = 0; i < receipt.events.length; i += 1) {
-          const event = receipt.events[i];
-          await this.beautifyAction("event", event);
-        }
-      }
-      this.manaUsed = `${utils.formatUnits(receipt.rc_used, 8)} MANA`;
+      window.close();
     },
 
     cancel() {
@@ -1195,7 +1215,9 @@ input {
   border: none;
   text-decoration: underline;
   color: var(--kondor-purple);
-  background-color: transparent;
+  text-align: center;
+  margin-bottom: 2em;
+  cursor: pointer;
 }
 .cancel-button .not-recommended {
   font-size: 0.8em;
