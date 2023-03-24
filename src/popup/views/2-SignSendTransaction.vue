@@ -309,7 +309,7 @@ export default {
 
   mounted() {
     let requests;
-    /* if (process.env.VUE_APP_ENV === "test") {
+    if (process.env.VUE_APP_ENV === "test") {
       requests = [
         {
           id: "270815b4-8c3e-4b53-b9ac-82ba3854c206",
@@ -737,11 +737,11 @@ export default {
         if (this.send) return r.command === "signer:sendTransaction";
         return r.command === "signer:signTransaction";
       });
-    }*/
-    requests = this.$store.state.requests.filter((r) => {
+    }
+    /*requests = this.$store.state.requests.filter((r) => {
       if (this.send) return r.command === "signer:sendTransaction";
       return r.command === "signer:signTransaction";
-    });
+    });*/
     /**
      * TODO: for several requests create a list of requesters
      * and ask to the user to select one to see the details
@@ -1133,10 +1133,41 @@ export default {
     async checkEvents() {
       try {
         // TODO: throw error if there are requests.length > 1
-        await this.buildTransaction();
-        await this.signTransaction();
-
-        this.receipt = await this.transaction.send({ broadcast: false });
+        if (process.env.VUE_APP_ENV === "test") {
+          this.receipt = {
+            id: "0x1220cf763bc42c18091fddf7a9d3c2963f95102b64a019d76c20215163ca9d900ff2",
+            payer: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
+            max_payer_rc: "930000000",
+            rc_limit: "930000000",
+            rc_used: "470895",
+            network_bandwidth_used: "311",
+            compute_bandwidth_used: "369509",
+            events: [
+              {
+                source: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                name: "koinos.contracts.token.transfer_event",
+                data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
+                impacted: [
+                  "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
+                  "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
+                ],
+              },
+              {
+                source: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                name: "koinos.contracts.token.transfer_event",
+                data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
+                impacted: [
+                  "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
+                  "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
+                ],
+              },
+            ],
+          };
+        } else {
+          await this.buildTransaction();
+          await this.signTransaction();
+          this.receipt = await this.transaction.send({ broadcast: false });
+        }
         this.events = [];
         if (this.receipt.events) {
           for (let i = 0; i < this.receipt.events.length; i += 1) {

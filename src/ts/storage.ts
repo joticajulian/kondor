@@ -22,6 +22,8 @@ export async function read<T = unknown>(
   });
 }
 
+export const DEFAULT_CURRENT_NETWORK = "mainnet";
+
 export async function setCurrentNetwork(currentNetwork: string): Promise<void> {
   return write("currentNetwork", currentNetwork);
 }
@@ -29,7 +31,7 @@ export async function setCurrentNetwork(currentNetwork: string): Promise<void> {
 export async function getCurrentNetwork(strict = false): Promise<string> {
   let currentNetwork = await read<string>("currentNetwork", strict);
   if (!currentNetwork) {
-    currentNetwork = "mainnet";
+    currentNetwork = DEFAULT_CURRENT_NETWORK;
     await setCurrentNetwork(currentNetwork);
     currentNetwork = await read("currentNetwork", true);
   }
@@ -44,6 +46,26 @@ export interface Network {
   koinContractId: string;
 }
 
+export const DEFAULT_NETWORKS = [
+  {
+    name: "Koinos Mainnet",
+    tag: "mainnet",
+    chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
+    rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
+    koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+  },
+  {
+    name: "Koinos Harbinger (testnet)",
+    tag: "harbinger",
+    chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+    rpcNodes: [
+      "https://harbinger-api.koinos.io",
+      "https://testnet.koinosblocks.com",
+    ],
+    koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+  },
+];
+
 export async function setNetworks(networks: Network[]): Promise<void> {
   return write("networks", networks);
 }
@@ -52,25 +74,7 @@ export async function getNetworks(strict = true): Promise<Network[]> {
   let networks = await read<Network[]>("networks", strict);
   if (!networks || networks.length === 0) {
     // store default value
-    networks = [
-      {
-        name: "Koinos Mainnet",
-        tag: "mainnet",
-        chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
-        rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
-        koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
-      },
-      {
-        name: "Koinos Harbinger (testnet)",
-        tag: "harbinger",
-        chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
-        rpcNodes: [
-          "https://harbinger-api.koinos.io",
-          "https://testnet.koinosblocks.com",
-        ],
-        koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-      },
-    ];
+    networks = DEFAULT_NETWORKS;
     await setNetworks(networks);
     networks = await read("networks", true);
   }
