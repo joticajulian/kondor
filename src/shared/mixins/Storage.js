@@ -110,59 +110,20 @@ export default {
       return this._read("accounts", strict);
     },
 
-    async _setRpcNodes(rpcNodes) {
-      return this._write("rpcNodes", rpcNodes);
+    async _setCurrentNetwork(currentNetwork) {
+      return storage.setCurrentNetwork(currentNetwork);
     },
 
-    async _getRpcNodes(strict = false) {
-      let rpcNodes = await this._read("rpcNodes", strict);
-      if (!rpcNodes || rpcNodes.length === 0) {
-        // store default value
-        rpcNodes =
-          process.env.VUE_APP_ENV === "test"
-            ? ["http://localhost:8081/jsonrpc"]
-            : ["https://api.koinos.io"];
-        await this._setRpcNodes(rpcNodes);
-        rpcNodes = await this._read("rpcNodes", true);
-      }
-      return rpcNodes;
+    async _getCurrentNetwork(strict = false) {
+      return storage.getCurrentNetwork(strict);
     },
 
-    async _setChainId(chainId) {
-      return this._write("chainId", chainId);
-    },
-
-    async _getChainId(strict = false) {
-      return this._read("chainId", strict);
+    async _setNetworks(networks) {
+      return storage.setNetworks(networks);
     },
 
     async _getNetworks(strict = false) {
-      let networks = await this._read("networks", strict);
-      if (!networks || networks.length === 0) {
-        // store default value
-        networks = [
-          {
-            name: "Koinos Mainnet",
-            tag: "mainnet",
-            chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
-            rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
-            koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
-          },
-          {
-            name: "Koinos Harbinger (testnet)",
-            tag: "harbinger",
-            chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
-            rpcNodes: [
-              "https://harbinger-api.koinos.io",
-              "https://testnet.koinosblocks.com",
-            ],
-            koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-          },
-        ];
-        await this._setNetworks(networks);
-        networks = await this._read("networks", true);
-      }
-      return networks;
+      return storage.getNetworks(strict);
     },
 
     async _setAbi(network, contractId, abi) {
