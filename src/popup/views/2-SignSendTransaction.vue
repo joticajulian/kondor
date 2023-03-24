@@ -189,7 +189,7 @@
       >
         <div
           v-if="receipt"
-          class="op-header"
+          class="ev-header"
           :class="ev.style"
         >
           <div class="contract-id">
@@ -216,6 +216,27 @@
             <div class="field-data">
               {{ arg.data }}
             </div>
+          </div>
+        </div>
+        <div
+          v-if="receipt"
+          class="ev-foot"
+          :class="ev.style"
+        >
+          <div>Impacted accounts</div>
+          <div
+            v-for="(imp, k) in ev.impacted"
+            :key="'imp' + k"
+            class="ev-impacted-account"
+          >
+            {{ imp }}
+          </div>
+          <div style="margin-top: 0.5em">
+            {{
+              ev.impactsUserAccounts
+                ? "It impacts your accounts"
+                : "It doesn't impact your accounts"
+            }}
           </div>
         </div>
       </div>
@@ -805,6 +826,18 @@ export default {
       const contractId = isOperation
         ? action.call_contract.contract_id
         : action.source;
+
+      let impacted = [];
+      let impactsUserAccounts = false;
+      if (isEvent && action.impacted) {
+        impacted = action.impacted.map((imp) => {
+          const acc = this.accounts.find((a) => a.address === imp);
+          if (!acc) return imp;
+          impactsUserAccounts = true;
+          return `${imp} - ${acc.name}`;
+        });
+      }
+
       try {
         const contract = new Contract({
           id: contractId,
@@ -845,7 +878,7 @@ export default {
             title: firstUpperCase(name),
             subtitle: contract.abi.methods[name].description || "",
             args,
-            style: { red: false },
+            style: { bgOperation: true },
           });
         }
 
@@ -868,12 +901,18 @@ export default {
               ),
             };
           });
+
           this.events.push({
             source: decodedEvent.source,
             title: firstUpperCase(decodedEvent.name),
             subtitle,
             args,
-            style: { red: false },
+            impactsUserAccounts,
+            impacted,
+            style: {
+              bgEvent: impactsUserAccounts,
+              gray: !impactsUserAccounts,
+            },
           });
         }
       } catch (error) {
@@ -909,7 +948,12 @@ export default {
                 data: action.data,
               },
             ],
-            style: { red: true },
+            impactsUserAccounts,
+            impacted,
+            style: {
+              red: impactsUserAccounts,
+              gray: !impactsUserAccounts,
+            },
           });
         }
       }
@@ -1294,31 +1338,42 @@ input {
   margin-bottom: 1em;
 }
 
-.op-header {
-  background: var(--kondor-purple);
-  padding: 8px 6px;
-  color: white;
-  margin-top: 0.5em;
-}
-
 .red {
   background: #dd3d3d;
+}
+
+.gray {
+  background: #7e7e7e;
 }
 
 .bgUploadContract {
   background: #308b9b;
 }
 
+.bgEvent {
+  background: #c19b10;
+}
+
+.bgOperation {
+  background: var(--kondor-purple);
+}
+
+.op-header {
+  padding: 8px 6px;
+  color: white;
+  margin-top: 0.5em;
+}
+
 .op-header .contract-id {
   font-size: 0.8em;
 }
 
-.op-header .op-title {
-  margin-top: 0.5em;
+.op-title {
   font-size: 1.2em;
+  margin-top: 0.5em;
 }
 
-.op-header .op-subtitle {
+.op-subtitle {
   margin-top: 0.5em;
   font-size: 0.8em;
 }
@@ -1329,9 +1384,24 @@ input {
   word-break: break-all;
 }
 
-.op-body .field-name {
+.field-name {
   margin: 9px 0 5px 0;
   color: gray;
+}
+
+.ev-header {
+  padding: 8px 6px;
+  color: white;
+  margin-top: 0.5em;
+}
+
+.ev-foot {
+  padding: 8px 6px;
+  color: white;
+}
+
+.ev-impacted-account {
+  font-size: 0.8em;
 }
 
 .signature {
