@@ -309,7 +309,7 @@ export default {
 
   mounted() {
     let requests;
-    if (process.env.VUE_APP_ENV === "test") {
+    /* if (process.env.VUE_APP_ENV === "test") {
       requests = [
         {
           id: "270815b4-8c3e-4b53-b9ac-82ba3854c206",
@@ -737,7 +737,11 @@ export default {
         if (this.send) return r.command === "signer:sendTransaction";
         return r.command === "signer:signTransaction";
       });
-    }
+    }*/
+    requests = this.$store.state.requests.filter((r) => {
+      if (this.send) return r.command === "signer:sendTransaction";
+      return r.command === "signer:signTransaction";
+    });
     /**
      * TODO: for several requests create a list of requesters
      * and ask to the user to select one to see the details
@@ -936,11 +940,10 @@ export default {
       try {
         this.accounts = await this._getAccounts();
         const networks = await this._getNetworks();
-        const rpcNodes = await this._getRpcNodes();
-        this.provider = new Provider(rpcNodes);
 
         const { header } = this.request.args.transaction;
         const network = networks.find((n) => n.chainId === header.chain_id);
+        this.provider = new Provider(network.rpcNodes);
         this.network = network ? network.tag : "Unknown chain id";
         this.maxMana = utils.formatUnits(header.rc_limit, 8);
         this.nonce = header.nonce;

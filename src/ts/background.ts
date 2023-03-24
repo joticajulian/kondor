@@ -63,6 +63,24 @@ async function preparePopup(sender?: Sender) {
   }
 }
 
+async function getProvider(inputNetworkTag?: string): Promise<Provider> {
+  const networkTag = inputNetworkTag || (await storage.getCurrentNetwork());
+  const networks = await storage.getNetworks();
+  const network = networks.find((n) => n.tag === networkTag);
+  if (!network) throw new Error(`network ${networkTag} not found`);
+  return new Provider(network.rpcNodes);
+}
+
+async function getChainIdFromStorage(
+  inputNetworkTag?: string
+): Promise<string> {
+  const networkTag = inputNetworkTag || (await storage.getCurrentNetwork());
+  const networks = await storage.getNetworks();
+  const network = networks.find((n) => n.tag === networkTag);
+  if (!network) throw new Error(`network ${networkTag} not found`);
+  return network.chainId;
+}
+
 const messenger = new Messenger({
   // eslint-disable-next-line
   // @ts-ignore
@@ -72,19 +90,6 @@ const messenger = new Messenger({
     if (to !== "background") return undefined;
 
     await idHelper.add(id);
-
-    let provider = new Provider([]);
-    let signer: Signer;
-    if (command.startsWith("provider")) {
-      const rpcNodes = await storage.getRpcNodes();
-      provider = new Provider(rpcNodes);
-    }
-    if (command.startsWith("signer")) {
-      const rpcNodes = await storage.getRpcNodes();
-      provider = new Provider(rpcNodes);
-      signer = Signer.fromSeed("seed");
-      signer.provider = provider;
-    }
 
     try {
       let result: unknown;
@@ -107,91 +112,124 @@ const messenger = new Messenger({
           break;
         }
         case "provider:call": {
-          const { method, params } = args as {
+          const { network, method, params } = args as {
+            network: string;
             method: string;
             params: unknown;
           };
+          const provider = await getProvider(network);
           result = await provider.call(method, params);
           break;
         }
         case "provider:getNonce": {
-          const { account } = args as { account: string };
+          const { network, account } = args as {
+            network: string;
+            account: string;
+          };
+          const provider = await getProvider(network);
           result = await provider.getNonce(account);
           break;
         }
         case "provider:getAccountRc": {
-          const { account } = args as { account: string };
+          const { network, account } = args as {
+            network: string;
+            account: string;
+          };
+          const provider = await getProvider(network);
           result = await provider.getAccountRc(account);
           break;
         }
         case "provider:getTransactionsById": {
-          const { transactionIds } = args as { transactionIds: string[] };
+          const { network, transactionIds } = args as {
+            network: string;
+            transactionIds: string[];
+          };
+          const provider = await getProvider(network);
           result = await provider.getTransactionsById(transactionIds);
           break;
         }
         case "provider:getBlocksById": {
-          const { blockIds } = args as { blockIds: string[] };
+          const { network, blockIds } = args as {
+            network: string;
+            blockIds: string[];
+          };
+          const provider = await getProvider(network);
           result = await provider.getBlocksById(blockIds);
           break;
         }
         case "provider:getHeadInfo": {
+          const { network } = args as { network: string };
+          const provider = await getProvider(network);
           result = await provider.getHeadInfo();
           break;
         }
         case "provider:getChainId": {
-          let chainId = await storage.getChainId(false);
-          if (!chainId) {
-            chainId = await provider.getChainId();
-            await storage.setChainId(chainId);
-          }
-          result = chainId;
+          const { network } = args as { network: string };
+          result = await getChainIdFromStorage(network);
           break;
         }
         case "provider:getBlocks": {
-          const { height, numBlocks, idRef } = args as {
+          const { network, height, numBlocks, idRef } = args as {
+            network: string;
             height: number;
             numBlocks?: number;
             idRef?: string;
           };
+          const provider = await getProvider(network);
           result = await provider.getBlocks(height, numBlocks, idRef);
           break;
         }
         case "provider:getBlock": {
-          const { height } = args as { height: number };
+          const { network, height } = args as {
+            network: string;
+            height: number;
+          };
+          const provider = await getProvider(network);
           result = await provider.getBlock(height);
           break;
         }
         case "provider:wait": {
-          const { txId, type, timeout } = args as {
+          const { network, txId, type, timeout } = args as {
+            network: string;
             txId: string;
             type: "byTransactionId" | "byBlock";
             timeout: number;
           };
+          const provider = await getProvider(network);
           result = await provider.wait(txId, type, timeout);
           break;
         }
         case "provider:sendTransaction": {
-          const { transaction, broadcast } = args as {
+          const { network, transaction, broadcast } = args as {
+            network: string;
             transaction: TransactionJson;
             broadcast: boolean;
           };
+          const provider = await getProvider(network);
           result = await provider.sendTransaction(transaction, broadcast);
           break;
         }
         case "provider:submitBlock": {
-          const { block } = args as { block: BlockJson };
+          const { network, block } = args as {
+            network: string;
+            block: BlockJson;
+          };
+          const provider = await getProvider(network);
           result = await provider.submitBlock(block);
           break;
         }
         case "provider:readContract": {
-          const { operation } = args as {
+          const { network, operation } = args as {
+            network: string;
             operation: CallContractOperationJson;
           };
+          const provider = await getProvider(network);
           result = await provider.readContract(operation);
           break;
         }
         case "signer:prepareTransaction": {
-          const { transaction, signerAddress } = args as {
+          const { network, transaction, signerAddress } = args as {
+            network: string;
             transaction: TransactionJson;
             signerAddress: string;
           };
@@ -206,14 +244,12 @@ const messenger = new Messenger({
           }
 
           if (!transaction.header.chain_id) {
-            let chainId = await storage.getChainId(false);
-            if (!chainId) {
-              chainId = await provider.getChainId();
-              await storage.setChainId(chainId);
-            }
-            transaction.header.chain_id = chainId;
+            transaction.header.chain_id = await getChainIdFromStorage(network);
           }
-          result = await signer!.prepareTransaction(transaction);
+
+          const signer = Signer.fromSeed("seed");
+          signer.provider = await getProvider(network);
+          result = await signer.prepareTransaction(transaction);
           break;
         }
         default: {

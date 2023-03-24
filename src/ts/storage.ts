@@ -22,18 +22,57 @@ export async function read<T = unknown>(
   });
 }
 
-export async function setRpcNodes(rpcNodes: string[]): Promise<void> {
-  return write("rpcNodes", rpcNodes);
+export async function setCurrentNetwork(currentNetwork: string): Promise<void> {
+  return write("currentNetwork", currentNetwork);
 }
 
-export async function getRpcNodes(strict = true): Promise<string[]> {
-  return read("rpcNodes", strict) as Promise<string[]>;
+export async function getCurrentNetwork(strict = false): Promise<string> {
+  let currentNetwork = await read<string>("currentNetwork", strict);
+  if (!currentNetwork) {
+    currentNetwork = "mainnet";
+    await setCurrentNetwork(currentNetwork);
+    currentNetwork = await read("currentNetwork", true);
+  }
+  return currentNetwork!;
 }
 
-export async function setChainId(chainId: string): Promise<void> {
-  return write("chainId", chainId);
+export interface Network {
+  name: string;
+  tag: string;
+  chainId: string;
+  rpcNodes: string[];
+  koinContractId: string;
 }
 
-export async function getChainId(strict = true): Promise<string> {
-  return read("chainId", strict) as Promise<string>;
+export async function setNetworks(networks: Network[]): Promise<void> {
+  return write("networks", networks);
+}
+
+export async function getNetworks(strict = true): Promise<Network[]> {
+  let networks = await read<Network[]>("networks", strict);
+  if (!networks || networks.length === 0) {
+    // store default value
+    networks = [
+      {
+        name: "Koinos Mainnet",
+        tag: "mainnet",
+        chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
+        rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
+        koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+      },
+      {
+        name: "Koinos Harbinger (testnet)",
+        tag: "harbinger",
+        chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+        rpcNodes: [
+          "https://harbinger-api.koinos.io",
+          "https://testnet.koinosblocks.com",
+        ],
+        koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+      },
+    ];
+    await setNetworks(networks);
+    networks = await read("networks", true);
+  }
+  return networks!;
 }

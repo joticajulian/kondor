@@ -28,7 +28,7 @@
               </div>
               <div class="input-button">
                 <input
-                  v-model="network.rpcNodes"
+                  v-model="network.rpcNodesText"
                   type="text"
                 >
               </div>
@@ -166,12 +166,31 @@ export default {
   mounted() {
     (async () => {
       this.networks = await this._getNetworks();
+      this.networks.forEach((n) => {
+        n.rpcNodesText = n.rpcNodes.join(",");
+      });
+      this.networks[0].name = "Koinos Mainnet";
+      this.networks[0].tag = "mainnet";
+      this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+
+      this.networks[1].name = "Koinos Harbinger (testnet)";
+      this.networks[1].tag = "harbinger";
+      this.networks[1].koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
     })();
   },
 
   methods: {
     async updateNetworks() {
-      await this._setNetworks(this.networks);
+      await this._setNetworks(
+        this.networks.map((n) => {
+          const { rpcNodesText, ...otherVals } = n;
+          const rpcNodes = rpcNodesText.split(",");
+          return {
+            ...otherVals,
+            rpcNodes,
+          };
+        })
+      );
       this.alertSuccess("Networks updated");
     },
 
