@@ -111,18 +111,30 @@ export default {
     },
 
     async _setCurrentNetwork(currentNetwork) {
+      if (process.env.VUE_APP_ENV === "test") {
+        return this._write("currentNetwork", currentNetwork);
+      }
       return storage.setCurrentNetwork(currentNetwork);
     },
 
     async _getCurrentNetwork(strict = false) {
+      if (process.env.VUE_APP_ENV === "test") {
+        return this._read("currentNetwork", strict);
+      }
       return storage.getCurrentNetwork(strict);
     },
 
     async _setNetworks(networks) {
+      if (process.env.VUE_APP_ENV === "test") {
+        return this._write("networks", networks);
+      }
       return storage.setNetworks(networks);
     },
 
     async _getNetworks(strict = false) {
+      if (process.env.VUE_APP_ENV === "test") {
+        return this._read("networks", strict);
+      }
       return storage.getNetworks(strict);
     },
 
