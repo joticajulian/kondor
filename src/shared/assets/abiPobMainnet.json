@@ -1,10 +1,11 @@
 {
   "methods": {
-    "burn KOIN 🔥": {
+    "burn": {
       "argument": "koinos.contracts.pob.burn_arguments",
       "return": "koinos.contracts.pob.burn_result",
       "entry-point": "0x859facc5",
-      "description": "Burn KOIN to receive VHP 🔥🤘",
+      "name": "burn KOIN 🔥",
+      "description": "Burn KOIN to receive VHP 🤘",
       "read-only": false,
       "beauty": {
         "token_amount": {

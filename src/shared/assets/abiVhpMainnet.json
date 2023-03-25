@@ -63,10 +63,11 @@
         }
       }
     },
-    "burn VHP ⚠️": {
+    "burn": {
       "argument": "koinos.contracts.token.burn_arguments",
       "return": "koinos.contracts.token.burn_result",
       "entry-point": "0x859facc5",
+      "name": "burn VHP ⚠️",
       "description": "⚠️ Be careful. This is to burn VHP. The tokens cannot be recovered",
       "read-only": false,
       "beauty": {
@@ -81,7 +82,8 @@
   "events": {
     "koinos.contracts.token.transfer_event": {
       "argument": "koinos.contracts.token.transfer_event",
-      "description": "Transfer of VHP",
+      "name": "VHP transferred ⚡️",
+      "description": "",
       "beauty": {
         "value": {
           "type": "number",
@@ -92,7 +94,8 @@
     },
     "koinos.contracts.token.mint_event": {
       "argument": "koinos.contracts.token.mint_event",
-      "description": "Mints VHP",
+      "name": "VHP minted ⚡️",
+      "description": "",
       "beauty": {
         "value": {
           "type": "number",
@@ -103,6 +106,7 @@
     },
     "koinos.contracts.token.burn_event": {
       "argument": "koinos.contracts.token.burn_event",
+      "name": "VHP burnt ⚠️",
       "description": "⚠️ Be careful. This is to burn VHP. The tokens cannot be recovered",
       "beauty": {
         "value": {

@@ -35,10 +35,11 @@
       "description": "Checks the balance at an address",
       "read-only": true
     },
-    "transfer tKOIN 💰": {
+    "transfer": {
       "argument": "koinos.contracts.token.transfer_arguments",
       "return": "koinos.contracts.token.transfer_result",
       "entry-point": "0x27f576ca",
+      "name": "transfer tKOIN 💰",
       "description": "Transfers the token",
       "read-only": false,
       "beauty": {
@@ -63,10 +64,11 @@
         }
       }
     },
-    "burn tKOIN ⚠️": {
+    "burn": {
       "argument": "koinos.contracts.token.burn_arguments",
       "return": "koinos.contracts.token.burn_result",
       "entry-point": "0x859facc5",
+      "name": "burn tKOIN ⚠️",
       "description": "⚠️ Be careful. This is to burn tokens but it will not create VHP",
       "read-only": false,
       "beauty": {
@@ -81,7 +83,8 @@
   "events": {
     "koinos.contracts.token.transfer_event": {
       "argument": "koinos.contracts.token.transfer_event",
-      "description": "Transfer of tKOIN 💰",
+      "name": "tKOIN transferred 💰",
+      "description": "",
       "beauty": {
         "value": {
           "type": "number",
@@ -92,7 +95,8 @@
     },
     "koinos.contracts.token.mint_event": {
       "argument": "koinos.contracts.token.mint_event",
-      "description": "Mints tKOIN",
+      "name": "tKOIN minted",
+      "description": "",
       "beauty": {
         "value": {
           "type": "number",
@@ -103,7 +107,8 @@
     },
     "koinos.contracts.token.burn_event": {
       "argument": "koinos.contracts.token.burn_event",
-      "description": "⚠️ Be careful. This is to burn tKOIN but it will not create VHP",
+      "name": "tKOIN burnt 🔥",
+      "description": "",
       "beauty": {
         "value": {
           "type": "number",
