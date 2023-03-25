@@ -875,7 +875,7 @@ export default {
           this.operations.push({
             call_contract: true,
             contractId,
-            title: firstUpperCase(name),
+            title: firstUpperCase(contract.abi.methods[name].name || name),
             subtitle: contract.abi.methods[name].description || "",
             args,
             style: { bgOperation: true },
@@ -902,9 +902,17 @@ export default {
             };
           });
 
+          let title = firstUpperCase(decodedEvent.name);
+          if (
+            abi.events &&
+            abi.events[action.name] &&
+            abi.events[action.name].name
+          )
+            title = abi.events[action.name].name;
+
           this.events.push({
             source: decodedEvent.source,
-            title: firstUpperCase(decodedEvent.name),
+            title,
             subtitle,
             args,
             impactsUserAccounts,
@@ -1364,7 +1372,7 @@ input {
   margin-top: 0.5em;
 }
 
-.op-header .contract-id {
+.contract-id {
   font-size: 0.8em;
 }
 

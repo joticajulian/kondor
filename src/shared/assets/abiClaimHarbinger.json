@@ -1,11 +1,12 @@
 {
   "methods": {
-    "claim 🤑": {
+    "claim": {
       "argument": "koinos.contracts.claim.claim_arguments",
       "return": "koinos.contracts.claim.claim_result",
       "description": "Claim KOIN from the snapshot",
       "entry-point": "0xdd1b3c31",
-      "read-only": false
+      "read-only": false,
+      "name": "claim 🤑"
     },
     "get_info": {
       "argument": "koinos.contracts.claim.get_info_arguments",
