@@ -193,7 +193,7 @@
           :class="ev.style"
         >
           <div class="contract-id">
-            {{ ev.source }}
+            {{ ev.contractId }}
           </div>
           <div class="op-title">
             {{ ev.title }}
@@ -204,7 +204,7 @@
         </div>
         <div
           v-if="receipt"
-          class="op-body"
+          class="ev-body"
         >
           <div
             v-for="(arg, j) in ev.args"
@@ -827,6 +827,40 @@ export default {
         ? action.call_contract.contract_id
         : action.source;
 
+      let contractIdName = contractId;
+      switch (contractId) {
+      // mainnet
+      case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
+        contractIdName = `${contractId} - KOIN Contract`;
+        break;
+      case "1AdzuXSpC6K9qtXdCBgD5NUpDNwHjMgrc9":
+        contractIdName = `${contractId} - VHP Contract`;
+        break;
+      case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
+        contractIdName = `${contractId} - PoB Contract`;
+        break;
+      case "18zw3ZokdfHtudzaWAUnU4tUvKzKiJeN76":
+        contractIdName = `${contractId} - Claim Contract`;
+        break;
+
+        // harbinger
+      case "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ":
+        contractIdName = `${contractId} - tKOIN Contract`;
+        break;
+      case "1JZqj7dDrK5LzvdJgufYBJNUFo88xBoWC8":
+        contractIdName = `${contractId} - VHP Contract`;
+        break;
+      case "198RuEouhgiiaQm7uGfaXS6jqZr6g6nyoR":
+        contractIdName = `${contractId} - PoB Contract`;
+        break;
+      default:
+        break;
+      }
+
+      const accContract = this.accounts.find((a) => a.address === contractId);
+      if (accContract)
+        contractIdName = `${contractId} - ${accContract.name}`;
+
       let impacted = [];
       let impactsUserAccounts = false;
       if (isEvent && action.impacted) {
@@ -874,7 +908,7 @@ export default {
 
           this.operations.push({
             call_contract: true,
-            contractId,
+            contractId: contractIdName,
             title: firstUpperCase(contract.abi.methods[name].name || name),
             subtitle: contract.abi.methods[name].description || "",
             args,
@@ -911,7 +945,7 @@ export default {
             title = abi.events[action.name].name;
 
           this.events.push({
-            source: decodedEvent.source,
+            contractId: contractIdName,
             title,
             subtitle,
             args,
@@ -928,7 +962,7 @@ export default {
         if (isOperation) {
           this.operations.push({
             call_contract: true,
-            contractId,
+            contractId: contractIdName,
             title: action.call_contract.entry_point,
             subtitle:
               "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
@@ -946,7 +980,7 @@ export default {
 
         if (isEvent) {
           this.events.push({
-            source: action.source,
+            contractId: contractIdName,
             title: firstUpperCase(action.name),
             subtitle:
               "⚠️ This event couldn't be decoded. Only continue if you understand the risks.",
@@ -1196,7 +1230,7 @@ export default {
             compute_bandwidth_used: "369509",
             events: [
               {
-                source: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                source: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
                 name: "koinos.contracts.token.transfer_event",
                 data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
                 impacted: [
@@ -1370,6 +1404,8 @@ input {
   padding: 8px 6px;
   color: white;
   margin-top: 0.5em;
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
 }
 
 .contract-id {
@@ -1390,6 +1426,8 @@ input {
   background: #dedede;
   padding: 1px 6px 8px 6px;
   word-break: break-all;
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
 }
 
 .field-name {
@@ -1401,11 +1439,21 @@ input {
   padding: 8px 6px;
   color: white;
   margin-top: 0.5em;
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
+}
+
+.ev-body {
+  background: #dedede;
+  padding: 1px 6px 8px 6px;
+  word-break: break-all;
 }
 
 .ev-foot {
   padding: 8px 6px;
   color: white;
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
 }
 
 .ev-impacted-account {
