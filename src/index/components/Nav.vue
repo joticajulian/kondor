@@ -53,6 +53,14 @@ export default {
     };
   },
 
+  watch: {
+    "$store.state.currentNetwork": function () {
+      const network =
+        this.$store.state.networks[this.$store.state.currentNetwork];
+      this._setCurrentNetwork(network.tag);
+    },
+  },
+
   methods: {
     back() {
       router.back();

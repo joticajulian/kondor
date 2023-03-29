@@ -1468,10 +1468,10 @@
   resolved "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@roamin/koinos-pb-to-proto@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@roamin/koinos-pb-to-proto/-/koinos-pb-to-proto-0.0.2.tgz#07289cf0d717d620cab0af6cf5497e8deadde88c"
-  integrity sha512-fXmX2EI2/m7CuklFO9KcD2/2gPphV967LPCAgoQTgAR9EFq7b3A5pwFZkE9V+39nj97wP8QzAIfeoMtNZjBACA==
+"@roamin/koinos-pb-to-proto@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@roamin/koinos-pb-to-proto/-/koinos-pb-to-proto-0.0.3.tgz#7c8bb6c65ee3cfcb6e889f6a3969bed01647303a"
+  integrity sha512-FR7hOtTM+COIMPBXpR6gc1HlJvFzioGgbAod9h7QAF527ACCF6xQG5mNyTSM65PrpbUVu/SA51O4Itp9BvZlTg==
   dependencies:
     google-protobuf "^3.21.0"
 
@@ -6221,14 +6221,14 @@ koilib@^5.2.0:
     multibase "^4.0.6"
     protobufjs "^7.0.0"
 
-koilib@^5.5.1:
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.5.1.tgz#92d658a8dec42ce5d6ebbd8f051bff483151b567"
-  integrity sha512-Q3dxmWyL8bW2QjnrUiEr6HGe+WEz9RZMyXk/kYxyDKo+wEHULLQPgHFSrhJIq8aUdrN3qxuX3/i5Pw3i/4OlNA==
+koilib@^5.5.3:
+  version "5.5.3"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.5.3.tgz#b841ae4e0a6c335d3f625981bb0e0a87a75a386d"
+  integrity sha512-qoBIxGfygwImKzq6H4KW22WYplYE0dB5FsCGk55w7gueCowi0olMU7ZEBQSvzavPa52GzEgBIDHwVUGrhnNlvw==
   dependencies:
     "@noble/hashes" "^1.1.2"
     "@noble/secp256k1" "^1.6.3"
-    "@roamin/koinos-pb-to-proto" "^0.0.2"
+    "@roamin/koinos-pb-to-proto" "^0.0.3"
     cross-fetch "^3.1.5"
     multibase "^4.0.6"
     protobufjs "^7.0.0"

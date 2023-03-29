@@ -19,11 +19,25 @@
         </div>
       </div>
       <div>
-        Signature requested by
+        Signature {{ send ? "and send" : "" }} requested by
         <div class="requester">
           {{ requester.origin }}
         </div>
       </div>
+      <div
+        v-if="advanced"
+        class="group-add-signer"
+      >
+        <select v-model="typeRequest">
+          <option value="sign">
+            Only sign transaction
+          </option>
+          <option value="send">
+            Sign and send transaction
+          </option>
+        </select>
+      </div>
+
       <div
         v-if="advanced"
         class="subtitle"
@@ -304,6 +318,7 @@ export default {
       data: "",
       abis: null,
       requester: "",
+      typeRequest: "",
       accounts: [],
       signerSelected: null,
       provider: null,
@@ -769,6 +784,7 @@ export default {
      */
     this.request = requests[0];
     this.requester = this.request.sender;
+    this.typeRequest = this.send ? "send" : "sign";
     this.decodeTransaction();
   },
 
@@ -858,8 +874,7 @@ export default {
       }
 
       const accContract = this.accounts.find((a) => a.address === contractId);
-      if (accContract)
-        contractIdName = `${contractId} - ${accContract.name}`;
+      if (accContract) contractIdName = `${contractId} - ${accContract.name}`;
 
       let impacted = [];
       let impactsUserAccounts = false;
@@ -1289,7 +1304,7 @@ export default {
           await this.signTransaction();
         }
 
-        if (this.send) {
+        if (this.typeRequest === "send") {
           const receipt = await this.transaction.send({ broadcast: true });
           message.result = {
             receipt,
