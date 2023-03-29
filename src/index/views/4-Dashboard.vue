@@ -29,16 +29,16 @@
             <div class="mana-title">
               MANA
             </div>
-            <div class="recharge-time">
-              {{ timeRechargeMana }}
+            <div class="mana-available">
+              {{ mana }}
             </div>
           </div>
           <div class="mana-info">
             <div class="title-gray">
-              Available
+              Time to recharge
             </div>
-            <div class="mana-available">
-              {{ mana }}
+            <div class="recharge-time">
+              {{ timeRechargeMana }}
             </div>
           </div>
         </div>
@@ -183,6 +183,11 @@ export default {
     },
 
     async loadBalanceInUsd() {
+      if (this.network.tag !== "mainnet") {
+        this.balanceUSD = "";
+        return;
+      }
+
       try {
         const response = await axios.get(
           "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
