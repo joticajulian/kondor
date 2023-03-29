@@ -134,6 +134,9 @@ export default {
     "$store.state.currentIndexAccount": function () {
       this.loadAccount(this.$store.state.currentIndexAccount);
     },
+    "$store.state.currentNetwork": function () {
+      this.loadAccount(this.$store.state.currentIndexAccount);
+    },
   },
 
   mounted() {
@@ -144,6 +147,10 @@ export default {
     async loadAccount(index) {
       try {
         this.$store.state.networks = await this._getNetworks();
+        const currentTag = await this._getCurrentNetwork();
+        this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
+          (n) => n.tag === currentTag
+        );
         this.network =
           this.$store.state.networks[this.$store.state.currentNetwork];
         this.provider = new Provider(this.network.rpcNodes);
