@@ -317,6 +317,7 @@ export default {
       advanced: false,
       data: "",
       abis: null,
+      abiUploadContract: null,
       requester: "",
       typeRequest: "",
       accounts: [],
@@ -774,10 +775,6 @@ export default {
         return r.command === "signer:signTransaction";
       });
     }
-    /*requests = this.$store.state.requests.filter((r) => {
-      if (this.send) return r.command === "signer:sendTransaction";
-      return r.command === "signer:signTransaction";
-    });*/
     /**
      * TODO: for several requests create a list of requesters
      * and ask to the user to select one to see the details
@@ -791,11 +788,11 @@ export default {
   methods: {
     async getAbi(contract) {
       const contractId = contract.getId();
-      // try to get ABI from local storage
+      // try to get the ABI from local storage
       let abi = await this._getAbi(this.network, contractId);
       if (abi) return abi;
 
-      // try to get ABI from the network
+      // try to get the ABI from the network
       try {
         abi = await contract.fetchAbi({
           updateFunctions: false,
@@ -805,6 +802,14 @@ export default {
         // empty
       }
       if (abi) return abi;
+
+      // try to get the ABI from contract upload
+      if (
+        this.abiUploadContract &&
+        this.abiUploadContract.contractId === contractId
+      ) {
+        return JSON.parse(this.abiUploadContract.abi);
+      }
 
       // try to get ABI from the request
       return this.abis ? this.abis[contractId] : undefined;
@@ -1081,6 +1086,10 @@ export default {
         for (let i = 0; i < operations.length; i += 1) {
           const op = operations[i];
           if (op.upload_contract) {
+            this.abiUploadContract = {
+              contractId: op.upload_contract.contract_id,
+              abi: op.upload_contract.abi,
+            };
             const title = "Upload contract 😎";
             const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
             const authMessage = (a) =>
