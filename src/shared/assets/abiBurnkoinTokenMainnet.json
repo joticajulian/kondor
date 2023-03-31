@@ -1,0 +1,120 @@
+{
+  "methods": {
+    "name": {
+      "argument": "token.name_arguments",
+      "return": "token.name_result",
+      "description": "Returns the token's name",
+      "entry-point": "0x82a3537f",
+      "read-only": true
+    },
+    "symbol": {
+      "argument": "token.symbol_arguments",
+      "return": "token.symbol_result",
+      "description": "Returns the token's symbol",
+      "entry-point": "0xb76a7ca1",
+      "read-only": true
+    },
+    "decimals": {
+      "argument": "token.decimals_arguments",
+      "return": "token.decimals_result",
+      "description": "Returns the token's decimals precision",
+      "entry-point": "0xee80fd2f",
+      "read-only": true
+    },
+    "total_supply": {
+      "argument": "token.total_supply_arguments",
+      "return": "token.total_supply_result",
+      "description": "Returns the token's total supply",
+      "entry-point": "0xb0da3934",
+      "read-only": true
+    },
+    "balance_of": {
+      "argument": "token.balance_of_arguments",
+      "return": "token.balance_of_result",
+      "description": "Checks the balance at an address",
+      "entry-point": "0x5c721497",
+      "read-only": true
+    },
+    "transfer": {
+      "argument": "token.transfer_arguments",
+      "return": "token.transfer_result",
+      "description": "Transfers the token",
+      "entry-point": "0x27f576ca",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "pVHP"
+        }
+      }
+    },
+    "mint": {
+      "argument": "token.mint_arguments",
+      "return": "token.mint_result",
+      "description": "Mints the token",
+      "entry-point": "0xdc6f17bb",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "pVHP"
+        }
+      }
+    },
+    "burn": {
+      "argument": "token.burn_arguments",
+      "return": "token.burn_result",
+      "description": "Burns the token",
+      "entry-point": "0x859facc5",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "pVHP"
+        }
+      }
+    }
+  },
+  "events": {
+    "token.transfer": {
+      "argument": "token.transfer_event",
+      "name": "pVHP transferred",
+      "description": "",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "pVHP"
+        }
+      }
+    },
+    "token.mint": {
+      "argument": "token.mint_event",
+      "name": "pVHP minted",
+      "description": "",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "pVHP"
+        }
+      }
+    },
+    "token.burn": {
+      "argument": "token.burn_event",
+      "name": "pVHP burnt",
+      "description": "",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "pVHP"
+        }
+      }
+    }
+  },
+  "types": "Cv4IChphc3NlbWJseS9wcm90by90b2tlbi5wcm90bxIFdG9rZW4aFGtvaW5vcy9vcHRpb25zLnByb3RvIhAKDm5hbWVfYXJndW1lbnRzIiMKC25hbWVfcmVzdWx0EhQKBXZhbHVlGAEgASgJUgV2YWx1ZSISChBzeW1ib2xfYXJndW1lbnRzIiUKDXN5bWJvbF9yZXN1bHQSFAoFdmFsdWUYASABKAlSBXZhbHVlIhQKEmRlY2ltYWxzX2FyZ3VtZW50cyInCg9kZWNpbWFsc19yZXN1bHQSFAoFdmFsdWUYASABKA1SBXZhbHVlIhgKFnRvdGFsX3N1cHBseV9hcmd1bWVudHMiLwoTdG90YWxfc3VwcGx5X3Jlc3VsdBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlIjIKFGJhbGFuY2Vfb2ZfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lciItChFiYWxhbmNlX29mX3Jlc3VsdBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlIl4KEnRyYW5zZmVyX2FyZ3VtZW50cxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhQKAnRvGAIgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgDIAEoBEICMAFSBXZhbHVlIicKD3RyYW5zZmVyX3Jlc3VsdBIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiQAoObWludF9hcmd1bWVudHMSFAoCdG8YASABKAxCBIC1GAZSAnRvEhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiIwoLbWludF9yZXN1bHQSFAoFdmFsdWUYASABKAhSBXZhbHVlIkQKDmJ1cm5fYXJndW1lbnRzEhgKBGZyb20YASABKAxCBIC1GAZSBGZyb20SGAoFdmFsdWUYAiABKARCAjABUgV2YWx1ZSIjCgtidXJuX3Jlc3VsdBIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiKgoOYmFsYW5jZV9vYmplY3QSGAoFdmFsdWUYASABKARCAjABUgV2YWx1ZSJ5ChNtYW5hX2JhbGFuY2Vfb2JqZWN0EhwKB2JhbGFuY2UYASABKARCAjABUgdiYWxhbmNlEhYKBG1hbmEYAiABKARCAjABUgRtYW5hEiwKEGxhc3RfbWFuYV91cGRhdGUYAyABKARCAjABUg5sYXN0TWFuYVVwZGF0ZSI8CgptaW50X2V2ZW50EhQKAnRvGAEgASgMQgSAtRgGUgJ0bxIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIkAKCmJ1cm5fZXZlbnQSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIloKDnRyYW5zZmVyX2V2ZW50EhgKBGZyb20YASABKAxCBIC1GAZSBGZyb20SFAoCdG8YAiABKAxCBIC1GAZSAnRvEhgKBXZhbHVlGAMgASgEQgIwAVIFdmFsdWViBnByb3RvMw=="
+}

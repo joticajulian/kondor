@@ -1,0 +1,169 @@
+{
+  "methods": {
+    "initialize": {
+      "argument": "pool.initialize_arguments",
+      "return": "pool.initialize_result",
+      "description": "Update internal metadata. Restricted to contract owner.",
+      "entry-point": "0x470ebe82",
+      "read-only": false
+    },
+    "balance_of": {
+      "argument": "pool.balance_of_arguments",
+      "return": "pool.balance_of_result",
+      "description": "Get value of KOIN/VHP based on PVHP held by address",
+      "entry-point": "0x5c721497",
+      "read-only": true
+    },
+    "basis": {
+      "argument": "pool.basis_arguments",
+      "return": "pool.basis_result",
+      "description": "Get internal basis used for tracking profit between reburns",
+      "entry-point": "0xa7a3c8f6",
+      "read-only": true
+    },
+    "get_metadata": {
+      "argument": "pool.get_metadata_arguments",
+      "return": "pool.get_metadata_result",
+      "description": "Get internal metadata",
+      "entry-point": "0xfcf7a68f",
+      "read-only": true
+    },
+    "set_metadata": {
+      "argument": "pool.set_metadata_arguments",
+      "return": "pool.set_metadata_result",
+      "description": "Update internal metadata. Restricted to contract owner.",
+      "entry-point": "0x3d59af19",
+      "read-only": false
+    },
+    "set_block_producer_key": {
+      "argument": "pool.set_block_producer_key_arguments",
+      "return": "pool.set_block_producer_key_result",
+      "description": "Update public key registered with proof of burn.",
+      "entry-point": "0x11f2ac17",
+      "read-only": false
+    },
+    "deposit_koin": {
+      "argument": "pool.deposit_koin_arguments",
+      "return": "pool.deposit_koin_result",
+      "description": "Deposit KOIN",
+      "entry-point": "0x1fca9c49",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    },
+    "deposit_vhp": {
+      "argument": "pool.deposit_vhp_arguments",
+      "return": "pool.deposit_vhp_result",
+      "description": "Deposit VHP",
+      "entry-point": "0x8ed1d782",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "VHP"
+        }
+      }
+    },
+    "withdraw_koin": {
+      "argument": "pool.withdraw_koin_arguments",
+      "return": "pool.withdraw_koin_result",
+      "description": "Withdraw KOIN for an amount of PVHP",
+      "entry-point": "0xc7c42a57",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    },
+    "withdraw_vhp": {
+      "argument": "pool.withdraw_vhp_arguments",
+      "return": "pool.withdraw_vhp_result",
+      "description": "Withdraw VHP for an amount of PVHP",
+      "entry-point": "0xc1610dbd",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "VHP"
+        }
+      }
+    },
+    "reburn": {
+      "argument": "pool.reburn_arguments",
+      "return": "pool.reburn_result",
+      "description": "Burn KOIN held by contract for VHP, distribute profit share to operator",
+      "entry-point": "0x79f80b0c",
+      "read-only": false,
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    }
+  },
+  "events": {
+    "pool.deposit_koin": {
+      "argument": "pool.deposit_koin_event",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    },
+    "pool.deposit_vhp": {
+      "argument": "pool.deposit_vhp_event",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "VHP"
+        }
+      }
+    },
+    "pool.withdraw_koin": {
+      "argument": "pool.withdraw_koin_event",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    },
+    "pool.withdraw_vhp": {
+      "argument": "pool.withdraw_vhp_event",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "VHP"
+        }
+      }
+    },
+    "pool.reburn": {
+      "argument": "pool.reburn_event",
+      "format": {
+        "value": {
+          "type": "number",
+          "decimals": 8,
+          "symbol": "KOIN"
+        }
+      }
+    }
+  },
+  "types": "CoAPChlhc3NlbWJseS9wcm90by9wb29sLnByb3RvEgRwb29sGhRrb2lub3Mvb3B0aW9ucy5wcm90byJ8ChRpbml0aWFsaXplX2FyZ3VtZW50cxIxChFpbml0aWFsX2RlcG9zaXRvchgBIAEoDEIEgLUYBlIQaW5pdGlhbERlcG9zaXRvchIxCghtZXRhZGF0YRgCIAEoCzIVLnBvb2wubWV0YWRhdGFfb2JqZWN0UghtZXRhZGF0YSIpChFpbml0aWFsaXplX3Jlc3VsdBIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiNgoUYmFsYW5jZV9vZl9hcmd1bWVudHMSHgoHYWNjb3VudBgBIAEoDEIEgLUYBlIHYWNjb3VudCItChFiYWxhbmNlX29mX3Jlc3VsdBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlIhEKD2Jhc2lzX2FyZ3VtZW50cyIoCgxiYXNpc19yZXN1bHQSGAoFdmFsdWUYASABKARCAjABUgV2YWx1ZSIYChZnZXRfbWV0YWRhdGFfYXJndW1lbnRzIkgKE2dldF9tZXRhZGF0YV9yZXN1bHQSMQoIbWV0YWRhdGEYASABKAsyFS5wb29sLm1ldGFkYXRhX29iamVjdFIIbWV0YWRhdGEiSwoWc2V0X21ldGFkYXRhX2FyZ3VtZW50cxIxCghtZXRhZGF0YRgBIAEoCzIVLnBvb2wubWV0YWRhdGFfb2JqZWN0UghtZXRhZGF0YSIrChNzZXRfbWV0YWRhdGFfcmVzdWx0EhQKBXZhbHVlGAEgASgIUgV2YWx1ZSJHCiBzZXRfYmxvY2tfcHJvZHVjZXJfa2V5X2FyZ3VtZW50cxIjCgpwdWJsaWNfa2V5GAEgASgMQgSAtRgAUglwdWJsaWNLZXkiNQodc2V0X2Jsb2NrX3Byb2R1Y2VyX2tleV9yZXN1bHQSFAoFdmFsdWUYASABKAhSBXZhbHVlIlIKFmRlcG9zaXRfa29pbl9hcmd1bWVudHMSHgoHYWNjb3VudBgBIAEoDEIEgLUYBlIHYWNjb3VudBIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIisKE2RlcG9zaXRfa29pbl9yZXN1bHQSFAoFdmFsdWUYASABKAhSBXZhbHVlIlEKFWRlcG9zaXRfdmhwX2FyZ3VtZW50cxIeCgdhY2NvdW50GAEgASgMQgSAtRgGUgdhY2NvdW50EhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiKgoSZGVwb3NpdF92aHBfcmVzdWx0EhQKBXZhbHVlGAEgASgIUgV2YWx1ZSJTChd3aXRoZHJhd19rb2luX2FyZ3VtZW50cxIeCgdhY2NvdW50GAEgASgMQgSAtRgGUgdhY2NvdW50EhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiLAoUd2l0aGRyYXdfa29pbl9yZXN1bHQSFAoFdmFsdWUYASABKAhSBXZhbHVlIlIKFndpdGhkcmF3X3ZocF9hcmd1bWVudHMSHgoHYWNjb3VudBgBIAEoDEIEgLUYBlIHYWNjb3VudBIYCgV2YWx1ZRgCIAEoBEICMAFSBXZhbHVlIisKE3dpdGhkcmF3X3ZocF9yZXN1bHQSFAoFdmFsdWUYASABKAhSBXZhbHVlIhIKEHJlYnVybl9hcmd1bWVudHMiJQoNcmVidXJuX3Jlc3VsdBIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUiKAoMYmFzaXNfb2JqZWN0EhgKBXZhbHVlGAEgASgEQgIwAVIFdmFsdWUisQEKD21ldGFkYXRhX29iamVjdBItCg9vcGVyYXRvcl93YWxsZXQYASABKAxCBIC1GAZSDm9wZXJhdG9yV2FsbGV0EiUKDG9wZXJhdG9yX2ZlZRgCIAEoBEICMAFSC29wZXJhdG9yRmVlEiMKC2tvaW5fYnVmZmVyGAMgASgEQgIwAVIKa29pbkJ1ZmZlchIjCg1idXJuX2RlcG9zaXRzGAQgASgIUgxidXJuRGVwb3NpdHMiTgoSZGVwb3NpdF9rb2luX2V2ZW50Eh4KB2FjY291bnQYASABKAxCBIC1GAZSB2FjY291bnQSGAoFdmFsdWUYAiABKARCAjABUgV2YWx1ZSJNChFkZXBvc2l0X3ZocF9ldmVudBIeCgdhY2NvdW50GAEgASgMQgSAtRgGUgdhY2NvdW50EhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiTwoTd2l0aGRyYXdfa29pbl9ldmVudBIeCgdhY2NvdW50GAEgASgMQgSAtRgGUgdhY2NvdW50EhgKBXZhbHVlGAIgASgEQgIwAVIFdmFsdWUiTgoSd2l0aGRyYXdfdmhwX2V2ZW50Eh4KB2FjY291bnQYASABKAxCBIC1GAZSB2FjY291bnQSGAoFdmFsdWUYAiABKARCAjABUgV2YWx1ZSI3CgxyZWJ1cm5fZXZlbnQSJwoNYW1vdW50X2J1cm5lZBgBIAEoBEICMAFSDGFtb3VudEJ1cm5lZGIGcHJvdG8z"
+}

@@ -9,6 +9,8 @@ import abiPobMainnet from "../assets/abiPobMainnet.json";
 import abiPobHarbinger from "../assets/abiPobHarbinger.json";
 import abiVhpMainnet from "../assets/abiVhpMainnet.json";
 import abiVhpHarbinger from "../assets/abiVhpHarbinger.json";
+import abiBurnkoinMainnet from "../assets/abiBurnkoinMainnet.json";
+import abiBurnkoinTokenMainnet from "../assets/abiBurnkoinTokenMainnet.json";
 
 function toUint8Array(hexString) {
   return new Uint8Array(
@@ -154,6 +156,10 @@ export default {
           return abiPobMainnet;
         case "18zw3ZokdfHtudzaWAUnU4tUvKzKiJeN76":
           return abiClaimMainnet;
+        case "1NsQbH5AhQXgtSNg1ejpFqTi2hmCWz1eQS":
+          return abiBurnkoinMainnet;
+        case "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy":
+          return abiBurnkoinTokenMainnet;
         default:
           break;
         }
