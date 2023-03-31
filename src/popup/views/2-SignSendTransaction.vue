@@ -852,27 +852,33 @@ export default {
       switch (contractId) {
       // mainnet
       case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
-        contractIdName = `${contractId} - KOIN Contract`;
+        contractIdName = `${contractId} - KOIN Token ☑️`;
         break;
       case "1AdzuXSpC6K9qtXdCBgD5NUpDNwHjMgrc9":
-        contractIdName = `${contractId} - VHP Contract`;
+        contractIdName = `${contractId} - VHP Token ☑️`;
         break;
       case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
-        contractIdName = `${contractId} - PoB Contract`;
+        contractIdName = `${contractId} - PoB Contract ☑️`;
         break;
       case "18zw3ZokdfHtudzaWAUnU4tUvKzKiJeN76":
-        contractIdName = `${contractId} - Claim Contract`;
+        contractIdName = `${contractId} - Claim Contract ☑️`;
+        break;
+      case "1NsQbH5AhQXgtSNg1ejpFqTi2hmCWz1eQS":
+        contractIdName = `${contractId} - Burnkoin Contract ☑️`;
+        break;
+      case "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy":
+        contractIdName = `${contractId} - pVHP Token ☑️`;
         break;
 
         // harbinger
       case "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ":
-        contractIdName = `${contractId} - tKOIN Contract`;
+        contractIdName = `${contractId} - tKOIN Token ☑️`;
         break;
       case "1JZqj7dDrK5LzvdJgufYBJNUFo88xBoWC8":
-        contractIdName = `${contractId} - VHP Contract`;
+        contractIdName = `${contractId} - VHP Token ☑️`;
         break;
       case "198RuEouhgiiaQm7uGfaXS6jqZr6g6nyoR":
-        contractIdName = `${contractId} - PoB Contract`;
+        contractIdName = `${contractId} - PoB Contract ☑️`;
         break;
       default:
         break;
