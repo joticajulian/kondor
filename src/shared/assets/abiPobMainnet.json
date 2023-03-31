@@ -7,7 +7,7 @@
       "name": "burn KOIN 🔥",
       "description": "Burn KOIN to receive VHP 🤘",
       "read-only": false,
-      "beauty": {
+      "format": {
         "token_amount": {
           "type": "number",
           "decimals": 8,

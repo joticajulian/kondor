@@ -42,7 +42,7 @@
       "name": "transfer KOIN 💰",
       "description": "Transfers the token",
       "read-only": false,
-      "beauty": {
+      "format": {
         "value": {
           "type": "number",
           "decimals": 8,
@@ -56,7 +56,7 @@
       "entry-point": "0xdc6f17bb",
       "description": "Mints the token",
       "read-only": false,
-      "beauty": {
+      "format": {
         "value": {
           "type": "number",
           "decimals": 8,
@@ -71,7 +71,7 @@
       "name": "burn KOIN ⚠️",
       "description": "⚠️ Be careful. This is to burn tokens but it will not create VHP",
       "read-only": false,
-      "beauty": {
+      "format": {
         "value": {
           "type": "number",
           "decimals": 8,
@@ -85,7 +85,7 @@
       "argument": "koinos.contracts.token.transfer_event",
       "name": "KOIN transferred 💰",
       "description": "",
-      "beauty": {
+      "format": {
         "value": {
           "type": "number",
           "decimals": 8,
@@ -97,7 +97,7 @@
       "argument": "koinos.contracts.token.mint_event",
       "name": "KOIN minted",
       "description": "",
-      "beauty": {
+      "format": {
         "value": {
           "type": "number",
           "decimals": 8,
@@ -109,7 +109,7 @@
       "argument": "koinos.contracts.token.burn_event",
       "name": "KOIN burnt 🔥",
       "description": "",
-      "beauty": {
+      "format": {
         "value": {
           "type": "number",
           "decimals": 8,
