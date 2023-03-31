@@ -444,7 +444,7 @@ export default {
                     description: "Transfers the token",
                     "read-only": false,
                     entry_point: 670398154,
-                    beauty: {
+                    format: {
                       value: {
                         type: "number",
                         decimals: 8,
@@ -472,7 +472,7 @@ export default {
                 events: {
                   "koinos.contracts.token.transfer_event": {
                     argument: "koinos.contracts.token.transfer_event",
-                    beauty: {
+                    format: {
                       value: {
                         type: "number",
                         decimals: 8,
@@ -815,20 +815,20 @@ export default {
       return this.abis ? this.abis[contractId] : undefined;
     },
 
-    applyBeauty(beauty, argName, data) {
+    applyFormat(format, argName, data) {
       // display address names
       const acc = this.accounts.find((a) => a.address === data);
       if (acc) {
         return `${acc.name} - ${data}`;
       }
 
-      if (!beauty || !beauty[argName]) return data;
+      if (!format || !format[argName]) return data;
 
       // beautify numbers
-      switch (beauty[argName].type) {
+      switch (format[argName].type) {
       case "number": {
-        return `${utils.formatUnits(data, beauty[argName].decimals)} ${
-          beauty[argName].symbol
+        return `${utils.formatUnits(data, format[argName].decimals)} ${
+          format[argName].symbol
         }`;
       }
       default:
@@ -915,13 +915,13 @@ export default {
         contract.serializer = await this.newSandboxSerializer(types);
         if (isOperation) {
           let { name, args } = await contract.decodeOperation(action);
-          const { beauty } = contract.abi.methods[name];
+          const { format } = contract.abi.methods[name];
           if (args) {
             args = Object.keys(args).map((argName) => {
               const field = firstUpperCase(argName);
               return {
                 field,
-                data: this.applyBeauty(beauty, argName, args[argName]),
+                data: this.applyFormat(format, argName, args[argName]),
               };
             });
           }
@@ -938,18 +938,18 @@ export default {
 
         if (isEvent) {
           let decodedEvent = await contract.decodeEvent(action);
-          let beauty = null;
+          let format = null;
           let subtitle = "";
           if (contract.abi.events && contract.abi.events[decodedEvent.name]) {
-            beauty = contract.abi.events[decodedEvent.name].beauty;
+            format = contract.abi.events[decodedEvent.name].format;
             subtitle = contract.abi.events[decodedEvent.name].description || "";
           }
           let args = Object.keys(decodedEvent.args).map((argName) => {
             const field = firstUpperCase(argName);
             return {
               field,
-              data: this.applyBeauty(
-                beauty,
+              data: this.applyFormat(
+                format,
                 argName,
                 decodedEvent.args[argName]
               ),
