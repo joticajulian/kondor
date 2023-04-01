@@ -158,13 +158,15 @@ const messenger = new Messenger({
           break;
         }
         case "provider:getHeadInfo": {
-          const { network } = args as { network: string };
+          const a = args as { network: string } | undefined;
+          const network = a && a.network ? a.network : undefined;
           const provider = await getProvider(network);
           result = await provider.getHeadInfo();
           break;
         }
         case "provider:getChainId": {
-          const { network } = args as { network: string };
+          const a = args as { network: string } | undefined;
+          const network = a && a.network ? a.network : undefined;
           result = await getChainIdFromStorage(network);
           break;
         }
