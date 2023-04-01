@@ -258,6 +258,12 @@
         v-if="receipt"
         class="mana-used"
       >
+        Mana limit: {{ maxMana }}
+      </div>
+      <div
+        v-if="receipt"
+        class="mana-used"
+      >
         Mana consumption: {{ manaUsed }}
       </div>
       <div
@@ -864,10 +870,28 @@ export default {
         contractIdName = `${contractId} - Claim Contract ☑️`;
         break;
       case "1NsQbH5AhQXgtSNg1ejpFqTi2hmCWz1eQS":
-        contractIdName = `${contractId} - Burnkoin Contract ☑️`;
+        contractIdName = `${contractId} - Burnkoin pool ☑️`;
         break;
       case "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy":
         contractIdName = `${contractId} - pVHP Token ☑️`;
+        break;
+      case "1DGNQQimsyBQajzQdWXY96m84YyDC2pUpB":
+        contractIdName = `${contractId} - Fogata JGA#1 ☑️`;
+        break;
+      case "1MbsVfNw6yzQqA8499d8KQj8qdLyRs8CzW":
+        contractIdName = `${contractId} - Fogata JGA#2 ☑️`;
+        break;
+      case "14iHqMGBznBM7xJXhkrQ266FgoFdymCqLM":
+        contractIdName = `${contractId} - Fogata KoinForge ☑️`;
+        break;
+      case "1KfD7n93LnnihyygopWUVTkbtWVe5aXXGW":
+        contractIdName = `${contractId} - Fogata Koinos en español ☑️`;
+        break;
+      case "18UYKhWVCbTpFs8oYC54xoiCQQthhEkX7m":
+        contractIdName = `${contractId} - Fogata Koinnoisseur's pure KOIN Pool ☑️`;
+        break;
+      case "15jueaBcMieDCMGw6wAmEK6cNSUVicknG1":
+        contractIdName = `${contractId} - Fogata Koinnoisseur's pure VAPOR Pool ☑️`;
         break;
 
         // harbinger

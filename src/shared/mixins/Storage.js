@@ -11,6 +11,7 @@ import abiVhpMainnet from "../assets/abiVhpMainnet.json";
 import abiVhpHarbinger from "../assets/abiVhpHarbinger.json";
 import abiBurnkoinMainnet from "../assets/abiBurnkoinMainnet.json";
 import abiBurnkoinTokenMainnet from "../assets/abiBurnkoinTokenMainnet.json";
+import abiFogata from "../assets/abiFogata.json";
 
 function toUint8Array(hexString) {
   return new Uint8Array(
@@ -160,6 +161,13 @@ export default {
           return abiBurnkoinMainnet;
         case "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy":
           return abiBurnkoinTokenMainnet;
+        case "1DGNQQimsyBQajzQdWXY96m84YyDC2pUpB":
+        case "1MbsVfNw6yzQqA8499d8KQj8qdLyRs8CzW":
+        case "14iHqMGBznBM7xJXhkrQ266FgoFdymCqLM":
+        case "1KfD7n93LnnihyygopWUVTkbtWVe5aXXGW":
+        case "18UYKhWVCbTpFs8oYC54xoiCQQthhEkX7m":
+        case "15jueaBcMieDCMGw6wAmEK6cNSUVicknG1":
+          return abiFogata;
         default:
           break;
         }
