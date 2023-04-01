@@ -80,7 +80,7 @@
         "value": {
           "type": "number",
           "decimals": 8,
-          "symbol": "KOIN"
+          "symbol": "pVHP"
         }
       }
     },
@@ -94,7 +94,7 @@
         "value": {
           "type": "number",
           "decimals": 8,
-          "symbol": "VHP"
+          "symbol": "pVHP"
         }
       }
     },
@@ -140,7 +140,7 @@
         "value": {
           "type": "number",
           "decimals": 8,
-          "symbol": "KOIN"
+          "symbol": "pVHP"
         }
       }
     },
@@ -150,7 +150,7 @@
         "value": {
           "type": "number",
           "decimals": 8,
-          "symbol": "VHP"
+          "symbol": "pVHP"
         }
       }
     },
