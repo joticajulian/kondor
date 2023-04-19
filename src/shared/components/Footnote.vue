@@ -18,9 +18,9 @@ export default {
 <style scoped>
 .message {
   padding: 0.8em;
-  font-size: 0.7em;
+  font-size: 1em;
   color: black;
-  margin: 5px 0px;
+  margin: 1em 0;
   background-color: orange;
 }
 </style>

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.7.2](https://github.com/joticajulian/kondor/releases/tag/v0.7.2) (2023-04-19)
+
+### 🚀 Features
+
+- Message in the popup to sign to warn the user to interact with trusted contracts
+
 ## [v0.7.1](https://github.com/joticajulian/kondor/releases/tag/v0.7.1) (2023-04-02)
 
 ### 🐛 Bug Fixes
