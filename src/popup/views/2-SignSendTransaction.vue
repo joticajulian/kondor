@@ -8,6 +8,9 @@
       <div class="title">
         Signature request {{ send ? "and send" : "" }}
       </div>
+      <Footnote
+        message="Be careful of unknown contracts as they could be malicious. Please interact only with contracts you trust"
+      />
       <div class="advanced">
         Advanced
         <div class="checkbox-wrapper-2">
