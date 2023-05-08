@@ -6221,10 +6221,10 @@ koilib@^5.2.0:
     multibase "^4.0.6"
     protobufjs "^7.0.0"
 
-koilib@^5.5.3:
-  version "5.5.3"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.5.3.tgz#b841ae4e0a6c335d3f625981bb0e0a87a75a386d"
-  integrity sha512-qoBIxGfygwImKzq6H4KW22WYplYE0dB5FsCGk55w7gueCowi0olMU7ZEBQSvzavPa52GzEgBIDHwVUGrhnNlvw==
+koilib@^5.5.6:
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.5.6.tgz#a8588ef863467ed761000d0ee521139964cf1f4a"
+  integrity sha512-Wje/fiY994lNv+Q8Smk2sy/K5TFKZy4NrXg7/uuXYb1mxwaN1+dreFxZUKObh4A8s350MNWFxyDsoeIfyOiKcw==
   dependencies:
     "@noble/hashes" "^1.1.2"
     "@noble/secp256k1" "^1.6.3"
