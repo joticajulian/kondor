@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.7.3](https://github.com/joticajulian/kondor/releases/tag/v0.7.1) (2023-05-08)
+
+### 🐛 Bug Fixes
+
+- Fix bug in transfers by upgrading to koilib v5.5.6
+
 ## [v0.7.2](https://github.com/joticajulian/kondor/releases/tag/v0.7.2) (2023-04-19)
 
 ### 🚀 Features
