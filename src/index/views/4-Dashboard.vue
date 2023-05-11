@@ -241,13 +241,15 @@ export default {
           throw new Error(`${this.toAddress} is an invalid address`);
         }
 
+        const manaAvailable = await this.provider.getAccountRc(this.address);
+        const rcLimit = Math.min(10_0000_0000, Number(manaAvailable)).toString();
         const { transaction, receipt } = await this.koin.transfer(
           {
             from: this.address,
             to: this.toAddress,
             value: utils.parseUnits(this.amount, 8),
           },
-          { chainId: this.network.chainId }
+          { chainId: this.network.chainId, rcLimit }
         );
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
@@ -257,7 +259,7 @@ export default {
           console.log("firing interval");
           this.loadBalance();
         }, 2000);
-        const { blockNumber } = await transaction.wait();
+        const { blockNumber } = await transaction.wait("byBlock", 60_000);
         clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
