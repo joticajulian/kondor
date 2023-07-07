@@ -1,70 +1,34 @@
 <template>
-  <div class="container">
-    <div class="column">
-      <div class="info container">
-        <div class="balance">
-          <div class="heading">
-            KOIN
-          </div>
-          <div class="amount">
-            <div
-              class="balance"
-              :data-tooltip="satoshis"
-            >
-              {{ balanceFormatted }}
-            </div>
-            <div class="usd">
-              {{ balanceUSD }}
-            </div>
-            <!-- <div>
-              <router-link to="/signers" class="signer-links"
-                >Signers</router-link
-              >
-            </div> -->
-          </div>
+  <div class="column">
+    <div class="row">
+      <div class="amount">
+        <div
+          :data-tooltip="satoshis"
+        >
+          <span class="balance">{{ balanceFormatted }}</span> <span class="koin-label">KOIN</span>
         </div>
-        <!-- <div class="recharge-bar" :class="timeRechargeMana != 0 ? red : green"></div> -->
-        <div class="mana-container">
-          <div class="recharge-container">
-            <div class="mana-title">
-              MANA
-            </div>
-            <div class="mana-available">
-              {{ mana }}
-            </div>
-          </div>
-          <div class="mana-info">
-            <div class="title-gray">
-              Time to recharge
-            </div>
-            <div class="recharge-time">
-              {{ timeRechargeMana }}
-            </div>
-          </div>
+        <div class="usd">
+          {{ balanceUSD }}
         </div>
       </div>
-      <div
-        v-if="!watchMode"
-        class="transfer container"
-      >
-        <label>Send to address</label>
-        <input
-          v-model="toAddress"
-          type="text"
-        >
-        <label>Send to amount</label>
-        <input
-          v-model="amount"
-          type="text"
-          @keyup.enter="transfer"
-        >
-        <button
-          class=""
-          @click="transfer"
-        >
-          transfer
-        </button>
-      </div>
+      <ManaOrb 
+        :mana-percent="manaPercent" 
+        :time-recharge="timeRechargeMana" 
+      />
+    </div>
+    <div
+      v-if="!watchMode"
+      class="actions container"
+    >
+      <button>
+        <span class="material-icons">add</span><span>Buy</span>
+      </button>
+      <button>
+        <span class="material-icons">arrow_outward</span><span>Send</span>
+      </button>
+      <button>
+        <span class="material-icons">swap_horiz</span><span>Swap</span>
+      </button>
     </div>
   </div>
 </template>
@@ -72,6 +36,7 @@
 <script>
 import axios from "axios";
 import { Contract, Provider, Signer, utils } from "koilib";
+import ManaOrb from "../components/ManaOrb.vue";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -100,6 +65,7 @@ function deltaTimeToString(milliseconds) {
 }
 
 export default {
+  components: { ManaOrb },
   mixins: [Storage, Sandbox, ViewHelper],
   data() {
     return {
@@ -115,8 +81,9 @@ export default {
       intervalMana: null,
       mana: "",
       lastUpdateMana: 0,
-      timeRechargeMana: "",
+      timeRechargeMana: "loading...",
       watchMode: false,
+      manaPercent: 1
     };
   },
   computed: {
@@ -218,6 +185,7 @@ export default {
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
         );
+        this.manaPercent = Math.floor(this.mana / balance * 100) || 1;
 
         clearInterval(this.intervalMana);
         this.intervalMana = setInterval(() => {
@@ -228,6 +196,7 @@ export default {
             ((balance - mana) * FIVE_DAYS) / balance
           );
           this.mana = Number(mana.toFixed(8));
+          this.manaPercent = Math.floor(this.mana / balance * 100) || 1;
         }, 1000);
       } catch (error) {
         this.alertDanger(error.message);
@@ -284,118 +253,54 @@ label {
   display: flex;
   flex-direction: column;
   margin-top: 3em;
+  width: 100%;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2em;
 }
 input {
   margin: 1em 0;
 }
 .balance {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  font-size: 1.5em;
+  font-size: 2.5em;
   font-weight: bold;
 }
 .amount {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
   font-weight: 100;
-  margin: 0.3em 0 1em 0;
+  cursor: default;
 }
-.heading {
-  font-size: 0.7em;
+.koin-label {
   font-weight: 300;
 }
-.info {
-  text-transform: none;
-  font-weight: 400;
-  color: #000;
-  width: 100vw;
+.actions {
+  margin-top: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
 }
-.tkoin {
-  font-size: 0.7em;
-  color: rgb(91, 91, 91);
-}
-.signer-links {
-  font-size: 0.5em;
+
+.actions > button {
+  background: white;
   color: var(--kondor-purple);
-  font-weight: 500;
-  margin-top: 0.4em;
-  text-decoration: underline;
-}
-.transfer {
-  margin-top: 3em;
-}
-.address-container {
-  font-weight: 400;
+  border: 0;
   display: flex;
-  align-items: center;
-  gap: 1em;
+  flex-direction: column;
+  width: auto;
 }
-.addr {
-  font-size: 0.9em;
-  margin-bottom: 0.5em;
+
+.actions > button:hover {
+  opacity: 0.9;
 }
-.addr-links {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.mana {
-  font-size: 0.8em;
-  font-weight: 400;
-  display: flex;
-  flex-direction: row;
-}
-.mana-container {
-  display: flex;
-  flex-direction: row;
-  box-sizing: border-box;
-  width: var(--app-width);
-  padding: 0 2em;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-.mana-info {
-  text-align: right;
-}
-.mana-title {
-  font-weight: 700;
-}
-.mana-available {
-  font-size: 1.2em;
-  font-weight: 400;
-}
-.title-gray {
-  font-size: 0.8em;
-  color: var(--kondor-lighter);
-}
-.recharge-container {
-  margin-bottom: 2em;
-}
-.recharge-bar {
-  width: 88vw;
-  height: 0.4em;
-  background-color: rgb(15, 201, 142);
+
+.actions > button > .material-icons {
+  background: var(--kondor-purple);
   color: white;
-  font-size: 0.5em;
-}
-.recharge-time {
-  font-weight: 400;
-  color: var(--kondor-lighter);
-}
-.green {
-  background-color: rgb(15, 201, 142);
-}
-.red {
-  background-color: rgb(223, 57, 57);
-}
-.usd {
-  font-size: 0.8em;
-  padding-top: 0.3em;
-  color: var(--kondor-gray);
+  padding: 0.3em;
+  border-radius: 50%;
 }
 </style>
