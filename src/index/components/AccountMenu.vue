@@ -11,7 +11,6 @@
           </div>
           <div :data-tooltip="msgCopy">
             <button
-              :data-tooltip="msgCopy"
               @click="copyAddress()"
             >
               <svg
@@ -163,8 +162,9 @@ export default {
 
 <style scoped>
 .dropdown-container {
-  padding: 2em 0 0 0;
+  padding: 2em 0;
   color: var(--kondor-purple);
+  border-bottom: 1px solid #ddd;
 }
 .dropdown-container .link {
   cursor: pointer;
@@ -242,8 +242,9 @@ export default {
   font-weight: 600;
   color: #c8c1d1;
 }
-current-account {
+.current-account {
   font-size: 1.2em;
+  cursor: default;
 }
 .dropdown-info {
   padding: 1.2em 1em;
@@ -259,12 +260,11 @@ current-account {
 .address-container {
   display: flex;
   align-items: center;
+  cursor: default;
 }
 .address-container button {
   all: unset;
   cursor: pointer;
-}
-.address-container svg {
   margin-left: 0.5em;
 }
 </style>

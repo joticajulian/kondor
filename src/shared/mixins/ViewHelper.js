@@ -14,14 +14,17 @@ export default {
   created() {
     switch (router.currentRoute.path) {
     case "/":
+      this.$store.state.showTopNav = false;
       this.$store.state.showAccountMenu = false;
       this.$store.state.showBackButton = false;
       break;
     case "/dashboard":
+      this.$store.state.showTopNav = true;
       this.$store.state.showAccountMenu = true;
-      this.$store.state.showBackButton = true;
+      this.$store.state.showBackButton = false;
       break;
     default:
+      this.$store.state.showTopNav = true;
       this.$store.state.showAccountMenu = false;
       this.$store.state.showBackButton = true;
       break;
