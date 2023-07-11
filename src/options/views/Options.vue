@@ -172,6 +172,8 @@ export default {
       this.networks[0].name = "Koinos Mainnet";
       this.networks[0].tag = "mainnet";
       this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
+      this.networks[0].kapNameServiceContractId = "13tmzDmfqCsbYT26C4CmKxq86d33senqH3";
+      this.networks[0].kapProfileContractId = "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB";
 
       this.networks[1].name = "Koinos Harbinger (testnet)";
       this.networks[1].tag = "harbinger";

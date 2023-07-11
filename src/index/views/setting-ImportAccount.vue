@@ -1,26 +1,32 @@
 <template>
   <div class="container">
     <h1>Import account</h1>
-    <input
-      v-model="name"
-      type="text"
-      placeholder="Name"
-      @keyup.enter="accept"
-    >
-    <input
-      id="watch-mode"
-      v-model="watchMode"
-      type="checkbox"
-      name="watch-mode"
-      value="watch-mode"
-    >
-    <label for="watch-mode">Import in watch mode (without private key)</label><br>
+    <div>
+      <label for="name">Account Nickname</label>
+      <input
+        id="name"
+        v-model="name"
+        type="text"
+        placeholder="Name"
+        @keyup.enter="accept"
+      >
+    </div>
+    <div>
+      <input
+        id="watch-mode"
+        v-model="watchMode"
+        type="checkbox"
+        name="watch-mode"
+        value="watch-mode"
+      >
+      <label for="watch-mode">Import in watch mode <br> (without private key)</label>
+    </div>
     <div
       v-if="watchMode"
-      class="todo-class"
     >
-      <div>Address</div>
+      <label for="address">Address</label>
       <input
+        id="address"
         v-model="address"
         type="text"
         placeholder="Address"
@@ -29,28 +35,30 @@
     </div>
     <div
       v-else
-      class="todo-class"
     >
-      <div>Private key</div>
+      <label for="privateKey">Private Key</label>
       <input
+        id="privateKey"
         v-model="privateKey"
         type="text"
         placeholder="Private Key"
         @keyup.enter="accept"
       >
     </div>
-    <button
-      class=""
-      @click="accept"
-    >
-      accept
-    </button>
-    <button
-      class=""
-      @click="cancel"
-    >
-      cancel
-    </button>
+    <div class="actions">
+      <button
+        class="secondary"
+        @click="cancel"
+      >
+        cancel
+      </button>
+      <button
+        class="primary"
+        @click="accept"
+      >
+        accept
+      </button>
+    </div>
   </div>
 </template>
 
@@ -99,16 +107,35 @@ export default {
 };
 </script>
 <style scoped>
+input {
+  display: block;
+  margin: 0;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
 input[type="checkbox"] {
   all: revert;
 }
 .container {
   min-height: 20em;
   margin: 4em 2em;
+  align-items: center;
+  gap: 1em;
 }
-
-.todo-class {
+.container > * {
   width: 100%;
-  margin-left: 3.5em;
+}
+button.secondary {
+  background-color: #ddd;
+  border-color: #ddd;
+  color: #000;
+}
+.actions {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: stretch;
 }
 </style>

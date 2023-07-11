@@ -32,6 +32,17 @@ export default {
   },
 
   methods: {
+    debounce(fn, wait = 300) {
+      let timer;
+      return (...args) => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          fn.apply(this, args);
+        }, wait);
+      };
+    },
     alertSuccess(message) {
       this.$store.state.alertType = "success";
       this.$store.state.alertMessage = message;

@@ -4,7 +4,7 @@
       v-if="$store.state.showTopNav"
       class="header"
     >
-      <div>
+      <div class="left">
         <span 
           v-if="$store.state.showBackButton"
           class="material-icons back-button"
@@ -15,8 +15,8 @@
         <Logo 
           v-else
           color="#FFF" 
-          width="45" 
-          height="45"
+          :width="45" 
+          :height="45"
         />
       </div>
       <div class="network-select">
@@ -35,12 +35,7 @@
           expand_more
         </span>
       </div>
-      <div
-        class="lock-button"
-        @click="lock()"
-      >
-        Lock
-      </div>
+      <AvatarMenu />
     </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />
   </div>
@@ -49,13 +44,14 @@
 <script>
 import router from "@/index/router";
 import AccountMenu from "@/index/components/AccountMenu.vue";
+import AvatarMenu from "@/index/components/AvatarMenu.vue";
 import Logo from "@/shared/components/Logo";
 
 // mixins
 import Storage from "@/shared/mixins/Storage";
 
 export default {
-  components: { Logo, AccountMenu },
+  components: { Logo, AccountMenu, AvatarMenu },
 
   mixins: [Storage],
 
@@ -65,16 +61,18 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork];
       this._setCurrentNetwork(network.tag);
     },
+    "$store.state.accounts": function() {
+      if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
+    }
+  },
+
+  mounted() {
+    if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
   },
 
   methods: {
     back() {
       router.back();
-    },
-
-    async lock() {
-      await this._removePasswordsFromSession();
-      router.push("/");
     },
   },
 };
@@ -95,6 +93,7 @@ select:focus {
   border-radius: 22px;
   appearance: none;
   cursor: pointer;
+  box-sizing: border-box;
 }
 
 .network-select {
@@ -109,6 +108,10 @@ select:focus {
   background: var(--kondor-purple);
 }
 
+.network-select:hover > .material-icons {
+  opacity: 0.8;
+}
+
 .back-button {
   cursor: pointer;
   color: white;
@@ -119,10 +122,14 @@ select:focus {
   background: var(--kondor-purple);
   color: white;
   display: flex;
-  justify-content: space-between;
+  gap: 1em;
   align-items: center;
   padding: 1em;
   height: 45px;
+}
+
+.header .left {
+  flex-grow: 1;
 }
 
 .connection-indicator {
