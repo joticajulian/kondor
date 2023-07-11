@@ -13,91 +13,44 @@
             <button
               @click="copyAddress()"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="12"
-                viewBox="0 96 960 960"
-                width="12"
-              >
-                <path
-                  d="M180 975q-24 0-42-18t-18-42V312h60v603h474v60H180Zm120-120q-24 0-42-18t-18-42V235q0-24 18-42t42-18h440q24 0 42 18t18 42v560q0 24-18 42t-42 18H300Zm0-60h440V235H300v560Zm0 0V235v560Z"
-                />
-              </svg>
+              <span class="material-icons">content_copy</span>
             </button>
           </div>
         </div>
       </div>
-      <div
-        class="link"
-        @click="toggleDropdown()"
+      <button
+        class="menu-toggle"
+        @click="openDropdown()" 
       >
-        <svg
-          width="20"
-          height="20"
-          version="1.1"
-          viewBox="0 0 1200 1200"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g>
-            <path
-              d="m720 180c0 66.273-53.727 120-120 120s-120-53.727-120-120 53.727-120 120-120 120 53.727 120 120"
-            />
-            <path
-              d="m720 1020c0 66.273-53.727 120-120 120s-120-53.727-120-120 53.727-120 120-120 120 53.727 120 120"
-            />
-            <path
-              d="m720 600c0 66.273-53.727 120-120 120s-120-53.727-120-120 53.727-120 120-120 120 53.727 120 120"
-            />
-          </g>
-        </svg>
-      </div>
+        <span class="material-icons">more_vert</span>
+      </button>
     </div>
 
     <div
       v-if="showDropdown"
       class="dropdown-content"
     >
-      <div class="dropdown-info">
-        <span class="heading">Available accounts</span>
-      </div>
-      <div
-        v-for="(account, index) in $store.state.accounts"
-        :key="index"
+      <a
         class="dropdown-item"
+        :href="'https://koinosblocks.com/address/' + currentAddress"
+        target="_blank"
       >
-        <div @click="selectAccount(index)">
-          <span>{{ account.name }}</span>
-          <div class="address">
-            {{ account.address }}
-          </div>
-        </div>
-      </div>
-      <div
-        disabled
-        class="separator"
-      />
-      <div v-if="$store.state.mnemonic0">
-        <div
-          class="dropdown-item"
-          @click="createAccount"
-        >
-          + Create account
-        </div>
-      </div>
-      <div v-else>
-        <div
-          class="dropdown-item"
-          @click="addSeed"
-        >
-          + Add seed to wallet
-        </div>
-      </div>
-      <div
-        class="dropdown-item"
-        @click="importAccount"
+        <span class="material-icons">open_in_new</span>View account on Koinos Blocks
+      </a>
+      <a 
+        class="dropdown-item" 
+        :href="'https://koiner.app/addresses/' + currentAddress"
+        target="_blank"
       >
-        + Import account
-      </div>
+        <span class="material-icons">open_in_new</span>View account on Koiner
+      </a>
+      <a 
+        class="dropdown-item" 
+        href="https://kap.domains/account"
+        target="_blank"
+      >
+        <span class="material-icons">edit</span>Edit KAP Profile
+      </a>
     </div>
   </div>
 </template>
@@ -120,8 +73,20 @@ export default {
   },
 
   methods: {
-    toggleDropdown() {
-      this.showDropdown = !this.showDropdown;
+    openDropdown() {
+      if (!this.showDropdown) {
+        this.showDropdown = true;
+        setTimeout(() => {
+          window.addEventListener("click", this.closeDropdown);
+        }, 0);
+      }
+    },
+
+    closeDropdown(e) {
+      if (typeof e === 'undefined' || this.$el.querySelector('.dropdown-content') && !this.$el.querySelector('.dropdown-content').contains(e.target)) {
+        this.showDropdown = false;
+        window.removeEventListener("click", this.closeDropdown);
+      }
     },
 
     selectAccount(index) {
@@ -163,66 +128,75 @@ export default {
 <style scoped>
 .dropdown-container {
   padding: 2em 0;
-  color: var(--kondor-purple);
   border-bottom: 1px solid #ddd;
 }
-.dropdown-container .link {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0.5em 0;
-  border-radius: 0.5em;
-  background-color: var(--kondor-dark);
-  color: var(--kondor-light);
-}
-.dropdown-content,
-.dropdown-content:hover {
-  min-width: 160px;
+.dropdown-content {
   box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  top: 48px;
-  left: 0;
+  top: 150px;
+  width: calc(var(--app-width) - 100px - 1em);
+  left: 100px;
   border: none;
+  border-radius: 22px;
   position: absolute;
-  width: var(--app-width);
-  margin-top: 6em;
-  height: 60%;
-  background: var(--primary-color);
+  background: white;
   z-index: 10;
-  overflow-y: scroll;
-  height: 79%;
+  padding: 0.5em 0;
+  overflow: hidden;
 }
 
 .dropdown-item {
   float: none;
-  padding: 1em 3em;
+  padding: 0.7em 2em;
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
   text-align: left;
   border: none;
   cursor: pointer;
-  margin-top: 0.5em;
 }
 
 .dropdown-item:hover {
-  color: var(--kondor-light);
   background-color: var(--kondor-purple);
-  font-weight: 700;
+  color: white;
+  opacity: 1;
 }
 
 .separator {
-  margin-top: 8px;
+  margin-top: 1em;
   border-top: 1px solid #666;
   padding: 0;
   height: 1em;
 }
-.link,
-.link:hover {
+.address {
+  font-size: 0.7em;
+  margin-top: 0.1em;
+}
+.dropdown-info {
+  padding: 0 2em;
   display: flex;
   flex-direction: row;
-  border: none;
-  color: var(--kondor-light);
+  justify-content: space-between;
+  align-items: center;
+}
+.dropdown-info > button {
+  width: auto;
+  border-radius: 22px;
+  background-color: transparent;
+  color: white;
+  border-color: white;
+}
+.heading {
   font-size: 1.2em;
+  font-weight: 600;
+}
+.menu-toggle {
+  border: none;
+  margin: 0;
+  width: auto;
+  background: #fff;
+  color: #000;
+  padding-right: 0;
 }
 .link-item {
   text-transform: capitalize;
@@ -232,30 +206,15 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: 0 2em;
-}
-.address {
-  font-size: 0.6em;
-  color: white;
+  align-items: center;
 }
 .current-address {
-  font-size: 0.6em;
-  font-weight: 600;
-  color: #c8c1d1;
+  font-size: 0.7em;
+  font-weight: 300;
 }
 .current-account {
   font-size: 1.2em;
   cursor: default;
-}
-.dropdown-info {
-  padding: 1.2em 1em;
-}
-.heading {
-  font-size: 1.2em;
-  font-weight: 600;
-}
-.signer-links {
-  color: var(--kondor-purple);
-  text-decoration: none;
 }
 .address-container {
   display: flex;
@@ -263,8 +222,15 @@ export default {
   cursor: default;
 }
 .address-container button {
-  all: unset;
-  cursor: pointer;
+  border: none;
+  margin: 0;
+  width: auto;
+  background: #fff;
+  color: #000;
+  padding: 0;
   margin-left: 0.5em;
+}
+.address-container button span {
+  font-size: 1em;
 }
 </style>

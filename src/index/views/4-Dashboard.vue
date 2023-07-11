@@ -20,23 +20,32 @@
       v-if="!watchMode"
       class="actions container"
     >
-      <button>
+      <button
+        @click="clickBuy()"
+      >
         <span class="material-icons">add</span><span>Buy</span>
       </button>
-      <button>
+      <button
+        @click="clickSend()"
+      >
         <span class="material-icons">arrow_outward</span><span>Send</span>
       </button>
-      <button>
+      <button
+        @click="clickSwap()"
+      >
         <span class="material-icons">swap_horiz</span><span>Swap</span>
       </button>
     </div>
+    <TabPanel />
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import router from "@/index/router";
 import { Contract, Provider, Signer, utils } from "koilib";
 import ManaOrb from "../components/ManaOrb.vue";
+import TabPanel from "../components/TabPanel.vue";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -65,13 +74,13 @@ function deltaTimeToString(milliseconds) {
 }
 
 export default {
-  components: { ManaOrb },
+  components: { ManaOrb, TabPanel },
   mixins: [Storage, Sandbox, ViewHelper],
   data() {
     return {
       address: "loading ",
       balance: "loading...",
-      balanceUSD: "",
+      balanceUSD: "$0 USD",
       signer: null,
       provider: null,
       koinContract: null,
@@ -88,7 +97,7 @@ export default {
   },
   computed: {
     balanceFormatted() {
-      const balanceNumber = Number(this.balance);
+      const balanceNumber = Number(this.balance) || 0;
       // return this.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "")
       return balanceNumber.toLocaleString("en");
     },
@@ -112,6 +121,7 @@ export default {
 
   methods: {
     async loadAccount(index) {
+      if (this.$store.state.accounts.length === 0) return;
       try {
         this.$store.state.networks = await this._getNetworks();
         const currentTag = await this._getCurrentNetwork();
@@ -151,7 +161,7 @@ export default {
 
     async loadBalanceInUsd() {
       if (this.network.tag !== "mainnet") {
-        this.balanceUSD = "";
+        this.balanceUSD = "$0 USD";
         return;
       }
 
@@ -203,42 +213,17 @@ export default {
         throw error;
       }
     },
-    async transfer() {
-      let interval;
-      try {
-        if (!utils.isChecksumAddress(this.toAddress)) {
-          throw new Error(`${this.toAddress} is an invalid address`);
-        }
 
-        const manaAvailable = await this.provider.getAccountRc(this.address);
-        const rcLimit = Math.min(10_0000_0000, Number(manaAvailable)).toString();
-        const { transaction, receipt } = await this.koin.transfer(
-          {
-            from: this.address,
-            to: this.toAddress,
-            value: utils.parseUnits(this.amount, 8),
-          },
-          { chainId: this.network.chainId, rcLimit }
-        );
-        this.alertSuccess("Sent. Waiting to be mined ...");
-        console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
-        console.log(receipt);
-        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
-        interval = setInterval(() => {
-          console.log("firing interval");
-          this.loadBalance();
-        }, 2000);
-        const { blockNumber } = await transaction.wait("byBlock", 60_000);
-        clearInterval(interval);
-        console.log("block number " + blockNumber);
-        this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
-        this.toAddress = "";
-        this.amount = "";
-      } catch (error) {
-        clearInterval(interval);
-        this.alertDanger(error.message);
-        throw error;
-      }
+    clickBuy() {
+      router.push('/buy');
+    },
+
+    clickSend() {
+      router.push('/send');
+    },
+
+    clickSwap() {
+      router.push('/swap');
     },
   },
 };
@@ -252,7 +237,7 @@ label {
 .column {
   display: flex;
   flex-direction: column;
-  margin-top: 3em;
+  margin-top: 2em;
   width: 100%;
 }
 .row {
@@ -268,13 +253,11 @@ input {
 .balance {
   font-size: 2.5em;
   font-weight: bold;
-}
-.amount {
-  font-weight: 100;
   cursor: default;
 }
-.koin-label {
+.usd, .koin-label {
   font-weight: 300;
+  cursor: default;
 }
 .actions {
   margin-top: 1em;
@@ -291,10 +274,6 @@ input {
   display: flex;
   flex-direction: column;
   width: auto;
-}
-
-.actions > button:hover {
-  opacity: 0.9;
 }
 
 .actions > button > .material-icons {

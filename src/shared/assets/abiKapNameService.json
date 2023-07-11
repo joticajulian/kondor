@@ -1,0 +1,159 @@
+{
+    "methods": {
+        "name": {
+            "argument": "collections.name_arguments",
+            "return": "collections.string_object",
+            "description": "Returns the token's name",
+            "entry-point": "0x82a3537f",
+            "read-only": true
+        },
+        "symbol": {
+            "argument": "collections.symbol_arguments",
+            "return": "collections.string_object",
+            "description": "Returns the token's symbol",
+            "entry-point": "0xb76a7ca1",
+            "read-only": true
+        },
+        "uri": {
+            "argument": "collections.uri_arguments",
+            "return": "collections.string_object",
+            "description": "Returns the token's uri",
+            "entry-point": "0x70e5d7b6",
+            "read-only": true
+        },
+        "total_supply": {
+            "argument": "collections.total_supply_arguments",
+            "return": "collections.uint64_object",
+            "description": "Gets the total number of minted tokens",
+            "entry-point": "0xb0da3934",
+            "read-only": true
+        },
+        "royalties": {
+            "argument": "collections.royalties_arguments",
+            "return": "collections.royalties_result",
+            "description": "Returns collection royalties",
+            "entry-point": "0x36e90cd0",
+            "read-only": true
+        },
+        "set_royalties": {
+            "argument": "collections.set_royalties_arguments",
+            "return": "collections.empty_object",
+            "description": "Unsupported",
+            "entry-point": "0x3b5bb56b",
+            "read-only": false
+        },
+        "owner": {
+            "argument": "collections.owner_arguments",
+            "return": "collections.bytes_address_object",
+            "description": "Returns collection owner",
+            "entry-point": "0x4c102969",
+            "read-only": true
+        },
+        "transfer_ownership": {
+            "argument": "collections.transfer_ownership_arguments",
+            "return": "collections.empty_object",
+            "description": "Transfer ownership of the contract",
+            "entry-point": "0x394be702",
+            "read-only": false
+        },
+        "balance_of": {
+            "argument": "collections.balance_of_arguments",
+            "return": "collections.uint64_object",
+            "description": "Gets the balance of an owner",
+            "entry-point": "0x5c721497",
+            "read-only": true
+        },
+        "owner_of": {
+            "argument": "collections.owner_of_arguments",
+            "return": "collections.bytes_address_object",
+            "description": "Gets the owner of a name",
+            "entry-point": "0xed61c847",
+            "read-only": true
+        },
+        "get_approved": {
+            "argument": "collections.get_approved_arguments",
+            "return": "collections.bytes_address_object",
+            "description": "Gets approved address for a token",
+            "entry-point": "0x4c731020",
+            "read-only": true
+        },
+        "is_approved_for_all": {
+            "argument": "collections.is_approved_for_all_arguments",
+            "return": "collections.bool_object",
+            "description": "Checks if an operator is approved by an owner",
+            "entry-point": "0xe7ab8ce5",
+            "read-only": true
+        },
+        "mint": {
+            "argument": "collections.mint_arguments",
+            "return": "collections.empty_object",
+            "description": "Mint a name or TLA",
+            "entry-point": "0xdc6f17bb",
+            "read-only": false
+        },
+        "burn": {
+            "argument": "collections.burn_arguments",
+            "return": "collections.empty_object",
+            "description": "Burn a name or TLA",
+            "entry-point": "0x859facc5",
+            "read-only": false
+        },
+        "transfer": {
+            "argument": "collections.transfer_arguments",
+            "return": "collections.empty_object",
+            "description": "Transfer ownership of a name or TLA",
+            "entry-point": "0x27f576ca",
+            "read-only": false
+        },
+        "approve": {
+            "argument": "collections.approve_arguments",
+            "return": "collections.empty_object",
+            "description": "Approves an address to transfer a token",
+            "entry-point": "0x74e21680",
+            "read-only": false
+        },
+        "set_approval_for_all": {
+            "argument": "collections.set_approval_for_all_arguments",
+            "return": "collections.empty_object",
+            "description": "Approves or revokes an address to operate on all tokens owned by caller",
+            "entry-point": "0x20442216",
+            "read-only": false
+        },
+        "renew": {
+            "argument": "collections.renew_arguments",
+            "return": "collections.empty_object",
+            "description": "Renew a name",
+            "entry-point": "0xa36a2ce1",
+            "read-only": false
+        },
+        "get_name": {
+            "argument": "collections.get_name_arguments",
+            "return": "collections.name_object",
+            "description": "Get name object",
+            "entry-point": "0xe5070a16",
+            "read-only": true
+        },
+        "get_names": {
+            "argument": "collections.get_names_arguments",
+            "return": "collections.get_names_result",
+            "description": "Get names that belong to an address",
+            "entry-point": "0xcd5c6518",
+            "read-only": true
+        },
+        "set_metadata": {
+            "argument": "collections.set_metadata_arguments",
+            "return": "collections.empty_object",
+            "description": "Set contract metadata",
+            "entry-point": "0x3d59af19",
+            "read-only": false
+        },
+        "get_metadata": {
+            "argument": "collections.get_metadata_arguments",
+            "return": "collections.metadata_object",
+            "description": "Get contract metadata",
+            "entry-point": "0xfcf7a68f",
+            "read-only": true
+        }
+    },
+    "types": "CqAiCiBhc3NlbWJseS9wcm90by9jb2xsZWN0aW9ucy5wcm90bxILY29sbGVjdGlvbnMaFGtvaW5vcy9vcHRpb25zLnByb3RvIhAKDm5hbWVfYXJndW1lbnRzIhIKEHN5bWJvbF9hcmd1bWVudHMiDwoNdXJpX2FyZ3VtZW50cyIYChZ0b3RhbF9zdXBwbHlfYXJndW1lbnRzIhUKE3JveWFsdGllc19hcmd1bWVudHMiRQoQcm95YWx0aWVzX3Jlc3VsdBIxCgV2YWx1ZRgBIAMoCzIbLmNvbGxlY3Rpb25zLnJveWFsdHlfb2JqZWN0UgV2YWx1ZSJMChdzZXRfcm95YWx0aWVzX2FyZ3VtZW50cxIxCgV2YWx1ZRgBIAMoCzIbLmNvbGxlY3Rpb25zLnJveWFsdHlfb2JqZWN0UgV2YWx1ZSIRCg9vd25lcl9hcmd1bWVudHMiOgocdHJhbnNmZXJfb3duZXJzaGlwX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiMgoUYmFsYW5jZV9vZl9hcmd1bWVudHMSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyIjUKEm93bmVyX29mX2FyZ3VtZW50cxIfCgh0b2tlbl9pZBgBIAEoDEIEgLUYAlIHdG9rZW5JZCI5ChZnZXRfYXBwcm92ZWRfYXJndW1lbnRzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkIl0KHWlzX2FwcHJvdmVkX2Zvcl9hbGxfYXJndW1lbnRzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIgCghvcGVyYXRvchgCIAEoDEIEgLUYBlIIb3BlcmF0b3Ii1AEKDm1pbnRfYXJndW1lbnRzEhIKBG5hbWUYASABKAlSBG5hbWUSLwoTZHVyYXRpb25faW5jcmVtZW50cxgCIAEoDVISZHVyYXRpb25JbmNyZW1lbnRzEhoKBW93bmVyGAMgASgMQgSAtRgGUgVvd25lchInCgxwYXltZW50X2Zyb20YBCABKAxCBIC1GAZSC3BheW1lbnRGcm9tEjgKFXBheW1lbnRfdG9rZW5fYWRkcmVzcxgFIAEoDEIEgLUYBVITcGF5bWVudFRva2VuQWRkcmVzcyJLCg5idXJuX2FyZ3VtZW50cxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEh8KCHRva2VuX2lkGAIgASgMQgSAtRgCUgd0b2tlbklkImUKEnRyYW5zZmVyX2FyZ3VtZW50cxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhQKAnRvGAIgASgMQgSAtRgGUgJ0bxIfCgh0b2tlbl9pZBgDIAEoDEIEgLUYAlIHdG9rZW5JZCJ7ChFhcHByb3ZlX2FyZ3VtZW50cxIvChBhcHByb3Zlcl9hZGRyZXNzGAEgASgMQgSAtRgGUg9hcHByb3ZlckFkZHJlc3MSFAoCdG8YAiABKAxCBIC1GAZSAnRvEh8KCHRva2VuX2lkGAMgASgMQgSAtRgCUgd0b2tlbklkIp4BCh5zZXRfYXBwcm92YWxfZm9yX2FsbF9hcmd1bWVudHMSLwoQYXBwcm92ZXJfYWRkcmVzcxgBIAEoDEIEgLUYBlIPYXBwcm92ZXJBZGRyZXNzEi8KEG9wZXJhdG9yX2FkZHJlc3MYAiABKAxCBIC1GAZSD29wZXJhdG9yQWRkcmVzcxIaCghhcHByb3ZlZBgDIAEoCFIIYXBwcm92ZWQiuQEKD3JlbmV3X2FyZ3VtZW50cxISCgRuYW1lGAEgASgJUgRuYW1lEi8KE2R1cmF0aW9uX2luY3JlbWVudHMYAiABKA1SEmR1cmF0aW9uSW5jcmVtZW50cxInCgxwYXltZW50X2Zyb20YAyABKAxCBIC1GAZSC3BheW1lbnRGcm9tEjgKFXBheW1lbnRfdG9rZW5fYWRkcmVzcxgEIAEoDEIEgLUYBVITcGF5bWVudFRva2VuQWRkcmVzcyIoChJnZXRfbmFtZV9hcmd1bWVudHMSEgoEbmFtZRgBIAEoCVIEbmFtZSKMAQoTZ2V0X25hbWVzX2FyZ3VtZW50cxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISHwoLbmFtZV9vZmZzZXQYAiABKAlSCm5hbWVPZmZzZXQSGAoFbGltaXQYAyABKARCAjABUgVsaW1pdBIeCgpkZXNjZW5kaW5nGAQgASgIUgpkZXNjZW5kaW5nIkIKEGdldF9uYW1lc19yZXN1bHQSLgoFbmFtZXMYASADKAsyGC5jb2xsZWN0aW9ucy5uYW1lX29iamVjdFIFbmFtZXMiiAEKFnNldF9tZXRhZGF0YV9hcmd1bWVudHMSIAoMdGxhX21pbnRfZmVlGAEgASgEUgp0bGFNaW50RmVlEjAKEWthcF90b2tlbl9hZGRyZXNzGAIgASgMQgSAtRgFUg9rYXBUb2tlbkFkZHJlc3MSGgoFb3duZXIYAyABKAxCBIC1GAVSBW93bmVyIhgKFmdldF9tZXRhZGF0YV9hcmd1bWVudHMiQwoKbWludF9ldmVudBIUCgJ0bxgBIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAiABKAxCBIC1GAJSB3Rva2VuSWQiRwoKYnVybl9ldmVudBIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEh8KCHRva2VuX2lkGAIgASgMQgSAtRgCUgd0b2tlbklkImEKDnRyYW5zZmVyX2V2ZW50EhgKBGZyb20YASABKAxCBIC1GAZSBGZyb20SFAoCdG8YAiABKAxCBIC1GAZSAnRvEh8KCHRva2VuX2lkGAMgASgMQgSAtRgCUgd0b2tlbklkIpcBChdvcGVyYXRvcl9hcHByb3ZhbF9ldmVudBIvChBhcHByb3Zlcl9hZGRyZXNzGAEgASgMQgSAtRgGUg9hcHByb3ZlckFkZHJlc3MSLwoQb3BlcmF0b3JfYWRkcmVzcxgCIAEoDEIEgLUYBlIPb3BlcmF0b3JBZGRyZXNzEhoKCGFwcHJvdmVkGAMgASgIUghhcHByb3ZlZCJ+ChR0b2tlbl9hcHByb3ZhbF9ldmVudBIvChBhcHByb3Zlcl9hZGRyZXNzGAEgASgMQgSAtRgGUg9hcHByb3ZlckFkZHJlc3MSFAoCdG8YAiABKAxCBIC1GAZSAnRvEh8KCHRva2VuX2lkGAMgASgMQgSAtRgCUgd0b2tlbklkIg4KDGVtcHR5X29iamVjdCIlCg1zdHJpbmdfb2JqZWN0EhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIpCg11aW50NjRfb2JqZWN0EhgKBXZhbHVlGAEgASgEQgIwAVIFdmFsdWUiIwoLYm9vbF9vYmplY3QSFAoFdmFsdWUYASABKAhSBXZhbHVlIjIKFGJ5dGVzX2FkZHJlc3Nfb2JqZWN0EhoKBXZhbHVlGAEgASgMQgSAtRgGUgV2YWx1ZSJMCg5yb3lhbHR5X29iamVjdBIaCgZhbW91bnQYASABKARCAjABUgZhbW91bnQSHgoHYWRkcmVzcxgCIAEoDEIEgLUYBlIHYWRkcmVzcyI3ChV0b2tlbl9hcHByb3ZhbF9vYmplY3QSHgoHYWRkcmVzcxgBIAEoDEIEgLUYBlIHYWRkcmVzcyJbChVvcGVyYXRvcl9hcHByb3ZhbF9rZXkSIAoIYXBwcm92ZXIYASABKAxCBIC1GAZSCGFwcHJvdmVyEiAKCG9wZXJhdG9yGAIgASgMQgSAtRgGUghvcGVyYXRvciI2ChhvcGVyYXRvcl9hcHByb3ZhbF9vYmplY3QSGgoIYXBwcm92ZWQYASABKAhSCGFwcHJvdmVkIoEBCg9tZXRhZGF0YV9vYmplY3QSIAoMdGxhX21pbnRfZmVlGAEgASgEUgp0bGFNaW50RmVlEjAKEWthcF90b2tlbl9hZGRyZXNzGAIgASgMQgSAtRgFUg9rYXBUb2tlbkFkZHJlc3MSGgoFb3duZXIYAyABKAxCBIC1GAVSBW93bmVyIoMCCgtuYW1lX29iamVjdBIWCgZkb21haW4YASABKAlSBmRvbWFpbhISCgRuYW1lGAIgASgJUgRuYW1lEhoKBW93bmVyGAMgASgMQgSAtRgGUgVvd25lchIiCgpleHBpcmF0aW9uGAQgASgEQgIwAVIKZXhwaXJhdGlvbhIsChBncmFjZV9wZXJpb2RfZW5kGAUgASgEQgIwAVIOZ3JhY2VQZXJpb2RFbmQSKgoPc3ViX25hbWVzX2NvdW50GAYgASgEQgIwAVINc3ViTmFtZXNDb3VudBIuChFsb2NrZWRfa2FwX3Rva2VucxgHIAEoBEICMAFSD2xvY2tlZEthcFRva2VucyIxCg5hZGRyZXNzX29iamVjdBIfCgtuYW1lc19jb3VudBgBIAEoBFIKbmFtZXNDb3VudCJKCg9vd25lcl9pbmRleF9rZXkSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEhsKCW5hbWVfaGFzaBgCIAEoDFIIbmFtZUhhc2gi8QEKE2F1dGhvcml6ZV9taW50X2FyZ3MSEgoEbmFtZRgBIAEoCVIEbmFtZRIWCgZkb21haW4YAiABKAlSBmRvbWFpbhIvChNkdXJhdGlvbl9pbmNyZW1lbnRzGAMgASgNUhJkdXJhdGlvbkluY3JlbWVudHMSGgoFb3duZXIYBCABKAxCBIC1GAZSBW93bmVyEicKDHBheW1lbnRfZnJvbRgFIAEoDEIEgLUYBlILcGF5bWVudEZyb20SOAoVcGF5bWVudF90b2tlbl9hZGRyZXNzGAYgASgMQgSAtRgFUhNwYXltZW50VG9rZW5BZGRyZXNzIl4KEmF1dGhvcml6ZV9taW50X3JlcxIeCgpleHBpcmF0aW9uGAEgASgEUgpleHBpcmF0aW9uEigKEGdyYWNlX3BlcmlvZF9lbmQYAiABKARSDmdyYWNlUGVyaW9kRW5kIkMKE2F1dGhvcml6ZV9idXJuX2FyZ3MSLAoEbmFtZRgBIAEoCzIYLmNvbGxlY3Rpb25zLm5hbWVfb2JqZWN0UgRuYW1lIjQKEmF1dGhvcml6ZV9idXJuX3JlcxIeCgphdXRob3JpemVkGAEgASgIUgphdXRob3JpemVkItoBChZhdXRob3JpemVfcmVuZXdhbF9hcmdzEiwKBG5hbWUYASABKAsyGC5jb2xsZWN0aW9ucy5uYW1lX29iamVjdFIEbmFtZRIvChNkdXJhdGlvbl9pbmNyZW1lbnRzGAIgASgNUhJkdXJhdGlvbkluY3JlbWVudHMSJwoMcGF5bWVudF9mcm9tGAMgASgMQgSAtRgGUgtwYXltZW50RnJvbRI4ChVwYXltZW50X3Rva2VuX2FkZHJlc3MYBCABKAxCBIC1GAVSE3BheW1lbnRUb2tlbkFkZHJlc3MiYQoVYXV0aG9yaXplX3JlbmV3YWxfcmVzEh4KCmV4cGlyYXRpb24YASABKARSCmV4cGlyYXRpb24SKAoQZ3JhY2VfcGVyaW9kX2VuZBgCIAEoBFIOZ3JhY2VQZXJpb2RFbmQiRgoWYXV0aG9yaXplX3JlY2xhaW1fYXJncxIsCgRuYW1lGAEgASgLMhguY29sbGVjdGlvbnMubmFtZV9vYmplY3RSBG5hbWUiNwoVYXV0aG9yaXplX3JlY2xhaW1fcmVzEh4KCmF1dGhvcml6ZWQYASABKAhSCmF1dGhvcml6ZWRiBnByb3RvMwrnAwoca29pbm9zL2NoYWluL2F1dGhvcml0eS5wcm90bxIMa29pbm9zLmNoYWluGhRrb2lub3Mvb3B0aW9ucy5wcm90byJVCgtjYWxsX3RhcmdldBIlCgtjb250cmFjdF9pZBgBIAEoDEIEgLUYBlIKY29udHJhY3RJZBIfCgtlbnRyeV9wb2ludBgCIAEoDVIKZW50cnlQb2ludCKIAQoTYXV0aG9yaXplX2FyZ3VtZW50cxI0CgR0eXBlGAEgASgOMiAua29pbm9zLmNoYWluLmF1dGhvcml6YXRpb25fdHlwZVIEdHlwZRIyCgRjYWxsGAIgASgLMhkua29pbm9zLmNoYWluLmNhbGxfdGFyZ2V0SABSBGNhbGyIAQFCBwoFX2NhbGwiKAoQYXV0aG9yaXplX3Jlc3VsdBIUCgV2YWx1ZRgBIAEoCFIFdmFsdWUqWQoSYXV0aG9yaXphdGlvbl90eXBlEhEKDWNvbnRyYWN0X2NhbGwQABIbChd0cmFuc2FjdGlvbl9hcHBsaWNhdGlvbhABEhMKD2NvbnRyYWN0X3VwbG9hZBACQjRaMmdpdGh1Yi5jb20va29pbm9zL2tvaW5vcy1wcm90by1nb2xhbmcva29pbm9zL2NoYWluYgZwcm90bzM="
+}

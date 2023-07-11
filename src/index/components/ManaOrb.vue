@@ -32,13 +32,12 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .orb {
   width: 3.5em;
   height: 3.5em;
   border-radius: 100%;
-  border-width: 1px;
-  border-color: #ddd;
+  border: 1px solid #ddd;
   background-color: var(--kondor-purple);
   position: relative;
   overflow: hidden;
@@ -55,7 +54,7 @@ export default {
 }
 
 .spinner {
-  background: #eee;
+  background: #fff;
   height: 100%;
   width: 100%;
   border-radius: 40%;

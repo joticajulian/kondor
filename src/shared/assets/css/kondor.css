@@ -125,12 +125,14 @@ button {
   background: var(--kondor-purple);
   text-align: center;
 }
-button:hover {
-  opacity: 0.5;
+button:hover, select:hover, a:hover {
+  opacity: 0.8;
   cursor: pointer;
 }
 button:disabled {
-  background: #a28f7a;
+  background: #999;
+  border-color: #999;
+  cursor: not-allowed;
 }
 .link {
   padding-bottom: 0 0 8px 0;
