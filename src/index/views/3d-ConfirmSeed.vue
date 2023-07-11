@@ -10,13 +10,22 @@
           alt=""
         >
         <p>Please select the words of the seed in the correct order.</p>
-        <textarea
-          id="seed"
-          v-model="mnemonic"
-          class="width-96"
-          rows="3"
-          disabled
-        />
+        <div class="mnemonic-display">
+          <textarea
+            id="seed"
+            v-model="mnemonic"
+            class="width-96"
+            rows="3"
+            disabled
+          />
+          <button
+            v-if="mnemonic"
+            class="reset-button"
+            @click="reset"
+          >
+            <span class="material-icons">close</span>
+          </button>
+        </div>
       </div>
       <div class="mb-1">
         <button
@@ -28,8 +37,17 @@
           {{ word }}
         </button>
       </div>
-      <div class="mb-1">
-        <button @click="confirmSeed">
+      <div class="row">
+        <button
+          class="secondary"
+          @click="goBack"
+        >
+          go back
+        </button>
+        <button
+          :disabled="words.length > 0"
+          @click="confirmSeed"
+        >
           confirm
         </button>
       </div>
@@ -54,15 +72,23 @@ export default {
   },
 
   created() {
-    this.words = this.$store.state.mnemonic0
+    this.initialWords = this.$store.state.mnemonic0
       .split(" ")
       .sort(() => (Math.random() > 0.5 ? 1 : -1));
+    this.words = this.initialWords;
   },
 
   methods: {
     addWord(word) {
       if (this.mnemonic) this.mnemonic += ` ${word}`;
       else this.mnemonic = word;
+
+      this.words = this.words.filter((item) => item !== word);
+    },
+
+    reset() {
+      this.mnemonic = "";
+      this.words = this.initialWords;
     },
 
     async confirmSeed() {
@@ -83,6 +109,10 @@ export default {
         throw error;
       }
     },
+
+    goBack() {
+      router.back();
+    }
   },
 };
 </script>
@@ -93,9 +123,11 @@ export default {
   align-items: center;
   width: 80%;
 }
+
 .heading {
   text-align: center;
 }
+
 .middle {
   display: flex;
   justify-content: center;
@@ -105,6 +137,7 @@ export default {
 .width-96 {
   width: 96%;
 }
+
 .item-checkbox {
   display: flex;
   flex-direction: row;
@@ -115,5 +148,45 @@ export default {
 .word-button {
   width: auto;
   margin: 10px;
+}
+
+button.secondary {
+  background-color: #ddd;
+  border-color: #ddd;
+  color: #000;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: stretch;
+  width: 100%;
+}
+
+.mnemonic-display {
+  position: relative;
+}
+.reset-button {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  background: white;
+  border-color: white;
+  color: black;
+}
+
+.reset-button span {
+  font-size: 1.5em;
+}
+
+.mnemonic-display textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-right: 2em;
 }
 </style>

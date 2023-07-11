@@ -20,7 +20,7 @@
       </div>
       <div v-else-if="activeTab === 'nfts'">
         <a 
-          :href="'https://kollection.app/profile/' + $store" 
+          :href="'https://kollection.app/profile/' + address" 
           target="_blank"
         >View account on Kollection <span class="material-icons">open_in_new</span></a>
       </div>
@@ -32,6 +32,13 @@
 </template>
 <script>
 export default {
+  props: {
+    address: {
+      type: String,
+      required: true
+    }
+  },
+
   data() {
     return {
       activeTab: "tokens"
