@@ -1,9 +1,11 @@
 <template>
   <div class="dropdown-container">
-    <button 
+    <button
       class="avatar-menu"
-      @click="openDropdown()" 
-    />
+      @click="openDropdown()"
+    >
+      <div v-html="avatar" />
+    </button>
 
     <div
       v-if="showDropdown"
@@ -15,7 +17,7 @@
           Lock
         </button>
       </div>
-      
+
       <div
         disabled
         class="separator"
@@ -26,9 +28,9 @@
         class="dropdown-item"
         @click="selectAccount(index)"
       >
-        <span 
+        <span
           :style="$store.state.currentIndexAccount === index ? 'visibility: visible;' : 'visibility: hidden;'"
-          class="material-icons" 
+          class="material-icons"
         >
           check
         </span>
@@ -83,6 +85,8 @@
 <script>
 /* eslint-disable no-undef */
 import router from "@/index/router";
+import { createAvatar } from "@dicebear/avatars";
+import * as identiconStyle from "@dicebear/avatars-identicon-sprites";
 
 // mixins
 import Storage from "@/shared/mixins/Storage";
@@ -94,6 +98,14 @@ export default {
     return {
       showDropdown: false,
     };
+  },
+
+  computed: {
+    avatar() {
+      const address = this.$store.state.accounts[this.$store.state.currentIndexAccount].address;
+      const identicon = createAvatar(identiconStyle, { seed: address });
+      return identicon;
+    }
   },
 
   methods: {
@@ -189,10 +201,12 @@ export default {
   padding: 0;
   height: 0.5em;
 }
+
 .address {
   font-size: 0.7em;
   margin-top: 0.1em;
 }
+
 .dropdown-info {
   padding: 0 2em;
   display: flex;
@@ -200,23 +214,28 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
-.dropdown-info > button {
+
+.dropdown-info>button {
   width: auto;
   border-radius: 22px;
   color: var(--kondor-purple);
   border-color: var(--kondor-purple);
   background-color: transparent;
 }
+
 .heading {
   font-size: 1.2em;
   font-weight: 600;
 }
+
 .avatar-menu {
   width: 45px;
   height: 45px;
   border: 1px solid white;
   border-radius: 50%;
-  padding: 2px;
+  padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
+  background: white;
 }
 </style>
