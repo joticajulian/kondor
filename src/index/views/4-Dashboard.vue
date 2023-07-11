@@ -26,17 +26,19 @@
         <span class="material-icons">add</span><span>Buy</span>
       </button>
       <button
+        :disabled="!(balance > 0)"
         @click="clickSend()"
       >
         <span class="material-icons">arrow_outward</span><span>Send</span>
       </button>
       <button
+        disabled
         @click="clickSwap()"
       >
         <span class="material-icons">swap_horiz</span><span>Swap</span>
       </button>
     </div>
-    <TabPanel />
+    <TabPanel :address="address" />
   </div>
 </template>
 
@@ -281,5 +283,13 @@ input {
   color: white;
   padding: 0.3em;
   border-radius: 50%;
+}
+
+.actions > button:disabled {
+  background: white;
+  color: #999;
+}
+.actions > button:disabled > .material-icons {
+  background: #999;
 }
 </style>

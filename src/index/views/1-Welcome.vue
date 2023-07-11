@@ -127,4 +127,8 @@ input {
   color: var(--kondor-purple);
   border: none;
 }
+
+button {
+  width: auto;
+}
 </style>

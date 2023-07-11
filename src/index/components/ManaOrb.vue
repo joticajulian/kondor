@@ -1,5 +1,5 @@
 <template>
-  <div :data-tooltip="'Time to recharge: ' + timeRecharge">
+  <div :data-tooltip="timeRecharge === 'Mana recharged' ? timeRecharge : 'Time to recharge: ' + timeRecharge">
     <div class="orb">
       <div 
         class="filler" 

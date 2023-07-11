@@ -14,6 +14,11 @@ export default {
   created() {
     switch (router.currentRoute.path) {
     case "/":
+    case "/newWallet":
+    case "/importSeedPhrase":
+    case "/importPrivateKey":
+    case "/generateSeed":
+    case "/confirmSeed":
       this.$store.state.showTopNav = false;
       this.$store.state.showAccountMenu = false;
       this.$store.state.showBackButton = false;

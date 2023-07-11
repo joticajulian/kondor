@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="!watchMode"
     class="transfer container"
   >
     <div class="send-to">
@@ -8,7 +7,7 @@
       <input
         v-model="to"
         type="text"
-        placeholder="Enter public address or KAP name"
+        :placeholder="'Enter public address' + (network && network.tag === 'mainnet' ? ' or KAP name' : '')"
         :class="isToValidated && !isToValidating && to.length > 0 && !isToValid ? 'invalid' : ''"
         @input="validateToDebounced()"
         @keyup="changeTo()"
@@ -93,27 +92,6 @@ import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 import { Contract, Provider, Signer, utils } from "koilib";
 
-const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
-
-function deltaTimeToString(milliseconds) {
-  if (Number.isNaN(milliseconds)) return "";
-
-  var seconds = Math.floor(milliseconds / 1000);
-
-  var interval = seconds / 86400;
-  if (interval > 2) return Math.floor(interval) + " days";
-
-  interval = seconds / 3600;
-  if (interval > 2) return Math.floor(interval) + " hours";
-
-  interval = seconds / 60;
-  if (interval > 2) return Math.floor(interval) + " minutes";
-
-  interval = Math.floor(seconds);
-  if (interval === 0) return "Mana recharged";
-  return interval + " seconds";
-}
-
 export default {
   mixins: [Storage, Sandbox, ViewHelper],
 
@@ -127,19 +105,15 @@ export default {
       koin: null,
       to: "",
       amount: "0",
-      intervalMana: null,
       mana: "",
-      lastUpdateMana: 0,
-      timeRechargeMana: "loading...",
-      watchMode: false,
-      manaPercent: 1,
       isToValid: false,
       isAmountValid: true,
       isToValidating: false,
       isToValidated: false,
       showAdvanced: false,
       maxMana: 10,
-      resolvedKap: ""
+      resolvedKap: "",
+      network: null
     };
   },
 
@@ -182,17 +156,20 @@ export default {
       }
       if (isAddress) {
         this.isToValid = true;
-      } else {
+      } else if (this.network.kapNameServiceContractId) {
         try {
           const buffer = new TextEncoder().encode(this.to);
           const kapHex = `0x${utils.toHexString(buffer)}`;
-          this.resolvedKap = await this.kapNameService.owner_of({
+          const { result } = await this.kapNameService.owner_of({
             token_id: kapHex,
-          })?.result?.value;
+          })
+          this.resolvedKap = result?.value;
           this.isToValid = !!this.resolvedKap;
         } catch (_) {
           this.isToValid = false;
         }
+      } else {
+        this.isToValid = false;
       }
       this.isToValidating = false;
       this.isToValidated = true;
@@ -222,9 +199,8 @@ export default {
         if (currentAccount.privateKey) {
           this.signer = Signer.fromWif(currentAccount.privateKey, true);
           this.signer.provider = this.provider;
-          this.watchMode = false;
         } else {
-          this.watchMode = true;
+          router.back();
         }
 
         this.koinContract = new Contract({
@@ -239,13 +215,11 @@ export default {
         this.koin = this.koinContract.functions;
 
         if (this.network.kapNameServiceContractId) {
-          const kapAbi = this._getAbi(this.network, this.network.kapNameServiceContractId);
+          const kapAbi = await this._getAbi(this.network.tag, this.network.kapNameServiceContractId);
           this.kapNameServiceContract = new Contract({
             id: this.network.kapNameServiceContractId,
             abi: kapAbi,
             provider: this.provider,
-            signer: this.signer,
-            serializer: await this.newSandboxSerializer(kapAbi.types)
           });
           this.kapNameService = this.kapNameServiceContract.functions;
         }
@@ -260,10 +234,6 @@ export default {
       try {
         const { result } = await this.koin.balanceOf({ owner: this.address });
         this.balance = utils.formatUnits(result.value, 8).toLocaleString("en");
-
-        this.loadBalanceInUsd();
-
-        const balance = Number(this.balance);
         const rc = await this.provider.getAccountRc(this.address);
         const initialMana = Number(rc) / 1e8;
         this.mana = Number(initialMana.toFixed(8));
@@ -271,18 +241,6 @@ export default {
           10,
           this.mana
         );
-
-        clearInterval(this.intervalMana);
-        this.intervalMana = setInterval(() => {
-          const delta = Math.min(Date.now() - this.lastUpdateMana, FIVE_DAYS);
-          let mana = initialMana + (delta * balance) / FIVE_DAYS;
-          mana = Math.min(mana, balance);
-          this.timeRechargeMana = deltaTimeToString(
-            ((balance - mana) * FIVE_DAYS) / balance
-          );
-          this.mana = Number(mana.toFixed(8));
-          this.manaPercent = Math.floor((this.mana / balance) * 100) || 1;
-        }, 1000);
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
@@ -292,17 +250,13 @@ export default {
     async transfer() {
       let interval;
       try {
-        if (!utils.isChecksumAddress(this.to)) {
-          throw new Error(`${this.to} is an invalid address`);
-        }
-
         const { transaction, receipt } = await this.koin.transfer(
           {
             from: this.address,
-            to: this.to,
+            to: this.resolvedKap || this.to,
             value: utils.parseUnits(this.amount, 8),
           },
-          { chainId: this.network.chainId, rcLimit: this.maxMana }
+          { chainId: this.network.chainId, rcLimit: this.maxMana * 1e8 }
         );
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
@@ -316,8 +270,7 @@ export default {
         clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
-        this.to = "";
-        this.amount = "";
+        router.push("/dashboard");
       } catch (error) {
         clearInterval(interval);
         this.alertDanger(error.message);
@@ -387,11 +340,13 @@ input.invalid {
   border: 1px solid #ddd;
   border-radius: 4px;
   color: #777;
+  padding-left: 2em;
 }
 
 .send-to .info .material-icons {
   font-size: 1.1em;
-  vertical-align: text-top;
+  position: absolute;
+  left: 0.5em;
 }
 
 .advanced-toggle .material-icons {
