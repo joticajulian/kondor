@@ -95,29 +95,11 @@ export default {
       }
     },
 
-    selectAccount(index) {
-      this.$store.state.currentIndexAccount = index;
-      this.showDropdown = false;
-      this.loadAccount();
-    },
-
     loadAccount() {
       if (this.$store.state.accounts.length === 0) return;
       const index = this.$store.state.currentIndexAccount;
       this.currentAccount = this.$store.state.accounts[index].name;
       this.currentAddress = this.$store.state.accounts[index].address;
-    },
-
-    createAccount() {
-      router.push("/createAccount");
-    },
-
-    importAccount() {
-      router.push("/importAccount");
-    },
-
-    addSeed() {
-      router.push("/generateSeed?privateKeyExist=true");
     },
 
     copyAddress() {

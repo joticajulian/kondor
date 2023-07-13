@@ -21,33 +21,32 @@
         </button>
       </div>
 
-      <div
-        disabled
-        class="separator"
-      />
-      <div
-        v-for="(account, index) in $store.state.accounts"
-        :key="index"
-        class="dropdown-item"
-        @click="selectAccount(index)"
-      >
-        <span
-          :style="$store.state.currentIndexAccount === index ? 'visibility: visible;' : 'visibility: hidden;'"
-          class="material-icons"
+      <hr>
+
+      <div class="account-list">
+        <div
+          v-for="(account, index) in $store.state.accounts"
+          :key="index"
+          class="dropdown-item"
+          @click="selectAccount(index)"
         >
-          check
-        </span>
-        <div>
-          <span>{{ account.name }}</span>
-          <span class="address">
-            {{ account.address }}
+          <span
+            :style="$store.state.currentIndexAccount === index ? 'visibility: visible;' : 'visibility: hidden;'"
+            class="material-icons"
+          >
+            check
           </span>
+          <div>
+            <span>{{ account.name }}</span>
+            <span class="address">
+              {{ account.address }}
+            </span>
+          </div>
         </div>
       </div>
-      <div
-        disabled
-        class="separator"
-      />
+      
+      <hr>
+
       <div v-if="$store.state.mnemonic0">
         <div
           class="dropdown-item"
@@ -71,10 +70,8 @@
         <span class="material-icons">file_download</span> Import account
       </div>
 
-      <div
-        disabled
-        class="separator"
-      />
+      <hr>
+
       <div
         class="dropdown-item"
         @click="openOptions"
@@ -178,7 +175,6 @@ export default {
   color: black;
   z-index: 10;
   padding: 0.5em 0;
-  overflow: hidden;
 }
 
 .dropdown-item {
@@ -199,11 +195,8 @@ export default {
   color: white;
 }
 
-.separator {
-  margin-top: 0.5em;
+hr {
   border-top: 1px solid #ddd;
-  padding: 0;
-  height: 0.5em;
 }
 
 .address {
@@ -241,5 +234,10 @@ export default {
   box-sizing: border-box;
   overflow: hidden;
   background: white;
+}
+
+.account-list {
+  max-height: 200px;
+  overflow-y: auto;
 }
 </style>
