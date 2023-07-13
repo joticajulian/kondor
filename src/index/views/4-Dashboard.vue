@@ -197,7 +197,7 @@ export default {
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
         );
-        this.manaPercent = Math.floor(this.mana / balance * 100) || 1;
+        this.manaPercent = Math.floor(this.mana / balance * 100);
 
         clearInterval(this.intervalMana);
         this.intervalMana = setInterval(() => {
@@ -208,7 +208,7 @@ export default {
             ((balance - mana) * FIVE_DAYS) / balance
           );
           this.mana = Number(mana.toFixed(8));
-          this.manaPercent = Math.floor(this.mana / balance * 100) || 1;
+          this.manaPercent = Math.floor(this.mana / balance * 100);
         }, 1000);
       } catch (error) {
         this.alertDanger(error.message);
