@@ -4,7 +4,10 @@
       class="avatar-menu"
       @click="openDropdown()"
     >
-      <div v-html="avatar" />
+      <img
+        :src="avatar"
+        alt="identicon for selected address"
+      >
     </button>
 
     <div
@@ -103,7 +106,7 @@ export default {
   computed: {
     avatar() {
       const address = this.$store.state.accounts[this.$store.state.currentIndexAccount].address;
-      const identicon = createAvatar(identiconStyle, { seed: address });
+      const identicon = createAvatar(identiconStyle, { seed: address, dataUri: true });
       return identicon;
     }
   },
@@ -237,5 +240,4 @@ export default {
   box-sizing: border-box;
   overflow: hidden;
   background: white;
-}
-</style>
+}</style>
