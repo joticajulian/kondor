@@ -26,7 +26,7 @@ export default {
   computed: {
     cssVars() {
       return {
-        '--fill-to': `-${(this.manaPercent - 50) / 2 + 50}%`
+        '--fill-to': `-${this.manaPercent / 2 + 25}%`
       };
     }
   }
