@@ -59,9 +59,10 @@ export default new Vuex.Store({
     },
     sandboxLoaded: false,
 
-    showTopNav: true,
-    showAccountMenu: false,
     showBackButton: false,
+    showCurrentNetwork: true,
+    showAvatarMenu: true,
+    showAccountMenu: false,
   },
   mutations: {},
   actions: {},

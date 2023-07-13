@@ -37,20 +37,12 @@
           {{ word }}
         </button>
       </div>
-      <div class="row">
-        <button
-          class="secondary"
-          @click="goBack"
-        >
-          go back
-        </button>
-        <button
-          :disabled="words.length > 0"
-          @click="confirmSeed"
-        >
-          confirm
-        </button>
-      </div>
+      <button
+        :disabled="words.length > 0"
+        @click="confirmSeed"
+      >
+        confirm
+      </button>
     </div>
   </div>
 </template>
@@ -108,10 +100,6 @@ export default {
         this.alertDanger(error.message);
         throw error;
       }
-    },
-
-    goBack() {
-      router.back();
     }
   },
 };
@@ -148,20 +136,6 @@ export default {
 .word-button {
   width: auto;
   margin: 10px;
-}
-
-button.secondary {
-  background-color: #ddd;
-  border-color: #ddd;
-  color: #000;
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
-  gap: 1em;
-  justify-content: stretch;
-  width: 100%;
 }
 
 .mnemonic-display {
