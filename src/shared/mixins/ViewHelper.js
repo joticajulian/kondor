@@ -35,6 +35,12 @@ export default {
       this.$store.state.showAvatarMenu = true;
       this.$store.state.showAccountMenu = true;
       break;
+    case "/send":
+      this.$store.state.showBackButton = true;
+      this.$store.state.showCurrentNetwork = true;
+      this.$store.state.showAvatarMenu = true;
+      this.$store.state.showAccountMenu = true;
+      break;
     default:
       this.$store.state.showBackButton = true;
       this.$store.state.showCurrentNetwork = true;
