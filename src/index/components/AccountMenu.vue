@@ -68,6 +68,12 @@ export default {
     };
   },
 
+  watch: {
+    "$store.state.currentIndexAccount": function () {
+      this.loadAccount();
+    },
+  },
+
   mounted() {
     this.loadAccount();
   },

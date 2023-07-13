@@ -105,8 +105,9 @@ export default {
 
   computed: {
     avatar() {
-      const address = this.$store.state.accounts[this.$store.state.currentIndexAccount].address;
-      const identicon = createAvatar(identiconStyle, { seed: address, dataUri: true });
+      const account = this.$store.state.accounts[this.$store.state.currentIndexAccount];
+      if (!account || !account.address) return "";
+      const identicon = createAvatar(identiconStyle, { seed: account.address, dataUri: true });
       return identicon;
     }
   },
@@ -240,4 +241,5 @@ export default {
   box-sizing: border-box;
   overflow: hidden;
   background: white;
-}</style>
+}
+</style>
