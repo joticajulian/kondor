@@ -1,25 +1,28 @@
 <template>
   <div>
     <div
-      v-if="$store.state.showTopNav"
+      v-if="$store.state.showBackButton || $store.state.showCurrentNetwork || $store.state.showAvatarMenu"
       class="header"
     >
       <div class="left">
-        <span 
+        <span
           v-if="$store.state.showBackButton"
           class="material-icons back-button"
           @click="back"
         >
           arrow_back
         </span>
-        <Logo 
+        <Logo
           v-else
-          color="#FFF" 
-          :width="45" 
+          color="#FFF"
+          :width="45"
           :height="45"
         />
       </div>
-      <div class="network-select">
+      <div
+        v-if="$store.state.showCurrentNetwork"
+        class="network-select"
+      >
         <select v-model="$store.state.currentNetwork">
           <option
             v-for="(network, index) in $store.state.networks"
@@ -29,13 +32,11 @@
             {{ network.name }}
           </option>
         </select>
-        <span 
-          class="material-icons"
-        >
+        <span class="material-icons">
           expand_more
         </span>
       </div>
-      <AvatarMenu />
+      <AvatarMenu v-if="$store.state.showAvatarMenu" />
     </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />
   </div>
@@ -61,7 +62,7 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork];
       this._setCurrentNetwork(network.tag);
     },
-    "$store.state.accounts": function() {
+    "$store.state.accounts": function () {
       if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
     }
   },
@@ -84,7 +85,6 @@ select:focus-visible,
 select:focus {
   background: var(--kondor-purple);
   color: white;
-  
   font-size: 1em;
   height: 45px;
   padding: 1em;
@@ -100,7 +100,7 @@ select:focus {
   position: relative;
 }
 
-.network-select > .material-icons {
+.network-select>.material-icons {
   position: absolute;
   right: 10px;
   top: 10px;
@@ -108,7 +108,7 @@ select:focus {
   background: var(--kondor-purple);
 }
 
-.network-select:hover > .material-icons {
+.network-select:hover>.material-icons {
   opacity: 0.8;
 }
 
