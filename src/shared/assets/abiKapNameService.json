@@ -162,7 +162,7 @@
             "read_only": true
         }
     },
-    "types": {
+    "koilib_types": {
         "nested": {
             "collections": {
                 "nested": {

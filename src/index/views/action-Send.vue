@@ -220,6 +220,9 @@ export default {
             id: this.network.kapNameServiceContractId,
             abi: kapAbi,
             provider: this.provider,
+            serializer: await this.newSandboxSerializer(
+              kapAbi.koilib_types
+            ),
           });
           this.kapNameService = this.kapNameServiceContract.functions;
         }
