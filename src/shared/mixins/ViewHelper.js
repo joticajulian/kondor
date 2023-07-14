@@ -14,21 +14,54 @@ export default {
   created() {
     switch (router.currentRoute.path) {
     case "/":
-      this.$store.state.showAccountMenu = false;
       this.$store.state.showBackButton = false;
+      this.$store.state.showCurrentNetwork = false;
+      this.$store.state.showAvatarMenu = false;
+      this.$store.state.showAccountMenu = false;
+      break;
+    case "/newWallet":
+    case "/importSeedPhrase":
+    case "/importPrivateKey":
+    case "/generateSeed":
+    case "/confirmSeed":
+      this.$store.state.showBackButton = true;
+      this.$store.state.showCurrentNetwork = false;
+      this.$store.state.showAvatarMenu = false;
+      this.$store.state.showAccountMenu = false;
       break;
     case "/dashboard":
+      this.$store.state.showBackButton = false;
+      this.$store.state.showCurrentNetwork = true;
+      this.$store.state.showAvatarMenu = true;
       this.$store.state.showAccountMenu = true;
+      break;
+    case "/send":
       this.$store.state.showBackButton = true;
+      this.$store.state.showCurrentNetwork = true;
+      this.$store.state.showAvatarMenu = true;
+      this.$store.state.showAccountMenu = true;
       break;
     default:
-      this.$store.state.showAccountMenu = false;
       this.$store.state.showBackButton = true;
+      this.$store.state.showCurrentNetwork = true;
+      this.$store.state.showAvatarMenu = true;
+      this.$store.state.showAccountMenu = false;
       break;
     }
   },
 
   methods: {
+    debounce(fn, wait = 300) {
+      let timer;
+      return (...args) => {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          fn.apply(this, args);
+        }, wait);
+      };
+    },
     alertSuccess(message) {
       this.$store.state.alertType = "success";
       this.$store.state.alertMessage = message;

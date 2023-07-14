@@ -1,19 +1,28 @@
 <template>
   <div>
     <div
-      v-if="$store.state.showBackButton"
+      v-if="$store.state.showBackButton || $store.state.showCurrentNetwork || $store.state.showAvatarMenu"
       class="header"
     >
-      <div
-        class="back-button"
-        @click="back"
-      >
-        &#8592;
+      <div class="left">
+        <span
+          v-if="$store.state.showBackButton"
+          class="material-icons back-button"
+          @click="back"
+        >
+          arrow_back
+        </span>
+        <Logo
+          v-else
+          color="#FFF"
+          :width="45"
+          :height="45"
+        />
       </div>
-      <!-- <div v-if="$store.state.networks.length">
-        {{ $store.state.networks[$store.state.currentNetwork].name }}
-      </div> -->
-      <div class="network-select">
+      <div
+        v-if="$store.state.showCurrentNetwork"
+        class="network-select"
+      >
         <select v-model="$store.state.currentNetwork">
           <option
             v-for="(network, index) in $store.state.networks"
@@ -23,13 +32,11 @@
             {{ network.name }}
           </option>
         </select>
+        <span class="material-icons">
+          expand_more
+        </span>
       </div>
-      <div
-        class="lock-button"
-        @click="lock()"
-      >
-        Lock
-      </div>
+      <AvatarMenu v-if="$store.state.showAvatarMenu" />
     </div>
     <AccountMenu v-if="$store.state.showAccountMenu" />
   </div>
@@ -38,20 +45,16 @@
 <script>
 import router from "@/index/router";
 import AccountMenu from "@/index/components/AccountMenu.vue";
+import AvatarMenu from "@/index/components/AvatarMenu.vue";
+import Logo from "@/shared/components/Logo";
 
 // mixins
 import Storage from "@/shared/mixins/Storage";
 
 export default {
-  components: { AccountMenu },
+  components: { Logo, AccountMenu, AvatarMenu },
 
   mixins: [Storage],
-
-  data() {
-    return {
-      showBackButton: false,
-    };
-  },
 
   watch: {
     "$store.state.currentNetwork": function () {
@@ -59,16 +62,18 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork];
       this._setCurrentNetwork(network.tag);
     },
+    "$store.state.accounts": function () {
+      if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
+    }
+  },
+
+  mounted() {
+    if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
   },
 
   methods: {
     back() {
       router.back();
-    },
-
-    async lock() {
-      await this._removePasswordsFromSession();
-      router.push("/");
     },
   },
 };
@@ -80,27 +85,51 @@ select:focus-visible,
 select:focus {
   background: var(--kondor-purple);
   color: white;
-  border: none !important;
   font-size: 1em;
-  padding: 0.5em;
+  height: 45px;
+  padding: 1em;
   margin: 0;
-  border: unset !important;
+  border-color: #FFFFFF;
+  border-radius: 22px;
+  appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.network-select {
+  position: relative;
+}
+
+.network-select>.material-icons {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  pointer-events: none;
+  background: var(--kondor-purple);
+}
+
+.network-select:hover>.material-icons {
+  opacity: 0.8;
 }
 
 .back-button {
   cursor: pointer;
   color: white;
-  /* margin-top: 20px; */
-  padding: 1em;
+  padding-right: 21px;
 }
 
 .header {
   background: var(--kondor-purple);
   color: white;
   display: flex;
-  justify-content: space-between;
+  gap: 1em;
   align-items: center;
-  padding: 0 1em;
+  padding: 1em;
+  height: 45px;
+}
+
+.header .left {
+  flex-grow: 1;
 }
 
 .connection-indicator {
@@ -110,8 +139,9 @@ select:focus {
 .lock-button {
   cursor: pointer;
   color: white;
-  padding-right: 1em;
   font-weight: bold;
+  width: 45px;
+  text-align: right;
 }
 
 .lock-button:hover {

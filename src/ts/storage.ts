@@ -44,6 +44,8 @@ export interface Network {
   chainId: string;
   rpcNodes: string[];
   koinContractId: string;
+  kapNameServiceContractId?: string;
+  kapProfileContractId?: string;
 }
 
 export const DEFAULT_NETWORKS = [
@@ -53,6 +55,8 @@ export const DEFAULT_NETWORKS = [
     chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
     rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
     koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+    kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
+    kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB"
   },
   {
     name: "Koinos Harbinger (testnet)",

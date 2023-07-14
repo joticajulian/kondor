@@ -125,12 +125,14 @@ button {
   background: var(--kondor-purple);
   text-align: center;
 }
-button:hover {
-  opacity: 0.5;
+button:hover, select:hover, a:hover {
+  opacity: 0.8;
   cursor: pointer;
 }
 button:disabled {
-  background: #a28f7a;
+  background: #999;
+  border-color: #999;
+  cursor: not-allowed;
 }
 .link {
   padding-bottom: 0 0 8px 0;
@@ -207,7 +209,6 @@ button:disabled {
 [data-tooltip] {
   position: relative;
   z-index: 2;
-  cursor: pointer;
 }
 
 /* Hide the tooltip content by default */
@@ -221,20 +222,28 @@ button:disabled {
 /* Position tooltip above the element */
 [data-tooltip]:before {
   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 100%;
-  left: 240%;
-  margin-bottom: 5px;
-  margin-left: -90px;
+  margin-bottom: 0.5em;
   padding: 1em;
-  width: 8em;
   border-radius: 3px;
   background-color: #444;
   color: white;
   content: attr(data-tooltip);
   text-align: center;
-  font-size: 0.7em;
+  font-size: 12px;
+  font-weight: normal;
   line-height: 1.2;
   transition: all 0.5s ease-in-out;
+  z-index: 3;
+}
+
+[data-tooltip]:after {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  content: "";
 }
 
 /* Show tooltip content on hover */
