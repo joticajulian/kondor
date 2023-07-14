@@ -10,6 +10,9 @@ import Dashboard from "./views/4-Dashboard.vue";
 import Signers from "./views/5-Signers.vue";
 import CreateAccount from "./views/setting-CreateAccount";
 import ImportAccount from "./views/setting-ImportAccount";
+import Buy from "./views/action-Buy";
+import Send from "./views/action-Send";
+import Swap from "./views/action-Swap";
 
 Vue.use(Router);
 
@@ -64,6 +67,21 @@ export default new Router({
       path: "/importAccount",
       name: "Import Account",
       component: ImportAccount,
+    },
+    {
+      path: "/buy",
+      name: "Buy KOIN",
+      component: Buy,
+    },
+    {
+      path: "/send",
+      name: "Send KOIN",
+      component: Send,
+    },
+    {
+      path: "/swap",
+      name: "Swap KOIN",
+      component: Swap,
     },
   ],
 });
