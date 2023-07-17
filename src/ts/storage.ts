@@ -61,17 +61,28 @@ export const DEFAULT_NETWORKS = [
   {
     name: "Koinos Harbinger (testnet)",
     tag: "harbinger",
-    chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+    // Harbinger chain #1
+    // chainId: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+
+    // Harbinger chain #2 (2023-07-14)
+    chainId: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
     rpcNodes: [
       "https://harbinger-api.koinos.io",
       "https://testnet.koinosblocks.com",
     ],
-    koinContractId: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+    koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
   },
 ];
 
 export async function setNetworks(networks: Network[]): Promise<void> {
-  return write("networks", networks);
+  // take default values except the RPC nodes
+  const _networks = JSON.parse(JSON.stringify(DEFAULT_NETWORKS)) as Network[];
+  _networks.forEach(n => {
+    const ne = networks.find(t => t.tag === n.tag);
+    if (!ne) return;
+    n.rpcNodes = ne.rpcNodes;
+  });
+  return write("networks", _networks);
 }
 
 export async function getNetworks(strict = true): Promise<Network[]> {

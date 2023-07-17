@@ -32,7 +32,7 @@
     >
       <a
         class="dropdown-item"
-        :href="'https://koinosblocks.com/address/' + currentAddress"
+        :href="koinosblocksUrl + currentAddress"
         target="_blank"
       >
         <span class="material-icons">open_in_new</span>View account on Koinos Blocks
@@ -56,14 +56,13 @@
 </template>
 
 <script>
-import router from "@/index/router";
-
 export default {
   data() {
     return {
       msgCopy: "copy address",
       currentAccount: "",
       currentAddress: "",
+      koinosblocksUrl: "https://koinosblocks.com/address/",
       showDropdown: false,
     };
   },
@@ -72,6 +71,9 @@ export default {
     "$store.state.currentIndexAccount": function () {
       this.loadAccount();
     },
+    "$store.state.currentNetwork": function () {
+      this.updateLinks();
+    }
   },
 
   mounted() {
@@ -100,6 +102,14 @@ export default {
       const index = this.$store.state.currentIndexAccount;
       this.currentAccount = this.$store.state.accounts[index].name;
       this.currentAddress = this.$store.state.accounts[index].address;
+    },
+
+    updateLinks() {
+      if (this.$store.state.networks[this.$store.state.currentNetwork].tag === "harbinger") {
+        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/";
+      } else {
+        this.koinosblocksUrl = "https://koinosblocks.com/address/";
+      }
     },
 
     copyAddress() {

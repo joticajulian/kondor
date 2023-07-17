@@ -863,7 +863,7 @@ export default {
       case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
         contractIdName = `${contractId} - KOIN Token ☑️`;
         break;
-      case "1AdzuXSpC6K9qtXdCBgD5NUpDNwHjMgrc9":
+      case "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr":
         contractIdName = `${contractId} - VHP Token ☑️`;
         break;
       case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
@@ -898,13 +898,13 @@ export default {
         break;
 
         // harbinger
-      case "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ":
+      case "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju":
         contractIdName = `${contractId} - tKOIN Token ☑️`;
         break;
-      case "1JZqj7dDrK5LzvdJgufYBJNUFo88xBoWC8":
+      case "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi":
         contractIdName = `${contractId} - VHP Token ☑️`;
         break;
-      case "198RuEouhgiiaQm7uGfaXS6jqZr6g6nyoR":
+      case "1MAbK5pYkhp9yHnfhYamC3tfSLmVRTDjd9":
         contractIdName = `${contractId} - PoB Contract ☑️`;
         break;
       default:
