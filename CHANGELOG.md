@@ -2,7 +2,25 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
-## [v0.7.3](https://github.com/joticajulian/kondor/releases/tag/v0.7.1) (2023-05-08)
+## [v0.8.0](https://github.com/joticajulian/kondor/releases/tag/v0.8.0) (2023-07-17)
+
+### 🚀 Features
+
+- KAP integration
+- CSS improvements
+- Links to block explorers, MEXC exchange, KAP profile and Kollection
+- Send tokens in a dedicated page
+- Improvements in seed confirmation: remove selected words
+- Update chain id and contracts of new harbinger
+
+## [v0.7.4](https://github.com/joticajulian/kondor/releases/tag/v0.7.1) (2023-05-11)
+
+### 🐛 Bug Fixes
+
+- 10 MANA limit in transfers
+- wait 60 seconds for a transaction to be mined
+
+## [v0.7.3](https://github.com/joticajulian/kondor/releases/tag/v0.7.3) (2023-05-08)
 
 ### 🐛 Bug Fixes
 
