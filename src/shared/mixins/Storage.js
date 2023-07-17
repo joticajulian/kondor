@@ -152,7 +152,7 @@ export default {
         switch (contractId) {
         case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
           return abiKoinMainnet;
-        case "1AdzuXSpC6K9qtXdCBgD5NUpDNwHjMgrc9":
+        case "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr":
           return abiVhpMainnet;
         case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
           return abiPobMainnet;
@@ -178,11 +178,11 @@ export default {
       }
       case "harbinger": {
         switch (contractId) {
-        case "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ":
+        case "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju":
           return abiKoinHarbinger;
-        case "1JZqj7dDrK5LzvdJgufYBJNUFo88xBoWC8":
+        case "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi":
           return abiVhpHarbinger;
-        case "198RuEouhgiiaQm7uGfaXS6jqZr6g6nyoR":
+        case "1MAbK5pYkhp9yHnfhYamC3tfSLmVRTDjd9":
           return abiPobHarbinger;
         default:
           break;
