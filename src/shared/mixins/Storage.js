@@ -369,6 +369,14 @@ export default {
       await this._setAccounts(encryptedAccounts);
     },
 
+    async _setCurrentIndexAccount(index) {
+      return this._write("currentIndexAccount", index);
+    },
+
+    async _getCurrentIndexAccount(strict = false) {
+      return this._read("currentIndexAccount", strict);
+    },
+
     // TODO: remove the following functions and replace them
     // with the ones in storage.ts
 
