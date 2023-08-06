@@ -27,18 +27,18 @@ export default {
     color: {
       type: String,
       required: false,
-      default: "#7161EF"
+      default: "#7161EF",
     },
     width: {
       type: Number,
       required: false,
-      default: 172
+      default: 172,
     },
     height: {
       type: Number,
       required: false,
-      default: 252
-    }
+      default: 252,
+    },
   },
 };
 </script>

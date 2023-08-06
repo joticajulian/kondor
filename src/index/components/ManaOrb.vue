@@ -1,8 +1,14 @@
 <template>
-  <div :data-tooltip="timeRecharge === 'Mana recharged' ? timeRecharge : 'Time to recharge: ' + timeRecharge">
+  <div
+    :data-tooltip="
+      timeRecharge === 'Mana recharged'
+        ? timeRecharge
+        : 'Time to recharge: ' + timeRecharge
+    "
+  >
     <div class="orb">
-      <div 
-        class="filler" 
+      <div
+        class="filler"
         :style="cssVars"
       >
         <div class="spinner" />
@@ -16,21 +22,21 @@ export default {
   props: {
     manaPercent: {
       type: Number,
-      required: true
+      required: true,
     },
     timeRecharge: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
     cssVars() {
       return {
-        '--fill-to': `-${this.manaPercent / 2 + 25}%`
+        "--fill-to": `-${this.manaPercent / 2 + 25}%`,
       };
-    }
-  }
-}
+    },
+  },
+};
 </script>
 <style scoped>
 .orb {
@@ -98,4 +104,5 @@ export default {
   100% {
     transform: rotate(720deg);
   }
-}</style>
+}
+</style>

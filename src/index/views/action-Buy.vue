@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <a 
-      href="https://www.mexc.com/exchange/KOIN_USDT" 
+    <a
+      href="https://www.mexc.com/exchange/KOIN_USDT"
       target="_blank"
     >Buy KOIN on MEXC <span class="material-icons">open_in_new</span></a>
   </div>
@@ -10,8 +10,8 @@
 import ViewHelper from "@/shared/mixins/ViewHelper";
 
 export default {
-  mixins: [ViewHelper]
-}
+  mixins: [ViewHelper],
+};
 </script>
 <style scoped>
 .container {

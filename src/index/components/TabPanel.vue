@@ -1,15 +1,15 @@
 <template>
   <div>
     <div class="tabs">
-      <a 
+      <a
         :class="activeTab === 'tokens' ? 'active' : ''"
         @click="setActiveTab('tokens')"
       >Tokens</a>
-      <a 
+      <a
         :class="activeTab === 'nfts' ? 'active' : ''"
         @click="setActiveTab('nfts')"
       >NFTs</a>
-      <a 
+      <a
         :class="activeTab === 'activity' ? 'active' : ''"
         @click="setActiveTab('activity')"
       >Activity</a>
@@ -19,10 +19,11 @@
         Coming soon
       </div>
       <div v-else-if="activeTab === 'nfts'">
-        <a 
-          :href="'https://kollection.app/profile/' + address" 
+        <a
+          :href="'https://kollection.app/profile/' + address"
           target="_blank"
-        >View account on Kollection <span class="material-icons">open_in_new</span></a>
+        >View account on Kollection
+          <span class="material-icons">open_in_new</span></a>
       </div>
       <div v-else>
         Coming soon
@@ -35,22 +36,22 @@ export default {
   props: {
     address: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
 
   data() {
     return {
-      activeTab: "tokens"
-    }
+      activeTab: "tokens",
+    };
   },
 
   methods: {
     setActiveTab(tab) {
       this.activeTab = tab;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 <style scoped>
 .tabs {
