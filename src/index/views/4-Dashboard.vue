@@ -2,33 +2,27 @@
   <div class="column">
     <div class="row">
       <div class="amount">
-        <div
-          :data-tooltip="satoshis"
-        >
-          <span class="balance">{{ balanceFormatted }}</span> <span class="koin-label">KOIN</span>
+        <div :data-tooltip="satoshis">
+          <span class="balance">{{ balanceFormatted }}</span>
+          <span class="koin-label">KOIN</span>
         </div>
         <div class="usd">
           {{ balanceUSD }}
         </div>
       </div>
-      <ManaOrb 
-        :mana-percent="manaPercent" 
-        :time-recharge="timeRechargeMana" 
+      <ManaOrb
+        :mana-percent="manaPercent"
+        :time-recharge="timeRechargeMana"
       />
     </div>
     <div
       v-if="!watchMode"
       class="actions container"
     >
-      <button
-        @click="clickBuy()"
-      >
+      <button @click="clickBuy()">
         <span class="material-icons">add</span><span>Buy</span>
       </button>
-      <button
-        :disabled="!(balance > 0)"
-        @click="clickSend()"
-      >
+      <button @click="clickSend()">
         <span class="material-icons">arrow_outward</span><span>Send</span>
       </button>
       <button
@@ -94,7 +88,7 @@ export default {
       lastUpdateMana: 0,
       timeRechargeMana: "loading...",
       watchMode: false,
-      manaPercent: 1
+      manaPercent: 1,
     };
   },
   computed: {
@@ -197,7 +191,7 @@ export default {
         this.timeRechargeMana = deltaTimeToString(
           ((balance - this.mana) * FIVE_DAYS) / balance
         );
-        this.manaPercent = Math.floor(this.mana / balance * 100);
+        this.manaPercent = Math.floor((this.mana / balance) * 100);
 
         clearInterval(this.intervalMana);
         this.intervalMana = setInterval(() => {
@@ -208,7 +202,7 @@ export default {
             ((balance - mana) * FIVE_DAYS) / balance
           );
           this.mana = Number(mana.toFixed(8));
-          this.manaPercent = Math.floor(this.mana / balance * 100);
+          this.manaPercent = Math.floor((this.mana / balance) * 100);
         }, 1000);
       } catch (error) {
         this.alertDanger(error.message);
@@ -217,15 +211,15 @@ export default {
     },
 
     clickBuy() {
-      router.push('/buy');
+      router.push("/buy");
     },
 
     clickSend() {
-      router.push('/send');
+      router.push("/send");
     },
 
     clickSwap() {
-      router.push('/swap');
+      router.push("/swap");
     },
   },
 };
@@ -257,7 +251,8 @@ input {
   font-weight: bold;
   cursor: default;
 }
-.usd, .koin-label {
+.usd,
+.koin-label {
   font-weight: 300;
   cursor: default;
 }

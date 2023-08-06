@@ -1,8 +1,8 @@
 # Kondor - Koinos Wallet in your browser
 
-Kondor is a browser extension to manage a wallet for the [Koinos Blockchain](https://koinos.io). It based on the [koilib](https://github.com/joticajulian/koilib) library. 
+Kondor is a browser extension to manage a wallet for the [Koinos Blockchain](https://koinos.io). It based on the [koilib](https://github.com/joticajulian/koilib) library.
 
-***Kondor is currently in beta and may include bugs.***
+**_Kondor is currently in beta and may include bugs._**
 
 ## Info for users
 
@@ -61,7 +61,7 @@ The server will start in http://localhost:8081
 
 Open the `.env` file and set `VUE_APP_ENV=test`. This variable will skip the access to the local storage in the extension and instead of that will save this data in memory.
 
-***Note: When using the test environment, the wallet password is `a`***
+**_Note: When using the test environment, the wallet password is `a`_**
 
 Build typescript files:
 

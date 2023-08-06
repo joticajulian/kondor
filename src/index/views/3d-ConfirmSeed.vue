@@ -100,7 +100,7 @@ export default {
         this.alertDanger(error.message);
         throw error;
       }
-    }
+    },
   },
 };
 </script>

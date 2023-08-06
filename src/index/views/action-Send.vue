@@ -1,14 +1,19 @@
 <template>
-  <div
-    class="transfer container"
-  >
+  <div class="transfer container">
     <div class="send-to">
       <label>Send to</label>
       <input
         v-model="to"
         type="text"
-        :placeholder="'Enter public address' + (network && network.tag === 'mainnet' ? ' or KAP name' : '')"
-        :class="isToValidated && !isToValidating && to.length > 0 && !isToValid ? 'invalid' : ''"
+        :placeholder="
+          'Enter public address' +
+            (network && network.tag === 'mainnet' ? ' or KAP name' : '')
+        "
+        :class="
+          isToValidated && !isToValidating && to.length > 0 && !isToValid
+            ? 'invalid'
+            : ''
+        "
         @input="validateToDebounced()"
         @keyup="changeTo()"
       >
@@ -113,7 +118,7 @@ export default {
       showAdvanced: false,
       maxMana: 10,
       resolvedKap: "",
-      network: null
+      network: null,
     };
   },
 
@@ -162,7 +167,7 @@ export default {
           const kapHex = `0x${utils.toHexString(buffer)}`;
           const { result } = await this.kapNameService.owner_of({
             token_id: kapHex,
-          })
+          });
           this.resolvedKap = result?.value;
           this.isToValid = !!this.resolvedKap;
         } catch (_) {
@@ -215,14 +220,15 @@ export default {
         this.koin = this.koinContract.functions;
 
         if (this.network.kapNameServiceContractId) {
-          const kapAbi = await this._getAbi(this.network.tag, this.network.kapNameServiceContractId);
+          const kapAbi = await this._getAbi(
+            this.network.tag,
+            this.network.kapNameServiceContractId
+          );
           this.kapNameServiceContract = new Contract({
             id: this.network.kapNameServiceContractId,
             abi: kapAbi,
             provider: this.provider,
-            serializer: await this.newSandboxSerializer(
-              kapAbi.koilib_types
-            ),
+            serializer: await this.newSandboxSerializer(kapAbi.koilib_types),
           });
           this.kapNameService = this.kapNameServiceContract.functions;
         }
@@ -240,10 +246,7 @@ export default {
         const rc = await this.provider.getAccountRc(this.address);
         const initialMana = Number(rc) / 1e8;
         this.mana = Number(initialMana.toFixed(8));
-        this.maxMana = Math.min(
-          10,
-          this.mana
-        );
+        this.maxMana = Math.min(10, this.mana);
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
@@ -292,7 +295,7 @@ export default {
   padding: 2em 2em;
 }
 
-.container>* {
+.container > * {
   width: 100%;
 }
 

@@ -7,8 +7,8 @@
 import ViewHelper from "@/shared/mixins/ViewHelper";
 
 export default {
-  mixins: [ViewHelper]
-}
+  mixins: [ViewHelper],
+};
 </script>
 <style scoped>
 .container {

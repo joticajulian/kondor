@@ -56,7 +56,7 @@ export const DEFAULT_NETWORKS = [
     rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
     koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
-    kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB"
+    kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB",
   },
   {
     name: "Koinos Harbinger (testnet)",
@@ -77,8 +77,8 @@ export const DEFAULT_NETWORKS = [
 export async function setNetworks(networks: Network[]): Promise<void> {
   // take default values except the RPC nodes
   const _networks = JSON.parse(JSON.stringify(DEFAULT_NETWORKS)) as Network[];
-  _networks.forEach(n => {
-    const ne = networks.find(t => t.tag === n.tag);
+  _networks.forEach((n) => {
+    const ne = networks.find((t) => t.tag === n.tag);
     if (!ne) return;
     n.rpcNodes = ne.rpcNodes;
   });

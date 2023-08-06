@@ -125,7 +125,9 @@ button {
   background: var(--kondor-purple);
   text-align: center;
 }
-button:hover, select:hover, a:hover {
+button:hover,
+select:hover,
+a:hover {
   opacity: 0.8;
   cursor: pointer;
 }

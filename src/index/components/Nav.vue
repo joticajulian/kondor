@@ -1,7 +1,11 @@
 <template>
   <div>
     <div
-      v-if="$store.state.showBackButton || $store.state.showCurrentNetwork || $store.state.showAvatarMenu"
+      v-if="
+        $store.state.showBackButton ||
+          $store.state.showCurrentNetwork ||
+          $store.state.showAvatarMenu
+      "
       class="header"
     >
       <div class="left">
@@ -32,9 +36,7 @@
             {{ network.name }}
           </option>
         </select>
-        <span class="material-icons">
-          expand_more
-        </span>
+        <span class="material-icons"> expand_more </span>
       </div>
       <AvatarMenu v-if="$store.state.showAvatarMenu" />
     </div>
@@ -63,12 +65,20 @@ export default {
       this._setCurrentNetwork(network.tag);
     },
     "$store.state.accounts": function () {
-      if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
-    }
+      if (
+        router.currentRoute.path !== "/" &&
+        this.$store.state.accounts.length === 0
+      )
+        router.push("/");
+    },
   },
 
   mounted() {
-    if (router.currentRoute.path !== "/" && this.$store.state.accounts.length === 0) router.push("/");
+    if (
+      router.currentRoute.path !== "/" &&
+      this.$store.state.accounts.length === 0
+    )
+      router.push("/");
   },
 
   methods: {
@@ -89,7 +99,7 @@ select:focus {
   height: 45px;
   padding: 1em;
   margin: 0;
-  border-color: #FFFFFF;
+  border-color: #ffffff;
   border-radius: 22px;
   appearance: none;
   cursor: pointer;
@@ -100,7 +110,7 @@ select:focus {
   position: relative;
 }
 
-.network-select>.material-icons {
+.network-select > .material-icons {
   position: absolute;
   right: 10px;
   top: 10px;
@@ -108,7 +118,7 @@ select:focus {
   background: var(--kondor-purple);
 }
 
-.network-select:hover>.material-icons {
+.network-select:hover > .material-icons {
   opacity: 0.8;
 }
 

@@ -31,7 +31,11 @@
           @click="selectAccount(index)"
         >
           <span
-            :style="$store.state.currentIndexAccount === index ? 'visibility: visible;' : 'visibility: hidden;'"
+            :style="
+              $store.state.currentIndexAccount === index
+                ? 'visibility: visible;'
+                : 'visibility: hidden;'
+            "
             class="material-icons"
           >
             check
@@ -44,7 +48,7 @@
           </div>
         </div>
       </div>
-      
+
       <hr>
 
       <div v-if="$store.state.mnemonic0">
@@ -102,11 +106,15 @@ export default {
 
   computed: {
     avatar() {
-      const account = this.$store.state.accounts[this.$store.state.currentIndexAccount];
+      const account =
+        this.$store.state.accounts[this.$store.state.currentIndexAccount];
       if (!account || !account.address) return "";
-      const identicon = createAvatar(identiconStyle, { seed: account.address, dataUri: true });
+      const identicon = createAvatar(identiconStyle, {
+        seed: account.address,
+        dataUri: true,
+      });
       return identicon;
-    }
+    },
   },
 
   methods: {
@@ -120,7 +128,11 @@ export default {
     },
 
     closeDropdown(e) {
-      if (typeof e === 'undefined' || this.$el.querySelector('.dropdown-content') && !this.$el.querySelector('.dropdown-content').contains(e.target)) {
+      if (
+        typeof e === "undefined" ||
+        (this.$el.querySelector(".dropdown-content") &&
+          !this.$el.querySelector(".dropdown-content").contains(e.target))
+      ) {
         this.showDropdown = false;
         window.removeEventListener("click", this.closeDropdown);
       }
@@ -212,7 +224,7 @@ hr {
   align-items: center;
 }
 
-.dropdown-info>button {
+.dropdown-info > button {
   width: auto;
   border-radius: 22px;
   color: var(--kondor-purple);

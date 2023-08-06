@@ -19,11 +19,12 @@
         name="watch-mode"
         value="watch-mode"
       >
-      <label for="watch-mode">Import in watch mode <br> (without private key)</label>
+      <label
+        for="watch-mode"
+      >Import in watch mode <br>
+        (without private key)</label>
     </div>
-    <div
-      v-if="watchMode"
-    >
+    <div v-if="watchMode">
       <label for="address">Address</label>
       <input
         id="address"
@@ -33,9 +34,7 @@
         @keyup.enter="accept"
       >
     </div>
-    <div
-      v-else
-    >
+    <div v-else>
       <label for="privateKey">Private Key</label>
       <input
         id="privateKey"

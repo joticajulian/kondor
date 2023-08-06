@@ -10,9 +10,7 @@
             {{ currentAddress }}
           </div>
           <div :data-tooltip="msgCopy">
-            <button
-              @click="copyAddress()"
-            >
+            <button @click="copyAddress()">
               <span class="material-icons">content_copy</span>
             </button>
           </div>
@@ -20,7 +18,7 @@
       </div>
       <button
         class="menu-toggle"
-        @click="openDropdown()" 
+        @click="openDropdown()"
       >
         <span class="material-icons">more_vert</span>
       </button>
@@ -35,17 +33,18 @@
         :href="koinosblocksUrl + currentAddress"
         target="_blank"
       >
-        <span class="material-icons">open_in_new</span>View account on Koinos Blocks
+        <span class="material-icons">open_in_new</span>View account on Koinos
+        Blocks
       </a>
-      <a 
-        class="dropdown-item" 
+      <a
+        class="dropdown-item"
         :href="'https://koiner.app/addresses/' + currentAddress"
         target="_blank"
       >
         <span class="material-icons">open_in_new</span>View account on Koiner
       </a>
-      <a 
-        class="dropdown-item" 
+      <a
+        class="dropdown-item"
         href="https://kap.domains/account"
         target="_blank"
       >
@@ -73,7 +72,7 @@ export default {
     },
     "$store.state.currentNetwork": function () {
       this.updateLinks();
-    }
+    },
   },
 
   mounted() {
@@ -91,7 +90,11 @@ export default {
     },
 
     closeDropdown(e) {
-      if (typeof e === 'undefined' || this.$el.querySelector('.dropdown-content') && !this.$el.querySelector('.dropdown-content').contains(e.target)) {
+      if (
+        typeof e === "undefined" ||
+        (this.$el.querySelector(".dropdown-content") &&
+          !this.$el.querySelector(".dropdown-content").contains(e.target))
+      ) {
         this.showDropdown = false;
         window.removeEventListener("click", this.closeDropdown);
       }
@@ -105,7 +108,10 @@ export default {
     },
 
     updateLinks() {
-      if (this.$store.state.networks[this.$store.state.currentNetwork].tag === "harbinger") {
+      if (
+        this.$store.state.networks[this.$store.state.currentNetwork].tag ===
+        "harbinger"
+      ) {
         this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/";
       } else {
         this.koinosblocksUrl = "https://koinosblocks.com/address/";
