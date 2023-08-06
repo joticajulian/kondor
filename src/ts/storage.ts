@@ -46,9 +46,10 @@ export interface Network {
   koinContractId: string;
   kapNameServiceContractId?: string;
   kapProfileContractId?: string;
+  freeManaSharer?: string;
 }
 
-export const DEFAULT_NETWORKS = [
+export const DEFAULT_NETWORKS: Network[] = [
   {
     name: "Koinos Mainnet",
     tag: "mainnet",
@@ -57,6 +58,7 @@ export const DEFAULT_NETWORKS = [
     koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
     kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB",
+    freeManaSharer: "1KyZyhNwiDo6a93f3FvK8pxspKdgEtQDwa",
   },
   {
     name: "Koinos Harbinger (testnet)",
@@ -71,6 +73,7 @@ export const DEFAULT_NETWORKS = [
       "https://testnet.koinosblocks.com",
     ],
     koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
+    freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
   },
 ];
 
@@ -93,5 +96,21 @@ export async function getNetworks(strict = true): Promise<Network[]> {
     await setNetworks(networks);
     networks = await read("networks", true);
   }
+
+  // take default values if not present
+  networks!.forEach((network, i) => {
+    const fields = [
+      "rpcNodes",
+      "koinContractId",
+      "kapNameServiceContractId",
+      "kapProfileContractId",
+      "freeManaSharer",
+    ] as const;
+    fields.forEach((field) => {
+      if (!network[field]) {
+        network[field] = DEFAULT_NETWORKS[i][field]! as string & string[];
+      }
+    });
+  });
   return networks!;
 }

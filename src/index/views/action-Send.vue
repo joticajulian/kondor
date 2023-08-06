@@ -67,11 +67,28 @@
       v-if="showAdvanced"
       class="advanced-content"
     >
+      <div class="group-free-mana">
+        <input
+          v-model="useFreeMana"
+          type="checkbox"
+        >
+        <label for="kondor-payer">Use free mana</label>
+      </div>
       <label for="max-mana">Max mana</label>
       <input
         v-model="maxMana"
         type="text"
       >
+      <div
+        v-if="!useFreeMana"
+        class="group-payer"
+      >
+        <label for="payer">Payer</label>
+        <input
+          v-model="payer"
+          type="text"
+        >
+      </div>
     </div>
     <div class="actions">
       <button
@@ -117,6 +134,8 @@ export default {
       isToValidated: false,
       showAdvanced: false,
       maxMana: 10,
+      payer: "",
+      useFreeMana: false,
       resolvedKap: "",
       network: null,
     };
@@ -200,6 +219,7 @@ export default {
         this.provider = new Provider(this.network.rpcNodes);
         const currentAccount = this.$store.state.accounts[index];
         this.address = currentAccount.address;
+        this.payer = currentAccount.address;
         this.signer = undefined;
         if (currentAccount.privateKey) {
           this.signer = Signer.fromWif(currentAccount.privateKey, true);
@@ -262,7 +282,11 @@ export default {
             to: this.resolvedKap || this.to,
             value: utils.parseUnits(this.amount, 8),
           },
-          { chainId: this.network.chainId, rcLimit: this.maxMana * 1e8 }
+          {
+            chainId: this.network.chainId,
+            rcLimit: this.maxMana * 1e8,
+            payer: this.useFreeMana ? this.network.freeManaSharer : this.payer,
+          }
         );
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
@@ -320,6 +344,11 @@ input {
   margin-bottom: 0.5em;
 }
 
+input[type="checkbox"] {
+  all: revert;
+  margin: 0 0.7em 0 0;
+}
+
 label {
   margin-top: 0.5em;
 }
@@ -362,7 +391,11 @@ input.invalid {
 
 .advanced-content {
   position: relative;
-  margin-top: 0.5em;
+  margin-top: 1.5em;
+}
+
+.group-free-mana {
+  display: flex;
 }
 
 .success {
