@@ -46,6 +46,9 @@ export default {
         });
         this.$store.state.currentIndexAccount =
           this.$store.state.accounts.length - 1;
+        await this._setCurrentIndexAccount(
+          this.$store.state.currentIndexAccount
+        );
         router.back();
       } catch (error) {
         this.alertDanger(error.message);

@@ -112,7 +112,10 @@ export default {
   },
 
   mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount);
+    this._getCurrentIndexAccount().then((index) => {
+      this.$store.state.currentIndexAccount = index ? index : 0;
+      this.loadAccount(this.$store.state.currentIndexAccount);
+    });
   },
 
   methods: {

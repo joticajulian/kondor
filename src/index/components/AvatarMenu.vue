@@ -138,8 +138,9 @@ export default {
       }
     },
 
-    selectAccount(index) {
+    async selectAccount(index) {
       this.$store.state.currentIndexAccount = index;
+      await this._setCurrentIndexAccount(index);
       this.closeDropdown();
     },
 
