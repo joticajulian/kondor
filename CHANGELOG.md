@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.8.1](https://github.com/joticajulian/kondor/releases/tag/v0.8.0) (2023-08-06)
+
+### 🚀 Features
+
+- Free mana option in the built-in transfer function and in the popup to sign transactions
+- Remember last account selected to load it next time kondor opens
+
+### 🐛 Bug Fixes
+
+- The button to transfer is not disabled anymore
+
 ## [v0.8.0](https://github.com/joticajulian/kondor/releases/tag/v0.8.0) (2023-07-17)
 
 ### 🚀 Features
