@@ -54,10 +54,17 @@
         <div class="group-input">
           <label for="network">Network</label>
           <input
-            v-model="network"
+            v-model="networkTag"
             type="text"
             disabled
           >
+        </div>
+        <div class="group-input">
+          <input
+            v-model="useFreeMana"
+            type="checkbox"
+          >
+          <label for="payer">Use free mana</label>
         </div>
         <div class="group-input">
           <label for="max-mana">Max. mana</label>
@@ -332,10 +339,12 @@ export default {
       accounts: [],
       signerSelected: null,
       provider: null,
-      network: "mainnet",
+      network: {},
+      networkTag: "mainnet",
       maxMana: "",
-      payer: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
-      payee: "1KRHqJ7uy5b4HZa5Une2dydYYFysVDyBwx",
+      useFreeMana: false,
+      payer: "",
+      payee: "",
       nonce: "",
       transaction: null,
       transactionSigned: false,
@@ -351,6 +360,17 @@ export default {
       isOldKoilib: false,
       isOldKondor: false,
     };
+  },
+
+  watch: {
+    useFreeMana: async function (newVal) {
+      if (newVal) {
+        this.payer = this.network.freeManaSharer;
+        this.payee = this.request.args.transaction.header.payer;
+      } else {
+        this.payer = this.request.args.transaction.header.payer;
+      }
+    },
   },
 
   mounted() {
@@ -391,7 +411,7 @@ export default {
                 },
               ],
               header: {
-                chain_id: "EiAAKqFi-puoXnuJTdn7qBGGJa8yd-dcS2P0ciODe4wupQ==",
+                chain_id: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
                 rc_limit: "0",
                 nonce: "KAE=",
                 operation_merkle_root:
@@ -798,7 +818,7 @@ export default {
     async getAbi(contract) {
       const contractId = contract.getId();
       // try to get the ABI from local storage
-      let abi = await this._getAbi(this.network, contractId);
+      let abi = await this._getAbi(this.networkTag, contractId);
       if (abi) return abi;
 
       // try to get the ABI from the network
@@ -1081,9 +1101,9 @@ export default {
         const networks = await this._getNetworks();
 
         const { header } = this.request.args.transaction;
-        const network = networks.find((n) => n.chainId === header.chain_id);
-        this.provider = new Provider(network.rpcNodes);
-        this.network = network ? network.tag : "Unknown chain id";
+        this.network = networks.find((n) => n.chainId === header.chain_id);
+        this.provider = new Provider(this.network.rpcNodes);
+        this.networkTag = this.network ? this.network.tag : "Unknown chain id";
         this.maxMana = utils.formatUnits(header.rc_limit, 8);
         this.nonce = header.nonce;
         this.payer = header.payer;
@@ -1394,6 +1414,7 @@ export default {
 input {
   margin-top: 2em;
 }
+
 .cancel-button {
   border: none;
   text-decoration: underline;
@@ -1428,9 +1449,14 @@ input {
   flex: 1;
 }
 
-.group-input input {
+.group-input input[type="text"] {
   flex: 2;
   margin: 5px 0px;
+}
+
+.group-input input[type="checkbox"] {
+  all: revert;
+  margin: 1em 0.7em 1em 0;
 }
 
 .operation {
