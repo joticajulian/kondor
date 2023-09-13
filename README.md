@@ -83,6 +83,10 @@ npm run serve
 
 The application will be available in http://localhost:8080
 
+Useful links:
+
+- Popup to sign transactions: http://localhost:8080/popup.html#/sendTransaction
+
 ### Run as browser extension
 
 Open the `.env` file and set `VUE_APP_ENV=extension` to enable the access to the local storage for extensions. Build the application

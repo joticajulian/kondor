@@ -371,6 +371,14 @@ export default {
         this.payer = this.request.args.transaction.header.payer;
       }
     },
+
+    payer: async function () {
+      this.nonce = await this.provider.getNextNonce(this.payee || this.payer);
+    },
+
+    payee: async function () {
+      this.nonce = await this.provider.getNextNonce(this.payee || this.payer);
+    },
   },
 
   mounted() {
