@@ -44,6 +44,7 @@ export interface Network {
   chainId: string;
   rpcNodes: string[];
   koinContractId: string;
+  nicknamesContractId?: string;
   kapNameServiceContractId?: string;
   kapProfileContractId?: string;
   freeManaSharer?: string;
@@ -56,6 +57,7 @@ export const DEFAULT_NETWORKS: Network[] = [
     chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
     rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
     koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+    nicknamesContractId: "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz",
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
     kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB",
     freeManaSharer: "1KyZyhNwiDo6a93f3FvK8pxspKdgEtQDwa",
@@ -73,6 +75,7 @@ export const DEFAULT_NETWORKS: Network[] = [
       "https://testnet.koinosblocks.com",
     ],
     koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
+    nicknamesContractId: "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR",
     freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
   },
 ];
@@ -102,6 +105,7 @@ export async function getNetworks(strict = true): Promise<Network[]> {
     const fields = [
       "rpcNodes",
       "koinContractId",
+      "nicknamesContractId",
       "kapNameServiceContractId",
       "kapProfileContractId",
       "freeManaSharer",
