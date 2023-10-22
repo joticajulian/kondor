@@ -857,11 +857,22 @@ export default {
       return this.abis ? this.abis[contractId] : undefined;
     },
 
-    applyFormat(format, argName, data) {
+    async applyFormat(format, argName, data) {
       // display address names
       const acc = this.accounts.find((a) => a.address === data);
       if (acc) {
         return `${acc.name} - ${data}`;
+      }
+
+      // resolve nickname if it is an address
+      try {
+        const isAddress = utils.isChecksumAddress(data);
+        if (isAddress) {
+          const resolvedName = await this.resolveAddress(data);
+          if (resolvedName) return `@${resolvedName} - ${data}`;
+        }
+      } catch {
+        // empty
       }
 
       if (!format || !format[argName]) return data;
@@ -952,13 +963,15 @@ export default {
           let { name, args } = await contract.decodeOperation(action);
           const { format } = contract.abi.methods[name];
           if (args) {
-            args = Object.keys(args).map((argName) => {
-              const field = firstUpperCase(argName);
-              return {
-                field,
-                data: this.applyFormat(format, argName, args[argName]),
-              };
-            });
+            args = await Promise.all(
+              Object.keys(args).map(async (argName) => {
+                const field = firstUpperCase(argName);
+                return {
+                  field,
+                  data: await this.applyFormat(format, argName, args[argName]),
+                };
+              })
+            );
           }
 
           this.operations.push({
@@ -979,17 +992,19 @@ export default {
             format = contract.abi.events[decodedEvent.name].format;
             subtitle = contract.abi.events[decodedEvent.name].description || "";
           }
-          let args = Object.keys(decodedEvent.args).map((argName) => {
-            const field = firstUpperCase(argName);
-            return {
-              field,
-              data: this.applyFormat(
-                format,
-                argName,
-                decodedEvent.args[argName]
-              ),
-            };
-          });
+          let args = await Promise.all(
+            Object.keys(decodedEvent.args).map(async (argName) => {
+              const field = firstUpperCase(argName);
+              return {
+                field,
+                data: await this.applyFormat(
+                  format,
+                  argName,
+                  decodedEvent.args[argName]
+                ),
+              };
+            })
+          );
 
           let title = firstUpperCase(decodedEvent.name);
           if (
