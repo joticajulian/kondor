@@ -6,8 +6,10 @@
         v-model="to"
         type="text"
         :placeholder="
-          'Enter public address' +
-            (network && network.tag === 'mainnet' ? ' or KAP name' : '')
+          'Enter address' +
+            (network && network.tag === 'mainnet'
+              ? ', nickname or KAP name'
+              : 'or nickname')
         "
         :class="
           isToValidated && !isToValidating && to.length > 0 && !isToValid
@@ -30,11 +32,11 @@
         class="error material-icons"
       >error_outline</span>
       <div
-        v-if="!!resolvedKap"
+        v-if="!!resolvedAddress"
         class="info"
       >
         <span class="material-icons">info_outline</span>
-        Will send to {{ resolvedKap }}
+        {{ resolvedMessage }}
       </div>
     </div>
     <label>Amount</label>
@@ -114,6 +116,10 @@ import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 import { Contract, Provider, Signer, utils } from "koilib";
 
+function fromUtf8ToHex(text) {
+  return utils.toHexString(new TextEncoder().encode(text));
+}
+
 export default {
   mixins: [Storage, Sandbox, ViewHelper],
 
@@ -136,8 +142,11 @@ export default {
       maxMana: 10,
       payer: "",
       useFreeMana: false,
-      resolvedKap: "",
+      resolvedAddress: "",
+      resolvedMessage: "",
       network: null,
+      kapNameService: null,
+      nicknames: null,
     };
   },
 
@@ -163,41 +172,77 @@ export default {
     setMaxAmount() {
       this.amount = this.balance;
     },
+
     toggleAdvanced() {
       this.showAdvanced = !this.showAdvanced;
     },
+
     changeTo() {
       this.isToValidated = false;
-      this.resolvedKap = "";
+      this.resolvedAddress = "";
+      this.resolvedMessage = "";
     },
+
     async validateTo() {
       this.isToValidating = true;
-      let isAddress;
+
+      // check if it is a public address
       try {
-        isAddress = utils.isChecksumAddress(this.to);
+        this.isToValid = utils.isChecksumAddress(this.to);
       } catch (_) {
-        isAddress = false;
+        this.isToValid = false;
       }
-      if (isAddress) {
-        this.isToValid = true;
-      } else if (this.network.kapNameServiceContractId) {
+      if (this.isToValid) {
+        this.isToValidating = false;
+        this.isToValidated = true;
+        return;
+      }
+
+      // check if it is a nickname
+      if (this.network.nicknamesContractId) {
         try {
-          const buffer = new TextEncoder().encode(this.to);
-          const kapHex = `0x${utils.toHexString(buffer)}`;
-          const { result } = await this.kapNameService.owner_of({
-            token_id: kapHex,
+          const tokenId = `0x${fromUtf8ToHex(this.to)}`;
+          const { result } = await this.nicknames.owner_of({
+            token_id: tokenId,
           });
-          this.resolvedKap = result?.value;
-          this.isToValid = !!this.resolvedKap;
+          this.resolvedAddress = result?.account;
+          this.resolvedMessage = `@${this.to} resolves to ${this.resolvedAddress}`;
+          this.isToValid = !!this.resolvedAddress;
         } catch (_) {
           this.isToValid = false;
         }
-      } else {
-        this.isToValid = false;
+        if (this.isToValid) {
+          this.isToValidating = false;
+          this.isToValidated = true;
+          return;
+        }
       }
+
+      // check if it is a KAP name
+      if (this.network.kapNameServiceContractId) {
+        try {
+          const tokenId = `0x${fromUtf8ToHex(this.to)}`;
+          const { result } = await this.kapNameService.owner_of({
+            token_id: tokenId,
+          });
+          this.resolvedAddress = result?.value;
+          this.resolvedMessage = `kap://${this.to} resolves to ${this.resolvedAddress}`;
+          this.isToValid = !!this.resolvedAddress;
+        } catch (_) {
+          this.isToValid = false;
+        }
+        if (this.isToValid) {
+          this.isToValidating = false;
+          this.isToValidated = true;
+          return;
+        }
+      }
+
+      this.isToValid = false;
       this.isToValidating = false;
       this.isToValidated = true;
     },
+
     validateAmount() {
       const amount = parseFloat(this.amount);
       this.isAmountValid =
@@ -206,6 +251,7 @@ export default {
         0 <= amount &&
         this.balance >= amount;
     },
+
     async loadAccount(index) {
       if (this.$store.state.accounts.length === 0) return;
       try {
@@ -239,6 +285,23 @@ export default {
         });
         this.koin = this.koinContract.functions;
 
+        // load nicknames contract
+        if (this.network.nicknamesContractId) {
+          const nicknamesAbi = await this._getAbi(
+            this.network.tag,
+            this.network.nicknamesContractId
+          );
+          this.nicknames = new Contract({
+            id: this.network.nicknamesContractId,
+            abi: nicknamesAbi,
+            provider: this.provider,
+            serializer: await this.newSandboxSerializer(
+              nicknamesAbi.koilib_types
+            ),
+          }).functions;
+        }
+
+        // load kap contract
         if (this.network.kapNameServiceContractId) {
           const kapAbi = await this._getAbi(
             this.network.tag,
@@ -279,7 +342,7 @@ export default {
         const { transaction, receipt } = await this.koin.transfer(
           {
             from: this.address,
-            to: this.resolvedKap || this.to,
+            to: this.resolvedAddress || this.to,
             value: utils.parseUnits(this.amount, 8),
           },
           {

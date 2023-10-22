@@ -1,0 +1,718 @@
+{
+  "methods": {
+    "verify_valid_name": {
+      "argument": "common.str",
+      "return": "common.str",
+      "description": "Verify if a new name is valid",
+      "entry_point": 1523793306,
+      "entry-point": "0x5ad33d9a",
+      "read_only": true,
+      "read-only": true
+    },
+    "mint": {
+      "argument": "nft.mint_args",
+      "return": "",
+      "description": "Create new name",
+      "entry_point": 3698268091,
+      "entry-point": "0xdc6f17bb",
+      "read_only": false,
+      "read-only": false
+    },
+    "burn": {
+      "argument": "nft.burn_args",
+      "return": "",
+      "description": "Delete a name",
+      "entry_point": 2241834181,
+      "entry-point": "0x859facc5",
+      "read_only": false,
+      "read-only": false
+    },
+    "transfer": {
+      "argument": "nft.transfer_args",
+      "return": "",
+      "description": "Transfer Name",
+      "entry_point": 670398154,
+      "entry-point": "0x27f576ca",
+      "read_only": false,
+      "read-only": false
+    },
+    "transfer_to_community": {
+      "argument": "nft.transfer_args",
+      "return": "",
+      "description": "Transfer name to another address and define that the name will be controlled by the community",
+      "entry_point": 2789495215,
+      "entry-point": "0xa64451af",
+      "read_only": false,
+      "read-only": false
+    },
+    "set_tabi": {
+      "argument": "nicknames.set_tabi_args",
+      "return": "",
+      "description": "Set Text ABI for a token",
+      "entry_point": 2998339941,
+      "entry-point": "0xb2b70965",
+      "read_only": false,
+      "read-only": false
+    },
+    "set_metadata": {
+      "argument": "nft.metadata_args",
+      "return": "",
+      "description": "Set metadata",
+      "entry_point": 1029287705,
+      "entry-point": "0x3d59af19",
+      "read_only": false,
+      "read-only": false
+    },
+    "set_name_in_dispute": {
+      "argument": "nft.token",
+      "return": "",
+      "description": "Set name in dispute",
+      "entry_point": 2614384615,
+      "entry-point": "0x9bd457e7",
+      "read_only": false,
+      "read-only": false
+    },
+    "name": {
+      "argument": "",
+      "return": "common.str",
+      "description": "Get name of the NFT",
+      "entry_point": 2191741823,
+      "entry-point": "0x82a3537f",
+      "read_only": true,
+      "read-only": true
+    },
+    "symbol": {
+      "argument": "",
+      "return": "common.str",
+      "description": "Get the symbol of the NFT",
+      "entry_point": 3077209249,
+      "entry-point": "0xb76a7ca1",
+      "read_only": true,
+      "read-only": true
+    },
+    "uri": {
+      "argument": "",
+      "return": "common.str",
+      "description": "Get URI of the NFT",
+      "entry_point": 1894111158,
+      "entry-point": "0x70e5d7b6",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_info": {
+      "argument": "",
+      "return": "nft.info",
+      "description": "Get name, symbol and decimals",
+      "entry_point": 3179243600,
+      "entry-point": "0xbd7f6850",
+      "read_only": true,
+      "read-only": true
+    },
+    "total_supply": {
+      "argument": "",
+      "return": "common.uint64",
+      "description": "Get total supply",
+      "entry_point": 2967091508,
+      "entry-point": "0xb0da3934",
+      "read_only": true,
+      "read-only": true
+    },
+    "royalties": {
+      "argument": "",
+      "return": "nft.royalties",
+      "description": "Get royalties",
+      "entry_point": 921242832,
+      "entry-point": "0x36e90cd0",
+      "read_only": true,
+      "read-only": true
+    },
+    "balance_of": {
+      "argument": "nft.balance_of_args",
+      "return": "common.uint64",
+      "description": "Get balance of an account",
+      "entry_point": 1550980247,
+      "entry-point": "0x5c721497",
+      "read_only": true,
+      "read-only": true
+    },
+    "owner_of": {
+      "argument": "nft.token",
+      "return": "common.address",
+      "description": "Get the owner of a token",
+      "entry_point": 3982608455,
+      "entry-point": "0xed61c847",
+      "read_only": true,
+      "read-only": true
+    },
+    "metadata_of": {
+      "argument": "nft.token",
+      "return": "common.str",
+      "description": "Get the metadata of a token",
+      "entry_point": 392990591,
+      "entry-point": "0x176c8f7f",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_tokens": {
+      "argument": "nft.get_tokens_args",
+      "return": "nft.token_ids",
+      "description": "Get list of token IDs",
+      "entry_point": 2103140055,
+      "entry-point": "0x7d5b5ed7",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_tokens_by_owner": {
+      "argument": "nft.get_tokens_by_owner_args",
+      "return": "nft.token_ids",
+      "description": "Get tokens owned by an address",
+      "entry_point": 4229163893,
+      "entry-point": "0xfc13eb75",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_approved": {
+      "argument": "nft.token",
+      "return": "common.address",
+      "description": "Check if an account is approved to operate a token ID",
+      "entry_point": 1282609184,
+      "entry-point": "0x4c731020",
+      "read_only": true,
+      "read-only": true
+    },
+    "is_approved_for_all": {
+      "argument": "nft.is_approved_for_all_args",
+      "return": "common.boole",
+      "description": "Check if an account is approved to operate all tokens owned by other account",
+      "entry_point": 3886779621,
+      "entry-point": "0xe7ab8ce5",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_operator_approvals": {
+      "argument": "nft.get_operators_args",
+      "return": "nft.get_operators_return",
+      "description": "Get allowances of an account",
+      "entry_point": 3676042766,
+      "entry-point": "0xdb1bf60e",
+      "read_only": true,
+      "read-only": true
+    },
+    "set_royalties": {
+      "argument": "nft.royalties",
+      "return": "",
+      "description": "Set royalties",
+      "entry_point": 995865963,
+      "entry-point": "0x3b5bb56b",
+      "read_only": false,
+      "read-only": false
+    },
+    "approve": {
+      "argument": "nft.approve_args",
+      "return": "",
+      "description": "Grant permissions to other account to manage a specific Token owned by the user. The user must approve only the accounts he trust.",
+      "entry_point": 1960973952,
+      "entry-point": "0x74e21680",
+      "read_only": false,
+      "read-only": false
+    },
+    "set_approval_for_all": {
+      "argument": "nft.set_approval_for_all_args",
+      "return": "",
+      "description": "Grant permissions to other account to manage all Tokens owned by the user. The user must approve only the accounts he trust.",
+      "entry_point": 541336086,
+      "entry-point": "0x20442216",
+      "read_only": false,
+      "read-only": false
+    }
+  },
+  "types": "CsUDCidrb2lub3Nib3gtcHJvdG8vbWFuYXNoYXJlci9jb21tb24ucHJvdG8SBmNvbW1vbhoUa29pbm9zL29wdGlvbnMucHJvdG8iGwoDc3RyEhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIeCgZ1aW50MzISFAoFdmFsdWUYASABKA1SBXZhbHVlIiIKBnVpbnQ2NBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlIh0KBWJvb2xlEhQKBXZhbHVlGAEgASgIUgV2YWx1ZSIpCgdhZGRyZXNzEh4KB2FjY291bnQYASABKAxCBIC1GAZSB2FjY291bnQibgoJbGlzdF9hcmdzEhoKBXN0YXJ0GAEgASgMQgSAtRgGUgVzdGFydBIUCgVsaW1pdBgCIAEoBVIFbGltaXQSLwoJZGlyZWN0aW9uGAMgASgOMhEuY29tbW9uLmRpcmVjdGlvblIJZGlyZWN0aW9uIi0KCWFkZHJlc3NlcxIgCghhY2NvdW50cxgBIAMoDEIEgLUYBlIIYWNjb3VudHMqKgoJZGlyZWN0aW9uEg0KCWFzY2VuZGluZxAAEg4KCmRlc2NlbmRpbmcQAWIGcHJvdG8zCsQMCh1rb2lub3Nib3gtcHJvdG8vbmZ0L25mdC5wcm90bxIDbmZ0GhRrb2lub3Mvb3B0aW9ucy5wcm90byJNCgdyb3lhbHR5EiIKCnBlcmNlbnRhZ2UYASABKARCAjABUgpwZXJjZW50YWdlEh4KB2FkZHJlc3MYAiABKAxCBIC1GAZSB2FkZHJlc3MiLwoJcm95YWx0aWVzEiIKBXZhbHVlGAEgAygLMgwubmZ0LnJveWFsdHlSBXZhbHVlIkwKDW1ldGFkYXRhX2FyZ3MSHwoIdG9rZW5faWQYASABKAxCBIC1GAJSB3Rva2VuSWQSGgoIbWV0YWRhdGEYAiABKAlSCG1ldGFkYXRhIkQKBGluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRIWCgZzeW1ib2wYAiABKAlSBnN5bWJvbBIQCgN1cmkYAyABKAlSA3VyaSItCg9iYWxhbmNlX29mX2FyZ3MSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyIigKBXRva2VuEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkIlgKGGlzX2FwcHJvdmVkX2Zvcl9hbGxfYXJncxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISIAoIb3BlcmF0b3IYAiABKAxCBIC1GAZSCG9wZXJhdG9yIkIKCW1pbnRfYXJncxIUCgJ0bxgBIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAiABKAxCBIC1GAJSB3Rva2VuSWQiLAoJYnVybl9hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkImAKDXRyYW5zZmVyX2FyZ3MSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAyABKAxCBIC1GAJSB3Rva2VuSWQidgoMYXBwcm92ZV9hcmdzEi8KEGFwcHJvdmVyX2FkZHJlc3MYASABKAxCBIC1GAZSD2FwcHJvdmVyQWRkcmVzcxIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAyABKAxCBIC1GAJSB3Rva2VuSWQimQEKGXNldF9hcHByb3ZhbF9mb3JfYWxsX2FyZ3MSLwoQYXBwcm92ZXJfYWRkcmVzcxgBIAEoDEIEgLUYBlIPYXBwcm92ZXJBZGRyZXNzEi8KEG9wZXJhdG9yX2FkZHJlc3MYAiABKAxCBIC1GAZSD29wZXJhdG9yQWRkcmVzcxIaCghhcHByb3ZlZBgDIAEoCFIIYXBwcm92ZWQikAEKEmdldF9vcGVyYXRvcnNfYXJncxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISGgoFc3RhcnQYAiABKAxCBIC1GAZSBXN0YXJ0EhQKBWxpbWl0GAMgASgFUgVsaW1pdBIsCglkaXJlY3Rpb24YBCABKA4yDi5uZnQuZGlyZWN0aW9uUglkaXJlY3Rpb24iVgoUZ2V0X29wZXJhdG9yc19yZXR1cm4SGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEiIKCW9wZXJhdG9ycxgCIAMoDEIEgLUYBlIJb3BlcmF0b3JzInEKD2dldF90b2tlbnNfYXJncxIaCgVzdGFydBgBIAEoDEIEgLUYAlIFc3RhcnQSFAoFbGltaXQYAiABKAVSBWxpbWl0EiwKCWRpcmVjdGlvbhgDIAEoDjIOLm5mdC5kaXJlY3Rpb25SCWRpcmVjdGlvbiKWAQoYZ2V0X3Rva2Vuc19ieV9vd25lcl9hcmdzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIaCgVzdGFydBgCIAEoDEIEgLUYAlIFc3RhcnQSFAoFbGltaXQYAyABKAVSBWxpbWl0EiwKCWRpcmVjdGlvbhgEIAEoDjIOLm5mdC5kaXJlY3Rpb25SCWRpcmVjdGlvbiIuCgl0b2tlbl9pZHMSIQoJdG9rZW5faWRzGAEgAygMQgSAtRgCUgh0b2tlbklkcyoqCglkaXJlY3Rpb24SDQoJYXNjZW5kaW5nEAASDgoKZGVzY2VuZGluZxABYgZwcm90bzMKtQEKD25pY2tuYW1lcy5wcm90bxIJbmlja25hbWVzGhRrb2lub3Mvb3B0aW9ucy5wcm90byIiCgR0YWJpEhoKCHBhdHRlcm5zGAEgAygJUghwYXR0ZXJucyJVCg1zZXRfdGFiaV9hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkEiMKBHRhYmkYAiABKAsyDy5uaWNrbmFtZXMudGFiaVIEdGFiaWIGcHJvdG8z",
+  "koilib_types": {
+    "nested": {
+      "common": {
+        "nested": {
+          "str": {
+            "fields": {
+              "value": {
+                "type": "string",
+                "id": 1
+              }
+            }
+          },
+          "uint32": {
+            "fields": {
+              "value": {
+                "type": "uint32",
+                "id": 1
+              }
+            }
+          },
+          "uint64": {
+            "fields": {
+              "value": {
+                "type": "uint64",
+                "id": 1,
+                "options": {
+                  "jstype": "JS_STRING"
+                }
+              }
+            }
+          },
+          "boole": {
+            "fields": {
+              "value": {
+                "type": "bool",
+                "id": 1
+              }
+            }
+          },
+          "address": {
+            "fields": {
+              "account": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              }
+            }
+          },
+          "direction": {
+            "values": {
+              "ascending": 0,
+              "descending": 1
+            }
+          },
+          "list_args": {
+            "fields": {
+              "start": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "limit": {
+                "type": "int32",
+                "id": 2
+              },
+              "direction": {
+                "type": "direction",
+                "id": 3
+              }
+            }
+          },
+          "addresses": {
+            "fields": {
+              "accounts": {
+                "rule": "repeated",
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              }
+            }
+          }
+        }
+      },
+      "koinos": {
+        "options": {
+          "go_package": "github.com/koinos/koinos-proto-golang/koinos"
+        },
+        "nested": {
+          "bytes_type": {
+            "values": {
+              "BASE64": 0,
+              "BASE58": 1,
+              "HEX": 2,
+              "BLOCK_ID": 3,
+              "TRANSACTION_ID": 4,
+              "CONTRACT_ID": 5,
+              "ADDRESS": 6
+            }
+          },
+          "_btype": {
+            "oneof": ["btype"]
+          },
+          "btype": {
+            "type": "bytes_type",
+            "id": 50000,
+            "extend": "google.protobuf.FieldOptions",
+            "options": {
+              "proto3_optional": true
+            }
+          }
+        }
+      },
+      "nft": {
+        "nested": {
+          "royalty": {
+            "fields": {
+              "percentage": {
+                "type": "uint64",
+                "id": 1,
+                "options": {
+                  "jstype": "JS_STRING"
+                }
+              },
+              "address": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              }
+            }
+          },
+          "royalties": {
+            "fields": {
+              "value": {
+                "rule": "repeated",
+                "type": "royalty",
+                "id": 1
+              }
+            }
+          },
+          "metadata_args": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "metadata": {
+                "type": "string",
+                "id": 2
+              }
+            }
+          },
+          "info": {
+            "fields": {
+              "name": {
+                "type": "string",
+                "id": 1
+              },
+              "symbol": {
+                "type": "string",
+                "id": 2
+              },
+              "uri": {
+                "type": "string",
+                "id": 3
+              }
+            }
+          },
+          "balance_of_args": {
+            "fields": {
+              "owner": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              }
+            }
+          },
+          "token": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              }
+            }
+          },
+          "is_approved_for_all_args": {
+            "fields": {
+              "owner": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "operator": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              }
+            }
+          },
+          "mint_args": {
+            "fields": {
+              "to": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "token_id": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              }
+            }
+          },
+          "burn_args": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              }
+            }
+          },
+          "transfer_args": {
+            "fields": {
+              "from": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "to": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "token_id": {
+                "type": "bytes",
+                "id": 3,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              }
+            }
+          },
+          "approve_args": {
+            "fields": {
+              "approver_address": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "to": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "token_id": {
+                "type": "bytes",
+                "id": 3,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              }
+            }
+          },
+          "set_approval_for_all_args": {
+            "fields": {
+              "approver_address": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "operator_address": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "approved": {
+                "type": "bool",
+                "id": 3
+              }
+            }
+          },
+          "direction": {
+            "values": {
+              "ascending": 0,
+              "descending": 1
+            }
+          },
+          "get_operators_args": {
+            "fields": {
+              "owner": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "start": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "limit": {
+                "type": "int32",
+                "id": 3
+              },
+              "direction": {
+                "type": "direction",
+                "id": 4
+              }
+            }
+          },
+          "get_operators_return": {
+            "fields": {
+              "owner": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "operators": {
+                "rule": "repeated",
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              }
+            }
+          },
+          "get_tokens_args": {
+            "fields": {
+              "start": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "limit": {
+                "type": "int32",
+                "id": 2
+              },
+              "direction": {
+                "type": "direction",
+                "id": 3
+              }
+            }
+          },
+          "get_tokens_by_owner_args": {
+            "fields": {
+              "owner": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "start": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "limit": {
+                "type": "int32",
+                "id": 3
+              },
+              "direction": {
+                "type": "direction",
+                "id": 4
+              }
+            }
+          },
+          "token_ids": {
+            "fields": {
+              "token_ids": {
+                "rule": "repeated",
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              }
+            }
+          }
+        }
+      },
+      "nicknames": {
+        "nested": {
+          "tabi": {
+            "fields": {
+              "patterns": {
+                "rule": "repeated",
+                "type": "string",
+                "id": 1
+              }
+            }
+          },
+          "set_tabi_args": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "tabi": {
+                "type": "tabi",
+                "id": 2
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "events": {
+    "collections.mint_event": {
+      "argument": "nft.mint_args"
+    },
+    "collections.burn_event": {
+      "argument": "nft.burn_args"
+    },
+    "collections.transfer_event": {
+      "argument": "nft.transfer_args"
+    },
+    "collections.transferred_to_community": {
+      "argument": "nft.transfer_args"
+    },
+    "nicknames.set_tabi": {
+      "argument": "nicknames.set_tabi_args"
+    },
+    "collections.set_metadata_event": {
+      "argument": "nft.metadata_args"
+    },
+    "collections.royalties_event": {
+      "argument": "nft.royalties"
+    },
+    "collections.token_approval_event": {
+      "argument": "nft.approve_args"
+    },
+    "collections.operator_approval_event": {
+      "argument": "nft.set_approval_for_all_args"
+    }
+  }
+}
