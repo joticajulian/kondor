@@ -314,6 +314,10 @@ function firstUpperCase(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function fromHexToUtf8(hex) {
+  return new TextDecoder().decode(utils.toUint8Array(hex));
+}
+
 export default {
   name: "SignSendTransaction",
 
@@ -359,6 +363,7 @@ export default {
       request: null,
       isOldKoilib: false,
       isOldKondor: false,
+      nicknames: null,
     };
   },
 
@@ -873,6 +878,17 @@ export default {
       }
     },
 
+    async resolveAddress(address) {
+      const { result } = await this.nicknames.get_tokens_by_owner({
+        owner: address,
+        limit: 1,
+      });
+      if (!result || !result.token_ids || !result.token_ids[0]) {
+        return "";
+      }
+      return fromHexToUtf8(result.token_ids[0]);
+    },
+
     /**
      * decode and beautify an operation
      * or an event
@@ -885,59 +901,10 @@ export default {
         ? action.call_contract.contract_id
         : action.source;
 
-      let contractIdName = contractId;
-      switch (contractId) {
-      // mainnet
-      case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
-        contractIdName = `${contractId} - KOIN Token ☑️`;
-        break;
-      case "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr":
-        contractIdName = `${contractId} - VHP Token ☑️`;
-        break;
-      case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
-        contractIdName = `${contractId} - PoB Contract ☑️`;
-        break;
-      case "18zw3ZokdfHtudzaWAUnU4tUvKzKiJeN76":
-        contractIdName = `${contractId} - Claim Contract ☑️`;
-        break;
-      case "1NsQbH5AhQXgtSNg1ejpFqTi2hmCWz1eQS":
-        contractIdName = `${contractId} - Burnkoin pool ☑️`;
-        break;
-      case "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy":
-        contractIdName = `${contractId} - pVHP Token ☑️`;
-        break;
-      case "1DGNQQimsyBQajzQdWXY96m84YyDC2pUpB":
-        contractIdName = `${contractId} - Fogata JGA#1 ☑️`;
-        break;
-      case "1MbsVfNw6yzQqA8499d8KQj8qdLyRs8CzW":
-        contractIdName = `${contractId} - Fogata JGA#2 ☑️`;
-        break;
-      case "14iHqMGBznBM7xJXhkrQ266FgoFdymCqLM":
-        contractIdName = `${contractId} - Fogata KoinForge ☑️`;
-        break;
-      case "1KfD7n93LnnihyygopWUVTkbtWVe5aXXGW":
-        contractIdName = `${contractId} - Fogata Koinos en español ☑️`;
-        break;
-      case "18UYKhWVCbTpFs8oYC54xoiCQQthhEkX7m":
-        contractIdName = `${contractId} - Fogata Koinnoisseur's pure KOIN Pool ☑️`;
-        break;
-      case "15jueaBcMieDCMGw6wAmEK6cNSUVicknG1":
-        contractIdName = `${contractId} - Fogata Koinnoisseur's pure VAPOR Pool ☑️`;
-        break;
-
-        // harbinger
-      case "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju":
-        contractIdName = `${contractId} - tKOIN Token ☑️`;
-        break;
-      case "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi":
-        contractIdName = `${contractId} - VHP Token ☑️`;
-        break;
-      case "1MAbK5pYkhp9yHnfhYamC3tfSLmVRTDjd9":
-        contractIdName = `${contractId} - PoB Contract ☑️`;
-        break;
-      default:
-        break;
-      }
+      const resolvedName = await this.resolveAddress(contractId);
+      let contractIdName = resolvedName
+        ? `${contractId} - @${resolvedName} contract`
+        : contractId;
 
       const accContract = this.accounts.find((a) => a.address === contractId);
       if (accContract) contractIdName = `${contractId} - ${accContract.name}`;
@@ -945,12 +912,19 @@ export default {
       let impacted = [];
       let impactsUserAccounts = false;
       if (isEvent && action.impacted) {
-        impacted = action.impacted.map((imp) => {
-          const acc = this.accounts.find((a) => a.address === imp);
-          if (!acc) return imp;
-          impactsUserAccounts = true;
-          return `${imp} - ${acc.name}`;
-        });
+        impacted = await Promise.all(
+          action.impacted.map(async (imp) => {
+            const acc = this.accounts.find((a) => a.address === imp);
+            if (acc) {
+              impactsUserAccounts = true;
+              return `${imp} - ${acc.name}`;
+            }
+
+            const resolvedName = await this.resolveAddress(imp);
+            if (resolvedName) return `${imp} - @${resolvedName}`;
+            return imp;
+          })
+        );
       }
 
       try {
@@ -1116,6 +1090,20 @@ export default {
         this.nonce = header.nonce;
         this.payer = header.payer;
         this.payee = header.payee || "";
+
+        const nicknamesAbi = await this._getAbi(
+          this.networkTag,
+          this.network.nicknamesContractId
+        );
+        this.nicknames = new Contract({
+          id: this.network.nicknamesContractId,
+          abi: nicknamesAbi,
+          provider: this.provider,
+          serializer: await this.newSandboxSerializer(
+            nicknamesAbi.koilib_types
+          ),
+        }).functions;
+
         if (this.request.args.signerAddress) {
           this.addSigner(this.request.args.signerAddress);
         } else {
