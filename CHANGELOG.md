@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
-## [v0.8.1](https://github.com/joticajulian/kondor/releases/tag/v0.8.0) (2023-08-06)
+## [v0.8.2](https://github.com/joticajulian/kondor/releases/tag/v0.8.2) (2023-10-22)
+
+### 🚀 Features
+
+- Support Nicknames in mainnet and harbinger
+
+## [v0.8.1](https://github.com/joticajulian/kondor/releases/tag/v0.8.1) (2023-08-06)
 
 ### 🚀 Features
 
