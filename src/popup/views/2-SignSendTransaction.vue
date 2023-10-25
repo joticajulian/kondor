@@ -890,6 +890,7 @@ export default {
     },
 
     async resolveAddress(address) {
+      if (!address) return "";
       const { result } = await this.nicknames.get_tokens_by_owner({
         owner: address,
         limit: 1,
