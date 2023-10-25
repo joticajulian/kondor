@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.8.3](https://github.com/joticajulian/kondor/releases/tag/v0.8.3) (2023-10-26)
+
+### 🐛 Bug Fixes
+
+- Fix bug trap when checking nicknames
+
 ## [v0.8.2](https://github.com/joticajulian/kondor/releases/tag/v0.8.2) (2023-10-22)
 
 ### 🚀 Features
