@@ -9,6 +9,33 @@
       "read_only": true,
       "read-only": true
     },
+    "get_community_tokens": {
+      "argument": "nft.get_tokens_args",
+      "return": "nft.token_ids",
+      "description": "Get community tokens",
+      "entry_point": 1237153485,
+      "entry-point": "0x49bd76cd",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_tabi": {
+      "argument": "nft.token",
+      "return": "nicknames.tabi",
+      "description": "Get TABI",
+      "entry_point": 1698453016,
+      "entry-point": "0x653c5618",
+      "read_only": true,
+      "read-only": true
+    },
+    "get_main_token": {
+      "argument": "common.address",
+      "return": "nft.token",
+      "description": "Get main token of an account",
+      "entry_point": 1053665215,
+      "entry-point": "0x3ecda7bf",
+      "read_only": true,
+      "read-only": true
+    },
     "mint": {
       "argument": "nft.mint_args",
       "return": "",
@@ -63,12 +90,12 @@
       "read_only": false,
       "read-only": false
     },
-    "set_name_in_dispute": {
+    "set_main_token": {
       "argument": "nft.token",
       "return": "",
-      "description": "Set name in dispute",
-      "entry_point": 2614384615,
-      "entry-point": "0x9bd457e7",
+      "description": "Set main token",
+      "entry_point": 191552998,
+      "entry-point": "0x0b6adde6",
       "read_only": false,
       "read-only": false
     },
@@ -333,7 +360,9 @@
             }
           },
           "_btype": {
-            "oneof": ["btype"]
+            "oneof": [
+              "btype"
+            ]
           },
           "btype": {
             "type": "bytes_type",
