@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.8.4](https://github.com/joticajulian/kondor/releases/tag/v0.8.3) (2023-10-30)
+
+### 🐛 Bug Fixes
+
+- Update ABI of Nicknames
+
 ## [v0.8.3](https://github.com/joticajulian/kondor/releases/tag/v0.8.3) (2023-10-26)
 
 ### 🐛 Bug Fixes
