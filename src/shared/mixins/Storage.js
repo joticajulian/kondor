@@ -144,6 +144,44 @@ export default {
       return storage.getNetworks(strict);
     },
 
+    async _setTokens(tokens) {
+      return this._write("tokens", tokens);
+    },
+
+    async _getTokens(strict = false) {
+      let tokens = await this._read("tokens", strict);
+      if (!tokens) {
+        tokens = [
+          {
+            nickname: "koin",
+            symbol: "KOIN",
+            decimals: 8,
+            /*
+          // Contract ID (in case nickname is not defined)
+          contractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+
+          // Load the token for a specific list of networks
+          // Default: all networks
+          networks: ["mainnet"],
+
+          // Load the token for a specific list of addresses
+          // Default: all addresses
+          addresses: [],
+
+          // Exceptions to the previous rule
+          noAddresses: [],
+          */
+          },
+          {
+            nickname: "vhp",
+            symbol: "VHP",
+            decimals: 8,
+          },
+        ];
+      }
+      return tokens;
+    },
+
     async _setAbi(network, contractId, abi) {
       return this._write(`${network}-${contractId}`, abi);
     },
