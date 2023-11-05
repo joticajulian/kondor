@@ -360,9 +360,7 @@
             }
           },
           "_btype": {
-            "oneof": [
-              "btype"
-            ]
+            "oneof": ["btype"]
           },
           "btype": {
             "type": "bytes_type",
