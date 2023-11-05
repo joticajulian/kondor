@@ -6,8 +6,8 @@
           <img :src="tokenImage">
         </div>
         <div class="amount">
-          <div>
-            <span class="balance">{{ balance }}</span>
+          <div :data-tooltip="balanceWithSymbol">
+            <span class="balance">{{ balanceFormatted }}</span>
             <span class="token-symbol">{{ tokenSymbol }}</span>
           </div>
           <div class="usd">
@@ -22,7 +22,7 @@
     </div>
     <div class="other-tokens">
       <div
-        v-for="(miniToken, i) in otherTokens"
+        v-for="(miniToken, i) in miniTokens"
         :key="i"
         class="mini-token"
         :data-tooltip="miniToken.balanceWithSymbol"
@@ -94,7 +94,7 @@ export default {
       tokenId: "",
       tokenImage: koinLogo,
       tokenSymbol: "KOIN",
-      otherTokens: [
+      miniTokens: [
         {
           image: koinLogo,
           nickname: "koin",
@@ -128,6 +128,7 @@ export default {
       ],
       address: "loading ",
       balance: "loading...",
+      balanceWithSymbol: "",
       balanceUSD: "$0 USD",
       signer: null,
       provider: null,
@@ -138,6 +139,14 @@ export default {
       watchMode: false,
       manaPercent: 1,
     };
+  },
+
+  computed: {
+    balanceFormatted() {
+      if (this.balance.startsWith("loading")) return this.balance;
+      const balanceNumber = Number(this.balance) || 0;
+      return balanceNumber.toLocaleString("en");
+    },
   },
 
   watch: {
@@ -223,7 +232,7 @@ export default {
         try {
           const balanceSatoshisNumber = Number(balanceSatoshis);
           const rc = await this.provider.getAccountRc(this.address);
-          const initialMana = Number(rc) / 1e8;
+          const initialMana = Number(rc);
           const lastUpdateMana = Date.now();
 
           const updateMana = () => {
@@ -257,76 +266,81 @@ export default {
 
     async loadTokens() {
       const t = await this._getTokens();
-      const tokens = [];
-      await Promise.all(
-        t.forEach(async (token) => {
-          // check network of token
-          if (token.networks) {
-            if (!token.networks.includes(this.network.tag)) {
-              return;
-            }
-          }
-
-          // check current address
-          if (token.addresses) {
-            if (!token.addresses.includes(this.address)) {
-              return;
-            }
-          }
-          if (token.noAddresses) {
-            if (token.noAddresses.includes(this.address)) {
-              return;
-            }
-          }
-
-          // resolve contract ID
-          if (!token.contractId || !token.nickname) {
-            return;
-          }
-
-          if (token.nickname) {
-            const tokenId = `0x${utils.toHexString(
-              new TextEncoder().encode(token.nickname)
-            )}`;
-            const { result: resultOwner } = await this.nicknames.owner_of({
-              token_id: tokenId,
-            });
-            if (!resultOwner || !resultOwner.account) {
-              return;
-            }
-            token.contractId = resultOwner.account;
-
-            const { result: resultMetadata } = await this.nicknames.metadata_of(
-              {
-                token_id: tokenId,
+      const tokens = (
+        await Promise.all(
+          t.map(async (token) => {
+            // check network of token
+            if (token.networks) {
+              if (!token.networks.includes(this.network.tag)) {
+                return {};
               }
-            );
-
-            token.image = "";
-            try {
-              const metadata = JSON.parse(resultMetadata.value);
-              token.image = metadata.image || "";
-            } catch (error) {
-              console.error(
-                `error when loading metadata of token @${token.nickname}`
-              );
-              console.error(error);
-              return;
             }
-          }
 
-          const balance = await this.loadTokenBalance(token);
+            // check current address
+            if (token.addresses) {
+              if (!token.addresses.includes(this.address)) {
+                return {};
+              }
+            }
+            if (token.noAddresses) {
+              if (token.noAddresses.includes(this.address)) {
+                return {};
+              }
+            }
 
-          tokens.push({
-            ...token,
-            ...balance,
-          });
-        })
-      );
+            // resolve contract ID
+            if (!token.contractId && !token.nickname) {
+              return {};
+            }
+
+            if (token.nickname) {
+              const tokenId = `0x${utils.toHexString(
+                new TextEncoder().encode(token.nickname)
+              )}`;
+              const { result: resultOwner } = await this.nicknames.owner_of({
+                token_id: tokenId,
+              });
+              if (!resultOwner || !resultOwner.account) {
+                return {};
+              }
+              token.contractId = resultOwner.account;
+
+              const { result: resultMetadata } =
+                await this.nicknames.metadata_of({
+                  token_id: tokenId,
+                });
+
+              token.image = "";
+              try {
+                const metadata = JSON.parse(resultMetadata.value);
+                token.image = metadata.image || "";
+              } catch (error) {
+                console.error(
+                  `error when loading metadata of token @${token.nickname}`
+                );
+                console.error(error);
+                token.image = koinLogo;
+              }
+            }
+
+            const balance = await this.loadTokenBalance(token);
+
+            return {
+              ...token,
+              ...balance,
+            };
+          })
+        )
+      ).filter((token) => !!token.contractId);
       return tokens;
     },
 
     async loadAccount(index) {
+      this.tokenImage = "";
+      this.tokenSymbol = "";
+      this.balanceWithSymbol = "";
+      this.balance = "loading";
+
       if (this.$store.state.accounts.length === 0) return;
       try {
         const currentAccount = this.$store.state.accounts[index];
@@ -339,24 +353,34 @@ export default {
         } else {
           this.watchMode = true;
         }
+
+        this.miniTokens = await this.loadTokens();
+
+        let mainTokenIndex = this.miniTokens.findIndex(
+          (t) => t.contractId === this.tokenId
+        );
+        if (mainTokenIndex < 0) mainTokenIndex = 0;
+
+        if (this.miniTokens.length === 0) {
+          throw new Error("0 tokens loaded");
+        }
+
+        const mainToken = this.miniTokens[mainTokenIndex];
+        this.tokenId = mainToken.contractId;
+        this.tokenImage = mainToken.image;
+        this.tokenSymbol = mainToken.symbol;
+        this.balance = mainToken.balance;
+        this.balanceWithSymbol = mainToken.balanceWithSymbol;
       } catch (error) {
+        this.tokenId = "";
+        this.tokenImage = "";
+        this.tokenSymbol = "";
+        this.balanceWithSymbol = "";
+        this.balance = "Error";
+
         this.alertDanger(error.message);
         throw error;
       }
-
-      const tokens = await this.loadTokens();
-
-      let mainTokenIndex = tokens.findIndex(
-        (t) => t.contractId === this.tokenId
-      );
-      if (mainTokenIndex < 0) mainTokenIndex = 0;
-
-      const [mainToken] = tokens.splice(mainTokenIndex, 1);
-      this.tokenId = mainToken.contractId;
-      this.tokenImage = mainToken.image;
-      this.tokenSymbol = mainToken.symbol;
-      this.balance = mainToken.balance;
-      this.otherTokens = tokens;
     },
 
     async loadToken(t) {
@@ -364,6 +388,7 @@ export default {
       this.tokenImage = t.image;
       this.tokenSymbol = t.symbol;
       this.balance = t.balance;
+      this.balanceWithSymbol = t.balanceWithSymbol;
     },
 
     clickBuy() {
