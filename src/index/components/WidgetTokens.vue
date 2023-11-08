@@ -93,39 +93,8 @@ export default {
       tokenId: "",
       tokenImage: koinLogo,
       tokenSymbol: "KOIN",
-      miniTokens: [
-        {
-          image: koinLogo,
-          nickname: "koin",
-          symbol: "KOIN",
-          decimals: 8,
-          balance: "200",
-          balanceSatoshis: "200000",
-          balanceWithSymbol: "200 KOIN",
-          balanceUSD: "$0 USD",
-        },
-        {
-          image: koinLogo,
-          nickname: "vhp",
-          symbol: "VHP",
-          decimals: 8,
-          balance: "300",
-          balanceSatoshis: "30000000",
-          balanceWithSymbol: "300 VHP",
-          balanceUSD: "$0 USD",
-        },
-        {
-          image: koinLogo,
-          nickname: "eth",
-          symbol: "ETH",
-          decimals: 18,
-          balance: "0.45",
-          balanceSatoshis: "45",
-          balanceWithSymbol: "0.45 ETH",
-          balanceUSD: "$0 USD",
-        },
-      ],
-      address: "loading ",
+      miniTokens: [],
+      address: "loading",
       balance: "loading...",
       balanceWithSymbol: "",
       balanceUSD: "$0 USD",
@@ -346,7 +315,10 @@ export default {
             ...balance,
           });
 
-          if (!this.tokenId || token.contractId === this.tokenId) {
+          if (
+            (!this.tokenId && token.nickname === "koin") ||
+            token.contractId === this.tokenId
+          ) {
             this.tokenId = token.contractId;
             this.tokenImage = token.image;
             this.tokenSymbol = token.symbol;
