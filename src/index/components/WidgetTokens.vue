@@ -2,7 +2,10 @@
   <div class="column">
     <div class="row">
       <div class="token">
-        <div class="token-image">
+        <div
+          class="token-image"
+          :data-tooltip="'@' + tokenName"
+        >
           <img :src="tokenImage">
         </div>
         <div class="amount">
@@ -61,9 +64,6 @@ import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 
-// logos
-import koinLogo from "@/shared/assets/logo.png";
-
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function deltaTimeToString(milliseconds) {
@@ -91,19 +91,19 @@ export default {
   data() {
     return {
       tokenId: "",
-      tokenImage: koinLogo,
-      tokenSymbol: "KOIN",
+      tokenName: "",
+      tokenImage: "",
+      tokenSymbol: "",
       miniTokens: [],
-      address: "loading",
-      balance: "loading...",
+      address: "",
+      balance: "",
       balanceWithSymbol: "",
-      balanceUSD: "$0 USD",
+      balanceUSD: "",
       signer: null,
       provider: null,
       serializer: null,
-      nicknames: null,
       intervalMana: null,
-      timeRechargeMana: "loading...",
+      timeRechargeMana: "",
       watchMode: false,
       manaPercent: 1,
     };
@@ -111,7 +111,7 @@ export default {
 
   computed: {
     balanceFormatted() {
-      if (this.balance.startsWith("loading")) return this.balance;
+      if (!this.balance) return this.balance;
       const balanceNumber = Number(this.balance) || 0;
       if (Number.isNaN(balanceNumber)) return `Error ${balanceNumber}`;
       return balanceNumber.toLocaleString("en");
@@ -122,16 +122,28 @@ export default {
     "$store.state.currentIndexAccount": function () {
       this.loadAccount(this.$store.state.currentIndexAccount);
     },
-    "$store.state.currentNetwork": function () {
+    "$store.state.currentNetwork": async function () {
+      await this.loadNetwork();
+      this.tokenId = "";
       this.loadAccount(this.$store.state.currentIndexAccount);
     },
   },
 
   async mounted() {
+    this.serializer = await this.newSandboxSerializer(
+      utils.tokenAbi.koilib_types
+    );
     await this.loadNetwork();
-    const index = await this._getCurrentIndexAccount();
-    this.$store.state.currentIndexAccount = index ? index : 0;
-    await this.loadAccount(this.$store.state.currentIndexAccount);
+    let index = await this._getCurrentIndexAccount();
+    if (Number.isNaN(Number(index))) index = 0;
+    if (index === this.$store.state.currentIndexAccount) {
+      await this.loadAccount(this.$store.state.currentIndexAccount);
+    } else {
+      this.$store.state.currentIndexAccount = index;
+      // the change will trigger the watch function which will
+      // call this.loadAccount
+    }
+    await this.updateSavedTokens();
   },
 
   methods: {
@@ -145,21 +157,6 @@ export default {
         this.network =
           this.$store.state.networks[this.$store.state.currentNetwork];
         this.provider = new Provider(this.network.rpcNodes);
-        this.serializer = await this.newSandboxSerializer(
-          utils.tokenAbi.koilib_types
-        );
-        const nicknamesAbi = await this._getAbi(
-          this.network.tag,
-          this.network.nicknamesContractId
-        );
-        this.nicknames = new Contract({
-          id: this.network.nicknamesContractId,
-          abi: nicknamesAbi,
-          provider: this.provider,
-          serializer: await this.newSandboxSerializer(
-            nicknamesAbi.koilib_types
-          ),
-        }).functions;
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
@@ -247,6 +244,73 @@ export default {
       };
     },
 
+    async updateSavedTokens() {
+      let tokens = await this._getTokens();
+
+      tokens = await Promise.all(
+        tokens.map(async (token) => {
+          if (!token.nickname) return token;
+
+          const networkId = this.$store.state.networks.findIndex(
+            (n) => n.tag === token.network
+          );
+          const network = this.$store.state.networks[networkId];
+          const provider = new Provider(network.rpcNodes);
+
+          const nicknamesAbi = await this._getAbi(
+            token.network,
+            network.nicknamesContractId
+          );
+
+          const nicknames = new Contract({
+            id: network.nicknamesContractId,
+            abi: nicknamesAbi,
+            provider,
+            serializer: await this.newSandboxSerializer(
+              nicknamesAbi.koilib_types
+            ),
+          }).functions;
+
+          const tokenId = `0x${utils.toHexString(
+            new TextEncoder().encode(token.nickname)
+          )}`;
+
+          try {
+            const { result: resultOwner } = await nicknames.owner_of({
+              token_id: tokenId,
+            });
+            if (!resultOwner || !resultOwner.account) {
+              return {};
+            }
+            token.contractId = resultOwner.account;
+          } catch (error) {
+            console.error(
+              `error when loading contract id of @${token.nickname}`
+            );
+            console.error(error);
+            return token;
+          }
+
+          try {
+            const { result: resultMetadata } = await nicknames.metadata_of({
+              token_id: tokenId,
+            });
+            const metadata = JSON.parse(resultMetadata.value);
+            if (metadata.image) token.image = metadata.image;
+          } catch (error) {
+            console.error(
+              `error when loading metadata of token @${token.nickname}`
+            );
+            console.error(error);
+          }
+
+          return token;
+        })
+      );
+
+      await this._setTokens(tokens);
+    },
+
     async loadTokens() {
       const t = await this._getTokens();
       this.miniTokens = [];
@@ -254,10 +318,8 @@ export default {
       await Promise.all(
         t.map(async (token) => {
           // check network of token
-          if (token.networks) {
-            if (!token.networks.includes(this.network.tag)) {
-              return {};
-            }
+          if (token.network !== this.network.tag) {
+            return {};
           }
 
           // check current address
@@ -272,59 +334,27 @@ export default {
             }
           }
 
-          // resolve contract ID
-          if (!token.contractId && !token.nickname) {
-            return {};
-          }
-
-          if (token.nickname) {
-            const tokenId = `0x${utils.toHexString(
-              new TextEncoder().encode(token.nickname)
-            )}`;
-            const { result: resultOwner } = await this.nicknames.owner_of({
-              token_id: tokenId,
-            });
-            if (!resultOwner || !resultOwner.account) {
-              return {};
-            }
-            token.contractId = resultOwner.account;
-
-            const { result: resultMetadata } = await this.nicknames.metadata_of(
-              {
-                token_id: tokenId,
-              }
-            );
-
-            token.image = "";
-            try {
-              const metadata = JSON.parse(resultMetadata.value);
-              token.image = metadata.image || "";
-            } catch (error) {
-              console.error(
-                `error when loading metadata of token @${token.nickname}`
-              );
-              console.error(error);
-              token.image = koinLogo;
-            }
-          }
-
           const balance = await this.loadTokenBalance(token);
-
-          this.miniTokens.push({
-            ...token,
-            ...balance,
-          });
 
           if (
             (!this.tokenId && token.nickname === "koin") ||
             token.contractId === this.tokenId
           ) {
             this.tokenId = token.contractId;
+            this.tokenName = token.nickname;
             this.tokenImage = token.image;
             this.tokenSymbol = token.symbol;
             this.balance = balance.balance;
             this.balanceWithSymbol = balance.balanceWithSymbol;
           }
+
+          if (this.miniTokens.find((m) => m.contractId === token.contractId))
+            return {};
+
+          this.miniTokens.push({
+            ...token,
+            ...balance,
+          });
 
           return {};
         })
@@ -340,10 +370,11 @@ export default {
     },
 
     async loadAccount(index) {
+      this.tokenName = "";
       this.tokenImage = "";
       this.tokenSymbol = "";
       this.balanceWithSymbol = "";
-      this.balance = "loading";
+      this.balance = "";
 
       if (this.$store.state.accounts.length === 0) return;
       try {
@@ -360,9 +391,6 @@ export default {
         await this.loadTokens();
       } catch (error) {
         this.tokenId = "";
-        this.tokenImage = "";
-        this.tokenSymbol = "";
-        this.balanceWithSymbol = "";
         this.balance = "Error";
 
         this.alertDanger(error.message);
@@ -372,6 +400,7 @@ export default {
 
     async loadToken(t) {
       this.tokenId = t.contractId;
+      this.tokenName = t.nickname;
       this.tokenImage = t.image;
       this.tokenSymbol = t.symbol;
       this.balance = t.balance;
