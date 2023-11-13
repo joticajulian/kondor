@@ -1,5 +1,16 @@
 <template>
   <div class="transfer container">
+    <div class="token">
+      <label>Token</label>
+      <select name="select-token" id="select-token" v-model="tokenId2">
+        <option v-for="token in miniTokens"
+          :key="token.contractId"
+          :value="token.contractId"
+        >{{ 
+          token.nickname ? `@${token.nickname}` : token.contractId
+        }}</option>
+      </select>
+    </div>
     <div class="send-to">
       <label>Send to</label>
       <input
@@ -110,11 +121,14 @@
   </div>
 </template>
 <script>
+import axios from "axios";
 import router from "@/index/router";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
 import { Contract, Provider, Signer, utils } from "koilib";
+
+const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 function fromUtf8ToHex(text) {
   return utils.toHexString(new TextEncoder().encode(text));
@@ -123,17 +137,26 @@ function fromUtf8ToHex(text) {
 export default {
   mixins: [Storage, Sandbox, ViewHelper],
 
+  props: {
+    tokenId: {
+      type: String,
+      default: "",
+    },
+  },
+
   data() {
     return {
       address: "loading ",
       balance: "0",
       signer: null,
       provider: null,
+      serializer: null,
       koinContract: null,
       koin: null,
       to: "",
       amount: "0",
       mana: "",
+      miniTokens: [],
       isToValid: false,
       isAmountValid: true,
       isToValidating: false,
@@ -147,6 +170,7 @@ export default {
       network: null,
       kapNameService: null,
       nicknames: null,
+      tokenId2: "",
     };
   },
 
@@ -154,7 +178,8 @@ export default {
     "$store.state.currentIndexAccount": function () {
       this.loadAccount(this.$store.state.currentIndexAccount);
     },
-    "$store.state.currentNetwork": function () {
+    "$store.state.currentNetwork": async function () {
+      await this.loadNetwork();
       this.loadAccount(this.$store.state.currentIndexAccount);
     },
   },
@@ -164,11 +189,236 @@ export default {
     this.validateAmountDebounced = this.debounce(this.validateAmount);
   },
 
-  mounted() {
-    this.loadAccount(this.$store.state.currentIndexAccount);
+  async mounted() {
+    this.tokenId2 = this.tokenId;
+    this.serializer = await this.newSandboxSerializer(
+      utils.tokenAbi.koilib_types
+    );
+    await this.loadNetwork();
+    let index = await this._getCurrentIndexAccount();
+    if (Number.isNaN(Number(index))) index = 0;
+    if (index === this.$store.state.currentIndexAccount) {
+      await this.loadAccount(this.$store.state.currentIndexAccount);
+    } else {
+      this.$store.state.currentIndexAccount = index;
+      // the change will trigger the watch function which will
+      // call this.loadAccount
+    }
   },
 
   methods: {
+    async loadNetwork() {
+      try {
+        this.$store.state.networks = await this._getNetworks();
+        const currentTag = await this._getCurrentNetwork();
+        this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
+          (n) => n.tag === currentTag
+        );
+        this.network =
+          this.$store.state.networks[this.$store.state.currentNetwork];
+        this.provider = new Provider(this.network.rpcNodes);
+
+        // load nicknames contract
+        if (this.network.nicknamesContractId) {
+          const nicknamesAbi = await this._getAbi(
+            this.network.tag,
+            this.network.nicknamesContractId
+          );
+          this.nicknames = new Contract({
+            id: this.network.nicknamesContractId,
+            abi: nicknamesAbi,
+            provider: this.provider,
+            serializer: await this.newSandboxSerializer(
+              nicknamesAbi.koilib_types
+            ),
+          }).functions;
+        }
+
+        // load kap contract
+        if (this.network.kapNameServiceContractId) {
+          const kapAbi = await this._getAbi(
+            this.network.tag,
+            this.network.kapNameServiceContractId
+          );
+          this.kapNameServiceContract = new Contract({
+            id: this.network.kapNameServiceContractId,
+            abi: kapAbi,
+            provider: this.provider,
+            serializer: await this.newSandboxSerializer(kapAbi.koilib_types),
+          });
+          this.kapNameService = this.kapNameServiceContract.functions;
+        }
+      } catch (error) {
+        this.alertDanger(error.message);
+        throw error;
+      }
+    },
+
+    async loadTokenBalance(t) {
+      const contract = new Contract({
+        id: t.contractId,
+        abi: utils.tokenAbi,
+        provider: this.provider,
+        serializer: this.serializer,
+      });
+
+      let balanceSatoshis;
+      let balance;
+      try {
+        const { result } = await contract.functions.balanceOf({
+          owner: this.address,
+        });
+        balanceSatoshis = result.value;
+        balance = utils.formatUnits(balanceSatoshis, t.decimals);
+      } catch (error) {
+        console.error(`error while loading the balance of @${t.nickname}`);
+        console.error(error);
+        return {
+          balanceSatoshis: "Error",
+          balance: "Error",
+          balanceWithSymbol: "Error",
+          balanceUSD: "Error",
+        };
+      }
+
+      // load USD balance
+      let balanceUSD = "$0 USD";
+      if (this.network.tag === "mainnet" && t.nickname === "koin") {
+        try {
+          const response = await axios.get(
+            "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
+          );
+          const price = Number(response.data.data[0].last);
+          const balanceSatoshisNumber = Number(balanceSatoshis);
+          balanceUSD = `$${(balanceSatoshisNumber * price).toFixed(2)} USD`;
+        } catch (error) {
+          console.error("Error when loading price from MEXC");
+          console.error(error);
+          balanceUSD = "USD Error";
+        }
+      }
+
+      if (t.nickname === "koin") {
+        // load mana
+        try {
+          const balanceSatoshisNumber = Number(balanceSatoshis);
+          const rc = await this.provider.getAccountRc(this.address);
+          const initialMana = Number(rc);
+          const lastUpdateMana = Date.now();
+          const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
+          let mana =
+            initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS;
+          mana = Math.min(mana, balanceSatoshisNumber);
+        } catch (error) {
+          console.error("error when loading mana");
+          console.error(error);
+        }
+      }
+
+      return {
+        balanceSatoshis,
+        balance,
+        balanceWithSymbol: `${balance} ${t.symbol}`,
+        balanceUSD,
+      };
+    },
+
+    async loadTokens() {
+      const t = await this._getTokens();
+      this.miniTokens = [];
+
+      await Promise.all(
+        t.map(async (token) => {
+          // check network of token
+          if (token.network !== this.network.tag) {
+            return {};
+          }
+
+          // check current address
+          if (token.addresses) {
+            if (!token.addresses.includes(this.address)) {
+              return {};
+            }
+          }
+          if (token.noAddresses) {
+            if (token.noAddresses.includes(this.address)) {
+              return {};
+            }
+          }
+
+          const balance = await this.loadTokenBalance(token);
+
+          if (
+            (!this.tokenId2 && token.nickname === "koin") ||
+            token.contractId === this.tokenId2
+          ) {
+            this.tokenId2 = token.contractId;
+            this.tokenName = token.nickname;
+            this.tokenImage = token.image;
+            this.tokenSymbol = token.symbol;
+            this.balance = balance.balance;
+            this.balanceWithSymbol = balance.balanceWithSymbol;
+          }
+
+          if (this.miniTokens.find((m) => m.contractId === token.contractId))
+            return {};
+
+          this.miniTokens.push({
+            ...token,
+            ...balance,
+          });
+
+          return {};
+        })
+      );
+
+      this.miniTokens.sort((a, b) => {
+        const idA = t.findIndex((tt) => tt.contractId === a.contractId);
+        const idB = t.findIndex((tt) => tt.contractId === b.contractId);
+        if (idA > idB) return 1;
+        if (idA < idB) return -1;
+        return 0;
+      });
+    },
+
+    async loadAccount(index) {
+      this.tokenName = "";
+      this.tokenImage = "";
+      this.tokenSymbol = "";
+      this.balanceWithSymbol = "";
+      this.balance = "";
+
+      if (this.$store.state.accounts.length === 0) return;
+      try {
+        const currentAccount = this.$store.state.accounts[index];
+        this.address = currentAccount.address;
+        this.signer = undefined;
+        if (currentAccount.privateKey) {
+          this.signer = Signer.fromWif(currentAccount.privateKey, true);
+          this.signer.provider = this.provider;
+          this.watchMode = false;
+        } else {
+          this.watchMode = true;
+        }
+        await this.loadTokens();
+      } catch (error) {
+        this.tokenId2 = "";
+        this.balance = "Error";
+
+        this.alertDanger(error.message);
+        throw error;
+      }
+    },
+
+    async loadToken(t) {
+      this.tokenId2 = t.contractId;
+      this.tokenName = t.nickname;
+      this.tokenImage = t.image;
+      this.tokenSymbol = t.symbol;
+      this.balance = t.balance;
+      this.balanceWithSymbol = t.balanceWithSymbol;
+    },
+
     setMaxAmount() {
       this.amount = this.balance;
     },
@@ -252,76 +502,6 @@ export default {
         this.balance >= amount;
     },
 
-    async loadAccount(index) {
-      if (this.$store.state.accounts.length === 0) return;
-      try {
-        this.$store.state.networks = await this._getNetworks();
-        const currentTag = await this._getCurrentNetwork();
-        this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
-          (n) => n.tag === currentTag
-        );
-        this.network =
-          this.$store.state.networks[this.$store.state.currentNetwork];
-        this.provider = new Provider(this.network.rpcNodes);
-        const currentAccount = this.$store.state.accounts[index];
-        this.address = currentAccount.address;
-        this.payer = currentAccount.address;
-        this.signer = undefined;
-        if (currentAccount.privateKey) {
-          this.signer = Signer.fromWif(currentAccount.privateKey, true);
-          this.signer.provider = this.provider;
-        } else {
-          router.back();
-        }
-
-        this.koinContract = new Contract({
-          id: this.network.koinContractId,
-          abi: utils.tokenAbi,
-          provider: this.provider,
-          signer: this.signer,
-          serializer: await this.newSandboxSerializer(
-            utils.tokenAbi.koilib_types
-          ),
-        });
-        this.koin = this.koinContract.functions;
-
-        // load nicknames contract
-        if (this.network.nicknamesContractId) {
-          const nicknamesAbi = await this._getAbi(
-            this.network.tag,
-            this.network.nicknamesContractId
-          );
-          this.nicknames = new Contract({
-            id: this.network.nicknamesContractId,
-            abi: nicknamesAbi,
-            provider: this.provider,
-            serializer: await this.newSandboxSerializer(
-              nicknamesAbi.koilib_types
-            ),
-          }).functions;
-        }
-
-        // load kap contract
-        if (this.network.kapNameServiceContractId) {
-          const kapAbi = await this._getAbi(
-            this.network.tag,
-            this.network.kapNameServiceContractId
-          );
-          this.kapNameServiceContract = new Contract({
-            id: this.network.kapNameServiceContractId,
-            abi: kapAbi,
-            provider: this.provider,
-            serializer: await this.newSandboxSerializer(kapAbi.koilib_types),
-          });
-          this.kapNameService = this.kapNameServiceContract.functions;
-        }
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
-      await this.loadBalance();
-    },
-
     async loadBalance() {
       try {
         const { result } = await this.koin.balanceOf({ owner: this.address });
@@ -384,6 +564,16 @@ export default {
 
 .container > * {
   width: 100%;
+}
+
+.token {
+  margin-bottom: 1em;
+}
+
+.token select {
+  width: 100%;
+  max-width: unset;
+  padding: 8px;
 }
 
 .actions {
