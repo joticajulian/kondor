@@ -2,13 +2,18 @@
   <div class="transfer container">
     <div class="token">
       <label>Token</label>
-      <select name="select-token" id="select-token" v-model="tokenId2">
-        <option v-for="token in miniTokens"
+      <select
+        id="select-token"
+        v-model="tokenId2"
+        name="select-token"
+      >
+        <option
+          v-for="token in miniTokens"
           :key="token.contractId"
           :value="token.contractId"
-        >{{ 
-          token.nickname ? `@${token.nickname}` : token.contractId
-        }}</option>
+        >
+          {{ token.nickname ? `@${token.nickname}` : token.contractId }}
+        </option>
       </select>
     </div>
     <div class="send-to">
@@ -63,7 +68,7 @@
       <a
         class="balance"
         @click="setMaxAmount()"
-      >Max: {{ balance }} KOIN</a>
+      >Max: {{ balanceWithSymbol }}</a>
       <a
         class="advanced-toggle"
         @click="toggleAdvanced()"
@@ -146,13 +151,12 @@ export default {
 
   data() {
     return {
-      address: "loading ",
-      balance: "0",
+      address: "",
+      balance: "",
+      balanceWithSymbol: "",
       signer: null,
       provider: null,
       serializer: null,
-      koinContract: null,
-      koin: null,
       to: "",
       amount: "0",
       mana: "",
@@ -181,6 +185,10 @@ export default {
     "$store.state.currentNetwork": async function () {
       await this.loadNetwork();
       this.loadAccount(this.$store.state.currentIndexAccount);
+    },
+    tokenId2: function (newVal) {
+      const token = this.miniTokens.find((t) => t.contractId === newVal);
+      this.loadToken(token);
     },
   },
 
@@ -306,9 +314,10 @@ export default {
           const initialMana = Number(rc);
           const lastUpdateMana = Date.now();
           const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
-          let mana =
-            initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS;
+          let mana = initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS;
           mana = Math.min(mana, balanceSatoshisNumber);
+          this.mana = Number(mana.toString()) / 1e8;
+          this.maxMana = Math.min(10, this.mana);
         } catch (error) {
           console.error("error when loading mana");
           console.error(error);
@@ -502,24 +511,16 @@ export default {
         this.balance >= amount;
     },
 
-    async loadBalance() {
-      try {
-        const { result } = await this.koin.balanceOf({ owner: this.address });
-        this.balance = utils.formatUnits(result.value, 8).toLocaleString("en");
-        const rc = await this.provider.getAccountRc(this.address);
-        const initialMana = Number(rc) / 1e8;
-        this.mana = Number(initialMana.toFixed(8));
-        this.maxMana = Math.min(10, this.mana);
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
-    },
-
     async transfer() {
-      let interval;
       try {
-        const { transaction, receipt } = await this.koin.transfer(
+        const contract = new Contract({
+          id: this.tokenId2,
+          abi: utils.tokenAbi,
+          provider: this.provider,
+          signer: this.signer,
+          serializer: this.serializer,
+        }).functions;
+        const { transaction, receipt } = await contract.transfer(
           {
             from: this.address,
             to: this.resolvedAddress || this.to,
@@ -534,18 +535,11 @@ export default {
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
         console.log(receipt);
-        if (receipt.logs) throw new Error(`Error: ${receipt.logs.join(", ")}`);
-        interval = setInterval(() => {
-          console.log("firing interval");
-          this.loadBalance();
-        }, 2000);
         const { blockNumber } = await transaction.wait("byBlock", 60_000);
-        clearInterval(interval);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
         router.push("/dashboard");
       } catch (error) {
-        clearInterval(interval);
         this.alertDanger(error.message);
         throw error;
       }
