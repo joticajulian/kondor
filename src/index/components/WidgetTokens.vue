@@ -412,7 +412,7 @@ export default {
     },
 
     clickSend() {
-      router.push("/send");
+      router.push(`/send?tokenId=${this.tokenId}`);
     },
 
     clickSwap() {

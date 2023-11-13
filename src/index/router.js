@@ -77,6 +77,7 @@ export default new Router({
       path: "/send",
       name: "Send KOIN",
       component: Send,
+      props: () => ({ tokenId: "" }),
     },
     {
       path: "/swap",
