@@ -40,14 +40,11 @@
       <button @click="clickBuy()">
         <span class="material-icons">add</span><span>Buy</span>
       </button>
-      <button @click="clickSend()">
+      <button @click="sendToken()">
         <span class="material-icons">arrow_outward</span><span>Send</span>
       </button>
-      <button
-        disabled
-        @click="clickSwap()"
-      >
-        <span class="material-icons">swap_horiz</span><span>Swap</span>
+      <button @click="tokenSettings()">
+        <span class="material-icons">settings</span><span>Settings</span>
       </button>
     </div>
   </div>
@@ -411,12 +408,12 @@ export default {
       router.push("/buy");
     },
 
-    clickSend() {
-      router.push(`/send?tokenId=${this.tokenId}`);
+    sendToken() {
+      router.push(`/tokens/send?tokenId=${this.tokenId}`);
     },
 
-    clickSwap() {
-      router.push("/swap");
+    tokenSettings() {
+      router.push("/tokens/settings");
     },
   },
 };
