@@ -11,8 +11,9 @@ import Signers from "./views/5-Signers.vue";
 import CreateAccount from "./views/setting-CreateAccount";
 import ImportAccount from "./views/setting-ImportAccount";
 import Buy from "./views/action-Buy";
-import Send from "./views/action-Send";
-import Swap from "./views/action-Swap";
+import SendToken from "./views/tokens/SendToken";
+import TokenSettings from "./views/tokens/Settings";
+import AddToken from "./views/tokens/AddToken";
 
 Vue.use(Router);
 
@@ -74,15 +75,20 @@ export default new Router({
       component: Buy,
     },
     {
-      path: "/send",
-      name: "Send KOIN",
-      component: Send,
+      path: "/tokens/send",
+      name: "Send Token",
+      component: SendToken,
       props: () => ({ tokenId: "" }),
     },
     {
-      path: "/swap",
-      name: "Swap KOIN",
-      component: Swap,
+      path: "/tokens/add",
+      name: "Add Token",
+      component: AddToken,
+    },
+    {
+      path: "/tokens/settings",
+      name: "Token Settings",
+      component: TokenSettings,
     },
   ],
 });
