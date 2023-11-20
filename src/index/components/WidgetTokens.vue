@@ -320,12 +320,12 @@ export default {
           }
 
           // check current address
-          if (token.addresses) {
+          if (token.addresses && token.addresses.length > 0) {
             if (!token.addresses.includes(this.address)) {
               return {};
             }
           }
-          if (token.noAddresses) {
+          if (token.noAddresses && token.noAddresses.length > 0) {
             if (token.noAddresses.includes(this.address)) {
               return {};
             }
@@ -413,7 +413,7 @@ export default {
     },
 
     tokenSettings() {
-      router.push("/tokens/settings");
+      router.push("/tokens/add");
     },
   },
 };
