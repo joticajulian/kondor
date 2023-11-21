@@ -413,7 +413,7 @@ export default {
     },
 
     tokenSettings() {
-      router.push("/tokens/add");
+      router.push("/tokens/settings");
     },
   },
 };
