@@ -431,7 +431,8 @@ export default {
 }
 
 .token-image img {
-  width: inherit;
+  max-width: 3.5em;
+  max-height: 3.5em;
   border-radius: 50%;
   box-shadow: 0em 0em 2em rgb(151, 151, 151);
 }
@@ -449,7 +450,8 @@ export default {
 }
 
 .mini-token img {
-  width: inherit;
+  max-width: 2em;
+  max-height: 2em;
   border-radius: 50%;
 }
 
