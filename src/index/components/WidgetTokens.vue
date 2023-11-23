@@ -55,6 +55,7 @@ import axios from "axios";
 import router from "@/index/router";
 import { Contract, Provider, Signer, utils } from "koilib";
 import ManaOrb from "./ManaOrb.vue";
+import emptyToken from "@/shared/assets/empty-token.png";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -246,6 +247,7 @@ export default {
 
       tokens = await Promise.all(
         tokens.map(async (token) => {
+          token.image = emptyToken;
           if (!token.nickname) return token;
 
           const networkId = this.$store.state.networks.findIndex(
