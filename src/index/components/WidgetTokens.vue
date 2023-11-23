@@ -195,8 +195,8 @@ export default {
             "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
           );
           const price = Number(response.data.data[0].last);
-          const balanceSatoshisNumber = Number(balanceSatoshis);
-          balanceUSD = `$${(balanceSatoshisNumber * price).toFixed(2)} USD`;
+          const balanceNumber = Number(balance);
+          balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
         } catch (error) {
           console.error("Error when loading price from MEXC");
           console.error(error);
@@ -343,6 +343,7 @@ export default {
             this.tokenSymbol = token.symbol;
             this.balance = balance.balance;
             this.balanceWithSymbol = balance.balanceWithSymbol;
+            this.balanceUSD = balance.balanceUSD;
           }
 
           if (this.miniTokens.find((m) => m.contractId === token.contractId))
@@ -402,6 +403,7 @@ export default {
       this.tokenSymbol = t.symbol;
       this.balance = t.balance;
       this.balanceWithSymbol = t.balanceWithSymbol;
+      this.balanceUSD = t.balanceUSD;
     },
 
     clickBuy() {
