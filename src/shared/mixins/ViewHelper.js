@@ -30,6 +30,7 @@ export default {
       this.$store.state.showAccountMenu = false;
       break;
     case "/dashboard":
+    case "/tokens/send":
       this.$store.state.showBackButton = false;
       this.$store.state.showCurrentNetwork = true;
       this.$store.state.showAvatarMenu = true;
