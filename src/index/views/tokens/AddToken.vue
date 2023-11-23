@@ -1,6 +1,10 @@
 <template>
   <div class="container">
     <h1>Add Token</h1>
+    <div class="warning-notification">
+      This is an experimental feature. It is extremely important that you
+      add only trusted tokens; Otherwise, you risk losing funds.
+    </div>
     <input
       v-model="name"
       type="text"
@@ -234,5 +238,14 @@ export default {
 .advanced-toggle .material-icons {
   font-size: 1em;
   vertical-align: text-bottom;
+}
+
+.warning-notification {
+  color: white;
+  background-color: #ef6161;
+  padding: 1em;
+  margin: 1em 0em;
+  border-radius: 8px;
+  width: 80%;
 }
 </style>
