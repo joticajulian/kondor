@@ -10,6 +10,7 @@ import Dashboard from "./views/4-Dashboard.vue";
 import Signers from "./views/5-Signers.vue";
 import CreateAccount from "./views/setting-CreateAccount";
 import ImportAccount from "./views/setting-ImportAccount";
+import UpdateAccount from "./views/setting-UpdateAccount";
 import Buy from "./views/action-Buy";
 import SendToken from "./views/tokens/SendToken";
 import TokenSettings from "./views/tokens/Settings";
@@ -68,6 +69,11 @@ export default new Router({
       path: "/importAccount",
       name: "Import Account",
       component: ImportAccount,
+    },
+    {
+      path: "/updateAccount",
+      name: "Update Account",
+      component: UpdateAccount,
     },
     {
       path: "/buy",

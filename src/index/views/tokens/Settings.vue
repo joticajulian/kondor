@@ -209,7 +209,8 @@ export default {
 }
 
 .token .image img {
-  width: inherit;
+  max-width: 3.5em;
+  max-height: 3.5em;
   border-radius: 50%;
   box-shadow: 0em 0em 1em rgb(151, 151, 151);
 }

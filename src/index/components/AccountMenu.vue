@@ -28,6 +28,12 @@
       v-if="showDropdown"
       class="dropdown-content"
     >
+      <router-link
+        class="dropdown-item"
+        :to="{ path: '/updateAccount', query: { address: currentAddress } }"
+      >
+        <span class="material-icons">edit</span>Update account
+      </router-link>
       <a
         class="dropdown-item"
         :href="koinosblocksUrl + currentAddress"
@@ -42,6 +48,13 @@
         target="_blank"
       >
         <span class="material-icons">open_in_new</span>View account on Koiner
+      </a>
+      <a
+        class="dropdown-item"
+        href="https://koinosbox.com/nicknames"
+        target="_blank"
+      >
+        <span class="material-icons">edit</span>Edit Nickname
       </a>
       <a
         class="dropdown-item"
