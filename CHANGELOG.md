@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.9.0](https://github.com/joticajulian/kondor/releases/tag/v0.9.0) (2023-11-24)
+
+### 🚀 Features
+
+- Now Kondor supports tokens, they can be added by entering the nickname
+- This version allows you to update the name of your accounts
+
 ## [v0.8.4](https://github.com/joticajulian/kondor/releases/tag/v0.8.3) (2023-10-30)
 
 ### 🐛 Bug Fixes
