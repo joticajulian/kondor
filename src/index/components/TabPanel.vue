@@ -2,10 +2,6 @@
   <div>
     <div class="tabs">
       <a
-        :class="activeTab === 'tokens' ? 'active' : ''"
-        @click="setActiveTab('tokens')"
-      >Tokens</a>
-      <a
         :class="activeTab === 'nfts' ? 'active' : ''"
         @click="setActiveTab('nfts')"
       >NFTs</a>
@@ -42,7 +38,7 @@ export default {
 
   data() {
     return {
-      activeTab: "tokens",
+      activeTab: "nfts",
     };
   },
 

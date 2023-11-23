@@ -1,10 +1,6 @@
 <template>
   <div class="container">
     <h1>Add Token</h1>
-    <div class="warning-notification">
-      This is an experimental feature. It is extremely important that you
-      add only trusted tokens; Otherwise, you risk losing funds.
-    </div>
     <input
       v-model="name"
       type="text"
@@ -36,11 +32,27 @@
       >
     </div>
     <button
+      v-if="!requestSecondConfirmation"
       class=""
       @click="accept"
     >
       accept
     </button>
+    <div
+      v-else
+      class="second-confirmation"
+    >
+      <div class="warning-notification">
+        This token is not listed in KoinDX. It is extremely important that you
+        add only trusted tokens; Otherwise, you risk losing funds.
+      </div>
+      <button
+        class=""
+        @click="accept2"
+      >
+        Yes, add token
+      </button>
+    </div>
     <button
       class=""
       @click="cancel"
@@ -52,7 +64,9 @@
 
 <script>
 import { Contract, Provider, utils } from "koilib";
+import axios from "axios";
 import router from "@/index/router";
+import emptyToken from "@/shared/assets/empty-token.png";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -73,12 +87,22 @@ export default {
       nicknames: null,
       network: null,
       provider: null,
+      tokens: [],
+      requestSecondConfirmation: false,
     };
   },
 
   watch: {
     "$store.state.currentNetwork": async function () {
       await this.loadNetwork();
+    },
+
+    name: function () {
+      this.requestSecondConfirmation = false;
+    },
+
+    tokenAddress: function () {
+      this.requestSecondConfirmation = false;
     },
   },
 
@@ -131,7 +155,7 @@ export default {
           nickname: "",
           symbol: "",
           decimals: 0,
-          image: "",
+          image: emptyToken,
           addresses: [],
           noAddresses: [],
         };
@@ -188,29 +212,70 @@ export default {
         newToken.symbol = symbol.value;
         newToken.decimals = decimals.value;
 
-        const tokens = await this._getTokens();
-        const existingId = tokens.findIndex(
+        this.tokens = await this._getTokens();
+        const existingId = this.tokens.findIndex(
           (t) =>
             t.contractId === newToken.contractId &&
             t.network === this.network.tag
         );
         if (existingId >= 0) {
-          const { addresses, noAddresses } = tokens[existingId];
-          tokens[existingId] = {
+          const { addresses, noAddresses } = this.tokens[existingId];
+          this.tokens[existingId] = {
             ...newToken,
             addresses,
             noAddresses,
           };
         } else {
-          tokens.push(newToken);
+          this.tokens.push(newToken);
         }
 
-        await this._setTokens(tokens);
-        router.back();
+        // verify token in koindx
+        let isListedInKoinDX = false;
+        if (newToken.nickname === "koin" || newToken.nickname === "vhp") {
+          isListedInKoinDX = true;
+        } else if (this.network.tag === "mainnet") {
+          try {
+            const { data: koindxTokens } = await axios.get(
+              "https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/mainnet.json"
+            );
+            if (
+              koindxTokens.tokens.find((t) => t.address === newToken.contractId)
+            ) {
+              isListedInKoinDX = true;
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        } else if (this.network.tag === "harbinger") {
+          try {
+            const { data: koindxTokens } = await axios.get(
+              "https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/harbinger.json"
+            );
+            if (
+              koindxTokens.tokens.find((t) => t.address === newToken.contractId)
+            ) {
+              isListedInKoinDX = true;
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+
+        if (isListedInKoinDX) {
+          await this._setTokens(this.tokens);
+          router.back();
+        } else {
+          this.requestSecondConfirmation = true;
+        }
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
       }
+    },
+
+    async accept2() {
+      await this._setTokens(this.tokens);
+      router.back();
     },
 
     cancel() {
@@ -247,5 +312,11 @@ export default {
   margin: 1em 0em;
   border-radius: 8px;
   width: 80%;
+}
+
+.second-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
