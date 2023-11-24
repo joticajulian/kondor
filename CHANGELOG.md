@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.9.1](https://github.com/joticajulian/kondor/releases/tag/v0.9.1) (2023-11-24)
+
+### 🐛 Bug Fixes
+
+- Fix tokens without decimals
+
 ## [v0.9.0](https://github.com/joticajulian/kondor/releases/tag/v0.9.0) (2023-11-24)
 
 ### 🚀 Features
