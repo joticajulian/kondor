@@ -204,10 +204,10 @@ export default {
         }).functions;
 
         const { result: symbol } = await contract.symbol({});
-        const { result: decimals } = await contract.decimals({});
+        let { result: decimals } = await contract.decimals({});
 
         if (!symbol || !symbol.value) throw new Error("token without symbol");
-        if (!decimals) throw new Error("token without decimals");
+        if (!decimals) decimals = 0;
 
         newToken.symbol = symbol.value;
         newToken.decimals = decimals.value;
