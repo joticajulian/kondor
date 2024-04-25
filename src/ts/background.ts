@@ -1,10 +1,12 @@
-import { Provider, Signer } from "koilib/lib/browser";
-import { Messenger, Sender } from "kondor-js/lib/browser";
 import {
+  Provider,
+  Signer,
+  Transaction,
   CallContractOperationJson,
   TransactionJson,
   BlockJson,
-} from "koilib/lib/interface";
+} from "koilib";
+import { Messenger, Sender } from "kondor-js";
 import * as storage from "./storage";
 
 const EXPIRATION_ID = 30 * 60 * 1000; // 30 minutes
@@ -251,7 +253,7 @@ const messenger = new Messenger({
 
           const signer = Signer.fromSeed("seed");
           signer.provider = await getProvider(network);
-          result = await signer.prepareTransaction(transaction);
+          result = Transaction.prepareTransaction(transaction, signer.provider);
           break;
         }
         default: {
