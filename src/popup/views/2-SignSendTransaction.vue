@@ -67,10 +67,18 @@
           <label for="payer">Use free mana</label>
         </div>
         <div class="group-input">
+          <input
+            v-model="estimateMaxMana"
+            type="checkbox"
+          >
+          <label for="payer">Estimate max. mana</label>
+        </div>
+        <div class="group-input">
           <label for="max-mana">Max. mana</label>
           <input
             v-model="maxMana"
             type="text"
+            :disabled="estimateMaxMana"
           >
         </div>
         <div class="group-input">
@@ -345,6 +353,7 @@ export default {
       provider: null,
       network: {},
       networkTag: "mainnet",
+      estimateMaxMana: true,
       maxMana: "",
       useFreeMana: false,
       payer: "",
@@ -355,6 +364,7 @@ export default {
       operations: [],
       signers: [],
       events: [],
+      internalReceipt: null,
       receipt: null,
       manaUsed: "",
       readyToSend: false,
@@ -1274,34 +1284,48 @@ export default {
     },
 
     async signTransaction() {
-      await Promise.all(
-        this.signers.map(async (s) => {
-          const acc = this.$store.state.accounts.find(
-            (a) => a.address === s.address
-          );
-          if (acc) {
-            const signer = Signer.fromWif(acc.privateKey);
-            await signer.signTransaction(this.transaction.transaction);
+      for (let i = 0; i < this.signers.length; i += 1) {
+        const s = this.signers[i];
+        const acc = this.$store.state.accounts.find(
+          (a) => a.address === s.address
+        );
+        if (acc) {
+          const signer = Signer.fromWif(acc.privateKey);
+          signer.provider = this.provider;
+          if (this.estimateMaxMana) {
+            signer.rcOptions = {
+              estimateRc: true,
+              adjustRcLimit: (receipt) => {
+                this.internalReceipt = receipt;
+                return Math.min(
+                  Number(receipt.max_payer_rc),
+                  Math.floor(1.1 * Number(receipt.rc_used))
+                );
+              },
+            };
           } else {
-            if (!s.signature) {
-              throw new Error(`No signature for ${s.address}`);
-            }
-            const address = Signer.recoverAddress(
-              utils.toUint8Array(this.transaction.transaction.id.slice(6)),
-              utils.decodeBase64url(s.signature)
-            );
-            if (address !== s.address) {
-              throw new Error(
-                `The transaction has changed and it's not possible to generate a new signature of ${s.address}`
-              );
-            }
-            if (!this.transaction.transaction.signatures) {
-              this.transaction.transaction.signatures = [];
-            }
-            this.transaction.transaction.signatures.push(s.signature);
+            signer.rcOptions = { estimateRc: false };
           }
-        })
-      );
+          await signer.signTransaction(this.transaction.transaction);
+        } else {
+          if (!s.signature) {
+            throw new Error(`No signature for ${s.address}`);
+          }
+          const address = Signer.recoverAddress(
+            utils.toUint8Array(this.transaction.transaction.id.slice(6)),
+            utils.decodeBase64url(s.signature)
+          );
+          if (address !== s.address) {
+            throw new Error(
+              `The transaction has changed and it's not possible to generate a new signature of ${s.address}`
+            );
+          }
+          if (!this.transaction.transaction.signatures) {
+            this.transaction.transaction.signatures = [];
+          }
+          this.transaction.transaction.signatures.push(s.signature);
+        }
+      }
       this.transactionSigned = true;
     },
 
@@ -1341,7 +1365,15 @@ export default {
         } else {
           await this.buildTransaction();
           await this.signTransaction();
-          this.receipt = await this.transaction.send({ broadcast: false });
+          if (this.estimateMaxMana && this.internalReceipt) {
+            this.receipt = this.internalReceipt;
+          } else {
+            this.receipt = await this.transaction.send({ broadcast: false });
+          }
+          this.maxMana = utils.formatUnits(
+            this.transaction.transaction.header.rc_limit,
+            8
+          );
         }
         this.events = [];
         if (this.receipt.events) {
