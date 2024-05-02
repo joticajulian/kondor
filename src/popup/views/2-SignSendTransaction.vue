@@ -326,8 +326,37 @@ function fromHexToUtf8(hex) {
   return new TextDecoder().decode(utils.toUint8Array(hex));
 }
 
-function formatTime() {
-  return "TODO: 5 seconds";
+function deltaTimeToString(milliseconds) {
+  if (Number.isNaN(milliseconds)) return "(error)";
+
+  var seconds = Math.floor(milliseconds / 1000);
+
+  var interval = seconds / 86400;
+  if (interval > 2) return Math.floor(interval) + " days";
+
+  interval = seconds / 3600;
+  if (interval > 2) return Math.floor(interval) + " hours";
+
+  interval = seconds / 60;
+  if (interval > 2) return Math.floor(interval) + " minutes";
+
+  interval = Math.floor(seconds);
+  return interval + " seconds";
+}
+
+function formatTime(rcLimit, availableMana) {
+  const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
+  const THREE_MINUTES = 180_000;
+  const { current, reserved, balance } = availableMana;
+  if (balance < rcLimit) return "(not enough balance)";
+
+  let deltaTime = ((rcLimit - current) * FIVE_DAYS) / balance;
+  if (reserved > 0 && deltaTime < THREE_MINUTES) {
+    deltaTime = THREE_MINUTES;
+    const deltaTime2 = ((rcLimit - current + reserved) * FIVE_DAYS) / balance;
+    if (deltaTime2 < deltaTime) deltaTime = deltaTime2;
+  }
+  return deltaTimeToString(deltaTime);
 }
 
 export default {
@@ -364,12 +393,10 @@ export default {
       payee: "",
       nonce: "",
       transaction: null,
-      transactionSigned: false,
       operations: [],
       signers: [],
       externalSigners: false,
       events: [],
-      internalReceipt: null,
       receipt: null,
       manaUsed: "",
       readyToSend: false,
@@ -1278,11 +1305,26 @@ export default {
     },
 
     async buildTransaction() {
+      let rcLimit = 1e8 * Number(this.maxMana.replace("MANA", "").trim());
+
+      if (!rcLimit) {
+        if (this.externalSigners)
+          throw new Error(
+            [
+              "no rc_limit set by the dApp and it's not possible to update",
+              "it because the signatures of the external signers will",
+              "become invalid",
+            ].join(" ")
+          );
+        rcLimit = 1;
+        this.maxMana = "0.00000001";
+      }
+
       this.transaction = new Transaction({
         provider: this.provider,
         options: {
           chainId: this.request.args.transaction.header.chain_id,
-          rcLimit: 1e8 * Number(this.maxMana.replace("MANA", "").trim()),
+          rcLimit,
           nonce: this.nonce,
           payer: this.payer,
           ...(this.payee && { payee: this.payee }),
@@ -1291,6 +1333,20 @@ export default {
       this.transaction.transaction.operations =
         this.request.args.transaction.operations;
       await this.transaction.prepare();
+    },
+
+    async useManaMeter() {
+      const initialPayee = this.transaction.transaction.header.payee;
+      const initialPayer = this.transaction.transaction.header.payer;
+      this.transaction.transaction.header.payee = initialPayee || initialPayer;
+      this.transaction.transaction.header.payer = this.network.manaMeter;
+      this.transaction.transaction.header.rc_limit = Math.floor(
+        0.9 * Number(await this.provider.getAccountRc(this.network.manaMeter))
+      );
+      this.transaction.transaction.id = Transaction.computeTransactionId(
+        this.transaction.transaction.header
+      );
+      return { payee: initialPayee, payer: initialPayer };
     },
 
     async getAvailableMana(account) {
@@ -1305,136 +1361,90 @@ export default {
       } catch {
         // empty
       }
-      return { current, reserved };
+      const koin = new Contract({
+        id: this.network.koinContractId,
+        abi: utils.tokenAbi,
+        provider: this.provider,
+        serializer: await this.newSandboxSerializer(
+          utils.tokenAbi.koilib_types
+        ),
+      }).functions;
+      const { result } = await koin.balanceOf({ owner: account });
+      const balance = result && result.value ? Number(result.value) : 0;
+      return { current, reserved, balance };
     },
 
-    /**
-     * Sign transaction with a single private key and
-     * try to resolve possible issues with mana
-     */
-    async signTransaction(signer) {
-      if (!this.transaction.transaction.header.rc_limit) {
-        if (this.externalSigners)
+    async estimateAndAdjustMana(initialPayerPayee) {
+      const initialPayer = initialPayerPayee.payer;
+      const initialPayee = initialPayerPayee.payee;
+      let receipt;
+      try {
+        receipt = await this.transaction.send({ broadcast: false });
+        if (receipt.rpc_error) {
+          const availableMana = await this.getAvailableMana(initialPayer);
+          this.transaction.transaction.header.rc_limit =
+            availableMana.current - availableMana.reserved;
+          console.log(receipt.rpc_error);
           throw new Error(
             [
-              "no rc_limit set by the dApp and it's not possible to update",
-              "it because the signatures of the external signers will",
-              "become invalid",
+              "timeout from the rpc. Not possible to estimate the consumption of mana.",
+              "Probably because the transaction has many computations.",
+              "As an alternative you can try to submit the transaction without",
+              "checking events.",
             ].join(" ")
           );
-        this.transaction.transaction.header.rc_limit = 1;
-        this.maxMana = "0.00000001";
+        }
+      } catch (error) {
+        let errorJson;
+        try {
+          errorJson = JSON.parse(error.message);
+        } catch {
+          throw error;
+        }
+        if (!errorJson.error) throw error;
+        if (errorJson.error.includes("compute bandwidth limit exceeded")) {
+          console.log(error);
+          throw new Error("Too many computations inside the transaction");
+        }
+        if (errorJson.error.includes("network bandwidth limit exceeded")) {
+          console.log(error);
+          throw new Error("The transaction is too large");
+        }
+        if (errorJson.error.includes("disk storage limit exceeded")) {
+          console.log(error);
+          throw new Error("Too many read/writes in the storage");
+        }
       }
 
-      if (
-        this.optimizeMana &&
-        (!this.transaction.transaction.signatures ||
-          this.transaction.transaction.signatures.length === 0)
-      ) {
-        const initialPayee = this.transaction.transaction.header.payee;
-        const initialPayer = this.transaction.transaction.header.payer;
-        this.transaction.transaction.header.payee =
-          initialPayee || initialPayer;
-        this.transaction.transaction.header.payer = this.network.manaMeter;
-        this.transaction.transaction.header.rc_limit = Math.floor(
-          0.9 * Number(await this.provider.getAccountRc(this.network.manaMeter))
-        );
-        this.transaction.transaction.id = Transaction.computeTransactionId(
-          this.transaction.transaction.header
-        );
-
-        try {
-          this.internalReceipt = await signer.estimateReceipt(
-            this.transaction.transaction
+      const rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
+      const availableMana1 = await this.getAvailableMana(initialPayer);
+      if (availableMana1.current - availableMana1.reserved < Number(rcLimit)) {
+        if (initialPayer === this.network.freeManaSharer) {
+          throw new Error(
+            [
+              `Free mana service is congested.``Try again in ${formatTime(
+                rcLimit,
+                availableMana1
+              )}`,
+            ].join(" ")
           );
-          if (this.internalReceipt.rpc_error) {
-            const availableMana = await this.getAvailableMana(initialPayer);
-            this.transaction.transaction.header.rc_limit =
-              availableMana.current - availableMana.reserved;
-            console.log(this.internalReceipt.rpc_error);
-            throw new Error(
-              [
-                "timeout from the rpc. Not possible to estimate the consumption of mana.",
-                "Probably because the transaction has many computations.",
-                "As an alternative you can try to submit the transaction without",
-                "checking events.",
-              ].join(" ")
-            );
-          }
-        } catch (error) {
-          let errorJson;
-          try {
-            errorJson = JSON.parse(error.message);
-          } catch {
-            throw error;
-          }
-          if (!errorJson.error) throw error;
-          if (errorJson.error.includes("compute bandwidth limit exceeded")) {
-            console.log(error);
-            throw new Error("Too many computations inside the transaction");
-          }
-          if (errorJson.error.includes("network bandwidth limit exceeded")) {
-            console.log(error);
-            throw new Error("The transaction is too large");
-          }
-          if (errorJson.error.includes("disk storage limit exceeded")) {
-            console.log(error);
-            throw new Error("Too many read/writes in the storage");
-          }
         }
 
-        const rcLimit = Math.floor(1.1 * Number(this.internalReceipt.rc_used));
-        const availableMana1 = await this.getAvailableMana(initialPayer);
+        // check if the free mana sharer can pay the transaction
+        const availableMana2 = await this.getAvailableMana(
+          this.network.freeManaSharer
+        );
         if (
-          availableMana1.current - availableMana1.reserved <
+          availableMana2.current - availableMana2.reserved <
           Number(rcLimit)
         ) {
-          if (initialPayer === this.network.freeManaSharer) {
-            throw new Error(
-              [
-                `Free mana service is congested.``Try again in ${formatTime(
-                  rcLimit,
-                  availableMana1
-                )}`,
-              ].join(" ")
-            );
-          }
-
-          // check if the free mana sharer can pay the transaction
-          const availableMana2 = await this.getAvailableMana(
-            this.network.freeManaSharer
-          );
-          if (
-            availableMana2.current - availableMana2.reserved <
-            Number(rcLimit)
-          ) {
-            const balance = await this.getBalance(initialPayer);
-            if (balance < rcLimit / 1e8) {
-              throw new Error(
-                [
-                  `you need at least ${utils.formatUnits(
-                    rcLimit,
-                    8
-                  )} KOIN in your balance.`,
-                  `Or try again in ${formatTime(
-                    rcLimit,
-                    availableMana2
-                  )} to see if the`,
-                  `free mana service is available.`,
-                ].join(" ")
-              );
-            }
-
+          if (availableMana1.balance < rcLimit) {
             throw new Error(
               [
                 `you need at least ${utils.formatUnits(
                   rcLimit,
                   8
-                )} liquid KOIN in your balance.`,
-                `Wait ${formatTime(
-                  rcLimit,
-                  availableMana1
-                )} until it recharges and try again.`,
+                )} KOIN in your balance.`,
                 `Or try again in ${formatTime(
                   rcLimit,
                   availableMana2
@@ -1443,28 +1453,42 @@ export default {
               ].join(" ")
             );
           }
-          this.transaction.transaction.header.payee =
-            initialPayee || initialPayer;
-          this.transaction.transaction.header.payer =
-            this.network.freeManaSharer;
-        } else {
-          this.transaction.transaction.header.payee = initialPayee;
-          this.transaction.transaction.header.payer = initialPayer;
-        }
-        this.transaction.transaction.header.rc_limit = rcLimit;
-        this.transaction.transaction.id = Transaction.computeTransactionId(
-          this.transaction.transaction.header
-        );
-      }
 
-      signer.rcOptions = { estimateRc: false };
-      await signer.signTransaction(this.transaction.transaction);
+          throw new Error(
+            [
+              `you need at least ${utils.formatUnits(
+                rcLimit,
+                8
+              )} liquid KOIN in your balance.`,
+              `Wait ${formatTime(
+                rcLimit,
+                availableMana1
+              )} until it recharges and try again.`,
+              `Or try again in ${formatTime(
+                rcLimit,
+                availableMana2
+              )} to see if the`,
+              `free mana service is available.`,
+            ].join(" ")
+          );
+        }
+        this.transaction.transaction.header.payee =
+          initialPayee || initialPayer;
+        this.transaction.transaction.header.payer = this.network.freeManaSharer;
+      } else {
+        this.transaction.transaction.header.payee = initialPayee;
+        this.transaction.transaction.header.payer = initialPayer;
+      }
+      this.transaction.transaction.header.rc_limit = rcLimit;
+      this.transaction.transaction.id = Transaction.computeTransactionId(
+        this.transaction.transaction.header
+      );
     },
 
     /**
      * Sign transaction with all required signers
      */
-    async signersSignTransaction() {
+    async signTransaction() {
       for (let i = 0; i < this.signers.length; i += 1) {
         const s = this.signers[i];
         const acc = this.$store.state.accounts.find(
@@ -1473,7 +1497,8 @@ export default {
         if (acc) {
           const signer = Signer.fromWif(acc.privateKey);
           signer.provider = this.provider;
-          await this.signTransaction(signer);
+          signer.rcOptions = { estimateRc: false };
+          await signer.signTransaction(this.transaction.transaction);
         } else {
           if (!s.signature) {
             throw new Error(`No signature for ${s.address}`);
@@ -1493,7 +1518,6 @@ export default {
           this.transaction.transaction.signatures.push(s.signature);
         }
       }
-      this.transactionSigned = true;
     },
 
     async checkEvents() {
@@ -1531,12 +1555,14 @@ export default {
           };
         } else {
           await this.buildTransaction();
-          await this.signersSignTransaction();
-          if (this.optimizeMana && this.internalReceipt) {
-            this.receipt = this.internalReceipt;
-          } else {
-            this.receipt = await this.transaction.send({ broadcast: false });
+          if (this.optimizeMana) {
+            const initialPayerPayee = await this.useManaMeter();
+            await this.signTransaction();
+            await this.estimateAndAdjustMana(initialPayerPayee);
+            this.transaction.transaction.signatures = [];
           }
+          await this.signTransaction();
+          this.receipt = await this.transaction.send({ broadcast: false });
           this.maxMana = utils.formatUnits(
             this.transaction.transaction.header.rc_limit,
             8
@@ -1549,7 +1575,7 @@ export default {
             await this.beautifyAction("event", event);
           }
         }
-        this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} MANA`;
+        this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`;
         this.readyToSend = true;
       } catch (error) {
         this.readyToSend = false;
@@ -1561,6 +1587,12 @@ export default {
     async skipEvents() {
       try {
         await this.buildTransaction();
+        if (this.optimizeMana) {
+          const initialPayerPayee = await this.useManaMeter();
+          await this.signTransaction();
+          await this.estimateAndAdjustMana(initialPayerPayee);
+          this.transaction.transaction.signatures = [];
+        }
         this.readyToSend = true;
       } catch (error) {
         this.readyToSend = false;
@@ -1573,8 +1605,11 @@ export default {
       let message = { id: this.request.id };
 
       try {
-        if (!this.transactionSigned) {
-          await this.signersSignTransaction();
+        if (
+          !this.transaction.transaction.signatures ||
+          this.transaction.transaction.signatures.length === 0
+        ) {
+          await this.signTransaction();
         }
 
         if (this.typeRequest === "send") {
