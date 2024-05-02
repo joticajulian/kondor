@@ -68,17 +68,17 @@
         </div>
         <div class="group-input">
           <input
-            v-model="estimateMaxMana"
+            v-model="optimizeMana"
             type="checkbox"
           >
-          <label for="payer">Estimate max. mana</label>
+          <label for="payer">Optimize mana</label>
         </div>
         <div class="group-input">
           <label for="max-mana">Max. mana</label>
           <input
             v-model="maxMana"
             type="text"
-            :disabled="estimateMaxMana"
+            :disabled="optimizeMana"
           >
         </div>
         <div class="group-input">
@@ -326,6 +326,10 @@ function fromHexToUtf8(hex) {
   return new TextDecoder().decode(utils.toUint8Array(hex));
 }
 
+function formatTime() {
+  return "TODO: 5 seconds";
+}
+
 export default {
   name: "SignSendTransaction",
 
@@ -353,7 +357,7 @@ export default {
       provider: null,
       network: {},
       networkTag: "mainnet",
-      estimateMaxMana: true,
+      optimizeMana: true,
       maxMana: "",
       useFreeMana: false,
       payer: "",
@@ -363,6 +367,7 @@ export default {
       transactionSigned: false,
       operations: [],
       signers: [],
+      externalSigners: false,
       events: [],
       internalReceipt: null,
       receipt: null,
@@ -1096,6 +1101,7 @@ export default {
           address,
           signature,
         });
+        this.externalSigners = true;
       }
     },
 
@@ -1111,6 +1117,10 @@ export default {
         const { header } = this.request.args.transaction;
         this.network = networks.find((n) => n.chainId === header.chain_id);
         this.provider = new Provider(this.network.rpcNodes);
+        this.provider.onError = (error) => {
+          this.provider.currentNodeId = 0;
+          throw error;
+        };
         this.networkTag = this.network ? this.network.tag : "Unknown chain id";
         this.maxMana = utils.formatUnits(header.rc_limit, 8);
         this.nonce = header.nonce;
@@ -1272,7 +1282,7 @@ export default {
         provider: this.provider,
         options: {
           chainId: this.request.args.transaction.header.chain_id,
-          rcLimit: utils.parseUnits(this.maxMana.replace("MANA", "").trim(), 8),
+          rcLimit: 1e8 * Number(this.maxMana.replace("MANA", "").trim()),
           nonce: this.nonce,
           payer: this.payer,
           ...(this.payee && { payee: this.payee }),
@@ -1283,7 +1293,178 @@ export default {
       await this.transaction.prepare();
     },
 
-    async signTransaction() {
+    async getAvailableMana(account) {
+      const current = Number(await this.provider.getAccountRc(account));
+      let reserved = 0;
+      try {
+        const res = await this.provider.call(
+          "mempool.get_reserved_account_rc",
+          { account }
+        );
+        if (res && res.rc) reserved = Number(res.rc);
+      } catch {
+        // empty
+      }
+      return { current, reserved };
+    },
+
+    /**
+     * Sign transaction with a single private key and
+     * try to resolve possible issues with mana
+     */
+    async signTransaction(signer) {
+      if (!this.transaction.transaction.header.rc_limit) {
+        if (this.externalSigners)
+          throw new Error(
+            [
+              "no rc_limit set by the dApp and it's not possible to update",
+              "it because the signatures of the external signers will",
+              "become invalid",
+            ].join(" ")
+          );
+        this.transaction.transaction.header.rc_limit = 1;
+        this.maxMana = "0.00000001";
+      }
+
+      if (
+        this.optimizeMana &&
+        (!this.transaction.transaction.signatures ||
+          this.transaction.transaction.signatures.length === 0)
+      ) {
+        const initialPayee = this.transaction.transaction.header.payee;
+        const initialPayer = this.transaction.transaction.header.payer;
+        this.transaction.transaction.header.payee =
+          initialPayee || initialPayer;
+        this.transaction.transaction.header.payer = this.network.manaMeter;
+        this.transaction.transaction.header.rc_limit = Math.floor(
+          0.9 * Number(await this.provider.getAccountRc(this.network.manaMeter))
+        );
+        this.transaction.transaction.id = Transaction.computeTransactionId(
+          this.transaction.transaction.header
+        );
+
+        try {
+          this.internalReceipt = await signer.estimateReceipt(
+            this.transaction.transaction
+          );
+          if (this.internalReceipt.rpc_error) {
+            const availableMana = await this.getAvailableMana(initialPayer);
+            this.transaction.transaction.header.rc_limit =
+              availableMana.current - availableMana.reserved;
+            console.log(this.internalReceipt.rpc_error);
+            throw new Error(
+              [
+                "timeout from the rpc. Not possible to estimate the consumption of mana.",
+                "Probably because the transaction has many computations.",
+                "As an alternative you can try to submit the transaction without",
+                "checking events.",
+              ].join(" ")
+            );
+          }
+        } catch (error) {
+          let errorJson;
+          try {
+            errorJson = JSON.parse(error.message);
+          } catch {
+            throw error;
+          }
+          if (!errorJson.error) throw error;
+          if (errorJson.error.includes("compute bandwidth limit exceeded")) {
+            console.log(error);
+            throw new Error("Too many computations inside the transaction");
+          }
+          if (errorJson.error.includes("network bandwidth limit exceeded")) {
+            console.log(error);
+            throw new Error("The transaction is too large");
+          }
+          if (errorJson.error.includes("disk storage limit exceeded")) {
+            console.log(error);
+            throw new Error("Too many read/writes in the storage");
+          }
+        }
+
+        const rcLimit = Math.floor(1.1 * Number(this.internalReceipt.rc_used));
+        const availableMana1 = await this.getAvailableMana(initialPayer);
+        if (
+          availableMana1.current - availableMana1.reserved <
+          Number(rcLimit)
+        ) {
+          if (initialPayer === this.network.freeManaSharer) {
+            throw new Error(
+              [
+                `Free mana service is congested.``Try again in ${formatTime(
+                  rcLimit,
+                  availableMana1
+                )}`,
+              ].join(" ")
+            );
+          }
+
+          // check if the free mana sharer can pay the transaction
+          const availableMana2 = await this.getAvailableMana(
+            this.network.freeManaSharer
+          );
+          if (
+            availableMana2.current - availableMana2.reserved <
+            Number(rcLimit)
+          ) {
+            const balance = await this.getBalance(initialPayer);
+            if (balance < rcLimit / 1e8) {
+              throw new Error(
+                [
+                  `you need at least ${utils.formatUnits(
+                    rcLimit,
+                    8
+                  )} KOIN in your balance.`,
+                  `Or try again in ${formatTime(
+                    rcLimit,
+                    availableMana2
+                  )} to see if the`,
+                  `free mana service is available.`,
+                ].join(" ")
+              );
+            }
+
+            throw new Error(
+              [
+                `you need at least ${utils.formatUnits(
+                  rcLimit,
+                  8
+                )} liquid KOIN in your balance.`,
+                `Wait ${formatTime(
+                  rcLimit,
+                  availableMana1
+                )} until it recharges and try again.`,
+                `Or try again in ${formatTime(
+                  rcLimit,
+                  availableMana2
+                )} to see if the`,
+                `free mana service is available.`,
+              ].join(" ")
+            );
+          }
+          this.transaction.transaction.header.payee =
+            initialPayee || initialPayer;
+          this.transaction.transaction.header.payer =
+            this.network.freeManaSharer;
+        } else {
+          this.transaction.transaction.header.payee = initialPayee;
+          this.transaction.transaction.header.payer = initialPayer;
+        }
+        this.transaction.transaction.header.rc_limit = rcLimit;
+        this.transaction.transaction.id = Transaction.computeTransactionId(
+          this.transaction.transaction.header
+        );
+      }
+
+      signer.rcOptions = { estimateRc: false };
+      await signer.signTransaction(this.transaction.transaction);
+    },
+
+    /**
+     * Sign transaction with all required signers
+     */
+    async signersSignTransaction() {
       for (let i = 0; i < this.signers.length; i += 1) {
         const s = this.signers[i];
         const acc = this.$store.state.accounts.find(
@@ -1292,21 +1473,7 @@ export default {
         if (acc) {
           const signer = Signer.fromWif(acc.privateKey);
           signer.provider = this.provider;
-          if (this.estimateMaxMana) {
-            signer.rcOptions = {
-              estimateRc: true,
-              adjustRcLimit: (receipt) => {
-                this.internalReceipt = receipt;
-                return Math.min(
-                  Number(receipt.max_payer_rc),
-                  Math.floor(1.1 * Number(receipt.rc_used))
-                );
-              },
-            };
-          } else {
-            signer.rcOptions = { estimateRc: false };
-          }
-          await signer.signTransaction(this.transaction.transaction);
+          await this.signTransaction(signer);
         } else {
           if (!s.signature) {
             throw new Error(`No signature for ${s.address}`);
@@ -1364,8 +1531,8 @@ export default {
           };
         } else {
           await this.buildTransaction();
-          await this.signTransaction();
-          if (this.estimateMaxMana && this.internalReceipt) {
+          await this.signersSignTransaction();
+          if (this.optimizeMana && this.internalReceipt) {
             this.receipt = this.internalReceipt;
           } else {
             this.receipt = await this.transaction.send({ broadcast: false });
@@ -1407,7 +1574,7 @@ export default {
 
       try {
         if (!this.transactionSigned) {
-          await this.signTransaction();
+          await this.signersSignTransaction();
         }
 
         if (this.typeRequest === "send") {

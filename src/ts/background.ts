@@ -5,6 +5,7 @@ import {
   CallContractOperationJson,
   TransactionJson,
   BlockJson,
+  GetBlockOptions,
 } from "koilib";
 import { Messenger, Sender } from "kondor-js";
 import * as storage from "./storage";
@@ -132,6 +133,15 @@ const messenger = new Messenger({
           result = await provider.getNonce(account);
           break;
         }
+        case "provider:getNextNonce": {
+          const { network, account } = args as {
+            network: string;
+            account: string;
+          };
+          const provider = await getProvider(network);
+          result = await provider.getNextNonce(account);
+          break;
+        }
         case "provider:getAccountRc": {
           const { network, account } = args as {
             network: string;
@@ -173,23 +183,25 @@ const messenger = new Messenger({
           break;
         }
         case "provider:getBlocks": {
-          const { network, height, numBlocks, idRef } = args as {
+          const { network, height, numBlocks, idRef, opts } = args as {
             network: string;
             height: number;
             numBlocks?: number;
             idRef?: string;
+            opts?: GetBlockOptions;
           };
           const provider = await getProvider(network);
-          result = await provider.getBlocks(height, numBlocks, idRef);
+          result = await provider.getBlocks(height, numBlocks, idRef, opts);
           break;
         }
         case "provider:getBlock": {
-          const { network, height } = args as {
+          const { network, height, opts } = args as {
             network: string;
             height: number;
+            opts: GetBlockOptions;
           };
           const provider = await getProvider(network);
-          result = await provider.getBlock(height);
+          result = await provider.getBlock(height, opts);
           break;
         }
         case "provider:wait": {
@@ -256,6 +268,39 @@ const messenger = new Messenger({
           result = Transaction.prepareTransaction(transaction, signer.provider);
           break;
         }
+        case "provider:getForkHeads": {
+          const { network } = args as {
+            network: string;
+          };
+          const provider = await getProvider(network);
+          result = await provider.getForkHeads();
+          break;
+        }
+        case "provider:getResourceLimits": {
+          const { network } = args as {
+            network: string;
+          };
+          const provider = await getProvider(network);
+          result = await provider.getResourceLimits();
+          break;
+        }
+
+        case "provider:invokeSystemCall": {
+          throw new Error(
+            "invokeSystemCall not implemented in kondor provider"
+          );
+        }
+
+        case "provider:invokeGetContractMetadata": {
+          const { network, contractId } = args as {
+            network: string;
+            contractId: string;
+          };
+          const provider = await getProvider(network);
+          result = await provider.invokeGetContractMetadata(contractId);
+          break;
+        }
+
         default: {
           result = undefined;
           break;

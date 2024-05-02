@@ -27,6 +27,7 @@ declare const window: {
 const backgroundCommands = [
   "provider:call",
   "provider:getNonce",
+  "provider:getNextNonce",
   "provider:getAccountRc",
   "provider:getTransactionsById",
   "provider:getBlocksById",
@@ -38,6 +39,10 @@ const backgroundCommands = [
   "provider:sendTransaction",
   "provider:submitBlock",
   "provider:readContract",
+  "provider:getForkHeads",
+  "provider:getResourceLimits",
+  "provider:invokeSystemCall",
+  "provider:invokeGetContractMetadata",
   "signer:prepareTransaction",
 ];
 

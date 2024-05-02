@@ -48,6 +48,7 @@ export interface Network {
   kapNameServiceContractId?: string;
   kapProfileContractId?: string;
   freeManaSharer?: string;
+  manaMeter?: string;
 }
 
 export const DEFAULT_NETWORKS: Network[] = [
@@ -61,6 +62,7 @@ export const DEFAULT_NETWORKS: Network[] = [
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
     kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB",
     freeManaSharer: "1KyZyhNwiDo6a93f3FvK8pxspKdgEtQDwa",
+    manaMeter: "1MqveNK3piSGPHGocsRUCVhpCPLgQA58K9",
   },
   {
     name: "Koinos Harbinger (testnet)",
@@ -77,6 +79,7 @@ export const DEFAULT_NETWORKS: Network[] = [
     koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
     nicknamesContractId: "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR",
     freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
+    manaMeter: "19jgVtCHfhzgzAWNVyRzhoH9G5aa9VTZCE",
   },
 ];
 
@@ -109,6 +112,7 @@ export async function getNetworks(strict = true): Promise<Network[]> {
       "kapNameServiceContractId",
       "kapProfileContractId",
       "freeManaSharer",
+      "manaMeter",
     ] as const;
     fields.forEach((field) => {
       if (!network[field]) {
