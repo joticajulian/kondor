@@ -390,6 +390,7 @@ export default {
       advanced: false,
       data: "",
       abis: null,
+      cacheAbis: {},
       abiUploadContract: null,
       requester: "",
       typeRequest: "",
@@ -419,6 +420,7 @@ export default {
       isOldKondor: false,
       nicknames: null,
       koinContract: null,
+      cacheNicknames: {},
       loadingEvents: false,
       loadingSkipEvents: false,
     };
@@ -887,9 +889,16 @@ export default {
   methods: {
     async getAbi(contract) {
       const contractId = contract.getId();
+
+      // take it from cache
+      if (this.cacheAbis[contractId]) return this.cacheAbis[contractId];
+
       // try to get the ABI from local storage
       let abi = await this._getAbi(this.networkTag, contractId);
-      if (abi) return abi;
+      if (abi) {
+        this.cacheAbis[contractId] = abi;
+        return abi;
+      }
 
       // try to get the ABI from the network
       try {
@@ -900,18 +909,28 @@ export default {
       } catch (error) {
         // empty
       }
-      if (abi) return abi;
+      if (abi) {
+        this.cacheAbis[contractId] = abi;
+        return abi;
+      }
 
       // try to get the ABI from contract upload
       if (
         this.abiUploadContract &&
         this.abiUploadContract.contractId === contractId
       ) {
-        return JSON.parse(this.abiUploadContract.abi);
+        abi = JSON.parse(this.abiUploadContract.abi);
+        this.cacheAbis[contractId] = abi;
+        return abi;
       }
 
       // try to get ABI from the request
-      return this.abis ? this.abis[contractId] : undefined;
+      if (this.abis && this.abis[contractId]) {
+        abi = this.abis[contractId];
+        this.cacheAbis[contractId] = abi;
+        return abi;
+      }
+      return undefined;
     },
 
     async applyFormat(format, argName, data) {
@@ -947,6 +966,7 @@ export default {
     },
 
     async resolveAddress(address) {
+      if (this.cacheNicknames[address]) return this.cacheNicknames[address];
       if (!address) return "";
       const { result } = await this.nicknames.get_tokens_by_owner({
         owner: address,
@@ -955,7 +975,8 @@ export default {
       if (!result || !result.token_ids || !result.token_ids[0]) {
         return "";
       }
-      return fromHexToUtf8(result.token_ids[0]);
+      this.cacheNicknames[address] = fromHexToUtf8(result.token_ids[0]);
+      return this.cacheNicknames[address];
     },
 
     /**
