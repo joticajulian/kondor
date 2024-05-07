@@ -199,13 +199,25 @@
           :disabled="!unlocked"
           @click="checkEvents"
         >
-          Check events
+          <span
+            v-if="loadingEvents"
+            class="loader2"
+          />
+          <span v-else>Check events</span>
         </button>
         <div
           class="cancel-button"
           @click="skipEvents"
         >
-          Skip <br><span class="not-recommended">(not recommended)</span>
+          <span
+            v-if="loadingSkipEvents"
+            class="loader2"
+          />
+          <span
+            v-else
+          >Skip <br><span
+            class="not-recommended"
+          >(not recommended)</span></span>
         </div>
       </div>
       <div
@@ -406,6 +418,9 @@ export default {
       isOldKoilib: false,
       isOldKondor: false,
       nicknames: null,
+      koinContract: null,
+      loadingEvents: false,
+      loadingSkipEvents: false,
     };
   },
 
@@ -1167,6 +1182,22 @@ export default {
           ),
         }).functions;
 
+        this.koinContract = new Contract({
+          id: this.network.koinContractId,
+          abi: {
+            ...utils.tokenAbi,
+            events: {
+              "koinos.contracts.token.transfer_event": {
+                argument: "token.transfer_args",
+              },
+            },
+          },
+          provider: this.provider,
+          serializer: await this.newSandboxSerializer(
+            utils.tokenAbi.koilib_types
+          ),
+        });
+
         if (this.request.args.signerAddress) {
           this.addSigner(this.request.args.signerAddress);
         } else {
@@ -1349,8 +1380,11 @@ export default {
       return { payee: initialPayee, payer: initialPayer };
     },
 
-    async getAvailableMana(account) {
-      const current = Number(await this.provider.getAccountRc(account));
+    async getAvailableMana(account, receipt) {
+      // current mana
+      let current = Number(await this.provider.getAccountRc(account));
+
+      // mana reserved in the mempool (pending state)
       let reserved = 0;
       try {
         const res = await this.provider.call(
@@ -1361,17 +1395,41 @@ export default {
       } catch {
         // empty
       }
-      const koin = new Contract({
-        id: this.network.koinContractId,
-        abi: utils.tokenAbi,
-        provider: this.provider,
-        serializer: await this.newSandboxSerializer(
-          utils.tokenAbi.koilib_types
-        ),
-      }).functions;
-      const { result } = await koin.balanceOf({ owner: account });
-      const balance = result && result.value ? Number(result.value) : 0;
-      return { current, reserved, balance };
+
+      // koin balance (mana recharged at 100%)
+      const { result } = await this.koinContract.functions.balanceOf({
+        owner: account,
+      });
+      let balance = result && result.value ? Number(result.value) : 0;
+
+      // check koin transfers in receipt, and deduct that value
+      let transferDetected = false;
+      if (receipt && receipt.events) {
+        await Promise.all(
+          receipt.events.map(async (event) => {
+            if (
+              event.source !== this.koinContract.getId() ||
+              event.name !== "koinos.contracts.token.transfer_event"
+            )
+              return;
+            if (!event.impacted || event.impacted[1] !== account) return;
+            const decoded = await this.koinContract.decodeEvent(event);
+            if (
+              decoded.args.from !== account ||
+              decoded.args.from === decoded.args.to
+            )
+              return;
+            // the account will do a koin transfer, then reduce
+            // the balance and current mana
+            const amount = Number(decoded.args.value);
+            current -= amount;
+            balance -= amount;
+            transferDetected = true;
+          })
+        );
+      }
+
+      return { current, reserved, balance, transferDetected };
     },
 
     async estimateAndAdjustMana(initialPayerPayee) {
@@ -1380,6 +1438,7 @@ export default {
       let receipt;
       try {
         receipt = await this.transaction.send({ broadcast: false });
+        if (!receipt) throw new Error("no receipt received from the rpc node");
         if (receipt.rpc_error) {
           const availableMana = await this.getAvailableMana(initialPayer);
           this.transaction.transaction.header.rc_limit =
@@ -1414,10 +1473,12 @@ export default {
           console.log(error);
           throw new Error("Too many read/writes in the storage");
         }
+        console.log(error);
+        throw new Error(errorJson.error);
       }
 
       const rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
-      const availableMana1 = await this.getAvailableMana(initialPayer);
+      const availableMana1 = await this.getAvailableMana(initialPayer, receipt);
       if (availableMana1.current - availableMana1.reserved < Number(rcLimit)) {
         if (initialPayer === this.network.freeManaSharer) {
           throw new Error(
@@ -1434,6 +1495,12 @@ export default {
         const availableMana2 = await this.getAvailableMana(
           this.network.freeManaSharer
         );
+        //todo: remove
+        /*const availableMana2 = {
+          current: 9999,
+          reserved: 6000_00000000,
+          balance: 6000_00000000,
+        };*/
         if (
           availableMana2.current - availableMana2.reserved <
           Number(rcLimit)
@@ -1441,7 +1508,9 @@ export default {
           if (availableMana1.balance < rcLimit) {
             throw new Error(
               [
-                `you need at least ${utils.formatUnits(
+                `you ${
+                  availableMana1.transferDetected ? "must keep" : "need"
+                } at least ${utils.formatUnits(
                   rcLimit,
                   8
                 )} KOIN in your balance.`,
@@ -1483,6 +1552,7 @@ export default {
       this.transaction.transaction.id = Transaction.computeTransactionId(
         this.transaction.transaction.header
       );
+      return receipt;
     },
 
     /**
@@ -1521,6 +1591,7 @@ export default {
     },
 
     async checkEvents() {
+      this.loadingEvents = true;
       try {
         // TODO: throw error if there are requests.length > 1
         if (process.env.VUE_APP_ENV === "test") {
@@ -1567,6 +1638,8 @@ export default {
             this.transaction.transaction.header.rc_limit,
             8
           );
+          this.payee = this.transaction.transaction.header.payee;
+          this.payer = this.transaction.transaction.header.payer;
         }
         this.events = [];
         if (this.receipt.events) {
@@ -1577,14 +1650,17 @@ export default {
         }
         this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`;
         this.readyToSend = true;
+        this.loadingEvents = false;
       } catch (error) {
         this.readyToSend = false;
+        this.loadingEvents = false;
         this.alertDanger(error.message);
         throw error;
       }
     },
 
     async skipEvents() {
+      this.loadingSkipEvents = true;
       try {
         await this.buildTransaction();
         if (this.optimizeMana) {
@@ -1594,8 +1670,10 @@ export default {
           this.transaction.transaction.signatures = [];
         }
         this.readyToSend = true;
+        this.loadingSkipEvents = false;
       } catch (error) {
         this.readyToSend = false;
+        this.loadingSkipEvents = false;
         this.alertDanger(error.message);
         throw error;
       }

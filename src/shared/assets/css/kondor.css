@@ -328,6 +328,28 @@ button:disabled {
   }
 }
 
+.loader2 {
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid #fff;
+  border-bottom-color: var(--kondor-purple);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  vertical-align: bottom;
+  margin-right: 0.4rem;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* Google - Material Icons */
 /* fallback */
 @font-face {
