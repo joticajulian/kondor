@@ -13,6 +13,12 @@
             <span class="balance">{{ balanceFormatted }}</span>
             <span class="token-symbol">{{ tokenSymbol }}</span>
           </div>
+          <div
+            v-if="showLiquidKoin && balance !== liquidKoin"
+            class="liquid-koin"
+          >
+            {{ liquidKoin }} liquid KOIN
+          </div>
           <div class="usd">
             {{ balanceUSD }}
           </div>
@@ -97,6 +103,8 @@ export default {
       balance: "",
       balanceWithSymbol: "",
       balanceUSD: "",
+      showLiquidKoin: false,
+      liquidKoin: "",
       signer: null,
       provider: null,
       serializer: null,
@@ -213,16 +221,37 @@ export default {
           const initialMana = Number(rc);
           const lastUpdateMana = Date.now();
 
+          // mana reserved in the mempool (pending state)
+          let reserved = 0;
+          try {
+            const res = await this.provider.call(
+              "mempool.get_reserved_account_rc",
+              { account: this.address }
+            );
+            if (res && res.rc) {
+              reserved = Number(res.rc);
+              // in 3 minutes reserved will be 0
+              setTimeout(() => {
+                reserved = 0;
+              }, 180000);
+            }
+          } catch {
+            // empty
+          }
+
           const updateMana = () => {
             const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
             let mana =
-              initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS;
-            mana = Math.min(mana, balanceSatoshisNumber);
+              initialMana +
+              (delta * balanceSatoshisNumber) / FIVE_DAYS -
+              reserved;
+            mana = Math.max(0, Math.min(mana, balanceSatoshisNumber));
             this.timeRechargeMana = deltaTimeToString(
               ((balanceSatoshisNumber - mana) * FIVE_DAYS) /
                 balanceSatoshisNumber
             );
             this.manaPercent = Math.floor((mana / balanceSatoshisNumber) * 100);
+            this.liquidKoin = (mana / 1e8).toFixed(8);
           };
 
           updateMana();
@@ -406,6 +435,7 @@ export default {
       this.balance = t.balance;
       this.balanceWithSymbol = t.balanceWithSymbol;
       this.balanceUSD = t.balanceUSD;
+      this.showLiquidKoin = t.nickname === "koin";
     },
 
     clickBuy() {
@@ -484,6 +514,11 @@ input {
   font-size: 2.5em;
   font-weight: bold;
   cursor: default;
+}
+.liquid-koin {
+  font-size: 0.8em;
+  font-style: italic;
+  color: red;
 }
 .usd,
 .token-symbol {
