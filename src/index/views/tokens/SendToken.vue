@@ -127,11 +127,12 @@
 </template>
 <script>
 import axios from "axios";
+import { Contract, Provider, Signer, Transaction, utils } from "koilib";
 import router from "@/index/router";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
-import { Contract, Provider, Signer, utils } from "koilib";
+import { estimateAndAdjustMana } from "../../../../lib/utils";
 
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
@@ -225,6 +226,10 @@ export default {
         this.network =
           this.$store.state.networks[this.$store.state.currentNetwork];
         this.provider = new Provider(this.network.rpcNodes);
+        this.provider.onError = (error) => {
+          this.provider.currentNodeId = 0;
+          throw error;
+        };
 
         // load nicknames contract
         if (this.network.nicknamesContractId) {
@@ -313,9 +318,28 @@ export default {
           const rc = await this.provider.getAccountRc(this.address);
           const initialMana = Number(rc);
           const lastUpdateMana = Date.now();
+
+          // mana reserved in the mempool (pending state)
+          let reserved = 0;
+          try {
+            const res = await this.provider.call(
+              "mempool.get_reserved_account_rc",
+              { account: this.address }
+            );
+            if (res && res.rc) {
+              reserved = Number(res.rc);
+              // in 3 minutes reserved will be 0
+              setTimeout(() => {
+                reserved = 0;
+              }, 180000);
+            }
+          } catch {
+            // empty
+          }
+
           const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
           let mana = initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS;
-          mana = Math.min(mana, balanceSatoshisNumber);
+          mana = Math.max(0, Math.min(mana, balanceSatoshisNumber) - reserved);
           this.mana = Number(mana.toString()) / 1e8;
           this.maxMana = Math.min(10, this.mana);
         } catch (error) {
@@ -327,7 +351,9 @@ export default {
       return {
         balanceSatoshis,
         balance,
-        balanceWithSymbol: `${balance} ${t.symbol}`,
+        balanceWithSymbol: `${t.nickname === "koin" ? this.mana : balance} ${
+          t.symbol
+        }`,
         balanceUSD,
       };
     },
@@ -405,6 +431,7 @@ export default {
         if (currentAccount.privateKey) {
           this.signer = Signer.fromWif(currentAccount.privateKey, true);
           this.signer.provider = this.provider;
+          this.signer.rcOptions = { estimateRc: false };
           this.watchMode = false;
         } else {
           this.watchMode = true;
@@ -429,7 +456,7 @@ export default {
     },
 
     setMaxAmount() {
-      this.amount = this.balance;
+      this.amount = this.tokenName === "koin" ? this.mana : this.balance;
     },
 
     toggleAdvanced() {
@@ -520,18 +547,65 @@ export default {
           signer: this.signer,
           serializer: this.serializer,
         }).functions;
-        const { transaction, receipt } = await contract.transfer(
-          {
-            from: this.address,
-            to: this.resolvedAddress || this.to,
-            value: utils.parseUnits(this.amount, 8),
+
+        const koinContract = new Contract({
+          id: this.network.koinContractId,
+          abi: {
+            ...utils.tokenAbi,
+            events: {
+              "koinos.contracts.token.transfer_event": {
+                argument: "token.transfer_args",
+              },
+            },
           },
-          {
+          provider: this.provider,
+          serializer: this.serializer,
+        });
+
+        const transaction = new Transaction({
+          provider: this.provider,
+          signer: this.signer,
+          options: {
             chainId: this.network.chainId,
             rcLimit: this.maxMana * 1e8,
-            payer: this.useFreeMana ? this.network.freeManaSharer : this.payer,
-          }
+            payer: this.payer,
+          },
+        });
+        await transaction.pushOperation(contract.transfer, {
+          from: this.address,
+          to: this.resolvedAddress || this.to,
+          value: utils.parseUnits(this.amount, 8),
+        });
+
+        // use mana meter
+        transaction.transaction.header.payee = this.address;
+        transaction.transaction.header.payer = this.network.manaMeter;
+        transaction.transaction.header.rc_limit = Math.floor(
+          0.9 * Number(await this.provider.getAccountRc(this.network.manaMeter))
         );
+        transaction.transaction.id = Transaction.computeTransactionId(
+          transaction.transaction.header
+        );
+        await transaction.prepare();
+        await transaction.sign();
+
+        // adjust mana
+        const { header, id } = await estimateAndAdjustMana({
+          payer: this.address,
+          payee: "",
+          freeManaSharer: this.network.freeManaSharer,
+          transaction,
+          provider: this.provider,
+          koinContract,
+        });
+        transaction.transaction.header = header;
+        transaction.transaction.id = id;
+        transaction.transaction.signatures = [];
+
+        // sign and send with mana updated
+        await transaction.sign();
+        const receipt = await transaction.send();
+
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
         console.log(receipt);

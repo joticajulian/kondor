@@ -67,27 +67,9 @@ import emptyToken from "@/shared/assets/empty-token.png";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
+import { formatTime } from "../../../lib/utils";
 
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
-
-function deltaTimeToString(milliseconds) {
-  if (Number.isNaN(milliseconds)) return "";
-
-  var seconds = Math.floor(milliseconds / 1000);
-
-  var interval = seconds / 86400;
-  if (interval > 2) return Math.floor(interval) + " days";
-
-  interval = seconds / 3600;
-  if (interval > 2) return Math.floor(interval) + " hours";
-
-  interval = seconds / 60;
-  if (interval > 2) return Math.floor(interval) + " minutes";
-
-  interval = Math.floor(seconds);
-  if (interval === 0) return "Mana recharged";
-  return interval + " seconds";
-}
 
 export default {
   components: { ManaOrb },
@@ -241,26 +223,39 @@ export default {
 
           const updateMana = () => {
             const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
-            let mana =
-              initialMana +
-              (delta * balanceSatoshisNumber) / FIVE_DAYS -
-              reserved;
-            mana = Math.max(0, Math.min(mana, balanceSatoshisNumber));
-            this.timeRechargeMana = deltaTimeToString(
-              ((balanceSatoshisNumber - mana) * FIVE_DAYS) /
-                balanceSatoshisNumber
+            let mana = Math.floor(
+              initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS
             );
+            mana = Math.min(mana, balanceSatoshisNumber);
+            const timeRechargeMana = formatTime(balanceSatoshisNumber, {
+              current: mana,
+              reserved,
+              balance: balanceSatoshisNumber,
+            });
+            if (timeRechargeMana === "0 seconds")
+              this.timeRechargeMana = "Mana recharged";
+            else {
+              this.timeRechargeMana = `Time to recharge: ${timeRechargeMana}`;
+            }
+            mana = Math.max(0, mana - reserved);
             this.manaPercent = Math.floor((mana / balanceSatoshisNumber) * 100);
-            this.liquidKoin = (mana / 1e8).toFixed(8);
+            this.liquidKoin = utils.formatUnits(mana.toString(), 8);
           };
 
-          updateMana();
-          clearInterval(this.intervalMana);
-          this.intervalMana = setInterval(updateMana, 1000);
+          if (balanceSatoshisNumber) {
+            updateMana();
+            clearInterval(this.intervalMana);
+            this.intervalMana = setInterval(updateMana, 1000);
+          } else {
+            this.timeRechargeMana = "No mana";
+          }
         } catch (error) {
           console.error("error when loading mana");
           console.error(error);
         }
+        this.showLiquidKoin = true;
+      } else {
+        this.showLiquidKoin = false;
       }
 
       return {
@@ -413,6 +408,7 @@ export default {
         if (currentAccount.privateKey) {
           this.signer = Signer.fromWif(currentAccount.privateKey, true);
           this.signer.provider = this.provider;
+          this.signer.rcOptions = { estimateRc: false };
           this.watchMode = false;
         } else {
           this.watchMode = true;
@@ -456,7 +452,7 @@ export default {
 .token {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: start;
 }
 .token-image {
   width: 3.5em;
@@ -503,7 +499,7 @@ label {
 .row {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   padding: 0 2em;
 }

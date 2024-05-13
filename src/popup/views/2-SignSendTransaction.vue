@@ -330,45 +330,14 @@ import Sandbox from "@/shared/mixins/Sandbox";
 import Unlock from "@/shared/components/Unlock.vue";
 import Footnote from "@/shared/components/Footnote.vue";
 
+import { estimateAndAdjustMana } from "../../../lib/utils";
+
 function firstUpperCase(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function fromHexToUtf8(hex) {
   return new TextDecoder().decode(utils.toUint8Array(hex));
-}
-
-function deltaTimeToString(milliseconds) {
-  if (Number.isNaN(milliseconds)) return "(error)";
-
-  var seconds = Math.floor(milliseconds / 1000);
-
-  var interval = seconds / 86400;
-  if (interval > 2) return Math.floor(interval) + " days";
-
-  interval = seconds / 3600;
-  if (interval > 2) return Math.floor(interval) + " hours";
-
-  interval = seconds / 60;
-  if (interval > 2) return Math.floor(interval) + " minutes";
-
-  interval = Math.floor(seconds);
-  return interval + " seconds";
-}
-
-function formatTime(rcLimit, availableMana) {
-  const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
-  const THREE_MINUTES = 180_000;
-  const { current, reserved, balance } = availableMana;
-  if (balance < rcLimit) return "(not enough balance)";
-
-  let deltaTime = ((rcLimit - current) * FIVE_DAYS) / balance;
-  if (reserved > 0 && deltaTime < THREE_MINUTES) {
-    deltaTime = THREE_MINUTES;
-    const deltaTime2 = ((rcLimit - current + reserved) * FIVE_DAYS) / balance;
-    if (deltaTime2 < deltaTime) deltaTime = deltaTime2;
-  }
-  return deltaTimeToString(deltaTime);
 }
 
 export default {
@@ -1401,181 +1370,6 @@ export default {
       return { payee: initialPayee, payer: initialPayer };
     },
 
-    async getAvailableMana(account, receipt) {
-      // current mana
-      let current = Number(await this.provider.getAccountRc(account));
-
-      // mana reserved in the mempool (pending state)
-      let reserved = 0;
-      try {
-        const res = await this.provider.call(
-          "mempool.get_reserved_account_rc",
-          { account }
-        );
-        if (res && res.rc) reserved = Number(res.rc);
-      } catch {
-        // empty
-      }
-
-      // koin balance (mana recharged at 100%)
-      const { result } = await this.koinContract.functions.balanceOf({
-        owner: account,
-      });
-      let balance = result && result.value ? Number(result.value) : 0;
-
-      // check koin transfers in receipt, and deduct that value
-      let transferDetected = false;
-      if (receipt && receipt.events) {
-        await Promise.all(
-          receipt.events.map(async (event) => {
-            if (
-              event.source !== this.koinContract.getId() ||
-              event.name !== "koinos.contracts.token.transfer_event"
-            )
-              return;
-            if (!event.impacted || event.impacted[1] !== account) return;
-            const decoded = await this.koinContract.decodeEvent(event);
-            if (
-              decoded.args.from !== account ||
-              decoded.args.from === decoded.args.to
-            )
-              return;
-            // the account will do a koin transfer, then reduce
-            // the balance and current mana
-            const amount = Number(decoded.args.value);
-            current -= amount;
-            balance -= amount;
-            transferDetected = true;
-          })
-        );
-      }
-
-      return { current, reserved, balance, transferDetected };
-    },
-
-    async estimateAndAdjustMana(initialPayerPayee) {
-      const initialPayer = initialPayerPayee.payer;
-      const initialPayee = initialPayerPayee.payee;
-      let receipt;
-      try {
-        receipt = await this.transaction.send({ broadcast: false });
-        if (!receipt) throw new Error("no receipt received from the rpc node");
-        if (receipt.rpc_error) {
-          const availableMana = await this.getAvailableMana(initialPayer);
-          this.transaction.transaction.header.rc_limit =
-            availableMana.current - availableMana.reserved;
-          console.log(receipt.rpc_error);
-          throw new Error(
-            [
-              "timeout from the rpc. Not possible to estimate the consumption of mana.",
-              "Probably because the transaction has many computations.",
-              "As an alternative you can try to submit the transaction without",
-              "checking events.",
-            ].join(" ")
-          );
-        }
-      } catch (error) {
-        let errorJson;
-        try {
-          errorJson = JSON.parse(error.message);
-        } catch {
-          throw error;
-        }
-        if (!errorJson.error) throw error;
-        if (errorJson.error.includes("compute bandwidth limit exceeded")) {
-          console.log(error);
-          throw new Error("Too many computations inside the transaction");
-        }
-        if (errorJson.error.includes("network bandwidth limit exceeded")) {
-          console.log(error);
-          throw new Error("The transaction is too large");
-        }
-        if (errorJson.error.includes("disk storage limit exceeded")) {
-          console.log(error);
-          throw new Error("Too many read/writes in the storage");
-        }
-        console.log(error);
-        throw new Error(errorJson.error);
-      }
-
-      const rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
-      const availableMana1 = await this.getAvailableMana(initialPayer, receipt);
-      if (availableMana1.current - availableMana1.reserved < Number(rcLimit)) {
-        if (initialPayer === this.network.freeManaSharer) {
-          throw new Error(
-            [
-              `Free mana service is congested.``Try again in ${formatTime(
-                rcLimit,
-                availableMana1
-              )}`,
-            ].join(" ")
-          );
-        }
-
-        // check if the free mana sharer can pay the transaction
-        const availableMana2 = await this.getAvailableMana(
-          this.network.freeManaSharer
-        );
-        //todo: remove
-        /*const availableMana2 = {
-          current: 9999,
-          reserved: 6000_00000000,
-          balance: 6000_00000000,
-        };*/
-        if (
-          availableMana2.current - availableMana2.reserved <
-          Number(rcLimit)
-        ) {
-          if (availableMana1.balance < rcLimit) {
-            throw new Error(
-              [
-                `you ${
-                  availableMana1.transferDetected ? "must keep" : "need"
-                } at least ${utils.formatUnits(
-                  rcLimit,
-                  8
-                )} KOIN in your balance.`,
-                `Or try again in ${formatTime(
-                  rcLimit,
-                  availableMana2
-                )} to see if the`,
-                `free mana service is available.`,
-              ].join(" ")
-            );
-          }
-
-          throw new Error(
-            [
-              `you need at least ${utils.formatUnits(
-                rcLimit,
-                8
-              )} liquid KOIN in your balance.`,
-              `Wait ${formatTime(
-                rcLimit,
-                availableMana1
-              )} until it recharges and try again.`,
-              `Or try again in ${formatTime(
-                rcLimit,
-                availableMana2
-              )} to see if the`,
-              `free mana service is available.`,
-            ].join(" ")
-          );
-        }
-        this.transaction.transaction.header.payee =
-          initialPayee || initialPayer;
-        this.transaction.transaction.header.payer = this.network.freeManaSharer;
-      } else {
-        this.transaction.transaction.header.payee = initialPayee;
-        this.transaction.transaction.header.payer = initialPayer;
-      }
-      this.transaction.transaction.header.rc_limit = rcLimit;
-      this.transaction.transaction.id = Transaction.computeTransactionId(
-        this.transaction.transaction.header
-      );
-      return receipt;
-    },
-
     /**
      * Sign transaction with all required signers
      */
@@ -1648,9 +1442,18 @@ export default {
         } else {
           await this.buildTransaction();
           if (this.optimizeMana) {
-            const initialPayerPayee = await this.useManaMeter();
+            const { payer, payee } = await this.useManaMeter();
             await this.signTransaction();
-            await this.estimateAndAdjustMana(initialPayerPayee);
+            const { header, id } = await estimateAndAdjustMana({
+              payer,
+              payee,
+              freeManaSharer: this.network.freeManaSharer,
+              transaction: this.transaction,
+              provider: this.provider,
+              koinContract: this.koinContract,
+            });
+            this.transaction.transaction.header = header;
+            this.transaction.transaction.id = id;
             this.transaction.transaction.signatures = [];
           }
           await this.signTransaction();
@@ -1685,9 +1488,18 @@ export default {
       try {
         await this.buildTransaction();
         if (this.optimizeMana) {
-          const initialPayerPayee = await this.useManaMeter();
+          const { payer, payee } = await this.useManaMeter();
           await this.signTransaction();
-          await this.estimateAndAdjustMana(initialPayerPayee);
+          const { header, id } = await estimateAndAdjustMana({
+            payer,
+            payee,
+            freeManaSharer: this.network.freeManaSharer,
+            transaction: this.transaction,
+            provider: this.provider,
+            koinContract: this.koinContract,
+          });
+          this.transaction.transaction.header = header;
+          this.transaction.transaction.id = id;
           this.transaction.transaction.signatures = [];
         }
         this.readyToSend = true;
