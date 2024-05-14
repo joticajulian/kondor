@@ -17,7 +17,7 @@
             v-if="showLiquidKoin && balance !== liquidKoin"
             class="liquid-koin"
           >
-            {{ liquidKoin }} liquid KOIN
+            {{ liquidKoin }} Liquid KOIN
           </div>
           <div class="usd">
             {{ balanceUSD }}
@@ -452,7 +452,7 @@ export default {
 .token {
   display: flex;
   flex-direction: row;
-  align-items: start;
+  align-items: flex-start;
 }
 .token-image {
   width: 3.5em;
@@ -499,7 +499,7 @@ label {
 .row {
   display: flex;
   flex-direction: row;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 0 2em;
 }
@@ -512,9 +512,7 @@ input {
   cursor: default;
 }
 .liquid-koin {
-  font-size: 0.8em;
-  font-style: italic;
-  color: red;
+  color: var(--kondor-purple);
 }
 .usd,
 .token-symbol {
