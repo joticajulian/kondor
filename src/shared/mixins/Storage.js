@@ -15,6 +15,7 @@ import abiFogata from "../assets/abiFogata.json";
 import abiNicknamesMainnet from "../assets/abiNicknamesMainnet.json";
 import abiNicknamesHarbinger from "../assets/abiNicknamesHarbinger.json";
 import abiKapNameService from "../assets/abiKapNameService.json";
+import abiFreeManaSharer from "../assets/abiFreeManaSharer.json";
 
 function toUint8Array(hexString) {
   return new Uint8Array(
@@ -232,6 +233,8 @@ export default {
           return abiKapNameService;
         case "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz":
           return abiNicknamesMainnet;
+        case "162GhJwsciDiKsgwzj2t6VoFHt3RMzGKdG":
+          return abiFreeManaSharer;
         default:
           break;
         }
@@ -247,6 +250,8 @@ export default {
           return abiPobHarbinger;
         case "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR":
           return abiNicknamesHarbinger;
+        case "1A5ovJ6htWqnh8qDiXPQMuWmqxtVr2q3Gn":
+          return abiFreeManaSharer;
         default:
           break;
         }
