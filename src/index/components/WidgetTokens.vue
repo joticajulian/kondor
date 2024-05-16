@@ -26,6 +26,7 @@
       </div>
       <ManaOrb
         :mana-percent="manaPercent"
+        :available-percent="availablePercent"
         :time-recharge="timeRechargeMana"
       />
     </div>
@@ -93,7 +94,8 @@ export default {
       intervalMana: null,
       timeRechargeMana: "",
       watchMode: false,
-      manaPercent: 1,
+      manaPercent: 0,
+      availablePercent: 0,
     };
   },
 
@@ -237,8 +239,11 @@ export default {
             else {
               this.timeRechargeMana = `Time to recharge: ${timeRechargeMana}`;
             }
-            mana = Math.max(0, mana - reserved);
             this.manaPercent = Math.floor((mana / balanceSatoshisNumber) * 100);
+            mana = Math.max(0, mana - reserved);
+            this.availablePercent = Math.floor(
+              (mana / balanceSatoshisNumber) * 100
+            );
             this.liquidKoin = utils.formatUnits(mana.toString(), 8);
           };
 
@@ -247,8 +252,10 @@ export default {
             clearInterval(this.intervalMana);
             this.intervalMana = setInterval(updateMana, 1000);
           } else {
+            clearInterval(this.intervalMana);
             this.timeRechargeMana = "No mana";
             this.manaPercent = 0;
+            this.availablePercent = 0;
             this.liquidKoin = "0";
           }
         } catch (error) {

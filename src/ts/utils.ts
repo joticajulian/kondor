@@ -283,8 +283,8 @@ export async function estimateAndAdjustMana(args: {
       );
     }
     header.payee = initialPayee || initialPayer;
-    header.payer = freeManaSharer.getId();console.log("rcLimit ", rcLimit);
-    rcLimit = rcLimitFreeMana;console.log("rcLimit ", rcLimit);
+    header.payer = freeManaSharer.getId();
+    rcLimit = rcLimitFreeMana;
   } else {
     header.payee = initialPayee;
     header.payer = initialPayer;

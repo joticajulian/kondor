@@ -155,9 +155,7 @@
               "authorize_arguments": {
                 "oneofs": {
                   "_call": {
-                    "oneof": [
-                      "call"
-                    ]
+                    "oneof": ["call"]
                   }
                 },
                 "fields": {
@@ -196,9 +194,7 @@
             }
           },
           "_btype": {
-            "oneof": [
-              "btype"
-            ]
+            "oneof": ["btype"]
           },
           "btype": {
             "type": "bytes_type",
