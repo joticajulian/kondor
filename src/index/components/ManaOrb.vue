@@ -5,6 +5,12 @@
         class="filler"
         :style="cssVars"
       >
+        <div class="spinner color2" />
+      </div>
+      <div
+        class="filler"
+        :style="cssVars2"
+      >
         <div class="spinner" />
       </div>
       <div class="shine" />
@@ -18,6 +24,10 @@ export default {
       type: Number,
       required: true,
     },
+    availablePercent: {
+      type: Number,
+      required: true,
+    },
     timeRecharge: {
       type: String,
       required: true,
@@ -27,6 +37,11 @@ export default {
     cssVars() {
       return {
         "--fill-to": `-${this.manaPercent / 2 + 25}%`,
+      };
+    },
+    cssVars2() {
+      return {
+        "--fill-to": `-${this.availablePercent / 2 + 25}%`,
       };
     },
   },
@@ -54,11 +69,15 @@ export default {
 }
 
 .spinner {
-  background: #fff;
+  background: #ffffff66;
   height: 100%;
   width: 100%;
   border-radius: 40%;
   animation: spin 4s ease-out forwards;
+}
+
+.color2 {
+  background-color: #ffffff;
 }
 
 .shine {
