@@ -116,11 +116,15 @@
         cancel
       </button>
       <button
-        :disabled="!isToValidated || !isToValid || !isAmountValid"
+        :disabled="!isToValidated || !isToValid || !isAmountValid || makingTransfer"
         class="primary"
         @click="transfer"
       >
-        transfer
+        <span
+          v-if="makingTransfer"
+          class="loader2"
+        />
+        <span v-else>transfer</span>
       </button>
     </div>
   </div>
@@ -176,6 +180,7 @@ export default {
       kapNameService: null,
       nicknames: null,
       tokenId2: "",
+      makingTransfer: false,
     };
   },
 
@@ -338,9 +343,9 @@ export default {
           }
 
           const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
-          let mana = initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS;
+          let mana = Math.floor(initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS);
           mana = Math.max(0, Math.min(mana, balanceSatoshisNumber) - reserved);
-          this.mana = Number(mana.toString()) / 1e8;
+          this.mana = utils.formatUnits(mana.toString(), 8);
           this.maxMana = Math.min(10, this.mana);
         } catch (error) {
           console.error("error when loading mana");
@@ -539,6 +544,7 @@ export default {
     },
 
     async transfer() {
+      this.makingTransfer = true;
       try {
         const contract = new Contract({
           id: this.tokenId2,
@@ -612,8 +618,10 @@ export default {
         const { blockNumber } = await transaction.wait("byBlock", 60_000);
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
+        this.makingTransfer = false;
         router.push("/dashboard");
       } catch (error) {
+        this.makingTransfer = false;
         this.alertDanger(error.message);
         throw error;
       }
