@@ -41,12 +41,17 @@ export function deltaTimeToString(milliseconds: number): string {
 
 export function formatTime(
   rcLimit: number,
-  availableMana: { current: number; reserved: number; balance: number }
+  availableMana: {
+    current: number;
+    reserved: number;
+    balance: number;
+    availableBalance: number;
+  }
 ): string {
   const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
   const THREE_MINUTES = 180_000;
-  const { current, reserved, balance } = availableMana;
-  if (balance < rcLimit) return "(not enough balance)";
+  const { current, reserved, balance, availableBalance } = availableMana;
+  if (availableBalance < rcLimit) return "no balance";
 
   let deltaTime = ((rcLimit - current) * FIVE_DAYS) / balance;
   if (reserved > 0 && deltaTime < THREE_MINUTES) {
@@ -57,6 +62,23 @@ export function formatTime(
     }
   }
   return deltaTimeToString(deltaTime);
+}
+
+export async function getReservedAccountRc(
+  account: string,
+  provider: Provider
+): Promise<number> {
+  let reserved = 0;
+  try {
+    const res = await provider.call<{ rc: string }>(
+      "mempool.get_reserved_account_rc",
+      { account }
+    );
+    if (res && res.rc) reserved = Number(res.rc);
+  } catch {
+    // empty
+  }
+  return reserved;
 }
 
 export async function getAvailableMana(
@@ -72,16 +94,7 @@ export async function getAvailableMana(
   let current = Number(await provider.getAccountRc(account));
 
   // mana reserved in the mempool (pending state)
-  let reserved = 0;
-  try {
-    const res = await provider.call<{ rc: string }>(
-      "mempool.get_reserved_account_rc",
-      { account }
-    );
-    if (res && res.rc) reserved = Number(res.rc);
-  } catch {
-    // empty
-  }
+  const reserved = await getReservedAccountRc(account, provider);
 
   // koin balance (mana recharged at 100%)
   const { result } = await koinContract.functions.balanceOf({
@@ -115,17 +128,18 @@ export async function getAvailableMana(
       })
     );
   }
+  const availableBalance = balance;
 
-  return { current, reserved, balance, transferDetected };
+  return { current, reserved, balance, availableBalance, transferDetected };
 }
 
 export async function estimateAndAdjustMana(args: {
   payer: string;
   payee: string;
-  freeManaSharer: string;
   transaction: Transaction;
   provider: Provider;
   koinContract: Contract;
+  freeManaSharer: Contract;
 }): Promise<{
   receipt: TransactionReceipt;
   header: TransactionHeaderJson;
@@ -190,14 +204,14 @@ export async function estimateAndAdjustMana(args: {
     throw new Error(errorJson.error);
   }
 
-  const rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
+  let rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
   const availableMana1 = await getAvailableMana(initialPayer, {
     provider,
     koinContract,
     receipt,
   });
-  if (availableMana1.current - availableMana1.reserved < Number(rcLimit)) {
-    if (initialPayer === freeManaSharer) {
+  if (availableMana1.current - availableMana1.reserved < rcLimit) {
+    if (initialPayer === freeManaSharer.getId()) {
       throw new Error(
         [
           `Free mana service is congested. Try again in ${formatTime(
@@ -209,28 +223,47 @@ export async function estimateAndAdjustMana(args: {
     }
 
     // check if the free mana sharer can pay the transaction
-    const availableMana2 = await getAvailableMana(freeManaSharer, {
-      provider,
-      koinContract,
-    });
+    const { result } = await freeManaSharer.functions.get_status();
+    const availableMana2 = result
+      ? {
+          current: Number(result.available_mana || 0),
+          reserved: await getReservedAccountRc(
+            freeManaSharer.getId(),
+            provider
+          ),
+          balance: Number(result.koin_balance || 0),
+          availableBalance: Number(result.available_balance || 0),
+          recommendedManaOffset: Number(result.recommended_mana_offset || 0),
+          transferDetected: false,
+        }
+      : {
+          current: 0,
+          reserved: 0,
+          balance: 0,
+          availableBalance: 0,
+          recommendedManaOffset: 0,
+          transferDetected: false,
+        };
     //todo: remove
     /*const availableMana2 = {
       current: 9999,
       reserved: 6000_00000000,
       balance: 6000_00000000,
     };*/
-    if (availableMana2.current - availableMana2.reserved < Number(rcLimit)) {
+    const rcLimitFreeMana = rcLimit + availableMana2.recommendedManaOffset;
+    if (availableMana2.current - availableMana2.reserved < rcLimitFreeMana) {
+      const timeFreeMana = formatTime(rcLimitFreeMana, availableMana2);
+      const messageFreeMana =
+        timeFreeMana === "no balance"
+          ? "The free mana service is unavailable due to lack of funds."
+          : `Or try again in ${timeFreeMana} to see if the free mana service is available.`;
       if (availableMana1.balance < rcLimit) {
         throw new Error(
           [
             `you ${
               availableMana1.transferDetected ? "must keep" : "need"
             } at least ${utils.formatUnits(rcLimit, 8)} KOIN in your balance.`,
-            `Or try again in ${formatTime(
-              rcLimit,
-              availableMana2
-            )} to see if the`,
-            `free mana service is available.`,
+            messageFreeMana,
           ].join(" ")
         );
       }
@@ -245,16 +278,13 @@ export async function estimateAndAdjustMana(args: {
             rcLimit,
             availableMana1
           )} until it recharges and try again.`,
-          `Or try again in ${formatTime(
-            rcLimit,
-            availableMana2
-          )} to see if the`,
-          `free mana service is available.`,
+          messageFreeMana,
         ].join(" ")
       );
     }
     header.payee = initialPayee || initialPayer;
-    header.payer = freeManaSharer;
+    header.payer = freeManaSharer.getId();console.log("rcLimit ", rcLimit);
+    rcLimit = rcLimitFreeMana;console.log("rcLimit ", rcLimit);
   } else {
     header.payee = initialPayee;
     header.payer = initialPayer;

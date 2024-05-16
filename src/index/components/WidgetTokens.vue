@@ -248,6 +248,8 @@ export default {
             this.intervalMana = setInterval(updateMana, 1000);
           } else {
             this.timeRechargeMana = "No mana";
+            this.manaPercent = 0;
+            this.liquidKoin = "0";
           }
         } catch (error) {
           console.error("error when loading mana");

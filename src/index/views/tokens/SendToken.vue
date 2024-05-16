@@ -116,7 +116,9 @@
         cancel
       </button>
       <button
-        :disabled="!isToValidated || !isToValid || !isAmountValid || makingTransfer"
+        :disabled="
+          !isToValidated || !isToValid || !isAmountValid || makingTransfer
+        "
         class="primary"
         @click="transfer"
       >
@@ -343,7 +345,9 @@ export default {
           }
 
           const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
-          let mana = Math.floor(initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS);
+          let mana = Math.floor(
+            initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS
+          );
           mana = Math.max(0, Math.min(mana, balanceSatoshisNumber) - reserved);
           this.mana = utils.formatUnits(mana.toString(), 8);
           this.maxMana = Math.min(10, this.mana);
@@ -568,6 +572,19 @@ export default {
           serializer: this.serializer,
         });
 
+        const abiFreeManaSharer = await this._getAbi(
+          this.network.tag,
+          this.network.freeManaSharer
+        );
+        const freeManaSharer = new Contract({
+          id: this.network.freeManaSharer,
+          abi: abiFreeManaSharer,
+          provider: this.provider,
+          serializer: await this.newSandboxSerializer(
+            abiFreeManaSharer.koilib_types
+          ),
+        });
+
         const transaction = new Transaction({
           provider: this.provider,
           signer: this.signer,
@@ -599,10 +616,10 @@ export default {
         const { header, id } = await estimateAndAdjustMana({
           payer: this.address,
           payee: "",
-          freeManaSharer: this.network.freeManaSharer,
           transaction,
           provider: this.provider,
           koinContract,
+          freeManaSharer,
         });
         transaction.transaction.header = header;
         transaction.transaction.id = id;

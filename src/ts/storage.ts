@@ -61,7 +61,8 @@ export const DEFAULT_NETWORKS: Network[] = [
     nicknamesContractId: "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz",
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
     kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB",
-    freeManaSharer: "1KyZyhNwiDo6a93f3FvK8pxspKdgEtQDwa",
+    // freeManaSharer: "1KyZyhNwiDo6a93f3FvK8pxspKdgEtQDwa", // kondor-nft
+    freeManaSharer: "162GhJwsciDiKsgwzj2t6VoFHt3RMzGKdG",
     manaMeter: "1MqveNK3piSGPHGocsRUCVhpCPLgQA58K9",
   },
   {
@@ -78,7 +79,8 @@ export const DEFAULT_NETWORKS: Network[] = [
     ],
     koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
     nicknamesContractId: "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR",
-    freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
+    // freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
+    freeManaSharer: "1A5ovJ6htWqnh8qDiXPQMuWmqxtVr2q3Gn",
     manaMeter: "19jgVtCHfhzgzAWNVyRzhoH9G5aa9VTZCE",
   },
 ];
@@ -105,8 +107,18 @@ export async function getNetworks(strict = true): Promise<Network[]> {
 
   // take default values if not present
   networks!.forEach((network, i) => {
+    const fields = ["rpcNodes"] as const;
+    fields.forEach((field) => {
+      if (!network[field]) {
+        network[field] = DEFAULT_NETWORKS[i][field]! as string & string[];
+      }
+    });
+  });
+
+  // force to use default values
+  networks!.forEach((network, i) => {
     const fields = [
-      "rpcNodes",
+      "chainId",
       "koinContractId",
       "nicknamesContractId",
       "kapNameServiceContractId",
@@ -115,10 +127,9 @@ export async function getNetworks(strict = true): Promise<Network[]> {
       "manaMeter",
     ] as const;
     fields.forEach((field) => {
-      if (!network[field]) {
-        network[field] = DEFAULT_NETWORKS[i][field]! as string & string[];
-      }
+      network[field] = DEFAULT_NETWORKS[i][field]! as string & string[];
     });
   });
+
   return networks!;
 }

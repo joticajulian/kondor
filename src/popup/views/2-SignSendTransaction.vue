@@ -389,6 +389,7 @@ export default {
       isOldKondor: false,
       nicknames: null,
       koinContract: null,
+      freeManaSharer: null,
       cacheNicknames: {},
       loadingEvents: false,
       loadingSkipEvents: false,
@@ -1172,6 +1173,19 @@ export default {
           ),
         }).functions;
 
+        const abiFreeManaSharer = await this._getAbi(
+          this.network.tag,
+          this.network.freeManaSharer
+        );
+        this.freeManaSharer = new Contract({
+          id: this.network.freeManaSharer,
+          abi: abiFreeManaSharer,
+          provider: this.provider,
+          serializer: await this.newSandboxSerializer(
+            abiFreeManaSharer.koilib_types
+          ),
+        });
+
         this.koinContract = new Contract({
           id: this.network.koinContractId,
           abi: {
@@ -1447,7 +1461,7 @@ export default {
             const { header, id } = await estimateAndAdjustMana({
               payer,
               payee,
-              freeManaSharer: this.network.freeManaSharer,
+              freeManaSharer: this.freeManaSharer,
               transaction: this.transaction,
               provider: this.provider,
               koinContract: this.koinContract,
@@ -1493,7 +1507,7 @@ export default {
           const { header, id } = await estimateAndAdjustMana({
             payer,
             payee,
-            freeManaSharer: this.network.freeManaSharer,
+            freeManaSharer: this.freeManaSharer,
             transaction: this.transaction,
             provider: this.provider,
             koinContract: this.koinContract,
