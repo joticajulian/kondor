@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.10.0](https://github.com/joticajulian/kondor/releases/tag/v0.10.0) (2024-05-17)
+
+### 🚀 Features
+
+- Mana is estimated before broadcasting and adjusted automatically
+- It als takes into account the transfers in the events to adjust the mana
+- Show Liquid KOIN
+- Error messages improved
+- The mana orb shows 2 colors: available mana and reserved mana (in mempool)
+- Introduction of the new kondor logo
+- It uses a new free mana sharer that is funded by the community
+- Cache abis and nicknames to improve performance
+
 ## [v0.9.1](https://github.com/joticajulian/kondor/releases/tag/v0.9.1) (2023-11-24)
 
 ### 🐛 Bug Fixes
