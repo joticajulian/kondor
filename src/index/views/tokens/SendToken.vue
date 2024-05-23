@@ -64,6 +64,11 @@
       :class="!isAmountValid ? 'invalid' : ''"
       @input="validateAmountDebounced()"
     >
+    <label>Memo</label>
+    <input
+      v-model="memo"
+      type="text"
+    >
     <div class="row">
       <a
         class="balance"
@@ -166,6 +171,7 @@ export default {
       serializer: null,
       to: "",
       amount: "0",
+      memo: "",
       mana: "",
       miniTokens: [],
       isToValid: false,
@@ -598,6 +604,7 @@ export default {
           from: this.address,
           to: this.resolvedAddress || this.to,
           value: utils.parseUnits(this.amount, 8),
+          memo: this.memo,
         });
 
         // use mana meter
