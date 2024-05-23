@@ -63,6 +63,7 @@
           <input
             v-model="useFreeMana"
             type="checkbox"
+            :disabled="externalSigners"
           >
           <label for="payer">Use free mana</label>
         </div>
@@ -70,6 +71,7 @@
           <input
             v-model="optimizeMana"
             type="checkbox"
+            :disabled="externalSigners"
           >
           <label for="payer">Optimize mana</label>
         </div>
@@ -78,7 +80,7 @@
           <input
             v-model="maxMana"
             type="text"
-            :disabled="optimizeMana"
+            :disabled="optimizeMana || externalSigners"
           >
         </div>
         <div class="group-input">
@@ -86,6 +88,7 @@
           <input
             v-model="payer"
             type="text"
+            :disabled="externalSigners"
           >
         </div>
         <div class="group-input">
@@ -93,6 +96,7 @@
           <input
             v-model="payee"
             type="text"
+            :disabled="externalSigners"
           >
         </div>
         <div class="group-input">
@@ -100,6 +104,7 @@
           <input
             v-model="nonce"
             type="text"
+            :disabled="externalSigners"
           >
         </div>
       </div>
@@ -1135,6 +1140,7 @@ export default {
           signature,
         });
         this.externalSigners = true;
+        this.optimizeMana = false;
       }
     },
 
