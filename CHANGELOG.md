@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.10.1](https://github.com/joticajulian/kondor/releases/tag/v0.10.1) (2024-05-24)
+
+### 🚀 Features
+
+- Support memo in transfers
+
+### 🐛 Bug Fixes
+
+- Disable changes in headers when the transaction comes pre-signed because the signature cannot be reproduced again after a change. At the same time all advanced options will be disabled.
+
 ## [v0.10.0](https://github.com/joticajulian/kondor/releases/tag/v0.10.0) (2024-05-17)
 
 ### 🚀 Features
