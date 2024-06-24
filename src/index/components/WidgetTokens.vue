@@ -30,6 +30,11 @@
         :time-recharge="timeRechargeMana"
       />
     </div>
+    <a
+      v-if="!tokenAddressPermanent"
+      class="notpermanent"
+      href="https://peakd.com/@jga/nicknames-not-permanent"
+    >⚠️ not permanent</a>
     <div class="other-tokens">
       <div
         v-for="(miniToken, i) in miniTokens"
@@ -81,6 +86,7 @@ export default {
       tokenName: "",
       tokenImage: "",
       tokenSymbol: "",
+      tokenAddressPermanent: true,
       miniTokens: [],
       address: "",
       balance: "",
@@ -308,13 +314,16 @@ export default {
           )}`;
 
           try {
-            const { result: resultOwner } = await nicknames.owner_of({
-              token_id: tokenId,
+            const { result: resultAddress } = await nicknames.get_address({
+              value: token.nickname,
             });
-            if (!resultOwner || !resultOwner.account) {
-              return {};
+            if (!resultAddress || !resultAddress.value) {
+              return token;
             }
-            token.contractId = resultOwner.account;
+            token.contractId = resultAddress.value;
+            token.permanentAddress =
+              !!resultAddress.address_modifiable_only_by_governance ||
+              !!resultAddress.permanent_address;
           } catch (error) {
             console.error(
               `error when loading contract id of @${token.nickname}`
@@ -349,47 +358,45 @@ export default {
 
       await Promise.all(
         t.map(async (token) => {
+          // skip repeated tokens (if any)
+          if (this.miniTokens.find((m) => m.contractId === token.contractId)) {
+            return;
+          }
+
           // check network of token
           if (token.network !== this.network.tag) {
-            return {};
+            return;
           }
 
           // check current address
           if (token.addresses && token.addresses.length > 0) {
             if (!token.addresses.includes(this.address)) {
-              return {};
+              return;
             }
           }
           if (token.noAddresses && token.noAddresses.length > 0) {
             if (token.noAddresses.includes(this.address)) {
-              return {};
+              return;
             }
           }
 
           const balance = await this.loadTokenBalance(token);
 
+          const miniToken = {
+            ...token,
+            ...balance,
+          };
+
           if (
             (!this.tokenId && token.nickname === "koin") ||
             token.contractId === this.tokenId
           ) {
-            this.tokenId = token.contractId;
-            this.tokenName = token.nickname;
-            this.tokenImage = token.image;
-            this.tokenSymbol = token.symbol;
-            this.balance = balance.balance;
-            this.balanceWithSymbol = balance.balanceWithSymbol;
-            this.balanceUSD = balance.balanceUSD;
+            this.loadToken(miniToken);
           }
 
-          if (this.miniTokens.find((m) => m.contractId === token.contractId))
-            return {};
+          this.miniTokens.push(miniToken);
 
-          this.miniTokens.push({
-            ...token,
-            ...balance,
-          });
-
-          return {};
+          return;
         })
       );
 
@@ -437,6 +444,7 @@ export default {
       this.tokenName = t.nickname;
       this.tokenImage = t.image;
       this.tokenSymbol = t.symbol;
+      this.tokenAddressPermanent = t.permanentAddress;
       this.balance = t.balance;
       this.balanceWithSymbol = t.balanceWithSymbol;
       this.balanceUSD = t.balanceUSD;
@@ -558,5 +566,15 @@ input {
 }
 .actions > button:disabled > .material-icons {
   background: #999;
+}
+
+.notpermanent {
+  background-color: var(--kondor-red);
+  color: white;
+  border-radius: 8px;
+  padding: 0.2rem 0.6rem;
+  margin: 0.5em 2em 0em 2em;
+  width: 7rem;
+  text-align: center;
 }
 </style>

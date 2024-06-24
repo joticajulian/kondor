@@ -34,18 +34,35 @@
     <button
       v-if="!requestSecondConfirmation"
       class=""
+      :disabled="loading"
       @click="accept"
     >
-      accept
+      <span
+        v-if="loading"
+        class="loader2"
+      />
+      <span v-else>accept</span>
     </button>
     <div
       v-else
       class="second-confirmation"
     >
-      <div class="warning-notification">
+      <div
+        v-if="!tokenInKoinDX"
+        class="warning-notification"
+      >
         This token is not listed in KoinDX. It is extremely important that you
         add only trusted tokens; Otherwise, you risk losing funds.
       </div>
+
+      <div
+        v-if="!tokenPermanentAddress"
+        class="warning-notification"
+      >
+        The token address is not permanent and could be changed at any time.
+        Only continue if you understand the risks.
+      </div>
+
       <button
         class=""
         @click="accept2"
@@ -89,6 +106,9 @@ export default {
       provider: null,
       tokens: [],
       requestSecondConfirmation: false,
+      tokenInKoinDX: false,
+      tokenPermanentAddress: true,
+      loading: false,
     };
   },
 
@@ -149,6 +169,7 @@ export default {
 
     async accept() {
       try {
+        this.loading = true;
         const newToken = {
           network: this.network.tag,
           contractId: "",
@@ -156,6 +177,7 @@ export default {
           symbol: "",
           decimals: 0,
           image: emptyToken,
+          permanentAddress: true,
           addresses: [],
           noAddresses: [],
         };
@@ -167,16 +189,22 @@ export default {
         } else {
           if (!this.name) throw new Error("define the nickname of the token");
           const tokenId = `0x${fromUtf8ToHex(this.name)}`;
-          const { result } = await this.nicknames.owner_of({
-            token_id: tokenId,
-          });
-          if (!result || !result.account) {
+          try {
+            const { result } = await this.nicknames.get_address({
+              value: this.name,
+            });
+            newToken.contractId = result.value;
+            newToken.nickname = this.name;
+            newToken.permanentAddress =
+              !!result.address_modifiable_only_by_governance ||
+              !!result.permanent_address;
+            this.tokenPermanentAddress = newToken.permanentAddress;
+          } catch (error) {
+            console.log(error);
             throw new Error(
               `nickname @${this.name} not found in ${this.network.tag} network`
             );
           }
-          newToken.contractId = result.account;
-          newToken.nickname = this.name;
 
           try {
             const { result: resultMetadata } = await this.nicknames.metadata_of(
@@ -230,21 +258,23 @@ export default {
         }
 
         // verify token in koindx
-        let isListedInKoinDX = false;
         if (newToken.nickname === "koin" || newToken.nickname === "vhp") {
-          isListedInKoinDX = true;
+          this.tokenInKoinDX = true;
         } else if (this.network.tag === "mainnet") {
           try {
             const { data: koindxTokens } = await axios.get(
               "https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/mainnet.json"
             );
             if (
-              koindxTokens.tokens.find((t) => t.address === newToken.contractId)
+              !koindxTokens.tokens.find(
+                (t) => t.address === newToken.contractId
+              )
             ) {
-              isListedInKoinDX = true;
+              this.tokenInKoinDX = false;
             }
           } catch (error) {
             console.error(error);
+            this.tokenInKoinDX = false;
           }
         } else if (this.network.tag === "harbinger") {
           try {
@@ -252,23 +282,28 @@ export default {
               "https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/harbinger.json"
             );
             if (
-              koindxTokens.tokens.find((t) => t.address === newToken.contractId)
+              !koindxTokens.tokens.find(
+                (t) => t.address === newToken.contractId
+              )
             ) {
-              isListedInKoinDX = true;
+              this.tokenInKoinDX = false;
             }
           } catch (error) {
             console.error(error);
+            this.tokenInKoinDX = false;
           }
         }
 
-        if (isListedInKoinDX) {
+        this.requestSecondConfirmation =
+          !this.tokenInKoinDX || !this.tokenPermanentAddress;
+        if (!this.requestSecondConfirmation) {
           await this._setTokens(this.tokens);
           router.back();
-        } else {
-          this.requestSecondConfirmation = true;
         }
+        this.loading = false;
       } catch (error) {
         this.alertDanger(error.message);
+        this.loading = false;
         throw error;
       }
     },
