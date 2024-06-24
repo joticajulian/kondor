@@ -5,17 +5,8 @@
       "return": "common.str",
       "description": "Verify if a new name is valid",
       "entry_point": 1523793306,
+      "read_only": true,
       "entry-point": "0x5ad33d9a",
-      "read_only": true,
-      "read-only": true
-    },
-    "get_community_tokens": {
-      "argument": "nft.get_tokens_args",
-      "return": "nft.token_ids",
-      "description": "Get community tokens",
-      "entry_point": 1237153485,
-      "entry-point": "0x49bd76cd",
-      "read_only": true,
       "read-only": true
     },
     "get_tabi": {
@@ -23,8 +14,8 @@
       "return": "nicknames.tabi",
       "description": "Get TABI",
       "entry_point": 1698453016,
-      "entry-point": "0x653c5618",
       "read_only": true,
+      "entry-point": "0x653c5618",
       "read-only": true
     },
     "get_main_token": {
@@ -32,8 +23,44 @@
       "return": "nft.token",
       "description": "Get main token of an account",
       "entry_point": 1053665215,
-      "entry-point": "0x3ecda7bf",
       "read_only": true,
+      "entry-point": "0x3ecda7bf",
+      "read-only": true
+    },
+    "get_extended_metadata": {
+      "argument": "nft.token",
+      "return": "nicknames.extended_metadata",
+      "description": "Get extended metadata",
+      "entry_point": 52933493,
+      "read_only": true,
+      "entry-point": "0x0327b375",
+      "read-only": true
+    },
+    "get_address_by_token_id": {
+      "argument": "nft.token",
+      "return": "nicknames.address_data",
+      "description": "Resolve the address of a nickname by providing the token id",
+      "entry_point": 492743805,
+      "read_only": true,
+      "entry-point": "0x1d5eac7d",
+      "read-only": true
+    },
+    "get_address": {
+      "argument": "common.str",
+      "return": "nicknames.address_data",
+      "description": "Resolve the address of a nickname",
+      "entry_point": 2786780648,
+      "read_only": true,
+      "entry-point": "0xa61ae5e8",
+      "read-only": true
+    },
+    "get_tokens_by_address": {
+      "argument": "nicknames.get_tokens_by_address_args",
+      "return": "nft.token_ids",
+      "description": "Get tokens owned by an address",
+      "entry_point": 1617918091,
+      "read_only": true,
+      "entry-point": "0x606f788b",
       "read-only": true
     },
     "mint": {
@@ -41,8 +68,8 @@
       "return": "",
       "description": "Create new name",
       "entry_point": 3698268091,
-      "entry-point": "0xdc6f17bb",
       "read_only": false,
+      "entry-point": "0xdc6f17bb",
       "read-only": false
     },
     "burn": {
@@ -50,8 +77,8 @@
       "return": "",
       "description": "Delete a name",
       "entry_point": 2241834181,
-      "entry-point": "0x859facc5",
       "read_only": false,
+      "entry-point": "0x859facc5",
       "read-only": false
     },
     "transfer": {
@@ -59,17 +86,8 @@
       "return": "",
       "description": "Transfer Name",
       "entry_point": 670398154,
+      "read_only": false,
       "entry-point": "0x27f576ca",
-      "read_only": false,
-      "read-only": false
-    },
-    "transfer_to_community": {
-      "argument": "nft.transfer_args",
-      "return": "",
-      "description": "Transfer name to another address and define that the name will be controlled by the community",
-      "entry_point": 2789495215,
-      "entry-point": "0xa64451af",
-      "read_only": false,
       "read-only": false
     },
     "set_tabi": {
@@ -77,8 +95,8 @@
       "return": "",
       "description": "Set Text ABI for a token",
       "entry_point": 2998339941,
-      "entry-point": "0xb2b70965",
       "read_only": false,
+      "entry-point": "0xb2b70965",
       "read-only": false
     },
     "set_metadata": {
@@ -86,8 +104,8 @@
       "return": "",
       "description": "Set metadata",
       "entry_point": 1029287705,
-      "entry-point": "0x3d59af19",
       "read_only": false,
+      "entry-point": "0x3d59af19",
       "read-only": false
     },
     "set_main_token": {
@@ -95,8 +113,26 @@
       "return": "",
       "description": "Set main token",
       "entry_point": 191552998,
-      "entry-point": "0x0b6adde6",
       "read_only": false,
+      "entry-point": "0x0b6adde6",
+      "read-only": false
+    },
+    "set_address": {
+      "argument": "nicknames.set_address_args",
+      "return": "",
+      "description": "Set address",
+      "entry_point": 1560272691,
+      "read_only": false,
+      "entry-point": "0x5cffdf33",
+      "read-only": false
+    },
+    "set_extended_metadata": {
+      "argument": "nicknames.set_extended_metadata_args",
+      "return": "",
+      "description": "Set extended metadata (including the address to which the name resolves)",
+      "entry_point": 4010970275,
+      "read_only": false,
+      "entry-point": "0xef128ca3",
       "read-only": false
     },
     "name": {
@@ -104,8 +140,8 @@
       "return": "common.str",
       "description": "Get name of the NFT",
       "entry_point": 2191741823,
-      "entry-point": "0x82a3537f",
       "read_only": true,
+      "entry-point": "0x82a3537f",
       "read-only": true
     },
     "symbol": {
@@ -113,8 +149,8 @@
       "return": "common.str",
       "description": "Get the symbol of the NFT",
       "entry_point": 3077209249,
-      "entry-point": "0xb76a7ca1",
       "read_only": true,
+      "entry-point": "0xb76a7ca1",
       "read-only": true
     },
     "uri": {
@@ -122,8 +158,8 @@
       "return": "common.str",
       "description": "Get URI of the NFT",
       "entry_point": 1894111158,
-      "entry-point": "0x70e5d7b6",
       "read_only": true,
+      "entry-point": "0x70e5d7b6",
       "read-only": true
     },
     "get_info": {
@@ -131,8 +167,17 @@
       "return": "nft.info",
       "description": "Get name, symbol and decimals",
       "entry_point": 3179243600,
-      "entry-point": "0xbd7f6850",
       "read_only": true,
+      "entry-point": "0xbd7f6850",
+      "read-only": true
+    },
+    "owner": {
+      "argument": "",
+      "return": "common.address",
+      "description": "Get the owner of the collection",
+      "entry_point": 1276127593,
+      "read_only": true,
+      "entry-point": "0x4c102969",
       "read-only": true
     },
     "total_supply": {
@@ -140,8 +185,8 @@
       "return": "common.uint64",
       "description": "Get total supply",
       "entry_point": 2967091508,
-      "entry-point": "0xb0da3934",
       "read_only": true,
+      "entry-point": "0xb0da3934",
       "read-only": true
     },
     "royalties": {
@@ -149,8 +194,8 @@
       "return": "nft.royalties",
       "description": "Get royalties",
       "entry_point": 921242832,
-      "entry-point": "0x36e90cd0",
       "read_only": true,
+      "entry-point": "0x36e90cd0",
       "read-only": true
     },
     "balance_of": {
@@ -158,8 +203,8 @@
       "return": "common.uint64",
       "description": "Get balance of an account",
       "entry_point": 1550980247,
-      "entry-point": "0x5c721497",
       "read_only": true,
+      "entry-point": "0x5c721497",
       "read-only": true
     },
     "owner_of": {
@@ -167,8 +212,8 @@
       "return": "common.address",
       "description": "Get the owner of a token",
       "entry_point": 3982608455,
-      "entry-point": "0xed61c847",
       "read_only": true,
+      "entry-point": "0xed61c847",
       "read-only": true
     },
     "metadata_of": {
@@ -176,8 +221,8 @@
       "return": "common.str",
       "description": "Get the metadata of a token",
       "entry_point": 392990591,
-      "entry-point": "0x176c8f7f",
       "read_only": true,
+      "entry-point": "0x176c8f7f",
       "read-only": true
     },
     "get_tokens": {
@@ -185,8 +230,8 @@
       "return": "nft.token_ids",
       "description": "Get list of token IDs",
       "entry_point": 2103140055,
-      "entry-point": "0x7d5b5ed7",
       "read_only": true,
+      "entry-point": "0x7d5b5ed7",
       "read-only": true
     },
     "get_tokens_by_owner": {
@@ -194,8 +239,8 @@
       "return": "nft.token_ids",
       "description": "Get tokens owned by an address",
       "entry_point": 4229163893,
-      "entry-point": "0xfc13eb75",
       "read_only": true,
+      "entry-point": "0xfc13eb75",
       "read-only": true
     },
     "get_approved": {
@@ -203,8 +248,8 @@
       "return": "common.address",
       "description": "Check if an account is approved to operate a token ID",
       "entry_point": 1282609184,
-      "entry-point": "0x4c731020",
       "read_only": true,
+      "entry-point": "0x4c731020",
       "read-only": true
     },
     "is_approved_for_all": {
@@ -212,8 +257,8 @@
       "return": "common.boole",
       "description": "Check if an account is approved to operate all tokens owned by other account",
       "entry_point": 3886779621,
-      "entry-point": "0xe7ab8ce5",
       "read_only": true,
+      "entry-point": "0xe7ab8ce5",
       "read-only": true
     },
     "get_operator_approvals": {
@@ -221,17 +266,26 @@
       "return": "nft.get_operators_return",
       "description": "Get allowances of an account",
       "entry_point": 3676042766,
-      "entry-point": "0xdb1bf60e",
       "read_only": true,
+      "entry-point": "0xdb1bf60e",
       "read-only": true
+    },
+    "transfer_ownership": {
+      "argument": "common.address",
+      "return": "",
+      "description": "Transfer ownership of the collection",
+      "entry_point": 961275650,
+      "read_only": false,
+      "entry-point": "0x394be702",
+      "read-only": false
     },
     "set_royalties": {
       "argument": "nft.royalties",
       "return": "",
       "description": "Set royalties",
       "entry_point": 995865963,
-      "entry-point": "0x3b5bb56b",
       "read_only": false,
+      "entry-point": "0x3b5bb56b",
       "read-only": false
     },
     "approve": {
@@ -239,8 +293,8 @@
       "return": "",
       "description": "Grant permissions to other account to manage a specific Token owned by the user. The user must approve only the accounts he trust.",
       "entry_point": 1960973952,
-      "entry-point": "0x74e21680",
       "read_only": false,
+      "entry-point": "0x74e21680",
       "read-only": false
     },
     "set_approval_for_all": {
@@ -248,12 +302,12 @@
       "return": "",
       "description": "Grant permissions to other account to manage all Tokens owned by the user. The user must approve only the accounts he trust.",
       "entry_point": 541336086,
-      "entry-point": "0x20442216",
       "read_only": false,
+      "entry-point": "0x20442216",
       "read-only": false
     }
   },
-  "types": "CsUDCidrb2lub3Nib3gtcHJvdG8vbWFuYXNoYXJlci9jb21tb24ucHJvdG8SBmNvbW1vbhoUa29pbm9zL29wdGlvbnMucHJvdG8iGwoDc3RyEhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIeCgZ1aW50MzISFAoFdmFsdWUYASABKA1SBXZhbHVlIiIKBnVpbnQ2NBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlIh0KBWJvb2xlEhQKBXZhbHVlGAEgASgIUgV2YWx1ZSIpCgdhZGRyZXNzEh4KB2FjY291bnQYASABKAxCBIC1GAZSB2FjY291bnQibgoJbGlzdF9hcmdzEhoKBXN0YXJ0GAEgASgMQgSAtRgGUgVzdGFydBIUCgVsaW1pdBgCIAEoBVIFbGltaXQSLwoJZGlyZWN0aW9uGAMgASgOMhEuY29tbW9uLmRpcmVjdGlvblIJZGlyZWN0aW9uIi0KCWFkZHJlc3NlcxIgCghhY2NvdW50cxgBIAMoDEIEgLUYBlIIYWNjb3VudHMqKgoJZGlyZWN0aW9uEg0KCWFzY2VuZGluZxAAEg4KCmRlc2NlbmRpbmcQAWIGcHJvdG8zCsQMCh1rb2lub3Nib3gtcHJvdG8vbmZ0L25mdC5wcm90bxIDbmZ0GhRrb2lub3Mvb3B0aW9ucy5wcm90byJNCgdyb3lhbHR5EiIKCnBlcmNlbnRhZ2UYASABKARCAjABUgpwZXJjZW50YWdlEh4KB2FkZHJlc3MYAiABKAxCBIC1GAZSB2FkZHJlc3MiLwoJcm95YWx0aWVzEiIKBXZhbHVlGAEgAygLMgwubmZ0LnJveWFsdHlSBXZhbHVlIkwKDW1ldGFkYXRhX2FyZ3MSHwoIdG9rZW5faWQYASABKAxCBIC1GAJSB3Rva2VuSWQSGgoIbWV0YWRhdGEYAiABKAlSCG1ldGFkYXRhIkQKBGluZm8SEgoEbmFtZRgBIAEoCVIEbmFtZRIWCgZzeW1ib2wYAiABKAlSBnN5bWJvbBIQCgN1cmkYAyABKAlSA3VyaSItCg9iYWxhbmNlX29mX2FyZ3MSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyIigKBXRva2VuEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkIlgKGGlzX2FwcHJvdmVkX2Zvcl9hbGxfYXJncxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISIAoIb3BlcmF0b3IYAiABKAxCBIC1GAZSCG9wZXJhdG9yIkIKCW1pbnRfYXJncxIUCgJ0bxgBIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAiABKAxCBIC1GAJSB3Rva2VuSWQiLAoJYnVybl9hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkImAKDXRyYW5zZmVyX2FyZ3MSGAoEZnJvbRgBIAEoDEIEgLUYBlIEZnJvbRIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAyABKAxCBIC1GAJSB3Rva2VuSWQidgoMYXBwcm92ZV9hcmdzEi8KEGFwcHJvdmVyX2FkZHJlc3MYASABKAxCBIC1GAZSD2FwcHJvdmVyQWRkcmVzcxIUCgJ0bxgCIAEoDEIEgLUYBlICdG8SHwoIdG9rZW5faWQYAyABKAxCBIC1GAJSB3Rva2VuSWQimQEKGXNldF9hcHByb3ZhbF9mb3JfYWxsX2FyZ3MSLwoQYXBwcm92ZXJfYWRkcmVzcxgBIAEoDEIEgLUYBlIPYXBwcm92ZXJBZGRyZXNzEi8KEG9wZXJhdG9yX2FkZHJlc3MYAiABKAxCBIC1GAZSD29wZXJhdG9yQWRkcmVzcxIaCghhcHByb3ZlZBgDIAEoCFIIYXBwcm92ZWQikAEKEmdldF9vcGVyYXRvcnNfYXJncxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISGgoFc3RhcnQYAiABKAxCBIC1GAZSBXN0YXJ0EhQKBWxpbWl0GAMgASgFUgVsaW1pdBIsCglkaXJlY3Rpb24YBCABKA4yDi5uZnQuZGlyZWN0aW9uUglkaXJlY3Rpb24iVgoUZ2V0X29wZXJhdG9yc19yZXR1cm4SGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEiIKCW9wZXJhdG9ycxgCIAMoDEIEgLUYBlIJb3BlcmF0b3JzInEKD2dldF90b2tlbnNfYXJncxIaCgVzdGFydBgBIAEoDEIEgLUYAlIFc3RhcnQSFAoFbGltaXQYAiABKAVSBWxpbWl0EiwKCWRpcmVjdGlvbhgDIAEoDjIOLm5mdC5kaXJlY3Rpb25SCWRpcmVjdGlvbiKWAQoYZ2V0X3Rva2Vuc19ieV9vd25lcl9hcmdzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIaCgVzdGFydBgCIAEoDEIEgLUYAlIFc3RhcnQSFAoFbGltaXQYAyABKAVSBWxpbWl0EiwKCWRpcmVjdGlvbhgEIAEoDjIOLm5mdC5kaXJlY3Rpb25SCWRpcmVjdGlvbiIuCgl0b2tlbl9pZHMSIQoJdG9rZW5faWRzGAEgAygMQgSAtRgCUgh0b2tlbklkcyoqCglkaXJlY3Rpb24SDQoJYXNjZW5kaW5nEAASDgoKZGVzY2VuZGluZxABYgZwcm90bzMKtQEKD25pY2tuYW1lcy5wcm90bxIJbmlja25hbWVzGhRrb2lub3Mvb3B0aW9ucy5wcm90byIiCgR0YWJpEhoKCHBhdHRlcm5zGAEgAygJUghwYXR0ZXJucyJVCg1zZXRfdGFiaV9hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkEiMKBHRhYmkYAiABKAsyDy5uaWNrbmFtZXMudGFiaVIEdGFiaWIGcHJvdG8z",
+  "types": "CoQDCidrb2lub3Nib3gtcHJvdG8vbWFuYXNoYXJlci9jb21tb24ucHJvdG8SBmNvbW1vbhoUa29pbm9zL29wdGlvbnMucHJvdG8iGwoDc3RyEhQKBXZhbHVlGAEgASgJUgV2YWx1ZSIeCgZ1aW50MzISFAoFdmFsdWUYASABKA1SBXZhbHVlIiIKBnVpbnQ2NBIYCgV2YWx1ZRgBIAEoBEICMAFSBXZhbHVlIh0KBWJvb2xlEhQKBXZhbHVlGAEgASgIUgV2YWx1ZSIlCgdhZGRyZXNzEhoKBXZhbHVlGAEgASgMQgSAtRgGUgV2YWx1ZSJdCglsaXN0X2FyZ3MSGgoFc3RhcnQYASABKAxCBIC1GAZSBXN0YXJ0EhQKBWxpbWl0GAIgASgFUgVsaW1pdBIeCgpkZXNjZW5kaW5nGAMgASgIUgpkZXNjZW5kaW5nIi0KCWFkZHJlc3NlcxIgCghhY2NvdW50cxgBIAMoDEIEgLUYBlIIYWNjb3VudHNiBnByb3RvMwqkDAoda29pbm9zYm94LXByb3RvL25mdC9uZnQucHJvdG8SA25mdBoUa29pbm9zL29wdGlvbnMucHJvdG8iTQoHcm95YWx0eRIiCgpwZXJjZW50YWdlGAEgASgEQgIwAVIKcGVyY2VudGFnZRIeCgdhZGRyZXNzGAIgASgMQgSAtRgGUgdhZGRyZXNzIi8KCXJveWFsdGllcxIiCgV2YWx1ZRgBIAMoCzIMLm5mdC5yb3lhbHR5UgV2YWx1ZSJMCg1tZXRhZGF0YV9hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkEhoKCG1ldGFkYXRhGAIgASgJUghtZXRhZGF0YSJmCgRpbmZvEhIKBG5hbWUYASABKAlSBG5hbWUSFgoGc3ltYm9sGAIgASgJUgZzeW1ib2wSEAoDdXJpGAMgASgJUgN1cmkSIAoLZGVzY3JpcHRpb24YBCABKAlSC2Rlc2NyaXB0aW9uIi0KD2JhbGFuY2Vfb2ZfYXJncxIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXIiKAoFdG9rZW4SHwoIdG9rZW5faWQYASABKAxCBIC1GAJSB3Rva2VuSWQiWAoYaXNfYXBwcm92ZWRfZm9yX2FsbF9hcmdzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIgCghvcGVyYXRvchgCIAEoDEIEgLUYBlIIb3BlcmF0b3IiQgoJbWludF9hcmdzEhQKAnRvGAEgASgMQgSAtRgGUgJ0bxIfCgh0b2tlbl9pZBgCIAEoDEIEgLUYAlIHdG9rZW5JZCIsCglidXJuX2FyZ3MSHwoIdG9rZW5faWQYASABKAxCBIC1GAJSB3Rva2VuSWQidAoNdHJhbnNmZXJfYXJncxIYCgRmcm9tGAEgASgMQgSAtRgGUgRmcm9tEhQKAnRvGAIgASgMQgSAtRgGUgJ0bxIfCgh0b2tlbl9pZBgDIAEoDEIEgLUYAlIHdG9rZW5JZBISCgRtZW1vGAQgASgJUgRtZW1vInYKDGFwcHJvdmVfYXJncxIvChBhcHByb3Zlcl9hZGRyZXNzGAEgASgMQgSAtRgGUg9hcHByb3ZlckFkZHJlc3MSFAoCdG8YAiABKAxCBIC1GAZSAnRvEh8KCHRva2VuX2lkGAMgASgMQgSAtRgCUgd0b2tlbklkIpkBChlzZXRfYXBwcm92YWxfZm9yX2FsbF9hcmdzEi8KEGFwcHJvdmVyX2FkZHJlc3MYASABKAxCBIC1GAZSD2FwcHJvdmVyQWRkcmVzcxIvChBvcGVyYXRvcl9hZGRyZXNzGAIgASgMQgSAtRgGUg9vcGVyYXRvckFkZHJlc3MSGgoIYXBwcm92ZWQYAyABKAhSCGFwcHJvdmVkIoIBChJnZXRfb3BlcmF0b3JzX2FyZ3MSGgoFb3duZXIYASABKAxCBIC1GAZSBW93bmVyEhoKBXN0YXJ0GAIgASgMQgSAtRgGUgVzdGFydBIUCgVsaW1pdBgDIAEoBVIFbGltaXQSHgoKZGVzY2VuZGluZxgEIAEoCFIKZGVzY2VuZGluZyJWChRnZXRfb3BlcmF0b3JzX3JldHVybhIaCgVvd25lchgBIAEoDEIEgLUYBlIFb3duZXISIgoJb3BlcmF0b3JzGAIgAygMQgSAtRgGUglvcGVyYXRvcnMiYwoPZ2V0X3Rva2Vuc19hcmdzEhoKBXN0YXJ0GAEgASgMQgSAtRgCUgVzdGFydBIUCgVsaW1pdBgCIAEoBVIFbGltaXQSHgoKZGVzY2VuZGluZxgDIAEoCFIKZGVzY2VuZGluZyKIAQoYZ2V0X3Rva2Vuc19ieV9vd25lcl9hcmdzEhoKBW93bmVyGAEgASgMQgSAtRgGUgVvd25lchIaCgVzdGFydBgCIAEoDEIEgLUYAlIFc3RhcnQSFAoFbGltaXQYAyABKAVSBWxpbWl0Eh4KCmRlc2NlbmRpbmcYBCABKAhSCmRlc2NlbmRpbmciLgoJdG9rZW5faWRzEiEKCXRva2VuX2lkcxgBIAMoDEIEgLUYAlIIdG9rZW5JZHNiBnByb3RvMwq5CAoPbmlja25hbWVzLnByb3RvEgluaWNrbmFtZXMaFGtvaW5vcy9vcHRpb25zLnByb3RvIiIKBHRhYmkSGgoIcGF0dGVybnMYASADKAlSCHBhdHRlcm5zIlUKDXNldF90YWJpX2FyZ3MSHwoIdG9rZW5faWQYASABKAxCBIC1GAJSB3Rva2VuSWQSIwoEdGFiaRgCIAEoCzIPLm5pY2tuYW1lcy50YWJpUgR0YWJpIoMBChBzZXRfYWRkcmVzc19hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkEh4KB2FkZHJlc3MYAiABKAxCBIC1GAZSB2FkZHJlc3MSLgoTZ292X3Byb3Bvc2FsX3VwZGF0ZRgDIAEoCFIRZ292UHJvcG9zYWxVcGRhdGUi0gEKGnNldF9leHRlbmRlZF9tZXRhZGF0YV9hcmdzEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkEisKEXBlcm1hbmVudF9hZGRyZXNzGAMgASgIUhBwZXJtYW5lbnRBZGRyZXNzElAKJWFkZHJlc3NfbW9kaWZpYWJsZV9vbmx5X2J5X2dvdmVybmFuY2UYBCABKAhSIWFkZHJlc3NNb2RpZmlhYmxlT25seUJ5R292ZXJuYW5jZRIUCgVvdGhlchgKIAEoDFIFb3RoZXIi6QEKEWV4dGVuZGVkX21ldGFkYXRhEh8KCHRva2VuX2lkGAEgASgMQgSAtRgCUgd0b2tlbklkEh4KB2FkZHJlc3MYAiABKAxCBIC1GAZSB2FkZHJlc3MSKwoRcGVybWFuZW50X2FkZHJlc3MYAyABKAhSEHBlcm1hbmVudEFkZHJlc3MSUAolYWRkcmVzc19tb2RpZmlhYmxlX29ubHlfYnlfZ292ZXJuYW5jZRgEIAEoCFIhYWRkcmVzc01vZGlmaWFibGVPbmx5QnlHb3Zlcm5hbmNlEhQKBW90aGVyGAogASgMUgVvdGhlciKpAQoMYWRkcmVzc19kYXRhEhoKBXZhbHVlGAEgASgMQgSAtRgGUgV2YWx1ZRIrChFwZXJtYW5lbnRfYWRkcmVzcxgCIAEoCFIQcGVybWFuZW50QWRkcmVzcxJQCiVhZGRyZXNzX21vZGlmaWFibGVfb25seV9ieV9nb3Zlcm5hbmNlGAMgASgIUiFhZGRyZXNzTW9kaWZpYWJsZU9ubHlCeUdvdmVybmFuY2UijgEKGmdldF90b2tlbnNfYnlfYWRkcmVzc19hcmdzEh4KB2FkZHJlc3MYASABKAxCBIC1GAZSB2FkZHJlc3MSGgoFc3RhcnQYAiABKAxCBIC1GAJSBXN0YXJ0EhQKBWxpbWl0GAMgASgFUgVsaW1pdBIeCgpkZXNjZW5kaW5nGAQgASgIUgpkZXNjZW5kaW5nYgZwcm90bzM=",
   "koilib_types": {
     "nested": {
       "common": {
@@ -295,19 +349,13 @@
           },
           "address": {
             "fields": {
-              "account": {
+              "value": {
                 "type": "bytes",
                 "id": 1,
                 "options": {
                   "(koinos.btype)": "ADDRESS"
                 }
               }
-            }
-          },
-          "direction": {
-            "values": {
-              "ascending": 0,
-              "descending": 1
             }
           },
           "list_args": {
@@ -323,8 +371,8 @@
                 "type": "int32",
                 "id": 2
               },
-              "direction": {
-                "type": "direction",
+              "descending": {
+                "type": "bool",
                 "id": 3
               }
             }
@@ -429,6 +477,10 @@
               "uri": {
                 "type": "string",
                 "id": 3
+              },
+              "description": {
+                "type": "string",
+                "id": 4
               }
             }
           },
@@ -523,6 +575,10 @@
                 "options": {
                   "(koinos.btype)": "HEX"
                 }
+              },
+              "memo": {
+                "type": "string",
+                "id": 4
               }
             }
           },
@@ -573,12 +629,6 @@
               }
             }
           },
-          "direction": {
-            "values": {
-              "ascending": 0,
-              "descending": 1
-            }
-          },
           "get_operators_args": {
             "fields": {
               "owner": {
@@ -599,8 +649,8 @@
                 "type": "int32",
                 "id": 3
               },
-              "direction": {
-                "type": "direction",
+              "descending": {
+                "type": "bool",
                 "id": 4
               }
             }
@@ -637,8 +687,8 @@
                 "type": "int32",
                 "id": 2
               },
-              "direction": {
-                "type": "direction",
+              "descending": {
+                "type": "bool",
                 "id": 3
               }
             }
@@ -663,8 +713,8 @@
                 "type": "int32",
                 "id": 3
               },
-              "direction": {
-                "type": "direction",
+              "descending": {
+                "type": "bool",
                 "id": 4
               }
             }
@@ -708,6 +758,126 @@
                 "id": 2
               }
             }
+          },
+          "set_address_args": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "address": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "gov_proposal_update": {
+                "type": "bool",
+                "id": 3
+              }
+            }
+          },
+          "set_extended_metadata_args": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "permanent_address": {
+                "type": "bool",
+                "id": 3
+              },
+              "address_modifiable_only_by_governance": {
+                "type": "bool",
+                "id": 4
+              },
+              "other": {
+                "type": "bytes",
+                "id": 10
+              }
+            }
+          },
+          "extended_metadata": {
+            "fields": {
+              "token_id": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "address": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "permanent_address": {
+                "type": "bool",
+                "id": 3
+              },
+              "address_modifiable_only_by_governance": {
+                "type": "bool",
+                "id": 4
+              },
+              "other": {
+                "type": "bytes",
+                "id": 10
+              }
+            }
+          },
+          "address_data": {
+            "fields": {
+              "value": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "permanent_address": {
+                "type": "bool",
+                "id": 2
+              },
+              "address_modifiable_only_by_governance": {
+                "type": "bool",
+                "id": 3
+              }
+            }
+          },
+          "get_tokens_by_address_args": {
+            "fields": {
+              "address": {
+                "type": "bytes",
+                "id": 1,
+                "options": {
+                  "(koinos.btype)": "ADDRESS"
+                }
+              },
+              "start": {
+                "type": "bytes",
+                "id": 2,
+                "options": {
+                  "(koinos.btype)": "HEX"
+                }
+              },
+              "limit": {
+                "type": "int32",
+                "id": 3
+              },
+              "descending": {
+                "type": "bool",
+                "id": 4
+              }
+            }
           }
         }
       }
@@ -723,14 +893,20 @@
     "collections.transfer_event": {
       "argument": "nft.transfer_args"
     },
-    "collections.transferred_to_community": {
-      "argument": "nft.transfer_args"
-    },
     "nicknames.set_tabi": {
       "argument": "nicknames.set_tabi_args"
     },
     "collections.set_metadata_event": {
       "argument": "nft.metadata_args"
+    },
+    "address_updated": {
+      "argument": "nicknames.set_address_args"
+    },
+    "extended_metadata_updated": {
+      "argument": "nicknames.extended_metadata"
+    },
+    "collections.owner_event": {
+      "argument": "common.address"
     },
     "collections.royalties_event": {
       "argument": "nft.royalties"
