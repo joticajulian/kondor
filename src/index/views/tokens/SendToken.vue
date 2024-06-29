@@ -503,7 +503,7 @@ export default {
       if (this.network.nicknamesContractId) {
         try {
           const { result } = await this.nicknames.get_address({
-            value: this.to
+            value: this.to,
           });
           this.resolvedAddress = result?.value;
           this.resolvedMessage = `@${this.to} resolves to ${this.resolvedAddress}`;
