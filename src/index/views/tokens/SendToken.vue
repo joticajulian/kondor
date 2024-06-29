@@ -502,11 +502,10 @@ export default {
       // check if it is a nickname
       if (this.network.nicknamesContractId) {
         try {
-          const tokenId = `0x${fromUtf8ToHex(this.to)}`;
-          const { result } = await this.nicknames.owner_of({
-            token_id: tokenId,
+          const { result } = await this.nicknames.get_address({
+            value: this.to
           });
-          this.resolvedAddress = result?.account;
+          this.resolvedAddress = result?.value;
           this.resolvedMessage = `@${this.to} resolves to ${this.resolvedAddress}`;
           this.isToValid = !!this.resolvedAddress;
         } catch (_) {

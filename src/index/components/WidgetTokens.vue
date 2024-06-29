@@ -33,7 +33,7 @@
     <a
       v-if="!tokenAddressPermanent"
       class="notpermanent"
-      href="https://peakd.com/@jga/nicknames-not-permanent"
+      href="https://peakd.com/@jga/nicknames-pointing-address"
     >⚠️ not permanent</a>
     <div class="other-tokens">
       <div
