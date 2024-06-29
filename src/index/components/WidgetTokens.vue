@@ -444,7 +444,10 @@ export default {
       this.tokenName = t.nickname;
       this.tokenImage = t.image;
       this.tokenSymbol = t.symbol;
-      this.tokenAddressPermanent = t.permanentAddress;
+      // this.tokenAddressPermanent = t.permanentAddress;
+      // TODO: temporal code. Use previous line in the next version
+      this.tokenAddressPermanent =
+        t.permanentAddress || t.nickname === "koin" || t.nickname === "vhp";
       this.balance = t.balance;
       this.balanceWithSymbol = t.balanceWithSymbol;
       this.balanceUSD = t.balanceUSD;

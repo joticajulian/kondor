@@ -235,7 +235,7 @@ export default {
 }
 
 .button-remove {
-  background-color: red;
+  background-color: var(--kondor-red);
   width: 1em;
   height: 1.3em;
   padding: 0.4em;
