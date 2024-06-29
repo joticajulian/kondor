@@ -1,6 +1,6 @@
 {
   "name": "kondor",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "private": true,
   "scripts": {
     "auditci": "audit-ci --moderate --skip-dev",

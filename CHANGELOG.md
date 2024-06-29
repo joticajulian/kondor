@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.11.0](https://github.com/joticajulian/kondor/releases/tag/v0.11.0) (2024-06-29)
+
+### 🚀 Features
+
+- Tokens based on nicknames now will have the "no permanent" flag if the token address
+  can be changed at any time by the project owner. This is to alert users and prevent
+  possible scams. There is also a link to more information.
+
 ## [v0.10.1](https://github.com/joticajulian/kondor/releases/tag/v0.10.1) (2024-05-24)
 
 ### 🚀 Features
