@@ -9,9 +9,14 @@
   --kondor-lighter: #c8c1d1;
   --gray-light: #f3f3f3;
   --app-width: 357px;
+
+  /* new-design */
+  --primary-dark: #222222;
+  --primary-light: #ffffff;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;700&display=swap');
 
 button {
   all: initial;
@@ -29,9 +34,9 @@ input:disabled {
 
 body {
   margin: 0px;
-  background: var(--kondor-light);
-  color: var(--secondary-color);
-  font-family: "Inter", sans-serif;
+  background: var(--primary-light);
+  color: var(--secondary-light);
+  font-family: "Poppins", sans-serif;
   font-size: 75%;
 }
 
@@ -60,12 +65,10 @@ h3 {
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Inter", monospace;
+  font-family: "Poppins", monospace;
   /* word-break: break-all; */
   font-weight: 400;
-  background: var(--kondor-light);
-  color: var(--primary-color);
-  height: 570px;
+  color: var(--primary-light);
   width: var(--app-width);
 }
 
