@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.11.1](https://github.com/joticajulian/kondor/releases/tag/v0.11.1) (2024-07-13)
+
+### 🐛 Bug Fixes
+
+- Fix duplication of mini tokens in the dashboard
+
 ## [v0.11.0](https://github.com/joticajulian/kondor/releases/tag/v0.11.0) (2024-06-29)
 
 ### 🚀 Features
