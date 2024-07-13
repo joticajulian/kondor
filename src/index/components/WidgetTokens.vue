@@ -359,11 +359,6 @@ export default {
 
       await Promise.all(
         t.map(async (token) => {
-          // skip repeated tokens (if any)
-          if (this.miniTokens.find((m) => m.contractId === token.contractId)) {
-            return;
-          }
-
           // check network of token
           if (token.network !== this.network.tag) {
             return;
@@ -395,9 +390,10 @@ export default {
             this.loadToken(miniToken);
           }
 
-          this.miniTokens.push(miniToken);
-
-          return;
+          // skip repeated tokens (if any)
+          if (!this.miniTokens.find((m) => m.contractId === token.contractId)) {
+            this.miniTokens.push(miniToken);
+          }
         })
       );
 
