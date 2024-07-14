@@ -7,20 +7,22 @@
         </div>
         <div class="address-container">
           <div class="current-address">
-            {{ currentAddress }}
-          </div>
-          <div :data-tooltip="msgCopy">
             <button @click="copyAddress()">
-              <span class="material-icons">content_copy</span>
+              {{ currentAddress }}
             </button>
           </div>
+          <div :data-tooltip="msgCopy" />
         </div>
       </div>
       <button
         class="menu-toggle"
         @click="openDropdown()"
       >
-        <span class="material-icons">more_vert</span>
+        <img
+          class="elipses-vertical"
+          src="../../../public/images/ellipsis-vertical-light.svg"
+          alt="menu toggle"
+        >
       </button>
     </div>
 
@@ -76,29 +78,29 @@ export default {
       currentAddress: "",
       koinosblocksUrl: "https://koinosblocks.com/address/",
       showDropdown: false,
-    };
+    }
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount();
+      this.loadAccount()
     },
     "$store.state.currentNetwork": function () {
-      this.updateLinks();
+      this.updateLinks()
     },
   },
 
   mounted() {
-    this.loadAccount();
+    this.loadAccount()
   },
 
   methods: {
     openDropdown() {
       if (!this.showDropdown) {
-        this.showDropdown = true;
+        this.showDropdown = true
         setTimeout(() => {
-          window.addEventListener("click", this.closeDropdown);
-        }, 0);
+          window.addEventListener("click", this.closeDropdown)
+        }, 0)
       }
     },
 
@@ -108,16 +110,16 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false;
-        window.removeEventListener("click", this.closeDropdown);
+        this.showDropdown = false
+        window.removeEventListener("click", this.closeDropdown)
       }
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return;
-      const index = this.$store.state.currentIndexAccount;
-      this.currentAccount = this.$store.state.accounts[index].name;
-      this.currentAddress = this.$store.state.accounts[index].address;
+      if (this.$store.state.accounts.length === 0) return
+      const index = this.$store.state.currentIndexAccount
+      this.currentAccount = this.$store.state.accounts[index].name
+      this.currentAddress = this.$store.state.accounts[index].address
     },
 
     updateLinks() {
@@ -125,35 +127,32 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork].tag ===
         "harbinger"
       ) {
-        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/";
+        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/"
       } else {
-        this.koinosblocksUrl = "https://koinosblocks.com/address/";
+        this.koinosblocksUrl = "https://koinosblocks.com/address/"
       }
     },
 
     copyAddress() {
-      navigator.clipboard.writeText(this.currentAddress);
-      this.msgCopy = "copied!";
+      navigator.clipboard.writeText(this.currentAddress)
+      this.msgCopy = "copied!"
       setTimeout(() => {
-        this.msgCopy = "copy address";
-      }, 2000);
+        this.msgCopy = "copy address"
+      }, 2000)
     },
   },
-};
+}
 </script>
 
 <style scoped>
 .dropdown-container {
-  padding: 2em 0;
-  border-bottom: 1px solid #ddd;
+  padding: 1em 0;
 }
 .dropdown-content {
-  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  top: 150px;
-  width: calc(var(--app-width) - 100px - 1em);
-  left: 100px;
+  top: 70px;
+  width: calc(var(--app-width) - 70px - 1em);
+  left: 30px;
   border: none;
-  border-radius: 22px;
   position: absolute;
   background: white;
   z-index: 10;
@@ -211,26 +210,34 @@ export default {
   border: none;
   margin: 0;
   width: auto;
-  background: #fff;
-  color: #000;
-  padding-right: 0;
+  background: none;
+  color: #ffffff;
+  padding-left: 2em;
 }
 .link-item {
   text-transform: capitalize;
   font-weight: 500;
   font-size: 1.2em;
-  color: #000;
   display: flex;
   justify-content: space-between;
-  padding: 0 2em;
+  padding-left: 1em;
   align-items: center;
 }
 .current-address {
-  font-size: 0.7em;
   font-weight: 300;
+  padding: 0 1em 0 0;
+}
+.current-address button {
+  border: none;
+  margin: 0 !important;
+  width: auto;
+  background: none !important;
+  color: white !important;
+  padding: 0;
+  font-size: 0.7em;
 }
 .current-account {
-  font-size: 1.2em;
+  font-size: 1em;
   cursor: default;
 }
 .address-container {
@@ -249,5 +256,8 @@ export default {
 }
 .address-container button span {
   font-size: 1em;
+}
+.elipses-vertical {
+  width: 4px;
 }
 </style>

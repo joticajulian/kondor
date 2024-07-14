@@ -658,7 +658,7 @@ export default {
 </script>
 <style scoped>
 .container {
-  padding: 2em 2em;
+  padding: 0 2em;
 }
 
 .container > * {
@@ -672,7 +672,7 @@ export default {
 .token select {
   width: 100%;
   max-width: unset;
-  padding: 8px;
+  padding: 1em;
 }
 
 .actions {

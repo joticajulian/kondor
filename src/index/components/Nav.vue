@@ -1,23 +1,68 @@
 <template>
   <nav class="navbar">
-    <div class="navbar-left">
-      <div class="avatar">MW</div>
-      <span class="navbar-title">NFT Minting Wallet</span>
-      <span class="material-icons">expand_more</span>
+    <div
+      class="navbar-left"
+    >
+      <AvatarMenu v-if="$store.state.showAvatarMenu" />
+      <AccountMenu v-if="$store.state.showAccountMenu" />
     </div>
     <div class="navbar-right">
-      <button class="icon-button">
+      <!-- <button class="icon-button">
+        <img
+          src="../../../public/images/home-icon.png"
+          alt=""
+        >
         <span class="material-icons">home</span>
-      </button>
+      </button> -->
     </div>
   </nav>
 </template>
 
-<script>
-export default {
 
-}
+<script>
+import router from "@/index/router";
+import AccountMenu from "@/index/components/AccountMenu.vue";
+import AvatarMenu from "@/index/components/AvatarMenu.vue";
+
+// mixins
+import Storage from "@/shared/mixins/Storage";
+
+export default {
+  components: { AccountMenu, AvatarMenu },
+
+  mixins: [Storage],
+
+  watch: {
+    "$store.state.currentNetwork": function () {
+      const network =
+        this.$store.state.networks[this.$store.state.currentNetwork];
+      this._setCurrentNetwork(network.tag);
+    },
+    "$store.state.accounts": function () {
+      if (
+        router.currentRoute.path !== "/" &&
+        this.$store.state.accounts.length === 0
+      )
+        router.push("/");
+    },
+  },
+
+  mounted() {
+    if (
+      router.currentRoute.path !== "/" &&
+      this.$store.state.accounts.length === 0
+    )
+      router.push("/");
+  },
+
+  methods: {
+    back() {
+      router.back();
+    },
+  },
+};
 </script>
+
 
 <style scoped>
 .navbar {
@@ -25,7 +70,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  background-color: #1a1a1a;
   color: white;
 }
 
@@ -38,6 +82,7 @@ export default {
 .navbar-title {
   font-size: 0.875rem;
   font-weight: 500;
+  color: #777777;
 }
 
 .navbar-right {
@@ -49,7 +94,7 @@ export default {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #fff;
+  background: #ffffff;
   color: #1a1a1a;
   display: flex;
   align-items: center;
@@ -71,6 +116,9 @@ export default {
 
 .material-icons {
   font-size: 1.25rem;
+}
+.white {
+    color: white;
 }
 </style>
 Last edited 8 minutes ago Claude
