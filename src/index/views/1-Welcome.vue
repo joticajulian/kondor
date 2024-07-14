@@ -1,9 +1,7 @@
 <template>
   <div class="container">
     <div class="logo">
-      <div><Logo /></div>
-      <br>
-      <div><LogoText /></div>
+      <img src="../../../public/images/kondor-logo-group.svg" alt="">
     </div>
     <div
       v-if="hasAccounts"
@@ -33,7 +31,7 @@
       v-else
       to="/newWallet"
     >
-      <button>New Wallet</button>
+      <button class="custom-button primary">New Wallet</button>
     </router-link>
   </div>
 </template>
@@ -47,13 +45,11 @@ import Storage from "@/shared/mixins/Storage";
 
 // components
 import Unlock from "@/shared/components/Unlock.vue";
-import Logo from "@/shared/components/Logo";
-import LogoText from "@/shared/components/LogoText";
 
 export default {
   name: "Welcome",
 
-  components: { Logo, LogoText, Unlock },
+  components: { Unlock },
   mixins: [Storage, ViewHelper],
   data() {
     return {
@@ -98,9 +94,7 @@ input {
 .logo {
   display: flex;
   flex-direction: column;
-  padding-top: 3em;
   align-items: center;
-  width: 100%;
 }
 .recover {
   margin-top: 1em;

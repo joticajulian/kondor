@@ -17,11 +17,9 @@
       <div class="dropdown-info">
         <span class="heading">My accounts</span>
         <button @click="lock()">
-          Lock
+          <img src="../../../public/images/lock.svg" alt="">
         </button>
       </div>
-
-      <hr>
 
       <div class="account-list">
         <div
@@ -175,17 +173,14 @@ export default {
 
 <style scoped>
 .dropdown-content {
-  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  top: 80px;
+  top: 70px;
   left: 0;
   width: 100%;
   margin: 0 1em;
   border: none;
   width: calc(var(--app-width) - 2em);
-  border-radius: 22px;
   position: absolute;
-  background: white;
-  color: black;
+  background: #1c1c1c;
   z-index: 10;
   padding: 0.5em 0;
 }
@@ -209,7 +204,7 @@ export default {
 }
 
 hr {
-  border-top: 1px solid #ddd;
+  border-top: .2px dashed #302e2e54;
 }
 
 .address {
@@ -227,10 +222,12 @@ hr {
 
 .dropdown-info > button {
   width: auto;
-  border-radius: 22px;
-  color: var(--kondor-purple);
-  border-color: var(--kondor-purple);
+  border: none;
   background-color: transparent;
+}
+
+.dropdown-info > button img {
+  width: 1em;
 }
 
 .heading {
@@ -239,9 +236,9 @@ hr {
 }
 
 .avatar-menu {
-  width: 45px;
-  height: 45px;
-  border: 1px solid white;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgb(116, 116, 116);
   border-radius: 50%;
   padding: 0;
   box-sizing: border-box;

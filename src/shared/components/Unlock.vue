@@ -16,7 +16,7 @@
         @keyup.enter="unlock"
       >
       <button
-        class="button"
+        class="custom-button primary"
         @click="unlock"
       >
         {{ labelButton }}
@@ -146,11 +146,10 @@ export default {
 .container {
   margin: auto;
   width: 100%;
+  height: 100%;
+ justify-content: space-around;
 }
-.button button {
-  background: none;
-  text-decoration: underline;
-  color: var(--kondor-purple);
-  border: none;
+button {
+  width: 100%;
 }
 </style>
