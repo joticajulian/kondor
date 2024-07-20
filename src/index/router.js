@@ -13,6 +13,7 @@ import ImportAccount from "./views/setting-ImportAccount";
 import UpdateAccount from "./views/setting-UpdateAccount";
 import Buy from "./views/action-Buy";
 import SendToken from "./views/tokens/SendToken";
+import ReceiveToken from "./views/tokens/ReceiveToken";
 import TokenSettings from "./views/tokens/Settings";
 import AddToken from "./views/tokens/AddToken";
 
@@ -84,6 +85,12 @@ export default new Router({
       path: "/tokens/send",
       name: "Send Token",
       component: SendToken,
+      props: () => ({ tokenId: "" }),
+    },
+    {
+      path: "/tokens/receive",
+      name: "Receive Token",
+      component: ReceiveToken,
       props: () => ({ tokenId: "" }),
     },
     {

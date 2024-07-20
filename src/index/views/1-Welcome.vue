@@ -1,8 +1,5 @@
 <template>
   <div class="container">
-    <div class="logo">
-      <img src="../../../public/images/kondor-logo-group.svg" alt="">
-    </div>
     <div
       v-if="hasAccounts"
       class="unlock"
@@ -16,35 +13,55 @@
       v-if="!hasAccounts"
       class="welcome-message"
     >
-      Welcome to Kondor!
-      <br>The first of its kind wallet for the first of its kind blockchain,
-      Koinos.
+      <div class="logo">
+        <img
+          src="../../../public/images/kondor-logo-group.svg"
+          alt=""
+        >
+      </div>
+      <div class="title">
+        Welcome to Kondor!
+      </div>
+      The first of its kind wallet for the first of its kind blockchain, Koinos.
     </div>
     <router-link
       v-if="hasAccounts"
       to="/importSeedPhrase"
       class="button"
     >
-      <button>Forgot password?</button>
+      <button class="custom-button secondary">
+        Forgot password?
+      </button>
     </router-link>
-    <router-link
+    <div
       v-else
-      to="/newWallet"
+      class="button-group"
     >
-      <button class="custom-button primary">New Wallet</button>
-    </router-link>
+      <div
+        class="custom-button primary"
+        @click="generateSeed"
+      >
+        Create Wallet
+      </div>
+      <div
+        class="custom-button secondary"
+        @click="importSeedPhrase"
+      >
+        Restore Wallet
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
+import router from "@/index/router"
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
 
 // components
-import Unlock from "@/shared/components/Unlock.vue";
+import Unlock from "@/shared/components/Unlock.vue"
 
 export default {
   name: "Welcome",
@@ -54,41 +71,69 @@ export default {
   data() {
     return {
       hasAccounts: false,
-    };
+    }
   },
 
   mounted() {
     (async () => {
-      const encAccounts = await this._getAccounts();
-      this.hasAccounts = encAccounts && encAccounts.length > 0;
-    })();
+      const encAccounts = await this._getAccounts()
+      this.hasAccounts = encAccounts && encAccounts.length > 0
+    })()
   },
 
   methods: {
     async unlock() {
-      this.alertClose();
-      router.push("/dashboard");
+      this.alertClose()
+      router.push("/dashboard")
+    },
+    async importSeedPhrase() {
+      this.alertClose()
+      router.push("/importSeedPhrase")
+    },
+    async generateSeed() {
+      this.alertClose()
+      router.push("/generateSeed")
     },
   },
-};
+}
 </script>
 
 <style scoped>
 input {
   margin: 0 !important;
 }
-
+.title {
+  font-family: "Poppins", sans-serif;
+  padding: 1em;
+  font-size: 1.4em;
+  margin-top: 2em;
+  font-weight: bold;
+  padding: 0.5em 1em;
+}
 .container {
-  align-items: center;
-  width: 100%;
-  margin: 0;
+  font-family: Poppins, sans-serif;
+    align-items: center;
+    width: 100%;
+    margin: 1.8em 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+    line-height: 1.5em;
+    justify-content: space-between;
+}
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  width: 80%;
+  padding: 1.5em 0;
 }
 
 .welcome-message {
-  width: 77%;
+  width: 60%;
   margin: 2em 0;
   line-height: 1.2em;
-  color: var(--primary-color);
   text-align: center;
 }
 .logo {
@@ -107,22 +152,5 @@ input {
 .unlock {
   width: 70%;
   margin-top: 3em;
-}
-.button {
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  margin-bottom: 2em;
-}
-
-.button button {
-  background: none;
-  text-decoration: underline;
-  color: var(--kondor-purple);
-  border: none;
-}
-
-button {
-  width: auto;
 }
 </style>

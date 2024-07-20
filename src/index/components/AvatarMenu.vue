@@ -1,6 +1,6 @@
 <template>
   <div class="dropdown-container">
-    <button
+    <div
       class="avatar-menu"
       @click="openDropdown()"
     >
@@ -8,7 +8,7 @@
         :src="avatar"
         alt="identicon for selected address"
       >
-    </button>
+  </div>
 
     <div
       v-if="showDropdown"
@@ -17,7 +17,10 @@
       <div class="dropdown-info">
         <span class="heading">My accounts</span>
         <button @click="lock()">
-          <img src="../../../public/images/lock.svg" alt="">
+          <img
+            src="../../../public/images/lock.svg"
+            alt=""
+          >
         </button>
       </div>
 
@@ -34,11 +37,9 @@
                 ? 'visibility: visible;'
                 : 'visibility: hidden;'
             "
-            class="material-icons"
-          >
-            check
-          </span>
-          <div>
+            class="selected-indicator"
+          />
+          <div class="account-item">
             <span>{{ account.name }}</span>
             <span class="address">
               {{ account.address }}
@@ -47,38 +48,48 @@
         </div>
       </div>
 
-      <hr>
-
-      <div v-if="$store.state.mnemonic0">
-        <div
-          class="dropdown-item"
-          @click="createAccount"
-        >
-          <span class="material-icons">add</span> Create account
+      <div class="option">
+        <div v-if="$store.state.mnemonic0">
+          <div
+            class="options-item"
+            @click="createAccount"
+          >
+            <img
+              src="../../../public/images/icon-add.png"
+              alt="create account icon"
+            > Create account
+          </div>
         </div>
-      </div>
-      <div v-else>
-        <div
-          class="dropdown-item"
-          @click="addSeed"
-        >
-          <span class="material-icons">add</span> Add seed to wallet
+        <div v-else>
+          <div
+            class="options-item"
+            @click="addSeed"
+          >
+            <img
+              src="../../../public/images/icon-add.png"
+              alt="add seed icon"
+            > Add seed to wallet
+          </div>
         </div>
-      </div>
-      <div
-        class="dropdown-item"
-        @click="importAccount"
-      >
-        <span class="material-icons">file_download</span> Import account
-      </div>
+        <div
+          class="options-item"
+          @click="importAccount"
+        >
+          <img
+            src="../../../public/images/icon-import.png"
+            alt=""
+          > Import account
+        </div>
 
-      <hr>
-
-      <div
-        class="dropdown-item"
-        @click="openOptions"
-      >
-        <span class="material-icons">settings</span> Settings
+        <div
+          class="options-item"
+          @click="openOptions"
+        >
+          <img
+            src="../../../public/images/icon-settings-wrench.png"
+            alt=""
+          > Settings
+        </div>
       </div>
     </div>
   </div>
@@ -86,12 +97,12 @@
 
 <script>
 /* eslint-disable no-undef */
-import router from "@/index/router";
-import { createAvatar } from "@dicebear/avatars";
-import * as identiconStyle from "@dicebear/avatars-identicon-sprites";
+import router from "@/index/router"
+import { createAvatar } from "@dicebear/avatars"
+import * as identiconStyle from "@dicebear/avatars-identicon-sprites"
 
 // mixins
-import Storage from "@/shared/mixins/Storage";
+import Storage from "@/shared/mixins/Storage"
 
 export default {
   mixins: [Storage],
@@ -99,29 +110,29 @@ export default {
   data() {
     return {
       showDropdown: false,
-    };
+    }
   },
 
   computed: {
     avatar() {
       const account =
-        this.$store.state.accounts[this.$store.state.currentIndexAccount];
-      if (!account || !account.address) return "";
+        this.$store.state.accounts[this.$store.state.currentIndexAccount]
+      if (!account || !account.address) return ""
       const identicon = createAvatar(identiconStyle, {
         seed: account.address,
         dataUri: true,
-      });
-      return identicon;
+      })
+      return identicon
     },
   },
 
   methods: {
     openDropdown() {
       if (!this.showDropdown) {
-        this.showDropdown = true;
+        this.showDropdown = true
         setTimeout(() => {
-          window.addEventListener("click", this.closeDropdown);
-        }, 0);
+          window.addEventListener("click", this.closeDropdown)
+        }, 0)
       }
     },
 
@@ -131,44 +142,44 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false;
-        window.removeEventListener("click", this.closeDropdown);
+        this.showDropdown = false
+        window.removeEventListener("click", this.closeDropdown)
       }
     },
 
     async selectAccount(index) {
-      this.$store.state.currentIndexAccount = index;
-      await this._setCurrentIndexAccount(index);
-      this.closeDropdown();
+      this.$store.state.currentIndexAccount = index
+      await this._setCurrentIndexAccount(index)
+      this.closeDropdown()
     },
 
     createAccount() {
-      router.push("/createAccount");
-      this.closeDropdown();
+      router.push("/createAccount")
+      this.closeDropdown()
     },
 
     importAccount() {
-      router.push("/importAccount");
-      this.closeDropdown();
+      router.push("/importAccount")
+      this.closeDropdown()
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true");
-      this.closeDropdown();
+      router.push("/generateSeed?privateKeyExist=true")
+      this.closeDropdown()
     },
 
     openOptions() {
-      chrome.runtime.openOptionsPage();
-      this.closeDropdown();
+      chrome.runtime.openOptionsPage()
+      this.closeDropdown()
     },
 
     async lock() {
-      await this._removePasswordsFromSession();
-      router.push("/");
-      this.closeDropdown();
+      await this._removePasswordsFromSession()
+      router.push("/")
+      this.closeDropdown()
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -180,14 +191,16 @@ export default {
   border: none;
   width: calc(var(--app-width) - 2em);
   position: absolute;
-  background: #1c1c1c;
+  background: #111111;
   z-index: 10;
   padding: 0.5em 0;
+  border: 1px solid rgb(25 25 25);
+  border-radius: 16px;
 }
 
 .dropdown-item {
   float: none;
-  padding: 0.7em 2em;
+  padding: 0.3em 2em;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -199,17 +212,21 @@ export default {
 }
 
 .dropdown-item:hover {
-  background-color: var(--kondor-purple);
+  background: #353535;
   color: white;
 }
 
-hr {
-  border-top: .2px dashed #302e2e54;
+button {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+
 }
 
 .address {
-  font-size: 0.7em;
+  font-size: 0.6em;
   margin-top: 0.1em;
+  color: #777777;
 }
 
 .dropdown-info {
@@ -236,18 +253,44 @@ hr {
 }
 
 .avatar-menu {
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgb(116, 116, 116);
-  border-radius: 50%;
-  padding: 0;
-  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
   overflow: hidden;
-  background: white;
 }
 
 .account-list {
   max-height: 200px;
   overflow-y: auto;
+}
+.selected-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 999%;
+  background-color: var(--kondor-purple);
+}
+.account-item {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.5em;
+}
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+.options-item {
+  display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding: 1em;
+    font-weight: 500;
+    margin: 0 1.2em;
+    align-items: center;
+    justify-content: flex-start;
+}
+.options-item:hover {
+  background: #353535;
 }
 </style>

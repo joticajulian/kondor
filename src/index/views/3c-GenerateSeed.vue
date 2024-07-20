@@ -1,27 +1,28 @@
 <template>
   <div class="middle">
     <div class="container">
-      <h1 class="heading">
+      <span class="heading">
         {{ title }}
-      </h1>
+      </span>
       <div>
-        <img
-          src=""
-          alt=""
-        >
         <p>
-          This is a newly generated seed phrase. Please write it down and keep
-          it in safe place.
+          Write down your new seed phrase and store it safely. It cannot be recovered if lost or stolen.
         </p>
         <textarea
           id="seed"
           v-model="mnemonic"
           class="width-96"
-          rows="3"
+          rows="2"
           disabled
         />
       </div>
-      <div class="mb-1">
+      <div class="mb-1 checkbox-group">
+        <!-- <div class="warning">
+          <div class="emp">
+            Do not share your secret phrase!
+          </div>
+          If someone has your secret phrase they will have full control of your wallet.
+        </div> -->
         <div class="item-checkbox">
           <input
             v-model="seedConsent1"
@@ -30,9 +31,8 @@
           >
           <span
             class="label-checkbox"
-          >I have stored the seed phrase in a safe place</span>
+          >I have safely stored my seed phrase</span>
         </div>
-
         <label>
           <div class="item-checkbox">
             <input
@@ -42,8 +42,9 @@
             >
             <span
               class="label-checkbox"
-            >I understand that I must not share this seed phrase with anyone
-              or else I may lose my assets</span>
+            >
+              I understand there is no recovery
+            </span>
           </div>
         </label>
       </div>
@@ -171,6 +172,14 @@ export default {
 };
 </script>
 <style scoped>
+textarea {
+  color: white;
+  background: none;
+
+}
+label {
+  font-size: 1em !important;
+}
 .container {
   display: flex;
   flex-direction: column;
@@ -187,12 +196,30 @@ export default {
 }
 
 .width-96 {
-  width: 96%;
+  width: 80%;
 }
 .item-checkbox {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 1em;
+}
+.warning {
+  background-color: #2C2424;
+  border: .5px solid #df2828;
+  border-radius: 5px;
+  color: #f24e59;
+  padding: 1em;
+  margin: 0 1em;
+  text-align: center;
+}
+.emp {
+  font-weight: bold;
+}
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
 }
 </style>

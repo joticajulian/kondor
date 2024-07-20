@@ -1,12 +1,15 @@
 <template>
   <div class="container">
+    <div class="logo">
+      <img src="../../../public/images/kondor-logo.png" alt="">
+    </div>
     <div
       v-if="loadingSession"
       class="loader"
     />
     <div
       v-else
-      class="container"
+      class="group"
     >
       <input
         v-model="password"
@@ -143,13 +146,13 @@ export default {
 };
 </script>
 <style scoped>
-.container {
-  margin: auto;
-  width: 100%;
-  height: 100%;
- justify-content: space-around;
+input {
+  width: 93% !important;
+  margin: none;
 }
-button {
-  width: 100%;
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4em;
 }
 </style>

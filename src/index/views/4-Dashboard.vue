@@ -27,7 +27,7 @@ export default {
 .content {
   flex-grow: 1;
   overflow-y: auto;
-  height: 485px;
+  height: 475px;
 }
 
 .status {
