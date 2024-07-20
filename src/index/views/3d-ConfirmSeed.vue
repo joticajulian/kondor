@@ -4,17 +4,13 @@
       <h1 class="heading">
         Confirm seed
       </h1>
-      <div>
-        <img
-          src=""
-          alt=""
-        >
-        <p>Please select the words of the seed in the correct order.</p>
+      <div class="w-100">
+        <p>Confirm your seed phrase</p>
         <div class="mnemonic-display">
           <textarea
             id="seed"
             v-model="mnemonic"
-            class="width-96"
+            class=""
             rows="3"
             disabled
           />
@@ -162,5 +158,6 @@ export default {
   max-width: 100%;
   box-sizing: border-box;
   padding-right: 2em;
+  background: none;
 }
 </style>

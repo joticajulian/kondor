@@ -1,12 +1,10 @@
 <template>
   <nav class="navbar">
-    <div
-      class="navbar-left"
-    >
+    <div class="navbar-left">
       <AvatarMenu v-if="$store.state.showAvatarMenu" />
-      <AccountMenu v-if="$store.state.showAccountMenu" />
     </div>
     <div class="navbar-right">
+      <AccountMenu v-if="$store.state.showAccountMenu" />
       <!-- <button class="icon-button">
         <img
           src="../../../public/images/home-icon.png"
@@ -18,14 +16,13 @@
   </nav>
 </template>
 
-
 <script>
-import router from "@/index/router";
-import AccountMenu from "@/index/components/AccountMenu.vue";
-import AvatarMenu from "@/index/components/AvatarMenu.vue";
+import router from "@/index/router"
+import AccountMenu from "@/index/components/AccountMenu.vue"
+import AvatarMenu from "@/index/components/AvatarMenu.vue"
 
 // mixins
-import Storage from "@/shared/mixins/Storage";
+import Storage from "@/shared/mixins/Storage"
 
 export default {
   components: { AccountMenu, AvatarMenu },
@@ -35,15 +32,15 @@ export default {
   watch: {
     "$store.state.currentNetwork": function () {
       const network =
-        this.$store.state.networks[this.$store.state.currentNetwork];
-      this._setCurrentNetwork(network.tag);
+        this.$store.state.networks[this.$store.state.currentNetwork]
+      this._setCurrentNetwork(network.tag)
     },
     "$store.state.accounts": function () {
       if (
         router.currentRoute.path !== "/" &&
         this.$store.state.accounts.length === 0
       )
-        router.push("/");
+        router.push("/")
     },
   },
 
@@ -52,25 +49,26 @@ export default {
       router.currentRoute.path !== "/" &&
       this.$store.state.accounts.length === 0
     )
-      router.push("/");
+      router.push("/")
   },
 
   methods: {
     back() {
-      router.back();
+      router.back()
     },
   },
-};
+}
 </script>
-
 
 <style scoped>
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  color: white;
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  background: #1a1a1a;
+  padding: 0.5rem 1em;
 }
 
 .navbar-left {
@@ -87,7 +85,7 @@ export default {
 
 .navbar-right {
   display: flex;
-  gap: 0.5rem;
+  justify-content: center
 }
 
 .avatar {
@@ -118,7 +116,7 @@ export default {
   font-size: 1.25rem;
 }
 .white {
-    color: white;
+  color: white;
 }
 </style>
 Last edited 8 minutes ago Claude
