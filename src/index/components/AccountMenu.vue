@@ -1,7 +1,7 @@
 <template>
   <div class="dropdown-container">
     <div class="link-item">
-      <div>
+      <div class="row">
         <div
           class="current-account"
           @click="copyAddress"
@@ -12,6 +12,11 @@
             {{ currentAddress }}
           </div>
         </div>
+        <img
+          src="../../../public/images/edit.svg"
+          alt="edit account icon"
+          class="dropdown-icon"
+        >
       </div>
       <button
         class="menu-toggle"
@@ -300,6 +305,11 @@ a:visited {
   font-size: 1em;
 }
 .dropdown-icon {
-  width: 0.7em;
+  width: 0.65em;
+  margin-left: .5em;
+}
+.row {
+  display: flex;
+  align-items: center;
 }
 </style>

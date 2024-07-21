@@ -34,7 +34,10 @@
         </span>
         Receive
       </button>
-      <button class="action-button more">
+      <button
+        class="action-button more"
+        @click="navigateToTransactionHistory"
+      >
         <span class="icon">&#8230;</span>
         More
       </button>
@@ -61,6 +64,12 @@ export default {
     navigateToReceiveToken(tokenId = '') {
       this.$router.push({ 
         name: 'Receive Token', 
+        params: { tokenId: tokenId }
+      });
+    },
+    navigateToTransactionHistory(tokenId = '') {
+      this.$router.push({ 
+        name: 'Account History', 
         params: { tokenId: tokenId }
       });
     }

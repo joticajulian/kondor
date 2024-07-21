@@ -1,14 +1,13 @@
 <template>
   <div class="app-status">
-    <div class="left">
-      <button class="menu-button">
-        <span class="material-icons">menu</span>
-      </button>
-    </div>
-    <div class="center">
-      <h1 class="title">
+    <div class="message">
+      <img
+        src="../../../public/images/kondor-mark.svg"
+        alt="Kondor logo mark"
+      >
+      <span class="title">
         {{ title }}
-      </h1>
+      </span>
     </div>
     <div class="indicator-container">
       <div
@@ -16,13 +15,7 @@
         :class="{ active: isActive }"
       />
     </div>
-    <!-- <div class="bottom-decoration">
-      <img
-        src="../../../public/images/kondor-mark.svg"
-        alt="Kondor logo mark"
-      >
-    </div> -->
-</div>
+  </div>
 </template>
   
 <script>
@@ -42,8 +35,10 @@ export default {
 </script>
   
   <style scoped>
-  button {
-    margin: 0;
+  .message {
+    display: flex;
+    align-items: center;
+    gap: 1em;
   }
   .app-status {
     background: #1a1a1a;
@@ -52,7 +47,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     position: relative;
-    padding: 0 1em;
+    padding: .5em 1em;
   }
   
   .menu-button {
@@ -66,6 +61,7 @@ export default {
     font-size: 1em;
     font-weight: normal;
     margin: 0;
+    padding: .5em 0;
   }
   
   .status-indicator {
@@ -112,16 +108,4 @@ export default {
     color: white;
     font-size: 24px;
   }
-  button {
-  -webkit-appearance: none;
-  border-radius: 0;
-  text-align: inherit;
-  background: none;
-  box-shadow: none;
-  padding: 0;
-  cursor: pointer;
-  border: none;
-  color: inherit;
-  font: inherit;
-}
   </style>
