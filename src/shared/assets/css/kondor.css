@@ -38,14 +38,13 @@ input:disabled {
 
 body {
   margin: 0px;
-  background: #111111;
+  background: #222222;
   color: var(--secondary-light);
   font-family: "Poppins", sans-serif;
   font-size: 75%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+  height: 100%;
+  position: relative;
 }
 
 h1 {

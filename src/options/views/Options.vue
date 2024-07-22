@@ -3,257 +3,257 @@
     <div class="inside-container">
       <header>
         <div class="logo">
-          <!-- <img src="../../../public/images/kondor-icon.png" alt="kondor icon" /> -->
           <h1>Kondor Settings</h1>
-          <br>
         </div>
       </header>
-      <div class="">
-        <h2>Networks</h2>
-        <p>Networks configured in the wallet.</p>
-      </div>
-      <div class="top content two-column">
-        <div
-          v-for="network in networks"
-          :key="network.name"
-          class="network-column"
+
+      <div class="tabs">
+        <button
+          :class="{ active: activeTab === 'networks' }"
+          @click="activeTab = 'networks'"
         >
-          <div class="key big">
-            {{ network.name }}
-          </div>
-          <div class="wide">
-            <div class="input-group">
-              <div class="description">
-                RPC Nodes
-              </div>
-              <div class="input-button">
-                <input
-                  v-model="network.rpcNodesText"
-                  type="text"
-                >
-              </div>
-            </div>
-            <div class="input-group">
-              <div class="description">
-                Set Chain Id
-              </div>
-              <div class="input-button">
-                <input
-                  v-model="network.chainId"
-                  type="text"
-                >
-              </div>
-            </div>
-          </div>
-        </div>
+          Networks
+        </button>
+        <button
+          :class="{ active: activeTab === 'wallet' }"
+          @click="activeTab = 'wallet'"
+        >
+          Wallet
+        </button>
       </div>
-      <button @click="updateNetworks()">
-        Update Networks
-      </button>
-      <hr>
-      <div class="bottom content">
-        <div class="">
-          <h2>Wallet</h2>
-          <p>
-            Here you can view your wallet's seed and private keys.
-            <span
-              class="warning"
-            >Note: this information is extremely sensitive! Keep it safe and
-              make sure it doesn't fall into the wrong hands. It is your
-              responsibility, there is no way to recover stolen funds.</span>
-          </p>
-        </div>
-        <div class="two-column">
-          <div class="left">
-            <p class="description">
-              View seed and private keys
-            </p>
-            <Unlock
-              label-button="View seed and private keys"
-              :autocomplete="false"
-              @onUnlock="viewSecrets"
-              @onError="alertDanger($event)"
-            />
-          </div>
-          <div class="right">
-            <div class="key">
-              Mnemonic:
-            </div>
-            <div class="value">
-              {{ mnemonic }}
-            </div>
-            <br>
-            <div class="title">
-              Accounts
-            </div>
+
+      <transition
+        name="fade"
+        mode="out-in"
+      >
+        <div
+          v-if="activeTab === 'networks'"
+          key="networks"
+          class="settings-container"
+        >
+          <div class="top content two-column">
             <div
-              v-for="account in accounts"
-              :key="account"
-              class=""
+              v-for="network in networks"
+              :key="network.name"
+              class="network-column"
             >
               <div class="key big">
-                {{ account.name }}
+                {{ network.name }}
               </div>
-              <br>
+              <div class="wide">
+                <div class="input-group">
+                  <div class="description">
+                    RPC Nodes
+                  </div>
+                  <div class="input-button">
+                    <input
+                      v-model="network.rpcNodesText"
+                      type="text"
+                    >
+                  </div>
+                </div>
+                <div class="input-group">
+                  <div class="description">
+                    Set Chain Id
+                  </div>
+                  <div class="input-button">
+                    <input
+                      v-model="network.chainId"
+                      type="text"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="custom-button"
+            @click="updateNetworks()"
+          >
+            Update Networks
+          </button>
+        </div>
+
+        <div
+          v-else-if="activeTab === 'wallet'"
+          key="wallet"
+          class="bottom content"
+        >
+          <div>
+            <h2>Wallet</h2>
+            <p>
+              Here you can view your wallet's seed and private keys.
+              <span
+                class="warning"
+              >Note: this information is extremely sensitive! Keep it safe and
+                make sure it doesn't fall into the wrong hands. It is your
+                responsibility, there is no way to recover stolen funds.</span>
+            </p>
+          </div>
+          <div class="two-column">
+            <div
+              v-if="!secretsVisible"
+              class="left"
+            >
+              <p class="description">
+                View seed and private keys
+              </p>
+              <Unlock
+                label-button="View seed and private keys"
+                :autocomplete="false"
+                @onUnlock="viewSecrets"
+                @onError="alertDanger($event)"
+              />
+            </div>
+            <div
+              v-if="secretsVisible"
+              class="right"
+            >
               <div class="key">
-                Key Path:
+                Mnemonic:
               </div>
               <div class="value">
-                {{ account.keyPath }}
+                {{ mnemonic }}
               </div>
               <br>
-              <div class="key">
-                Address:
+              <div class="title">
+                Accounts
               </div>
-              <div class="value">
-                {{ account.address }}
-              </div>
-              <br>
-              <div class="key">
-                Private Key:
-              </div>
-              <div class="value">
-                {{ account.privateKey }}
-              </div>
-              <br>
-              <div class="signers">
-                <div
-                  v-for="signer in account.signers"
-                  :key="signer.name"
-                >
-                  {{ signer.name }} <br>
-                  {{ signer.keyPath }} <br>
-                  {{ signer.address }} <br>
-                  {{ signer.privateKey }} <br>
+              <div
+                v-for="account in accounts"
+                :key="account.address"
+                class=""
+              >
+                <div class="key big">
+                  {{ account.name }}
+                </div>
+                <br>
+                <div class="key">
+                  Key Path:
+                </div>
+                <div class="value">
+                  {{ account.keyPath }}
+                </div>
+                <br>
+                <div class="key">
+                  Address:
+                </div>
+                <div class="value">
+                  {{ account.address }}
+                </div>
+                <br>
+                <div class="key">
+                  Private Key:
+                </div>
+                <div class="value">
+                  {{ account.privateKey }}
+                </div>
+                <br>
+                <div class="signers">
+                  <div
+                    v-for="signer in account.signers"
+                    :key="signer.address"
+                  >
+                    {{ signer.name }} <br>
+                    {{ signer.keyPath }} <br>
+                    {{ signer.address }} <br>
+                    {{ signer.privateKey }} <br>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- <div>
-          <div>
-            Delete wallet: Remove all private keys and accounts from this wallet
-          </div>
-          <button @click="deleteWallet" class="warning">Delete wallet</button>
-        </div> -->
-      </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
-// mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
-
-// components
-import Unlock from "@/shared/components/Unlock.vue";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
+import Unlock from "@/shared/components/Unlock.vue"
 
 export default {
   components: { Unlock },
-
   mixins: [Storage, ViewHelper],
   data() {
     return {
+      activeTab: "networks",
       rpcNodes: "",
       chainId: "",
       mnemonic: "",
       accounts: [],
       networks: [],
-    };
+      secretsVisible: false,
+    }
   },
 
   mounted() {
-    (async () => {
-      this.networks = await this._getNetworks();
-      this.networks.forEach((n) => {
-        n.rpcNodesText = n.rpcNodes.join(",");
-      });
-      this.networks[0].name = "Koinos Mainnet";
-      this.networks[0].tag = "mainnet";
-      this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
-      this.networks[0].kapNameServiceContractId =
-        "13tmzDmfqCsbYT26C4CmKxq86d33senqH3";
-      this.networks[0].kapProfileContractId =
-        "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB";
-      this.networks[0].nicknamesContractId =
-        "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz";
-
-      this.networks[1].name = "Koinos Harbinger (testnet)";
-      this.networks[1].tag = "harbinger";
-      this.networks[1].koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
-      this.networks[1].nicknamesContractId =
-        "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR";
-    })();
+    this.loadNetworks()
   },
 
   methods: {
+    async loadNetworks() {
+      this.networks = await this._getNetworks()
+      this.networks.forEach((n) => {
+        n.rpcNodesText = n.rpcNodes.join(",")
+      })
+      this.networks[0].name = "Koinos Mainnet"
+      this.networks[0].tag = "mainnet"
+      this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL"
+      this.networks[0].kapNameServiceContractId =
+        "13tmzDmfqCsbYT26C4CmKxq86d33senqH3"
+      this.networks[0].kapProfileContractId =
+        "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB"
+      this.networks[0].nicknamesContractId =
+        "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz"
+
+      this.networks[1].name = "Koinos Harbinger (testnet)"
+      this.networks[1].tag = "harbinger"
+      this.networks[1].koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ"
+      this.networks[1].nicknamesContractId =
+        "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR"
+    },
+
     async updateNetworks() {
       await this._setNetworks(
         this.networks.map((n) => {
-          const { rpcNodesText, ...otherVals } = n;
-          const rpcNodes = rpcNodesText.split(",");
+          const { rpcNodesText, ...otherVals } = n
+          const rpcNodes = rpcNodesText.split(",")
           return {
             ...otherVals,
             rpcNodes,
-          };
+          }
         })
-      );
-      this.alertSuccess("Networks updated");
-    },
-
-    async deleteWallet() {
-      try {
-        await this._deleteWallet(null);
-        this.alertSuccess("Wallet deleted");
-      } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
-      }
+      )
+      this.alertSuccess("Networks updated")
     },
 
     async viewSecrets() {
-      this.mnemonic = this.$store.state.mnemonic0;
-      this.accounts = this.$store.state.accounts;
+      this.mnemonic = this.$store.state.mnemonic0
+      this.accounts = this.$store.state.accounts
+      this.secretsVisible = true
 
       this.alertSuccess(
         "Secrets are visible, be careful not to expose them to third parties"
-      );
+      )
     },
   },
-};
+}
 </script>
+
 <style scoped>
 input {
   margin-bottom: 0;
   max-width: 100%;
+  color: #777777;
 }
-
-button {
-  margin: 0;
-  width: auto;
-  margin-top: 2em;
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
 }
-
-h1 {
-  margin: 0;
-  font-size: 2em;
-  font-weight: bold;
-}
-
-h2 {
-  font-size: 1.5em;
-  font-weight: bold;
-}
-
-p {
-  width: 80%;
-}
-
-hr {
-  margin: 2em 0;
-}
-
 .container {
   margin: 0;
   display: block;
@@ -269,10 +269,10 @@ hr {
 }
 
 .inside-container {
-  width: 60%;
+  width: 50%;
   margin: 0 auto;
   padding: 4em;
-  background-color: #f5f5f5;
+  background-color: #222222;
 }
 
 .logo {
@@ -283,7 +283,9 @@ hr {
 }
 
 .warning {
-  background-color: red;
+  color: rgb(207, 27, 27);
+  background: none;
+  font-weight: bold;
 }
 
 .input-group {
@@ -291,7 +293,7 @@ hr {
   flex-direction: column;
   align-content: center;
   justify-content: flex-start;
-  width: 100%;
+  align-items: start;
   gap: 0.5em;
 }
 
@@ -313,6 +315,14 @@ hr {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 1em;
+  width: 100%;
+  height: 6em;
+}
+
+.group {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
 }
 
 .heading {
@@ -321,7 +331,7 @@ hr {
 
 .two-column {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 2em;
 }
 
@@ -342,17 +352,44 @@ hr {
   margin-top: 30px;
 }
 
-.warning {
-  color: rgb(207, 27, 27);
-  background: none;
-  font-weight: bold;
-}
-
 .network-column {
   display: flex;
   flex-direction: column;
   gap: 1em;
   width: 100%;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 2em;
+}
+
+.tabs button {
+  padding: 0.5em 1em;
+  font-size: 1em;
+  background-color: #333333;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.tabs button.active {
+  background-color: #444444;
+}
+
+.tabs button:hover {
+  background-color: #555555;
+}
+
+/* Transition styles */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 @media (max-width: 768px) {

@@ -150,6 +150,12 @@ input {
   width: 93% !important;
   margin: none;
 }
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
 .logo {
   display: flex;
   justify-content: center;
