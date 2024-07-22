@@ -8,24 +8,29 @@
       </header>
 
       <div class="tabs">
-        <button
+        <span
+          class="tab"
           :class="{ active: activeTab === 'networks' }"
           @click="activeTab = 'networks'"
         >
-          Networks
-        </button>
-        <button
+          <div class="tab-detail">
+            <span class="lg-text">Networks</span>
+            <span class="sm-text">Network configuration</span>
+          </div>
+        </span>
+        <span
+          class="tab"
           :class="{ active: activeTab === 'wallet' }"
           @click="activeTab = 'wallet'"
         >
-          Wallet
-        </button>
+          <div class="tab-detail">
+            <span class="lg-text">Wallet</span>
+            <span class="sm-text">Seed phrase and private keys</span>
+          </div>
+        </span>
       </div>
 
-      <transition
-        name="fade"
-        mode="out-in"
-      >
+      <transition name="fade" mode="out-in">
         <div
           v-if="activeTab === 'networks'"
           key="networks"
@@ -42,34 +47,21 @@
               </div>
               <div class="wide">
                 <div class="input-group">
-                  <div class="description">
-                    RPC Nodes
-                  </div>
+                  <div class="description">RPC Nodes</div>
                   <div class="input-button">
-                    <input
-                      v-model="network.rpcNodesText"
-                      type="text"
-                    >
+                    <input v-model="network.rpcNodesText" type="text" />
                   </div>
                 </div>
                 <div class="input-group">
-                  <div class="description">
-                    Set Chain Id
-                  </div>
+                  <div class="description">Set Chain Id</div>
                   <div class="input-button">
-                    <input
-                      v-model="network.chainId"
-                      type="text"
-                    >
+                    <input v-model="network.chainId" type="text" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <button
-            class="custom-button"
-            @click="updateNetworks()"
-          >
+          <button class="custom-button" @click="updateNetworks()">
             Update Networks
           </button>
         </div>
@@ -83,21 +75,16 @@
             <h2>Wallet</h2>
             <p>
               Here you can view your wallet's seed and private keys.
-              <span
-                class="warning"
-              >Note: this information is extremely sensitive! Keep it safe and
+              <span class="warning"
+                >Note: this information is extremely sensitive! Keep it safe and
                 make sure it doesn't fall into the wrong hands. It is your
-                responsibility, there is no way to recover stolen funds.</span>
+                responsibility, there is no way to recover stolen funds.</span
+              >
             </p>
           </div>
           <div class="two-column">
-            <div
-              v-if="!secretsVisible"
-              class="left"
-            >
-              <p class="description">
-                View seed and private keys
-              </p>
+            <div v-if="!secretsVisible" class="left">
+              <p class="description">View seed and private keys</p>
               <Unlock
                 label-button="View seed and private keys"
                 :autocomplete="false"
@@ -105,59 +92,39 @@
                 @onError="alertDanger($event)"
               />
             </div>
-            <div
-              v-if="secretsVisible"
-              class="right"
-            >
-              <div class="key">
-                Mnemonic:
-              </div>
+            <div v-if="secretsVisible" class="right">
+              <div class="key">Mnemonic:</div>
               <div class="value">
                 {{ mnemonic }}
               </div>
-              <br>
-              <div class="title">
-                Accounts
-              </div>
-              <div
-                v-for="account in accounts"
-                :key="account.address"
-                class=""
-              >
+              <br />
+              <div class="title">Accounts</div>
+              <div v-for="account in accounts" :key="account.address" class="">
                 <div class="key big">
                   {{ account.name }}
                 </div>
-                <br>
-                <div class="key">
-                  Key Path:
-                </div>
+                <br />
+                <div class="key">Key Path:</div>
                 <div class="value">
                   {{ account.keyPath }}
                 </div>
-                <br>
-                <div class="key">
-                  Address:
-                </div>
+                <br />
+                <div class="key">Address:</div>
                 <div class="value">
                   {{ account.address }}
                 </div>
-                <br>
-                <div class="key">
-                  Private Key:
-                </div>
+                <br />
+                <div class="key">Private Key:</div>
                 <div class="value">
                   {{ account.privateKey }}
                 </div>
-                <br>
+                <br />
                 <div class="signers">
-                  <div
-                    v-for="signer in account.signers"
-                    :key="signer.address"
-                  >
-                    {{ signer.name }} <br>
-                    {{ signer.keyPath }} <br>
-                    {{ signer.address }} <br>
-                    {{ signer.privateKey }} <br>
+                  <div v-for="signer in account.signers" :key="signer.address">
+                    {{ signer.name }} <br />
+                    {{ signer.keyPath }} <br />
+                    {{ signer.address }} <br />
+                    {{ signer.privateKey }} <br />
                   </div>
                 </div>
               </div>
@@ -248,6 +215,35 @@ input {
   margin-bottom: 0;
   max-width: 100%;
   color: #777777;
+}
+
+/* tabs */
+.tabs {
+  display: flex;
+  gap: 1em;
+  margin-bottom: 2em;
+  margin-bottom: 2em;
+  justify-content: flex-start;
+}
+.tab {
+  display: flex;
+  flex-direction: column;
+  padding: 1em;
+  cursor: pointer;
+  border-radius: 0.5em;
+  transition: background-color 0.3s;
+}
+.tab-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.lg-text {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+.sm-text {
+  font-size: 1em;
 }
 .settings-container {
   display: flex;
@@ -357,11 +353,6 @@ input {
   flex-direction: column;
   gap: 1em;
   width: 100%;
-}
-
-.tabs {
-  display: flex;
-  margin-bottom: 2em;
 }
 
 .tabs button {
