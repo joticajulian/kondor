@@ -2,19 +2,52 @@
   <div class="column">
     <div class="content">
       <WalletInfo />
-      <TabPanel address="" />
+      <div class="debug-info">
+        <p>Current Address: {{ currentAddress }}</p>
+      </div>
+      <TabPanel :address="currentAddress" />
     </div>
   </div>
 </template>
 
 <script>
-import WalletInfo from "../components/WalletInfo.vue";
-import TabPanel from "../components/TabPanel.vue";
+import WalletInfo from "../components/WalletInfo.vue"
+import TabPanel from "../components/TabPanel.vue"
 
 export default {
   components: { WalletInfo, TabPanel },
-};
+  
+  data() {
+    return {
+      currentAddress: ''
+    }
+  },
+
+  computed: {
+    currentIndexAccount() {
+      return this.$store.state.currentIndexAccount
+    }
+  },
+
+  watch: {
+    currentIndexAccount: 'loadAccount'
+  },
+
+  mounted() {
+    this.loadAccount()
+  },
+
+  methods: {
+    loadAccount() {
+      if (this.$store.state.accounts.length === 0) return
+      const index = this.$store.state.currentIndexAccount
+      this.currentAddress = this.$store.state.accounts[index].address
+      console.log('Current address loaded:', this.currentAddress)
+    }
+  }
+}
 </script>
+
 <style scoped>
 .column {
   display: flex;
@@ -30,12 +63,18 @@ export default {
   height: 475px;
 }
 
+.debug-info {
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
 .status {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;/* Add a background color to ensure it's visible */
-  z-index: 1; /* Ensure it stays on top of other content */
+  right: 0;
+  z-index: 1;
 }
-
 </style>
