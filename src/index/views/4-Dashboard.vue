@@ -2,9 +2,6 @@
   <div class="column">
     <div class="content">
       <WalletInfo />
-      <div class="debug-info">
-        <p>Current Address: {{ currentAddress }}</p>
-      </div>
       <TabPanel :address="currentAddress" />
     </div>
   </div>
