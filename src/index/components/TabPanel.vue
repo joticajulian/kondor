@@ -1,61 +1,55 @@
 <template>
   <div class="bottom">
-    <div class="debug-info">
-      <p>TabPanel Address Prop: {{ address }}</p>
-    </div>
     <div class="tabs-container">
-      <div class="tabs">
-        <a
-          :class="activeTab === 'coins' ? 'active' : ''"
-          @click="setActiveTab('coins')"
-        >Coins</a>
-        <a
-          :class="activeTab === 'nfts' ? 'active' : ''"
-          @click="setActiveTab('nfts')"
-        >NFTs</a>
-        <a
-          :class="activeTab === 'activity' ? 'active' : ''"
-          @click="setActiveTab('activity')"
-        >Activity</a>
-      </div>
-      <div class="manage-tokens">
-        <img
-          src="../../../public/images/manage-tokens.svg"
-          alt="Manage tokens"
-        >
-      </div>
+      <a
+        v-for="tab in ['Coins', 'NFTs', 'Activity']"
+        :key="tab"
+        :class="{ active: activeTab === tab.toLowerCase() }"
+        @click="setActiveTab(tab.toLowerCase())"
+      >{{ tab }}</a>
     </div>
     <div class="panel">
       <div v-if="activeTab === 'nfts'">
-        <h2>NFTs Tab Content</h2>
-        <div v-if="loading">
+        <div
+          v-if="loading"
+          class="loading"
+        >
           Loading NFTs...
         </div>
         <div
           v-else-if="error"
           class="error-message"
         >
-          Error: {{ error }}
-          <br>
-          <small>Please check the console for more details.</small>
+          {{ error }}
         </div>
-        <div v-else-if="!nfts || nfts.length === 0">
+        <div
+          v-else-if="!nfts || nfts.length === 0"
+          class="no-nfts"
+        >
           No NFTs found for this address
         </div>
-        <div v-else>
+        <div
+          v-else
+          class="nft-list"
+        >
           <div
             v-for="nft in nfts"
-            :key="nft.token_id"
+            :key="nft.id"
             class="nft-item"
           >
             <img
-              :src="nft.image_url"
-              :alt="nft.name"
+              v-if="nft.metadata && nft.metadata.image"
+              :src="nft.metadata.image"
+              :alt="nft.metadata.name"
               class="nft-image"
             >
             <div class="nft-info">
-              <h3>{{ nft.name }}</h3>
-              <p>{{ nft.collection_name }}</p>
+              <h3 class="nft-name">
+                {{ nft.metadata ? (nft.metadata.name || 'Untitled') : 'Untitled' }}
+              </h3>
+              <p class="nft-description">
+                {{ nft.metadata ? (nft.metadata.description || 'No description') : 'No description' }}
+              </p>
             </div>
           </div>
         </div>
@@ -81,15 +75,6 @@ export default {
       nfts: null,
       loading: false,
       error: null,
-      cryptoList: [
-        {
-          symbol: "KOIN",
-          name: "Koinos",
-          balance: 200,
-          usd: 299,
-        },
-        // ... other crypto items ...
-      ]
     }
   },
 
@@ -99,7 +84,6 @@ export default {
   },
 
   mounted() {
-    console.log('TabPanel mounted. Address:', this.address)
     this.fetchNFTs()
   },
 
@@ -107,7 +91,6 @@ export default {
     async fetchNFTs() {
       if (this.activeTab !== 'nfts' || !this.address) return
 
-      console.log('Fetching NFTs for address:', this.address)
       this.loading = true
       this.error = null
       this.nfts = null
@@ -118,28 +101,21 @@ export default {
             'Accept': 'application/json',
           },
         })
-        console.log('API Response:', JSON.stringify(response.data, null, 2))
 
-        if (response.data && typeof response.data === 'object') {
-          if (Array.isArray(response.data.data)) {
-            this.nfts = response.data.data
-          } else if (Array.isArray(response.data)) {
-            this.nfts = response.data
-          } else {
-            this.error = 'Unexpected API response structure'
-            console.error('API response structure:', response.data)
-          }
+        if (response.data && Array.isArray(response.data.data)) {
+          this.nfts = response.data.data
+          console.log('NFTs loaded:', this.nfts)
         } else {
-          this.error = 'Invalid API response'
-          console.error('Invalid API response:', response.data)
+          this.error = 'Unexpected API response structure'
+          console.error('API response:', response.data)
         }
 
         if (this.nfts && this.nfts.length === 0) {
           this.error = 'No NFTs found for this address'
         }
       } catch (err) {
-        console.error('Error fetching NFTs:', err)
         this.error = `Failed to fetch NFTs: ${err.message}`
+        console.error('Error fetching NFTs:', err)
       } finally {
         this.loading = false
       }
@@ -151,210 +127,93 @@ export default {
         this.fetchNFTs()
       }
     },
-
-    goToCollection(nft) {
-      window.open(`https://kollection.app/profile/${this.address}`, '_blank')
-    }
   }
 }
 </script>
 
 <style scoped>
 .bottom {
-  background: #222222;
+  background: #181818;
   color: #ffffff;
-  padding: 20px;
-}
-
-.debug-info {
-  background-color: #f0f0f0;
-  color: #333;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-}
-
-.tabs-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.tabs {
-  display: flex;
-}
-
-.tabs a {
-  color: #ffffff;
-  padding: 10px 20px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.tabs a.active {
-  background-color: #444444;
-  border-radius: 5px;
-}
-
-.panel {
-  background-color: #333333;
-  padding: 20px;
-  border-radius: 5px;
-}
-.bottom {
-  background: #222222;
-  color: #ffffff;
-}
-.tabs {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: stretch;
-  width: 100%;
-}
-
-.tabs > a {
-  flex: 1;
-  text-align: center;
-  padding: 1em;
-}
-
-.tabs > a.active {
-  color: var(--primary-light);
-}
-.tabs-container {
-  display: flex;
-  align-items: center;
-  padding: 0 1em;
-  gap: 8em;
-}
-.manage-tokens {
-  width: 2em;
-  padding-right: 1em;
-}
-.panel {
-  margin: 1em 2em;
-}
-
-.panel .material-icons {
-  font-size: 1.2em;
-  vertical-align: text-bottom;
-}
-a,
-a:visited {
-  color: #777777;
-}
-
-.crypto-item {
-  display: flex;
-  align-items: center;
-  background-color: #2a2a2a;
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 12px;
-  height: 4.5em;
-}
-
-.crypto-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
-  font-size: 20px;
-}
-
-.crypto-info {
-  flex-grow: 1;
-  display: flex;
-  justify-content: space-between;
-}
-
-.crypto-main,
-.crypto-values {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.crypto-symbol {
-  color: #fff;
-  font-family: Poppins;
-  font-size: 1rem;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  letter-spacing: -0.02rem;
-}
-
-.crypto-name,
-.crypto-usd {
-  color: #777;
-  text-align: right;
-  font-family: Poppins;
-  font-size: 0.75rem;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  letter-spacing: -0.015rem;
-}
-.crypto-balance {
-  color: #fff;
-  text-align: right;
-  font-family: Poppins;
-  font-size: 1rem;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  letter-spacing: -0.02rem;
-}
-
-.nft-column {
+.tabs-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: space-around;
+  background: #252525;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.tabs-container a {
+  color: #777777;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+.tabs-container a.active {
+  background-color: #383838;
+  color: #ffffff;
+}
+
+.panel {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.nft-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .nft-item {
-  width: calc(50% - 0.5rem);
-  background-color: #2a2a2a;
+  background-color: #252525;
   border-radius: 10px;
   overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
-}
-
-.nft-item:hover {
-  transform: scale(1.05);
 }
 
 .nft-image {
   width: 100%;
-  height: 150px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
 }
 
 .nft-info {
-  padding: 0.5rem;
+  padding: 15px;
 }
 
-.nft-info h3 {
+.nft-name {
   margin: 0;
-  font-size: 1rem;
-  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
 }
 
-.nft-info p {
-  margin: 0.25rem 0 0;
-  font-size: 0.75rem;
-  color: #777;
+.nft-description {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #777777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-.loading, .error, .no-nfts {
+.loading, .error-message, .no-nfts {
   text-align: center;
-  padding: 1rem;
-  color: #777;
+  padding: 20px;
+  color: #777777;
+}
+
+.error-message {
+  color: #ff6b6b;
 }
 </style>
