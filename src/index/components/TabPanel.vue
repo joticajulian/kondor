@@ -30,7 +30,7 @@
         </div>
         <div
           v-else
-          class="nft-list"
+          class="nft-grid"
         >
           <div
             v-for="nft in nfts"
@@ -48,9 +48,17 @@
                 {{ nft.metadata ? (nft.metadata.name || 'Untitled') : 'Untitled' }}
               </h3>
               <p class="nft-description">
-                {{ nft.metadata ? (nft.metadata.description || 'No description') : 'No description' }}
+                {{ nft.metadata ? (truncateDescription(nft.metadata.description) || 'No description') : 'No description' }}
               </p>
+              <!-- <button><a href="https://kollection.app/assets/1Cs4tVzdRZZ4DPYEHpiULe4VMemjiK6p1Y/0x3632">View on Kollection</a></button> -->
             </div>
+          </div>
+          <div class="kollection-link">
+            <a
+              :href="kollectionProfileUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >View on Kollection</a>
           </div>
         </div>
       </div>
@@ -76,6 +84,12 @@ export default {
       loading: false,
       error: null,
     }
+  },
+
+  computed: {
+    kollectionProfileUrl() {
+      return `https://kollection.app/profile/${this.address}`
+    },
   },
 
   watch: {
@@ -127,6 +141,10 @@ export default {
         this.fetchNFTs()
       }
     },
+    truncateDescription(description) {
+      if (!description) return 'No description'
+      return description.length > 30 ? description.slice(0, 30) + '...' : description
+    }
   }
 }
 </script>
@@ -167,10 +185,11 @@ export default {
   padding: 10px;
 }
 
-.nft-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
 }
 
 .nft-item {
@@ -183,28 +202,30 @@ export default {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
+  border-radius: 10px 10px 0 0;
 }
 
 .nft-info {
-  padding: 15px;
+  padding: 10px;
 }
 
 .nft-name {
   margin: 0;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   color: #ffffff;
-}
-
-.nft-description {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #777777;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+}
+
+.nft-collection {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: #777777;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .loading, .error-message, .no-nfts {
@@ -215,5 +236,17 @@ export default {
 
 .error-message {
   color: #ff6b6b;
+}
+.kollection-link {
+  width: 100%;
+  text-align: center;
+  padding: 1em;
+  margin-top: auto;
+  color: var(--primary-light);
+  grid-column: 1 / -1;
+}
+.kollection-link a, .kollection-link a:visited {
+  color: var(--primary-light);
+  text-decoration: none;
 }
 </style>
