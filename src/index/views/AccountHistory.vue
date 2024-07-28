@@ -20,7 +20,7 @@
 </template>
   
 <script>
-import { getAccountHistory } from '@/services/apiService';
+import { getAccountHistory } from '@/services/accountService';
   
 export default {
   name: 'AccountHistory',
