@@ -35,11 +35,11 @@
         Receive
       </button>
       <button
-        class="action-button more"
-        @click="navigateToTransactionHistory"
+        class="action-button add-token"
+        @click="navigateToAddToken"
       >
-        <span class="icon">&#8230;</span>
-        More
+        <span class="icon">+</span>
+        Add Token
       </button>
     </div>
   </div>
@@ -67,10 +67,9 @@ export default {
         params: { tokenId: tokenId }
       });
     },
-    navigateToTransactionHistory(tokenId = '') {
+    navigateToAddToken() {
       this.$router.push({ 
-        name: 'Account History', 
-        params: { tokenId: tokenId }
+        name: 'Add Token'
       });
     }
   }
