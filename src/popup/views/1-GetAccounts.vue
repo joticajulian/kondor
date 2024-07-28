@@ -138,7 +138,7 @@ label {
 .container {
   width: 90%;
   padding: 2em 0;
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 400;
   text-transform: none;
   align-items: flex-start;

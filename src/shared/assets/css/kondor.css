@@ -125,7 +125,7 @@ textarea {
   vertical-align: middle;
   white-space: normal;
   line-height: 1;
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
   max-width: 20em;
 }
 button {
@@ -185,7 +185,7 @@ button:disabled {
 }
 
 .container {
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 400;
   display: flex;
   flex-direction: column;

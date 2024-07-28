@@ -77,7 +77,7 @@ export default {
 </script>
 <style scoped>
 .container {
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
