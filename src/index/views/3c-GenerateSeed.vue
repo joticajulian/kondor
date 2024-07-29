@@ -6,7 +6,8 @@
       </span>
       <div>
         <p>
-          Write down your new seed phrase and store it safely. It cannot be recovered if lost or stolen.
+          Write down your new seed phrase and store it safely. It cannot be
+          recovered if lost or stolen.
         </p>
         <textarea
           id="seed"
@@ -40,9 +41,7 @@
               type="checkbox"
               class="checkbox"
             >
-            <span
-              class="label-checkbox"
-            >
+            <span class="label-checkbox">
               I understand there is no recovery
             </span>
           </div>
@@ -175,7 +174,6 @@ export default {
 textarea {
   color: white;
   background: none;
-
 }
 label {
   font-size: 1em !important;
@@ -205,8 +203,8 @@ label {
   margin-bottom: 1em;
 }
 .warning {
-  background-color: #2C2424;
-  border: .5px solid #df2828;
+  background-color: #2c2424;
+  border: 0.5px solid #df2828;
   border-radius: 5px;
   color: #f24e59;
   padding: 1em;

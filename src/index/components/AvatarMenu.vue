@@ -11,11 +11,9 @@
     </div>
     <div
       class="dropdown-wrapper"
-      :class="{ 'show': showDropdown }"
+      :class="{ show: showDropdown }"
     >
-      <div
-        class="dropdown-content"
-      >
+      <div class="dropdown-content">
         <div>
           <div class="dropdown-info">
             <span class="heading">My accounts</span>
@@ -109,12 +107,12 @@
 
 <script>
 /* eslint-disable no-undef */
-import router from "@/index/router"
-import { createAvatar } from "@dicebear/avatars"
-import * as identiconStyle from "@dicebear/avatars-identicon-sprites"
+import router from "@/index/router";
+import { createAvatar } from "@dicebear/avatars";
+import * as identiconStyle from "@dicebear/avatars-identicon-sprites";
 
 // mixins
-import Storage from "@/shared/mixins/Storage"
+import Storage from "@/shared/mixins/Storage";
 
 export default {
   mixins: [Storage],
@@ -122,28 +120,28 @@ export default {
   data() {
     return {
       showDropdown: false,
-    }
+    };
   },
 
   computed: {
     avatar() {
       const account =
-        this.$store.state.accounts[this.$store.state.currentIndexAccount]
-      if (!account || !account.address) return ""
+        this.$store.state.accounts[this.$store.state.currentIndexAccount];
+      if (!account || !account.address) return "";
       const identicon = createAvatar(identiconStyle, {
         seed: account.address,
         dataUri: true,
-      })
-      return identicon
+      });
+      return identicon;
     },
   },
 
   methods: {
     openDropdown() {
-      console.log('openDropdown called'); // Add this line
+      console.log("openDropdown called"); // Add this line
       if (!this.showDropdown) {
         this.showDropdown = true;
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = "hidden";
         setTimeout(() => {
           window.addEventListener("click", this.closeDropdown);
         }, 0);
@@ -156,44 +154,44 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false
-        window.removeEventListener("click", this.closeDropdown)
+        this.showDropdown = false;
+        window.removeEventListener("click", this.closeDropdown);
       }
     },
 
     async selectAccount(index) {
-      this.$store.state.currentIndexAccount = index
-      await this._setCurrentIndexAccount(index)
-      this.closeDropdown()
+      this.$store.state.currentIndexAccount = index;
+      await this._setCurrentIndexAccount(index);
+      this.closeDropdown();
     },
 
     createAccount() {
-      router.push("/createAccount")
-      this.closeDropdown()
+      router.push("/createAccount");
+      this.closeDropdown();
     },
 
     importAccount() {
-      router.push("/importAccount")
-      this.closeDropdown()
+      router.push("/importAccount");
+      this.closeDropdown();
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true")
-      this.closeDropdown()
+      router.push("/generateSeed?privateKeyExist=true");
+      this.closeDropdown();
     },
 
     openOptions() {
-      chrome.runtime.openOptionsPage()
-      this.closeDropdown()
+      chrome.runtime.openOptionsPage();
+      this.closeDropdown();
     },
 
     async lock() {
-      await this._removePasswordsFromSession()
-      router.push("/")
-      this.closeDropdown()
+      await this._removePasswordsFromSession();
+      router.push("/");
+      this.closeDropdown();
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -234,7 +232,6 @@ export default {
 .dropdown-wrapper.show .dropdown-content {
   left: 0;
 }
-
 
 .dropdown-content {
   top: 42px;

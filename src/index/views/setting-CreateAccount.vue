@@ -33,12 +33,12 @@
 </template>
 
 <script>
-import router from "@/index/router"
-import PageTitle from "@/shared/components/PageTitle"
+import router from "@/index/router";
+import PageTitle from "@/shared/components/PageTitle";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
 
 export default {
   components: { PageTitle },
@@ -46,7 +46,7 @@ export default {
   data() {
     return {
       name: "",
-    }
+    };
   },
 
   methods: {
@@ -55,24 +55,24 @@ export default {
         await this._addAccount({
           name: this.name,
           passwordId: 0,
-        })
+        });
         this.$store.state.currentIndexAccount =
-          this.$store.state.accounts.length - 1
+          this.$store.state.accounts.length - 1;
         await this._setCurrentIndexAccount(
           this.$store.state.currentIndexAccount
-        )
-        router.back()
+        );
+        router.back();
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 
     cancel() {
-      router.back()
+      router.back();
     },
   },
-}
+};
 </script>
 <style scoped>
 .container {

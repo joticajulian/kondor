@@ -1,48 +1,46 @@
 <template>
   <div class="column">
     <div class="content">
-      <WalletInfo />
-      <TabPanel :address="currentAddress" />
+      <WidgetTokens />
     </div>
   </div>
 </template>
 
 <script>
-import WalletInfo from "../components/WalletInfo.vue"
-import TabPanel from "../components/TabPanel.vue"
+import WidgetTokens from "../components/WidgetTokens.vue";
 
 export default {
-  components: { WalletInfo, TabPanel },
-  
+  components: { WidgetTokens },
+
   data() {
     return {
-      currentAddress: ''
-    }
+      currentAddress: "",
+    };
   },
 
   computed: {
     currentIndexAccount() {
-      return this.$store.state.currentIndexAccount
-    }
+      return this.$store.state.currentIndexAccount;
+    },
   },
 
   watch: {
-    currentIndexAccount: 'loadAccount'
+    currentIndexAccount: "loadAccount",
   },
 
   mounted() {
-    this.loadAccount()
+    this.loadAccount();
   },
 
   methods: {
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return
-      const index = this.$store.state.currentIndexAccount
-      this.currentAddress = this.$store.state.accounts[index].address
-      console.log('Current address loaded:', this.currentAddress)
-    }
-  }
-}
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAddress = this.$store.state.accounts[index].address;
+      console.log("Current address loaded:", this.currentAddress);
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -4,10 +4,8 @@
       ${{ balance }}
     </h1>
     <p class="mana tooltip">
-      Mana {{ manaPercentage }}%
-      <span class="tooltiptext">
-        938 Liquid KOIN
-      </span>
+      Mana {{ manaPercent }}%
+      <span class="tooltiptext"> {{ liquidKoin }} Liquid KOIN </span>
     </p>
     <div class="action-buttons">
       <button
@@ -47,39 +45,55 @@
 
 <script>
 export default {
-  name: 'WalletBalance',
-  data() {
-    return {
-      balance: '1,540',
-      manaPercentage: 53.65
-    }
+  name: "WalletBalance",
+
+  props: {
+    balance: {
+      type: String,
+      required: true,
+    },
+    manaPercentage: {
+      type: Number,
+      required: true,
+    },
+    liquidKoin: {
+      type: String,
+      required: true,
+    },
   },
+
+  computed: {
+    manaPercent() {
+      return this.manaPercentage.toFixed(2);
+    },
+  },
+
   methods: {
-    navigateToSendToken(tokenId = '') {
-      this.$router.push({ 
-        name: 'Send Token', 
-        params: { tokenId: tokenId }
+    navigateToSendToken(tokenId = "") {
+      this.$router.push({
+        name: "Send Token",
+        params: { tokenId: tokenId },
       });
     },
-    navigateToReceiveToken(tokenId = '') {
-      this.$router.push({ 
-        name: 'Receive Token', 
-        params: { tokenId: tokenId }
+    navigateToReceiveToken(tokenId = "") {
+      this.$router.push({
+        name: "Receive Token",
+        params: { tokenId: tokenId },
       });
     },
     navigateToAddToken() {
-      this.$router.push({ 
-        name: 'Add Token'
+      this.$router.push({
+        name: "Add Token",
       });
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
 .wallet-balance {
   padding: 1.5em 1.5em 0 1.5em;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -93,12 +107,12 @@ export default {
 }
 
 .mana {
-  background-color: #2A2A2A;
+  background-color: #2a2a2a;
   color: #777777;
   display: inline-block;
-  padding: .3em 1em;
+  padding: 0.3em 1em;
   border-radius: 1.5em;
-  font-size: .9em;
+  font-size: 0.9em;
   margin: 10px 0;
   position: relative;
   cursor: help;
@@ -129,7 +143,7 @@ export default {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: transparent transparent #111 transparent; 
+  border-color: transparent transparent #111 transparent;
 }
 
 .tooltip:hover .tooltiptext {
@@ -174,6 +188,6 @@ export default {
 
 .more {
   font-weight: bold;
-  color: #777777
+  color: #777777;
 }
 </style>

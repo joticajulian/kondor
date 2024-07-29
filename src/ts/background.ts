@@ -55,12 +55,12 @@ async function preparePopup(sender?: Sender) {
       const { width, height } = displays[0].bounds;
       chrome.windows.create({
         focused: true,
-        url: 'popup.html',
-        type: 'popup',
+        url: "popup.html",
+        type: "popup",
         width: 400,
         height: 600,
-        left: Math.floor(width / 2 - 200),  // Center horizontally
-        top: Math.floor(height / 2 - 300),  // Center vertically
+        left: Math.floor(width / 2 - 200), // Center horizontally
+        top: Math.floor(height / 2 - 300), // Center vertically
       });
     });
   }

@@ -18,17 +18,17 @@
     </ul>
   </div>
 </template>
-  
+
 <script>
-import { getAccountHistory } from '@/services/accountService';
-  
+import { getAccountHistory } from "@/services/accountService";
+
 export default {
-  name: 'AccountHistory',
+  name: "AccountHistory",
   data() {
     return {
       history: [],
       loading: true,
-      error: null
+      error: null,
     };
   },
   mounted() {
@@ -37,11 +37,11 @@ export default {
   methods: {
     async fetchHistory() {
       try {
-        const account = '12vRwxu2nVG2697dM36KMNkmfecNdU8PpR';
+        const account = "12vRwxu2nVG2697dM36KMNkmfecNdU8PpR";
         const result = await getAccountHistory(account, {
           limit: 10,
           decode_operations: true,
-          decode_events: true
+          decode_events: true,
         });
         this.history = result;
       } catch (err) {
@@ -49,7 +49,7 @@ export default {
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>

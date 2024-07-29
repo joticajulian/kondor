@@ -8,18 +8,18 @@
 </template>
 <script>
 export default {
-  name: 'PageTitle',
+  name: "PageTitle",
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     subtitle: {
       type: String,
-      default: ''
-    }
-  }
-}
+      default: "",
+    },
+  },
+};
 </script>
 <style scoped>
 .page-title {

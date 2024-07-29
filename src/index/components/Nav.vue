@@ -17,12 +17,12 @@
 </template>
 
 <script>
-import router from "@/index/router"
-import AccountMenu from "@/index/components/AccountMenu.vue"
-import AvatarMenu from "@/index/components/AvatarMenu.vue"
+import router from "@/index/router";
+import AccountMenu from "@/index/components/AccountMenu.vue";
+import AvatarMenu from "@/index/components/AvatarMenu.vue";
 
 // mixins
-import Storage from "@/shared/mixins/Storage"
+import Storage from "@/shared/mixins/Storage";
 
 export default {
   components: { AccountMenu, AvatarMenu },
@@ -32,15 +32,15 @@ export default {
   watch: {
     "$store.state.currentNetwork": function () {
       const network =
-        this.$store.state.networks[this.$store.state.currentNetwork]
-      this._setCurrentNetwork(network.tag)
+        this.$store.state.networks[this.$store.state.currentNetwork];
+      this._setCurrentNetwork(network.tag);
     },
     "$store.state.accounts": function () {
       if (
         router.currentRoute.path !== "/" &&
         this.$store.state.accounts.length === 0
       )
-        router.push("/")
+        router.push("/");
     },
   },
 
@@ -49,15 +49,15 @@ export default {
       router.currentRoute.path !== "/" &&
       this.$store.state.accounts.length === 0
     )
-      router.push("/")
+      router.push("/");
   },
 
   methods: {
     back() {
-      router.back()
+      router.back();
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -85,7 +85,7 @@ export default {
 
 .navbar-right {
   display: flex;
-  justify-content: center
+  justify-content: center;
 }
 
 .avatar {

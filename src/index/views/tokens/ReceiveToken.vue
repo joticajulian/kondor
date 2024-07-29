@@ -45,14 +45,14 @@ export default {
       this.$router.push({ name: "Dashboard" });
     },
   },
-}
+};
 </script>
 
 <style scoped>
 .middle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .receive-koin {
   height: 100vh;
@@ -97,21 +97,21 @@ h1 {
 }
 
 .account-info {
-    background-color: #181818;
-    padding: 1em;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 85%;
-    color: #777777;
-    width: 78%;
+  background-color: #181818;
+  padding: 1em;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 85%;
+  color: #777777;
+  width: 78%;
 }
 .account-info span {
-    width: 12px;
+  width: 12px;
 }
 .account-label {
-  font-size: .6em;
+  font-size: 0.6em;
 }
 
 .pill-button {

@@ -30,7 +30,10 @@
         </span>
       </div>
 
-      <transition name="fade" mode="out-in">
+      <transition
+        name="fade"
+        mode="out-in"
+      >
         <div
           v-if="activeTab === 'networks'"
           key="networks"
@@ -47,21 +50,34 @@
               </div>
               <div class="wide">
                 <div class="input-group">
-                  <div class="description">RPC Nodes</div>
+                  <div class="description">
+                    RPC Nodes
+                  </div>
                   <div class="input-button">
-                    <input v-model="network.rpcNodesText" type="text" />
+                    <input
+                      v-model="network.rpcNodesText"
+                      type="text"
+                    >
                   </div>
                 </div>
                 <div class="input-group">
-                  <div class="description">Set Chain Id</div>
+                  <div class="description">
+                    Set Chain Id
+                  </div>
                   <div class="input-button">
-                    <input v-model="network.chainId" type="text" />
+                    <input
+                      v-model="network.chainId"
+                      type="text"
+                    >
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <button class="custom-button" @click="updateNetworks()">
+          <button
+            class="custom-button"
+            @click="updateNetworks()"
+          >
             Update Networks
           </button>
         </div>
@@ -75,16 +91,21 @@
             <h2>Wallet</h2>
             <p>
               Here you can view your wallet's seed and private keys.
-              <span class="warning"
-                >Note: this information is extremely sensitive! Keep it safe and
+              <span
+                class="warning"
+              >Note: this information is extremely sensitive! Keep it safe and
                 make sure it doesn't fall into the wrong hands. It is your
-                responsibility, there is no way to recover stolen funds.</span
-              >
+                responsibility, there is no way to recover stolen funds.</span>
             </p>
           </div>
           <div class="two-column">
-            <div v-if="!secretsVisible" class="left">
-              <p class="description">View seed and private keys</p>
+            <div
+              v-if="!secretsVisible"
+              class="left"
+            >
+              <p class="description">
+                View seed and private keys
+              </p>
               <Unlock
                 label-button="View seed and private keys"
                 :autocomplete="false"
@@ -92,39 +113,59 @@
                 @onError="alertDanger($event)"
               />
             </div>
-            <div v-if="secretsVisible" class="right">
-              <div class="key">Mnemonic:</div>
+            <div
+              v-if="secretsVisible"
+              class="right"
+            >
+              <div class="key">
+                Mnemonic:
+              </div>
               <div class="value">
                 {{ mnemonic }}
               </div>
-              <br />
-              <div class="title">Accounts</div>
-              <div v-for="account in accounts" :key="account.address" class="">
+              <br>
+              <div class="title">
+                Accounts
+              </div>
+              <div
+                v-for="account in accounts"
+                :key="account.address"
+                class=""
+              >
                 <div class="key big">
                   {{ account.name }}
                 </div>
-                <br />
-                <div class="key">Key Path:</div>
+                <br>
+                <div class="key">
+                  Key Path:
+                </div>
                 <div class="value">
                   {{ account.keyPath }}
                 </div>
-                <br />
-                <div class="key">Address:</div>
+                <br>
+                <div class="key">
+                  Address:
+                </div>
                 <div class="value">
                   {{ account.address }}
                 </div>
-                <br />
-                <div class="key">Private Key:</div>
+                <br>
+                <div class="key">
+                  Private Key:
+                </div>
                 <div class="value">
                   {{ account.privateKey }}
                 </div>
-                <br />
+                <br>
                 <div class="signers">
-                  <div v-for="signer in account.signers" :key="signer.address">
-                    {{ signer.name }} <br />
-                    {{ signer.keyPath }} <br />
-                    {{ signer.address }} <br />
-                    {{ signer.privateKey }} <br />
+                  <div
+                    v-for="signer in account.signers"
+                    :key="signer.address"
+                  >
+                    {{ signer.name }} <br>
+                    {{ signer.keyPath }} <br>
+                    {{ signer.address }} <br>
+                    {{ signer.privateKey }} <br>
                   </div>
                 </div>
               </div>
@@ -137,9 +178,9 @@
 </template>
 
 <script>
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Unlock from "@/shared/components/Unlock.vue"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
   components: { Unlock },
@@ -153,61 +194,61 @@ export default {
       accounts: [],
       networks: [],
       secretsVisible: false,
-    }
+    };
   },
 
   mounted() {
-    this.loadNetworks()
+    this.loadNetworks();
   },
 
   methods: {
     async loadNetworks() {
-      this.networks = await this._getNetworks()
+      this.networks = await this._getNetworks();
       this.networks.forEach((n) => {
-        n.rpcNodesText = n.rpcNodes.join(",")
-      })
-      this.networks[0].name = "Koinos Mainnet"
-      this.networks[0].tag = "mainnet"
-      this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL"
+        n.rpcNodesText = n.rpcNodes.join(",");
+      });
+      this.networks[0].name = "Koinos Mainnet";
+      this.networks[0].tag = "mainnet";
+      this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
       this.networks[0].kapNameServiceContractId =
-        "13tmzDmfqCsbYT26C4CmKxq86d33senqH3"
+        "13tmzDmfqCsbYT26C4CmKxq86d33senqH3";
       this.networks[0].kapProfileContractId =
-        "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB"
+        "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB";
       this.networks[0].nicknamesContractId =
-        "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz"
+        "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz";
 
-      this.networks[1].name = "Koinos Harbinger (testnet)"
-      this.networks[1].tag = "harbinger"
-      this.networks[1].koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ"
+      this.networks[1].name = "Koinos Harbinger (testnet)";
+      this.networks[1].tag = "harbinger";
+      this.networks[1].koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
       this.networks[1].nicknamesContractId =
-        "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR"
+        "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR";
     },
 
     async updateNetworks() {
       await this._setNetworks(
         this.networks.map((n) => {
-          const { rpcNodesText, ...otherVals } = n
-          const rpcNodes = rpcNodesText.split(",")
+          const { rpcNodesText, ...otherVals } = n;
+          const rpcNodes = rpcNodesText.split(",");
           return {
             ...otherVals,
             rpcNodes,
-          }
+          };
         })
-      )
-      this.alertSuccess("Networks updated")
+      );
+      this.alertSuccess("Networks updated");
     },
 
     async viewSecrets() {
-      this.mnemonic = this.$store.state.mnemonic0
-      this.accounts = this.$store.state.accounts
-      this.secretsVisible = true
+      this.mnemonic = this.$store.state.mnemonic0;
+      this.accounts = this.$store.state.accounts;
+      this.secretsVisible = true;
 
       this.alertSuccess(
         "Secrets are visible, be careful not to expose them to third parties"
-      )
+      );
     },
   },
-}
+};
 </script>
 
 <style scoped>

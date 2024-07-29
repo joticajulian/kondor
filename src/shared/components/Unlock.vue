@@ -1,7 +1,10 @@
 <template>
   <div class="container">
     <div class="logo">
-      <img src="../../../public/images/kondor-logo.png" alt="">
+      <img
+        src="../../../public/images/kondor-logo.png"
+        alt=""
+      >
     </div>
     <div
       v-if="loadingSession"

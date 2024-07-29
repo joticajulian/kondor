@@ -22,9 +22,7 @@
         name="watch-mode"
         value="watch-mode"
       >
-      <label
-        for="watch-mode"
-      >Import in watch mode (no private key)</label>
+      <label for="watch-mode">Import in watch mode (no private key)</label>
     </div>
     <div v-if="watchMode">
       <label for="address">Address</label>
@@ -126,7 +124,7 @@ input[type="checkbox"] {
 }
 
 label {
-  font-size: .8em;
+  font-size: 0.8em;
   color: #777;
 }
 .container {
@@ -149,5 +147,4 @@ button.secondary {
   gap: 1em;
   justify-content: stretch;
 }
-
 </style>

@@ -20,8 +20,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap");
 
-
-
 button {
   all: initial;
   font: inherit;
@@ -454,7 +452,7 @@ label {
 .loader {
   width: 48px;
   height: 48px;
-  border: 3px solid #FFF;
+  border: 3px solid #fff;
   border-radius: 50%;
   display: inline-block;
   position: relative;
@@ -462,19 +460,19 @@ label {
   animation: rotation 1s linear infinite;
 }
 .loader::after {
-    content: '';  
+  content: "";
   box-sizing: border-box;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 3px solid transparent;
-    border-bottom-color: var(--kondor-purple);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-bottom-color: var(--kondor-purple);
 }
-    
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
@@ -482,8 +480,8 @@ label {
   100% {
     transform: rotate(360deg);
   }
-} 
- /* End Loader 2 */
+}
+/* End Loader 2 */
 
 /* Loader */
 .loader,

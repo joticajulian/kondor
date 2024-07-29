@@ -38,10 +38,19 @@
                 >
                 <div class="nft-info">
                   <h3 class="nft-name">
-                    {{ nft.metadata ? (nft.metadata.name || 'Untitled') : 'Untitled' }}
+                    {{
+                      nft.metadata
+                        ? nft.metadata.name || "Untitled"
+                        : "Untitled"
+                    }}
                   </h3>
                   <p class="nft-description">
-                    {{ nft.metadata ? (truncateDescription(nft.metadata.description) || 'No description') : 'No description' }}
+                    {{
+                      nft.metadata
+                        ? truncateDescription(nft.metadata.description) ||
+                          "No description"
+                        : "No description"
+                    }}
                   </p>
                 </div>
               </div>
@@ -68,7 +77,7 @@
           </div>
         </div>
       </div>
-      
+
       <div v-if="activeTab === 'activity'">
         <div
           v-if="loadingActivity"
@@ -98,17 +107,28 @@
             class="transaction-item"
           >
             <div class="transaction-icon">
-              {{ getTransactionType(transaction) === 'receive' ? '↓' : '↑' }}
+              {{ getTransactionType(transaction) === "receive" ? "↓" : "↑" }}
             </div>
             <div class="transaction-details">
               <div class="transaction-top">
-                <span class="transaction-amount">{{ getTransactionAmount(transaction) }} {{ getTokenSymbol(transaction) }}</span>
-                <span class="transaction-date">{{ getTransactionDate(transaction) }}</span>
+                <span
+                  class="transaction-amount"
+                >{{ getTransactionAmount(transaction) }}
+                  {{ getTokenSymbol(transaction) }}</span>
+                <span class="transaction-date">{{
+                  getTransactionDate(transaction)
+                }}</span>
               </div>
               <div class="transaction-bottom">
-                <span class="transaction-type">{{ getTransactionType(transaction) }}</span>
+                <span class="transaction-type">{{
+                  getTransactionType(transaction)
+                }}</span>
                 <span class="transaction-address">
-                  {{ getTransactionType(transaction) === 'receive' ? 'From: ' : 'To: ' }}
+                  {{
+                    getTransactionType(transaction) === "receive"
+                      ? "From: "
+                      : "To: "
+                  }}
                   {{ getTransactionAddress(transaction) }}
                 </span>
               </div>
@@ -116,13 +136,28 @@
           </div>
         </div>
       </div>
+      <div v-if="activeTab === 'coins'">
+        <div
+          v-for="(coin, i) in coins"
+          :key="i"
+        >
+          <img :src="coin.image">
+          {{ coin.balance }} {{ coin.symbol }}
+          <a
+            v-if="!coin.permanentAddress"
+            class="notpermanent"
+            href="https://peakd.com/@jga/nicknames-pointing-address"
+            target="_blank"
+          >⚠️ not permanent</a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import { getAccountHistory } from '@/services/accountService'
+import axios from "axios";
+import { getAccountHistory } from "@/services/accountService";
 
 export default {
   props: {
@@ -130,42 +165,49 @@ export default {
       type: String,
       required: true,
     },
+    coins: {
+      type: Object,
+      required: true,
+    },
   },
 
   data() {
     return {
-      activeTab: 'nfts',
+      activeTab: "nfts",
       nfts: null,
       loading: false,
       error: null,
       transactions: [],
       loadingActivity: false,
       activityError: null,
-    }
+    };
   },
 
   computed: {
     kollectionProfileUrl() {
-      return `https://kollection.app/profile/${this.address}`
+      return `https://kollection.app/profile/${this.address}`;
     },
   },
 
   watch: {
-    address: 'fetchData',
-    activeTab: 'fetchData'
+    address: "fetchData",
+    activeTab: "fetchData",
   },
 
   mounted() {
-    this.fetchData()
+    this.fetchData();
   },
 
   methods: {
     getTransactionType(transaction) {
       const operation = transaction.trx.transaction.operations[0];
-      if (operation.call_contract && operation.call_contract.args.from === this.address) {
-        return 'send';
+      if (
+        operation.call_contract &&
+        operation.call_contract.args.from === this.address
+      ) {
+        return "send";
       }
-      return 'receive';
+      return "receive";
     },
 
     getTransactionAmount(transaction) {
@@ -173,124 +215,130 @@ export default {
       if (operation.call_contract && operation.call_contract.args.value) {
         return (parseInt(operation.call_contract.args.value) / 1e8).toFixed(8);
       }
-      return 'N/A';
+      return "N/A";
     },
 
     getTokenSymbol(transaction) {
-    // This assumes all transactions are for KOIN. 
-    // You may need to adjust this if there are other token types.
-      return 'KOIN';
+      // This assumes all transactions are for KOIN.
+      // You may need to adjust this if there are other token types.
+      return "KOIN";
     },
 
     getTransactionDate(transaction) {
-    // The API response doesn't seem to include a timestamp.
-    // If it's available, you would parse and format it here.
-    // For now, we'll return a placeholder:
-      return 'Date not available';
+      // The API response doesn't seem to include a timestamp.
+      // If it's available, you would parse and format it here.
+      // For now, we'll return a placeholder:
+      return "Date not available";
     },
 
     getTransactionAddress(transaction) {
       const operation = transaction.trx.transaction.operations[0];
       const type = this.getTransactionType(transaction);
       if (operation.call_contract) {
-        return type === 'receive' ? operation.call_contract.args.from : operation.call_contract.args.to;
+        return type === "receive"
+          ? operation.call_contract.args.from
+          : operation.call_contract.args.to;
       }
-      return 'N/A';
+      return "N/A";
     },
-
-
 
     // older
     async fetchData() {
-      if (this.activeTab === 'nfts') {
-        await this.fetchNFTs()
-      } else if (this.activeTab === 'activity') {
-        await this.fetchAccountHistory()
+      if (this.activeTab === "nfts") {
+        await this.fetchNFTs();
+      } else if (this.activeTab === "activity") {
+        await this.fetchAccountHistory();
       }
     },
 
     async fetchNFTs() {
-      if (!this.address) return
+      if (!this.address) return;
 
-      this.loading = true
-      this.error = null
-      this.nfts = null
+      this.loading = true;
+      this.error = null;
+      this.nfts = null;
 
       try {
-        const response = await axios.get(`https://kollection.app/api/v1/nfts_by_owner/${this.address}`, {
-          headers: {
-            'Accept': 'application/json',
-          },
-        })
+        const response = await axios.get(
+          `https://kollection.app/api/v1/nfts_by_owner/${this.address}`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
 
         if (response.data && Array.isArray(response.data.data)) {
-          this.nfts = response.data.data
-          console.log('NFTs loaded:', this.nfts)
+          this.nfts = response.data.data;
+          console.log("NFTs loaded:", this.nfts);
         } else {
-          this.error = 'Unexpected API response structure'
-          console.error('API response:', response.data)
+          this.error = "Unexpected API response structure";
+          console.error("API response:", response.data);
         }
 
         if (this.nfts && this.nfts.length === 0) {
-          this.error = 'No NFTs found for this address'
+          this.error = "No NFTs found for this address";
         }
       } catch (err) {
-        this.error = `Failed to fetch NFTs: ${err.message}`
-        console.error('Error fetching NFTs:', err)
+        this.error = `Failed to fetch NFTs: ${err.message}`;
+        console.error("Error fetching NFTs:", err);
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async fetchAccountHistory() {
-      if (!this.address) return
+      if (!this.address) return;
 
-      this.loadingActivity = true
-      this.activityError = null
-      this.transactions = []
+      this.loadingActivity = true;
+      this.activityError = null;
+      this.transactions = [];
 
       try {
-        const data = await getAccountHistory(this.address)
-        this.transactions = data
-        console.log('Account history loaded:', this.transactions)
+        const data = await getAccountHistory(this.address);
+        this.transactions = data;
+        console.log("Account history loaded:", this.transactions);
       } catch (err) {
-        this.activityError = `Failed to fetch account history: ${err.message}`
-        console.error('Error fetching account history:', err)
+        this.activityError = `Failed to fetch account history: ${err.message}`;
+        console.error("Error fetching account history:", err);
       } finally {
-        this.loadingActivity = false
+        this.loadingActivity = false;
       }
     },
 
     setActiveTab(tab) {
-      this.activeTab = tab
-      this.fetchData()
+      this.activeTab = tab;
+      this.fetchData();
     },
 
     truncateDescription(description) {
-      if (!description) return 'No description'
-      return description.length > 30 ? description.slice(0, 30) + '...' : description
+      if (!description) return "No description";
+      return description.length > 30
+        ? description.slice(0, 30) + "..."
+        : description;
     },
 
     getOperationType(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
+      const operation = transaction.trx.transaction.operations[0];
       if (operation.call_contract) {
-        return `Call Contract: ${operation.call_contract.contract_id}`
+        return `Call Contract: ${operation.call_contract.contract_id}`;
       }
-      return 'Unknown Operation'
+      return "Unknown Operation";
     },
 
     getFromAddress(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
-      return operation.call_contract ? operation.call_contract.args.from : 'N/A'
+      const operation = transaction.trx.transaction.operations[0];
+      return operation.call_contract
+        ? operation.call_contract.args.from
+        : "N/A";
     },
 
     getToAddress(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
-      return operation.call_contract ? operation.call_contract.args.to : 'N/A'
+      const operation = transaction.trx.transaction.operations[0];
+      return operation.call_contract ? operation.call_contract.args.to : "N/A";
     },
-    
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -372,7 +420,10 @@ export default {
   text-overflow: ellipsis;
 }
 
-.loading, .error-message, .no-nfts, .no-activity {
+.loading,
+.error-message,
+.no-nfts,
+.no-activity {
   text-align: center;
   padding: 20px;
   color: #777777;
@@ -400,7 +451,8 @@ export default {
   width: 1.5em;
 }
 
-.kollection-link a, .kollection-link a:visited {
+.kollection-link a,
+.kollection-link a:visited {
   color: var(--primary-light);
   text-decoration: none;
   display: flex;
@@ -430,7 +482,8 @@ export default {
   flex-grow: 1;
 }
 
-.transaction-top, .transaction-bottom {
+.transaction-top,
+.transaction-bottom {
   display: flex;
   justify-content: space-between;
 }
@@ -440,7 +493,9 @@ export default {
   color: #ffffff;
 }
 
-.transaction-date, .transaction-type, .transaction-address {
+.transaction-date,
+.transaction-type,
+.transaction-address {
   font-size: 12px;
   color: #777777;
 }

@@ -97,29 +97,29 @@ export default {
       currentAddress: "",
       koinosblocksUrl: "https://koinosblocks.com/address/",
       showDropdown: false,
-    }
+    };
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount()
+      this.loadAccount();
     },
     "$store.state.currentNetwork": function () {
-      this.updateLinks()
+      this.updateLinks();
     },
   },
 
   mounted() {
-    this.loadAccount()
+    this.loadAccount();
   },
 
   methods: {
     openDropdown() {
       if (!this.showDropdown) {
-        this.showDropdown = true
+        this.showDropdown = true;
         setTimeout(() => {
-          window.addEventListener("click", this.closeDropdown)
-        }, 0)
+          window.addEventListener("click", this.closeDropdown);
+        }, 0);
       }
     },
 
@@ -129,16 +129,16 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false
-        window.removeEventListener("click", this.closeDropdown)
+        this.showDropdown = false;
+        window.removeEventListener("click", this.closeDropdown);
       }
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return
-      const index = this.$store.state.currentIndexAccount
-      this.currentAccount = this.$store.state.accounts[index].name
-      this.currentAddress = this.$store.state.accounts[index].address
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAccount = this.$store.state.accounts[index].name;
+      this.currentAddress = this.$store.state.accounts[index].address;
     },
 
     updateLinks() {
@@ -146,21 +146,21 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork].tag ===
         "harbinger"
       ) {
-        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/"
+        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/";
       } else {
-        this.koinosblocksUrl = "https://koinosblocks.com/address/"
+        this.koinosblocksUrl = "https://koinosblocks.com/address/";
       }
     },
 
     copyAddress() {
-      navigator.clipboard.writeText(this.currentAddress)
-      this.tooltipMessage = "Copied!"
+      navigator.clipboard.writeText(this.currentAddress);
+      this.tooltipMessage = "Copied!";
       setTimeout(() => {
-        this.tooltipMessage = "Click to copy"
-      }, 2000)
+        this.tooltipMessage = "Click to copy";
+      }, 2000);
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -264,12 +264,12 @@ a:visited {
   position: absolute;
   top: 100%;
   left: 50%;
-  margin-top: .3em;
+  margin-top: 0.3em;
   transform: translateX(-50%);
   background-color: #111;
   color: #fff;
   text-align: center;
-  padding: .6em 1em;
+  padding: 0.6em 1em;
   border-radius: 4px;
   font-size: 0.8em;
   white-space: nowrap;
@@ -306,7 +306,7 @@ a:visited {
 }
 .dropdown-icon {
   width: 0.65em;
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 .row {
   display: flex;

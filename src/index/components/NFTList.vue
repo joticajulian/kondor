@@ -22,9 +22,9 @@
       v-else
       class="nft-column"
     >
-      <div 
-        v-for="nft in nfts" 
-        :key="nft.token_id" 
+      <div
+        v-for="nft in nfts"
+        :key="nft.token_id"
         class="nft-item"
         @click="goToCollection"
       >
@@ -49,12 +49,12 @@
     </div>
   </div>
 </template>
-  
+
 <script>
-import axios from 'axios';
-  
+import axios from "axios";
+
 export default {
-  name: 'NFTList',
+  name: "NFTList",
   props: {
     address: {
       type: String,
@@ -71,71 +71,74 @@ export default {
   },
   computed: {
     debugNFTs() {
-      if (!this.nfts) return 'undefined';
-      if (this.nfts.length === 0) return 'Empty array';
+      if (!this.nfts) return "undefined";
+      if (this.nfts.length === 0) return "Empty array";
       return `Array with ${this.nfts.length} items`;
     },
   },
   watch: {
     address: {
       immediate: true,
-      handler: 'fetchNFTs',
+      handler: "fetchNFTs",
     },
   },
   mounted() {
-    console.log('NFTList component mounted');
+    console.log("NFTList component mounted");
     this.fetchNFTs();
   },
   methods: {
     async fetchNFTs() {
-      console.log('Fetching NFTs for address:', this.address);
+      console.log("Fetching NFTs for address:", this.address);
       this.loading = true;
       this.error = null;
       this.nfts = null;
       this.apiResponse = null;
-  
+
       try {
-        const response = await axios.get(`https://kollection.app/api/v1/nfts_by_owner/${this.address}`, {
-          headers: {
-            'Accept': 'application/json',
-          },
-        });
-        console.log('API Response:', response.data);
+        const response = await axios.get(
+          `https://kollection.app/api/v1/nfts_by_owner/${this.address}`,
+          {
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+        console.log("API Response:", response.data);
         this.apiResponse = JSON.stringify(response.data, null, 2);
-  
+
         if (Array.isArray(response.data)) {
           this.nfts = response.data;
         } else {
-          console.error('Unexpected API response format:', response.data);
-          this.error = 'Unexpected API response format';
+          console.error("Unexpected API response format:", response.data);
+          this.error = "Unexpected API response format";
         }
       } catch (err) {
-        console.error('Error fetching NFTs:', err);
+        console.error("Error fetching NFTs:", err);
         this.error = `Failed to fetch NFTs: ${err.message}`;
       } finally {
         this.loading = false;
       }
     },
     goToCollection() {
-      window.open(`https://kollection.app/profile/${this.address}`, '_blank');
+      window.open(`https://kollection.app/profile/${this.address}`, "_blank");
     },
   },
 };
 </script>
-  
-  <style scoped>
-  /* ... (previous styles remain unchanged) ... */
-  
-  .debug-info {
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #333;
-    border-radius: 8px;
-    white-space: pre-wrap;
-    word-break: break-all;
-  }
-  
-  .debug-info h4 {
-    margin-top: 0;
-  }
-  </style>
+
+<style scoped>
+/* ... (previous styles remain unchanged) ... */
+
+.debug-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #333;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.debug-info h4 {
+  margin-top: 0;
+}
+</style>
