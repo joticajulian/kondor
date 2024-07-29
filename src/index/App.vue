@@ -7,6 +7,7 @@
     />
     <Nav />
     <router-view />
+    <Status />
     <Alert
       :type="$store.state.alertType"
       :show="$store.state.alertShow"
@@ -19,8 +20,9 @@
 <script>
 import Nav from "@/index/components/Nav";
 import Alert from "@/shared/components/Alert";
+import Status from "@/index/components/Status";
 
 export default {
-  components: { Nav, Alert },
+  components: { Nav, Alert, Status },
 };
 </script>

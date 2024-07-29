@@ -91,4 +91,10 @@ h1 {
   justify-content: center;
   margin: 1em 0;
 }
+textarea {
+  width: 85% !important;
+  height: 100px;
+  background: none !important;
+  color: #777777;
+}
 </style>

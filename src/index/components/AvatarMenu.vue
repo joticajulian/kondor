@@ -1,6 +1,6 @@
 <template>
   <div class="dropdown-container">
-    <button
+    <div
       class="avatar-menu"
       @click="openDropdown()"
     >
@@ -8,79 +8,98 @@
         :src="avatar"
         alt="identicon for selected address"
       >
-    </button>
-
+    </div>
     <div
-      v-if="showDropdown"
-      class="dropdown-content"
+      class="dropdown-wrapper"
+      :class="{ show: showDropdown }"
     >
-      <div class="dropdown-info">
-        <span class="heading">My accounts</span>
-        <button @click="lock()">
-          Lock
-        </button>
-      </div>
+      <div class="dropdown-content">
+        <div>
+          <div class="dropdown-info">
+            <span class="heading">My accounts</span>
+            <button
+              class="chip"
+              @click="lock()"
+            >
+              <img
+                src="../../../public/images/lock.svg"
+                alt=""
+              >
+            </button>
+          </div>
 
-      <hr>
-
-      <div class="account-list">
-        <div
-          v-for="(account, index) in $store.state.accounts"
-          :key="index"
-          class="dropdown-item"
-          @click="selectAccount(index)"
-        >
-          <span
-            :style="
-              $store.state.currentIndexAccount === index
-                ? 'visibility: visible;'
-                : 'visibility: hidden;'
-            "
-            class="material-icons"
-          >
-            check
-          </span>
-          <div>
-            <span>{{ account.name }}</span>
-            <span class="address">
-              {{ account.address }}
-            </span>
+          <div class="account-list">
+            <div
+              v-for="(account, index) in $store.state.accounts"
+              :key="index"
+              class="dropdown-item"
+              @click="selectAccount(index)"
+            >
+              <span
+                :style="
+                  $store.state.currentIndexAccount === index
+                    ? 'visibility: visible;'
+                    : 'visibility: hidden;'
+                "
+                class="selected-indicator"
+              />
+              <div class="account-item">
+                <span>{{ account.name }}</span>
+                <span class="address">
+                  {{ account.address }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <hr>
+        <div class="option">
+          <div v-if="$store.state.mnemonic0">
+            <div
+              class="options-item"
+              @click="createAccount"
+            >
+              <img
+                src="../../../public/images/icon-add.png"
+                alt="create account icon"
+              >
+              Create account
+            </div>
+          </div>
+          <div v-else>
+            <div
+              class="options-item"
+              @click="addSeed"
+            >
+              <img
+                src="../../../public/images/icon-add.png"
+                alt="add seed icon"
+              >
+              Add seed to wallet
+            </div>
+          </div>
+          <div
+            class="options-item"
+            @click="importAccount"
+          >
+            <img
+              src="../../../public/images/icon-import.png"
+              alt=""
+            > Import
+            account
+          </div>
 
-      <div v-if="$store.state.mnemonic0">
-        <div
-          class="dropdown-item"
-          @click="createAccount"
-        >
-          <span class="material-icons">add</span> Create account
+          <div
+            class="options-item"
+            @click="openOptions"
+          >
+            <img
+              src="../../../public/images/icon-settings-wrench.png"
+              alt=""
+            >
+            Settings
+          </div>
         </div>
-      </div>
-      <div v-else>
-        <div
-          class="dropdown-item"
-          @click="addSeed"
-        >
-          <span class="material-icons">add</span> Add seed to wallet
-        </div>
-      </div>
-      <div
-        class="dropdown-item"
-        @click="importAccount"
-      >
-        <span class="material-icons">file_download</span> Import account
-      </div>
-
-      <hr>
-
-      <div
-        class="dropdown-item"
-        @click="openOptions"
-      >
-        <span class="material-icons">settings</span> Settings
       </div>
     </div>
   </div>
@@ -119,8 +138,10 @@ export default {
 
   methods: {
     openDropdown() {
+      console.log("openDropdown called"); // Add this line
       if (!this.showDropdown) {
         this.showDropdown = true;
+        document.body.style.overflow = "hidden";
         setTimeout(() => {
           window.addEventListener("click", this.closeDropdown);
         }, 0);
@@ -174,25 +195,64 @@ export default {
 </script>
 
 <style scoped>
-.dropdown-content {
-  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  top: 80px;
+/* dropdown wrapper */
+.dropdown-wrapper {
+  position: fixed;
+  top: 0;
   left: 0;
   width: 100%;
-  margin: 0 1em;
-  border: none;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease;
+}
+
+.dropdown-wrapper.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dropdown-content {
+  position: fixed;
+  top: 0;
+  left: -100%;
   width: calc(var(--app-width) - 2em);
-  border-radius: 22px;
-  position: absolute;
-  background: white;
-  color: black;
+  height: 100%;
+  background: #111;
   z-index: 10;
   padding: 0.5em 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: left 0.8s ease;
+}
+
+.dropdown-wrapper.show .dropdown-content {
+  left: 0;
+}
+
+.dropdown-content {
+  top: 42px;
+  left: 0;
+  /* width: 100%; */
+  /* margin: 0 1em; */
+  border: none;
+  width: calc(var(--app-width) - 2em);
+  position: absolute;
+  background: #111;
+  z-index: 10;
+  padding: 0.5em 0;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .dropdown-item {
   float: none;
-  padding: 0.7em 2em;
+  padding: 0.3em 2em;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -204,17 +264,20 @@ export default {
 }
 
 .dropdown-item:hover {
-  background-color: var(--kondor-purple);
+  background: #353535;
   color: white;
 }
 
-hr {
-  border-top: 1px solid #ddd;
+button {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
 }
 
 .address {
-  font-size: 0.7em;
+  font-size: 0.6em;
   margin-top: 0.1em;
+  color: #777777;
 }
 
 .dropdown-info {
@@ -227,10 +290,12 @@ hr {
 
 .dropdown-info > button {
   width: auto;
-  border-radius: 22px;
-  color: var(--kondor-purple);
-  border-color: var(--kondor-purple);
-  background-color: transparent;
+  border: 1px solid white;
+  background-color: gray;
+}
+
+.dropdown-info > button img {
+  width: 1em;
 }
 
 .heading {
@@ -239,18 +304,57 @@ hr {
 }
 
 .avatar-menu {
-  width: 45px;
-  height: 45px;
-  border: 1px solid white;
-  border-radius: 50%;
-  padding: 0;
-  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
   overflow: hidden;
-  background: white;
 }
 
 .account-list {
   max-height: 200px;
   overflow-y: auto;
+}
+.selected-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 999%;
+  background-color: var(--kondor-purple);
+}
+.account-item {
+  display: flex;
+  flex-direction: column;
+  margin-left: 0.5em;
+}
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+.options-item {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  padding: 1em;
+  font-weight: 500;
+  margin: 0 1.2em;
+  align-items: center;
+  justify-content: flex-start;
+}
+.options-item:hover {
+  background: #353535;
+}
+.chip {
+  background-color: #2a2a2a;
+  padding: 0.5em 1em !important;
+  color: #777;
+  padding: 10px;
+  border-radius: 2em;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 0.8em;
+  cursor: pointer !important;
 }
 </style>

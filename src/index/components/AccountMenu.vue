@@ -1,27 +1,27 @@
 <template>
   <div class="dropdown-container">
     <div class="link-item">
-      <div>
-        <div class="current-account">
+      <div class="row">
+        <div
+          class="current-account"
+          @click="copyAddress"
+        >
           {{ currentAccount }}
-        </div>
-        <div class="address-container">
-          <div class="current-address">
+          <div class="tooltip">
+            <span>{{ tooltipMessage }}</span> <br>
             {{ currentAddress }}
           </div>
-          <div :data-tooltip="msgCopy">
-            <button @click="copyAddress()">
-              <span class="material-icons">content_copy</span>
-            </button>
-          </div>
         </div>
+        <img
+          src="../../../public/images/edit.svg"
+          alt="edit account icon"
+          class="dropdown-icon"
+        >
       </div>
       <button
         class="menu-toggle"
         @click="openDropdown()"
-      >
-        <span class="material-icons">more_vert</span>
-      </button>
+      />
     </div>
 
     <div
@@ -29,40 +29,61 @@
       class="dropdown-content"
     >
       <router-link
-        class="dropdown-item"
+        class="options-item"
         :to="{ path: '/updateAccount', query: { address: currentAddress } }"
       >
-        <span class="material-icons">edit</span>Update account
+        <img
+          src="../../../public/images/icon-edit.png"
+          alt=""
+        >
+        Update account
       </router-link>
       <a
-        class="dropdown-item"
+        class="options-item"
         :href="koinosblocksUrl + currentAddress"
         target="_blank"
       >
-        <span class="material-icons">open_in_new</span>View account on Koinos
-        Blocks
+        <img
+          src="../../../public/images/icon-link.png"
+          alt="link icon"
+        >
+        View on KoinosBlocks
       </a>
       <a
-        class="dropdown-item"
+        class="options-item"
         :href="'https://koiner.app/addresses/' + currentAddress"
         target="_blank"
       >
-        <span class="material-icons">open_in_new</span>View account on Koiner
+        <img
+          src="../../../public/images/icon-link.png"
+          alt="link icon"
+        >
+        View on Koiner
       </a>
       <a
-        class="dropdown-item"
+        class="options-item"
         href="https://koinosbox.com/nicknames"
         target="_blank"
       >
-        <span class="material-icons">edit</span>Edit Nickname
+        <img
+          src="../../../public/images/icon-link.png"
+          alt="link icon"
+        > Edit
+        Nickname
       </a>
-      <a
-        class="dropdown-item"
-        href="https://kap.domains/account"
-        target="_blank"
-      >
-        <span class="material-icons">edit</span>Edit KAP Profile
-      </a>
+      <div>
+        <a
+          class="options-item"
+          href="https://kap.domains/account"
+          target="_blank"
+        >
+          <img
+            src="../../../public/images/icon-link.png"
+            alt="link icon"
+          >
+          <span>Edit KAP Profile</span>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -71,7 +92,7 @@
 export default {
   data() {
     return {
-      msgCopy: "copy address",
+      tooltipMessage: "Click to copy",
       currentAccount: "",
       currentAddress: "",
       koinosblocksUrl: "https://koinosblocks.com/address/",
@@ -133,9 +154,9 @@ export default {
 
     copyAddress() {
       navigator.clipboard.writeText(this.currentAddress);
-      this.msgCopy = "copied!";
+      this.tooltipMessage = "Copied!";
       setTimeout(() => {
-        this.msgCopy = "copy address";
+        this.tooltipMessage = "Click to copy";
       }, 2000);
     },
   },
@@ -143,27 +164,24 @@ export default {
 </script>
 
 <style scoped>
-.dropdown-container {
-  padding: 2em 0;
-  border-bottom: 1px solid #ddd;
-}
 .dropdown-content {
-  box-shadow: 0 8px 16px 0 rgb(0 0 0 / 20%);
-  top: 150px;
-  width: calc(var(--app-width) - 100px - 1em);
-  left: 100px;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  margin: 0 1em;
   border: none;
-  border-radius: 22px;
+  width: calc(var(--app-width) - 2em);
   position: absolute;
-  background: white;
+  background: #111111;
   z-index: 10;
   padding: 0.5em 0;
-  overflow: hidden;
+  border: 1px solid rgb(25 25 25);
+  border-radius: 16px;
 }
 
 .dropdown-item {
   float: none;
-  padding: 0.7em 2em;
+  padding: 0.3em 2em;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -171,19 +189,32 @@ export default {
   text-align: left;
   border: none;
   cursor: pointer;
+  font-size: 1.3em;
 }
 
 .dropdown-item:hover {
-  background-color: var(--kondor-purple);
+  background: #353535;
   color: white;
-  opacity: 1;
 }
 
-.separator {
-  margin-top: 1em;
-  border-top: 1px solid #666;
-  padding: 0;
-  height: 1em;
+a,
+a:visited {
+  color: var(--primary-light);
+  font-size: 1em;
+}
+
+.options-item {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  padding: 1em;
+  font-weight: 500;
+  margin: 0 1.2em;
+  align-items: center;
+  justify-content: flex-start;
+}
+.options-item:hover {
+  background: #353535;
 }
 .address {
   font-size: 0.7em;
@@ -211,28 +242,51 @@ export default {
   border: none;
   margin: 0;
   width: auto;
-  background: #fff;
-  color: #000;
-  padding-right: 0;
+  background: none;
+  color: #ffffff;
 }
 .link-item {
   text-transform: capitalize;
   font-weight: 500;
   font-size: 1.2em;
-  color: #000;
   display: flex;
   justify-content: space-between;
-  padding: 0 2em;
+  padding-left: 1em;
   align-items: center;
 }
-.current-address {
-  font-size: 0.7em;
-  font-weight: 300;
-}
 .current-account {
-  font-size: 1.2em;
-  cursor: default;
+  font-size: 1em;
+  cursor: pointer;
+  position: relative;
 }
+
+.current-account .tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: 0.3em;
+  transform: translateX(-50%);
+  background-color: #111;
+  color: #fff;
+  text-align: center;
+  padding: 0.6em 1em;
+  border-radius: 4px;
+  font-size: 0.8em;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.7s, visibility 0.3s;
+}
+.tooltip span {
+  font-size: 0.8em;
+  color: #777777;
+}
+
+.current-account:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
 .address-container {
   display: flex;
   align-items: center;
@@ -249,5 +303,13 @@ export default {
 }
 .address-container button span {
   font-size: 1em;
+}
+.dropdown-icon {
+  width: 0.65em;
+  margin-left: 0.5em;
+}
+.row {
+  display: flex;
+  align-items: center;
 }
 </style>

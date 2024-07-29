@@ -1,35 +1,47 @@
 <template>
   <div class="container">
-    <h1>New account</h1>
-    <input
-      v-model="name"
-      type="text"
-      placeholder="Name"
-      @keyup.enter="accept"
-    >
-    <button
-      class=""
-      @click="accept"
-    >
-      accept
-    </button>
-    <button
-      class=""
-      @click="cancel"
-    >
-      cancel
-    </button>
+    <div class="screen-heading">
+      <PageTitle
+        title="Create Account"
+        subtitle="Add an account to your main account"
+      />
+    </div>
+    <div class="input-group">
+      <input
+        v-model="name"
+        class="input"
+        type="text"
+        placeholder="Name"
+        @keyup.enter="accept"
+      >
+      <div class="button-group">
+        <button
+          class="custom-button primary"
+          @click="accept"
+        >
+          Create
+        </button>
+        <button
+          class="custom-button secondary"
+          @click="cancel"
+        >
+          cancel
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import router from "@/index/router";
+import PageTitle from "@/shared/components/PageTitle";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+  components: { PageTitle },
   mixins: [Storage, ViewHelper],
   data() {
     return {
@@ -64,7 +76,26 @@ export default {
 </script>
 <style scoped>
 .container {
-  min-height: 20em;
-  margin: 4em 2em;
+  margin: 4em;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.button-group {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  margin-top: 1em;
+  gap: 1em;
+  width: 100%;
+}
+input {
+  width: 88% !important;
+  margin: 0 !important;
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 </style>

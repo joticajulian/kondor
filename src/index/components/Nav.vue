@@ -1,60 +1,31 @@
 <template>
-  <div>
-    <div
-      v-if="
-        $store.state.showBackButton ||
-          $store.state.showCurrentNetwork ||
-          $store.state.showAvatarMenu
-      "
-      class="header"
-    >
-      <div class="left">
-        <span
-          v-if="$store.state.showBackButton"
-          class="material-icons back-button"
-          @click="back"
-        >
-          arrow_back
-        </span>
-        <Logo
-          v-else
-          color="#FFF"
-          :width="45"
-          :height="45"
-        />
-      </div>
-      <div
-        v-if="$store.state.showCurrentNetwork"
-        class="network-select"
-      >
-        <select v-model="$store.state.currentNetwork">
-          <option
-            v-for="(network, index) in $store.state.networks"
-            :key="index"
-            :value="index"
-          >
-            {{ network.name }}
-          </option>
-        </select>
-        <span class="material-icons"> expand_more </span>
-      </div>
+  <nav class="navbar">
+    <div class="navbar-left">
       <AvatarMenu v-if="$store.state.showAvatarMenu" />
     </div>
-    <AccountMenu v-if="$store.state.showAccountMenu" />
-  </div>
+    <div class="navbar-right">
+      <AccountMenu v-if="$store.state.showAccountMenu" />
+      <!-- <button class="icon-button">
+        <img
+          src="../../../public/images/home-icon.png"
+          alt=""
+        >
+        <span class="material-icons">home</span>
+      </button> -->
+    </div>
+  </nav>
 </template>
 
 <script>
 import router from "@/index/router";
 import AccountMenu from "@/index/components/AccountMenu.vue";
 import AvatarMenu from "@/index/components/AvatarMenu.vue";
-import Logo from "@/shared/components/Logo";
 
 // mixins
 import Storage from "@/shared/mixins/Storage";
 
 export default {
-  components: { Logo, AccountMenu, AvatarMenu },
+  components: { AccountMenu, AvatarMenu },
 
   mixins: [Storage],
 
@@ -90,71 +61,62 @@ export default {
 </script>
 
 <style scoped>
-select,
-select:focus-visible,
-select:focus {
-  background: var(--kondor-purple);
+.navbar {
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  background: #1a1a1a;
+  padding: 0.5rem 1em;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #777777;
+}
+
+.navbar-right {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.icon-button {
+  background: none;
+  border: none;
   color: white;
-  font-size: 1em;
-  height: 45px;
-  padding: 1em;
-  margin: 0;
-  border-color: #ffffff;
-  border-radius: 22px;
-  appearance: none;
   cursor: pointer;
-  box-sizing: border-box;
+  padding: 0.25rem;
 }
 
-.network-select {
-  position: relative;
-}
-
-.network-select > .material-icons {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  pointer-events: none;
-  background: var(--kondor-purple);
-}
-
-.network-select:hover > .material-icons {
+.icon-button:hover {
   opacity: 0.8;
 }
 
-.back-button {
-  cursor: pointer;
+.material-icons {
+  font-size: 1.25rem;
+}
+.white {
   color: white;
-  padding-right: 21px;
-}
-
-.header {
-  background: var(--kondor-purple);
-  color: white;
-  display: flex;
-  gap: 1em;
-  align-items: center;
-  padding: 1em;
-  height: 45px;
-}
-
-.header .left {
-  flex-grow: 1;
-}
-
-.connection-indicator {
-  color: greenyellow;
-}
-
-.lock-button {
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  width: 45px;
-  text-align: right;
-}
-
-.lock-button:hover {
-  color: #adff2f;
 }
 </style>
+Last edited 8 minutes ago Claude

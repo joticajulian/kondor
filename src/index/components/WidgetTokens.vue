@@ -1,65 +1,14 @@
 <template>
   <div class="column">
-    <div class="row">
-      <div class="token">
-        <div
-          class="token-image"
-          :data-tooltip="'@' + tokenName"
-        >
-          <img :src="tokenImage">
-        </div>
-        <div class="amount">
-          <div :data-tooltip="balanceWithSymbol">
-            <span class="balance">{{ balanceFormatted }}</span>
-            <span class="token-symbol">{{ tokenSymbol }}</span>
-          </div>
-          <div
-            v-if="showLiquidKoin && balance !== liquidKoin"
-            class="liquid-koin"
-          >
-            {{ liquidKoin }} Liquid KOIN
-          </div>
-          <div class="usd">
-            {{ balanceUSD }}
-          </div>
-        </div>
-      </div>
-      <ManaOrb
-        :mana-percent="manaPercent"
-        :available-percent="availablePercent"
-        :time-recharge="timeRechargeMana"
-      />
-    </div>
-    <a
-      v-if="!tokenAddressPermanent"
-      class="notpermanent"
-      href="https://peakd.com/@jga/nicknames-pointing-address"
-      target="_blank"
-    >⚠️ not permanent</a>
-    <div class="other-tokens">
-      <div
-        v-for="(miniToken, i) in miniTokens"
-        :key="i"
-        class="mini-token"
-        @click="loadToken(miniToken)"
-      >
-        <img :src="miniToken.image">
-      </div>
-    </div>
-    <div
-      v-if="!watchMode"
-      class="actions container"
-    >
-      <button @click="clickBuy()">
-        <span class="material-icons">add</span><span>Buy</span>
-      </button>
-      <button @click="sendToken()">
-        <span class="material-icons">arrow_outward</span><span>Send</span>
-      </button>
-      <button @click="tokenSettings()">
-        <span class="material-icons">settings</span><span>Settings</span>
-      </button>
-    </div>
+    <WalletInfo
+      :balance="totalBalance"
+      :mana-percentage="manaPercent"
+      :liquid-koin="liquidKoin"
+    />
+    <TabPanel
+      :address="address"
+      :coins="miniTokens"
+    />
   </div>
 </template>
 
@@ -67,8 +16,9 @@
 import axios from "axios";
 import router from "@/index/router";
 import { Contract, Provider, Signer, utils } from "koilib";
-import ManaOrb from "./ManaOrb.vue";
 import emptyToken from "@/shared/assets/empty-token.png";
+import WalletInfo from "./WalletInfo.vue";
+import TabPanel from "./TabPanel.vue";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -79,7 +29,7 @@ import { formatTime } from "../../../lib/utils";
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 export default {
-  components: { ManaOrb },
+  components: { WalletInfo, TabPanel },
   mixins: [Storage, Sandbox, ViewHelper],
   data() {
     return {
@@ -112,6 +62,12 @@ export default {
       const balanceNumber = Number(this.balance) || 0;
       if (Number.isNaN(balanceNumber)) return `Error ${balanceNumber}`;
       return balanceNumber.toLocaleString("en");
+    },
+    totalBalance() {
+      return this.miniTokens.reduce((t, miniToken) => {
+        if (!miniToken.price) return t;
+        return t + miniToken.price * Number(miniToken.balance);
+      }, 0).toLocaleString();
     },
   },
 
@@ -188,13 +144,14 @@ export default {
       }
 
       // load USD balance
+      let price = 0;
       let balanceUSD = "$0 USD";
       if (this.network.tag === "mainnet" && t.nickname === "koin") {
         try {
           const response = await axios.get(
             "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
           );
-          const price = Number(response.data.data[0].last);
+          price = Number(response.data.data[0].last);
           const balanceNumber = Number(balance);
           balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
         } catch (error) {
@@ -279,6 +236,7 @@ export default {
         balance,
         balanceWithSymbol: `${balance} ${t.symbol}`,
         balanceUSD,
+        price,
       };
     },
 

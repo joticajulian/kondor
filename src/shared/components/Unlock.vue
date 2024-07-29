@@ -1,12 +1,18 @@
 <template>
   <div class="container">
+    <div class="logo">
+      <img
+        src="../../../public/images/kondor-logo.png"
+        alt=""
+      >
+    </div>
     <div
       v-if="loadingSession"
       class="loader"
     />
     <div
       v-else
-      class="container"
+      class="group"
     >
       <input
         v-model="password"
@@ -16,7 +22,7 @@
         @keyup.enter="unlock"
       >
       <button
-        class="button"
+        class="custom-button primary"
         @click="unlock"
       >
         {{ labelButton }}
@@ -143,14 +149,19 @@ export default {
 };
 </script>
 <style scoped>
-.container {
-  margin: auto;
+input {
+  width: 93% !important;
+  margin: none;
+}
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
 }
-.button button {
-  background: none;
-  text-decoration: underline;
-  color: var(--kondor-purple);
-  border: none;
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4em;
 }
 </style>

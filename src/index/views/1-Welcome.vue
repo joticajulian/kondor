@@ -1,10 +1,5 @@
 <template>
   <div class="container">
-    <div class="logo">
-      <div><Logo /></div>
-      <br>
-      <div><LogoText /></div>
-    </div>
     <div
       v-if="hasAccounts"
       class="unlock"
@@ -18,23 +13,43 @@
       v-if="!hasAccounts"
       class="welcome-message"
     >
-      Welcome to Kondor!
-      <br>The first of its kind wallet for the first of its kind blockchain,
-      Koinos.
+      <div class="logo">
+        <img
+          src="../../../public/images/kondor-logo-group.svg"
+          alt=""
+        >
+      </div>
+      <div class="title">
+        Welcome to Kondor!
+      </div>
+      The first of its kind wallet for the first of its kind blockchain, Koinos.
     </div>
     <router-link
       v-if="hasAccounts"
       to="/importSeedPhrase"
       class="button"
     >
-      <button>Forgot password?</button>
+      <button class="custom-button secondary">
+        Forgot password?
+      </button>
     </router-link>
-    <router-link
+    <div
       v-else
-      to="/newWallet"
+      class="button-group"
     >
-      <button>New Wallet</button>
-    </router-link>
+      <div
+        class="custom-button primary"
+        @click="generateSeed"
+      >
+        Create Wallet
+      </div>
+      <div
+        class="custom-button secondary"
+        @click="importSeedPhrase"
+      >
+        Restore Wallet
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,13 +62,11 @@ import Storage from "@/shared/mixins/Storage";
 
 // components
 import Unlock from "@/shared/components/Unlock.vue";
-import Logo from "@/shared/components/Logo";
-import LogoText from "@/shared/components/LogoText";
 
 export default {
   name: "Welcome",
 
-  components: { Logo, LogoText, Unlock },
+  components: { Unlock },
   mixins: [Storage, ViewHelper],
   data() {
     return {
@@ -73,6 +86,14 @@ export default {
       this.alertClose();
       router.push("/dashboard");
     },
+    async importSeedPhrase() {
+      this.alertClose();
+      router.push("/importSeedPhrase");
+    },
+    async generateSeed() {
+      this.alertClose();
+      router.push("/generateSeed");
+    },
   },
 };
 </script>
@@ -81,26 +102,44 @@ export default {
 input {
   margin: 0 !important;
 }
-
+.title {
+  font-family: "Poppins", sans-serif;
+  padding: 1em;
+  font-size: 1.4em;
+  margin-top: 2em;
+  font-weight: bold;
+  padding: 0.5em 1em;
+}
 .container {
+  font-family: Poppins, sans-serif;
   align-items: center;
   width: 100%;
-  margin: 0;
+  margin: 1.8em 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-align: center;
+  line-height: 1.5em;
+  justify-content: space-between;
+}
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  width: 80%;
+  padding: 1.5em 0;
 }
 
 .welcome-message {
-  width: 77%;
+  width: 60%;
   margin: 2em 0;
   line-height: 1.2em;
-  color: var(--primary-color);
   text-align: center;
 }
 .logo {
   display: flex;
   flex-direction: column;
-  padding-top: 3em;
   align-items: center;
-  width: 100%;
 }
 .recover {
   margin-top: 1em;
@@ -113,22 +152,5 @@ input {
 .unlock {
   width: 70%;
   margin-top: 3em;
-}
-.button {
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  margin-bottom: 2em;
-}
-
-.button button {
-  background: none;
-  text-decoration: underline;
-  color: var(--kondor-purple);
-  border: none;
-}
-
-button {
-  width: auto;
 }
 </style>

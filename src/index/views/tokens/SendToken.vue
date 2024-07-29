@@ -657,8 +657,13 @@ export default {
 };
 </script>
 <style scoped>
+.transfer {
+  overflow-y: auto;
+}
 .container {
-  padding: 2em 2em;
+  padding: 2.5em;
+  margin: 0;
+  background: #222222 !important;
 }
 
 .container > * {
@@ -672,7 +677,7 @@ export default {
 .token select {
   width: 100%;
   max-width: unset;
-  padding: 8px;
+  padding: 1em;
 }
 
 .actions {

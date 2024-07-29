@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <h1>Import account</h1>
+    <PageTitle
+      title="Import Account"
+      subtitle="Import an account into your main account by using the private key or in watch mode without a private key."
+    />
     <div>
       <label for="name">Account Nickname</label>
       <input
@@ -19,10 +22,7 @@
         name="watch-mode"
         value="watch-mode"
       >
-      <label
-        for="watch-mode"
-      >Import in watch mode <br>
-        (without private key)</label>
+      <label for="watch-mode">Import in watch mode (no private key)</label>
     </div>
     <div v-if="watchMode">
       <label for="address">Address</label>
@@ -63,12 +63,14 @@
 
 <script>
 import router from "@/index/router";
+import PageTitle from "@/shared/components/PageTitle.vue";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
+  components: { PageTitle },
   mixins: [Storage, ViewHelper],
   data() {
     return {
@@ -119,6 +121,11 @@ input {
 
 input[type="checkbox"] {
   all: revert;
+}
+
+label {
+  font-size: 0.8em;
+  color: #777;
 }
 .container {
   min-height: 20em;
