@@ -138,11 +138,12 @@
       </div>
       <div v-if="activeTab === 'coins'">
         <div
-          v-for="(coin, i) in coins"
-          :key="i"
+          v-for="(coin, symbol) in coins"
+          :key="symbol"
+          class="coin-item"
         >
-          <img :src="coin.image">
-          {{ coin.balance }} {{ coin.symbol }}
+          <img :src="coin.image" :alt="symbol" class="coin-image">
+          <span class="coin-balance">{{ coin.balance }} {{ symbol }}</span>
           <a
             v-if="!coin.permanentAddress"
             class="notpermanent"
@@ -505,5 +506,31 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.coin-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #252525;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.coin-image {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.coin-balance {
+  flex-grow: 1;
+  color: #ffffff;
+}
+
+.notpermanent {
+  color: #ff6b6b;
+  text-decoration: none;
+  margin-left: 10px;
 }
 </style>
