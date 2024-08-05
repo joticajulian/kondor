@@ -63,8 +63,8 @@ async function preparePopup(sender?: Sender) {
 
     // Get the current window's information
     chrome.windows.getCurrent({}, (currentWindow) => {
-      const top = (currentWindow.top || 0) + 49; // Move 49 pixels down
-      const left = (currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth;
+      const top = (currentWindow.top || 0) + 120; 
+      const left = (currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 80;
 
       chrome.windows.create({
         focused: true,
