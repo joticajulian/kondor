@@ -51,28 +51,20 @@ async function preparePopup(sender?: Sender) {
     await messenger.sendExtensionMessage("popup", "ping2", {}, { timeout: 20 });
   } catch (error) {
     tabIdRequester = sender.tab.id;
-    chrome.windows.getCurrent((currentWindow) => {
-      if (currentWindow) {
-        const popupWidth = 400;
-        const popupHeight = 600;
-        
-        // Position the popup in the top-right corner of the current window
-        const left = (currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth;
-        const top = currentWindow.top || 0;
+    const popupWidth = 400;
+    const popupHeight = 600;
 
-        chrome.windows.create({
-          focused: true,
-          url: "popup.html",
-          type: "popup",
-          width: popupWidth,
-          height: popupHeight,
-          left: Math.round(left),
-          top: Math.round(top)
-        }, () => {
-          if (chrome.runtime.lastError) {
-            console.error("Error creating popup:", chrome.runtime.lastError);
-          }
-        });
+    chrome.windows.create({
+      focused: true,
+      url: "popup.html",
+      type: "popup",
+      width: popupWidth,
+      height: popupHeight,
+    }, (window) => {
+      if (chrome.runtime.lastError) {
+        console.error("Error creating popup:", chrome.runtime.lastError);
+      } else if (window) {
+        console.log("Popup window created successfully");
       }
     });
   }
