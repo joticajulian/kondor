@@ -144,7 +144,7 @@
           </div>
           <div class="coin-balance-value">
             <span class="coin-balance">{{ coin.balance }}</span>
-            <span class="coin-value">${{ coin.usdValue }} USD</span>
+            <span class="coin-value">${{ calculateUsdValue(coin) }} USD</span>
           </div>
         </div>
         <div class="manage-tokens">
@@ -171,6 +171,10 @@ export default {
       required: true,
     },
     coins: {
+      type: Object,
+      required: true,
+    },
+    prices: {
       type: Object,
       required: true,
     },
@@ -326,6 +330,11 @@ export default {
     truncateDescription(description) {
       if (!description) return "No description";
       return description.length > 30 ? description.slice(0, 30) + "..." : description;
+    },
+    calculateUsdValue(coin) {
+      const price = this.prices[coin.symbol];
+      if (!price) return "N/A";
+      return (Number(coin.balance) * price).toFixed(2);
     },
   },
 };

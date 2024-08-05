@@ -8,6 +8,7 @@
     <TabPanel
       :address="address"
       :coins="miniTokens"
+      :prices="tokenPrices"
     />
   </div>
 </template>
@@ -53,6 +54,7 @@ export default {
       watchMode: false,
       manaPercent: 0,
       availablePercent: 0,
+      tokenPrices: {},
     };
   },
 
@@ -146,16 +148,17 @@ export default {
       // load USD balance
       let price = 0;
       let balanceUSD = "$0 USD";
-      if (this.network.tag === "mainnet" && t.nickname === "koin") {
+      if (this.network.tag === "mainnet") {
         try {
           const response = await axios.get(
-            "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
+            `https://api.coingecko.com/api/v3/simple/price?ids=${t.coingeckoId}&vs_currencies=usd`
           );
-          price = Number(response.data.data[0].last);
+          price = response.data[t.coingeckoId].usd;
           const balanceNumber = Number(balance);
           balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
+          this.tokenPrices[t.symbol] = price;
         } catch (error) {
-          console.error("Error when loading price from MEXC");
+          console.error(`Error when loading price for ${t.symbol}`);
           console.error(error);
           balanceUSD = "USD Error";
         }
