@@ -38,19 +38,10 @@
                 >
                 <div class="nft-info">
                   <h3 class="nft-name">
-                    {{
-                      nft.metadata
-                        ? nft.metadata.name || "Untitled"
-                        : "Untitled"
-                    }}
+                    {{ nft.metadata ? nft.metadata.name || "Untitled" : "Untitled" }}
                   </h3>
                   <p class="nft-description">
-                    {{
-                      nft.metadata
-                        ? truncateDescription(nft.metadata.description) ||
-                          "No description"
-                        : "No description"
-                    }}
+                    {{ nft.metadata ? truncateDescription(nft.metadata.description) || "No description" : "No description" }}
                   </p>
                 </div>
               </div>
@@ -106,29 +97,23 @@
             :key="transaction.trx.transaction.id"
             class="transaction-item"
           >
-            <div class="transaction-icon">
+            <div 
+              class="transaction-icon"
+              :class="{ 'sent': getTransactionType(transaction) === 'send', 'received': getTransactionType(transaction) === 'receive' }"
+            >
               {{ getTransactionType(transaction) === "receive" ? "↓" : "↑" }}
             </div>
             <div class="transaction-details">
               <div class="transaction-top">
-                <span
-                  class="transaction-amount"
-                >{{ getTransactionAmount(transaction) }}
-                  {{ getTokenSymbol(transaction) }}</span>
-                <span class="transaction-date">{{
-                  getTransactionDate(transaction)
-                }}</span>
+                <span class="transaction-amount">
+                  {{ formatTransactionAmount(transaction) }} {{ getTokenSymbol(transaction) }}
+                </span>
+                <span class="transaction-id">{{ getTruncatedTransactionId(transaction) }}</span>
               </div>
               <div class="transaction-bottom">
-                <span class="transaction-type">{{
-                  getTransactionType(transaction)
-                }}</span>
+                <span class="transaction-type">{{ getTransactionType(transaction) }}</span>
                 <span class="transaction-address">
-                  {{
-                    getTransactionType(transaction) === "receive"
-                      ? "From: "
-                      : "To: "
-                  }}
+                  {{ getTransactionType(transaction) === "receive" ? "From: " : "To: " }}
                   {{ getTransactionAddress(transaction) }}
                 </span>
               </div>
@@ -136,20 +121,39 @@
           </div>
         </div>
       </div>
-      <div v-if="activeTab === 'coins'">
+
+      <div
+        v-if="activeTab === 'coins'"
+        class="coins-container"
+      >
         <div
           v-for="(coin, symbol) in coins"
           :key="symbol"
           class="coin-item"
         >
-          <img :src="coin.image" :alt="symbol" class="coin-image">
-          <span class="coin-balance">{{ coin.balance }} {{ symbol }}</span>
-          <a
-            v-if="!coin.permanentAddress"
-            class="notpermanent"
-            href="https://peakd.com/@jga/nicknames-pointing-address"
-            target="_blank"
-          >⚠️ not permanent</a>
+          <div class="coin-icon-and-name">
+            <img
+              :src="coin.image"
+              :alt="symbol"
+              class="coin-image"
+            >
+            <div class="coin-name-container">
+              <span class="coin-symbol">{{ coin.symbol }}</span>
+              <span class="coin-name">{{ coin.name }}</span>
+            </div>
+          </div>
+          <div class="coin-balance-value">
+            <span class="coin-balance">{{ coin.balance }}</span>
+            <span class="coin-value">${{ coin.usdValue }} USD</span>
+          </div>
+        </div>
+        <div class="manage-tokens">
+          <img
+            src="../../../public/images/settings-icon.svg"
+            alt="Settings"
+            class="settings-icon"
+          >
+          <span>Manage token list</span>
         </div>
       </div>
     </div>
@@ -174,7 +178,7 @@ export default {
 
   data() {
     return {
-      activeTab: "nfts",
+      activeTab: "coins",
       nfts: null,
       loading: false,
       error: null,
@@ -202,10 +206,7 @@ export default {
   methods: {
     getTransactionType(transaction) {
       const operation = transaction.trx.transaction.operations[0];
-      if (
-        operation.call_contract &&
-        operation.call_contract.args.from === this.address
-      ) {
+      if (operation.call_contract && operation.call_contract.args.from === this.address) {
         return "send";
       }
       return "receive";
@@ -219,16 +220,29 @@ export default {
       return "N/A";
     },
 
+    formatTransactionAmount(transaction) {
+      const operation = transaction.trx.transaction.operations[0];
+      if (operation.call_contract && operation.call_contract.args.value) {
+        const amount = (parseInt(operation.call_contract.args.value) / 1e8);
+        if (amount % 1 === 0) {
+          return amount.toFixed(2);
+        } else {
+          return amount.toString();
+        }
+      }
+      return "N/A";
+    },
+
+    getTruncatedTransactionId(transaction) {
+      const id = transaction.trx.transaction.id;
+      return id ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}` : 'N/A';
+    },
+
     getTokenSymbol(transaction) {
-      // This assumes all transactions are for KOIN.
-      // You may need to adjust this if there are other token types.
       return "KOIN";
     },
 
     getTransactionDate(transaction) {
-      // The API response doesn't seem to include a timestamp.
-      // If it's available, you would parse and format it here.
-      // For now, we'll return a placeholder:
       return "Date not available";
     },
 
@@ -236,14 +250,11 @@ export default {
       const operation = transaction.trx.transaction.operations[0];
       const type = this.getTransactionType(transaction);
       if (operation.call_contract) {
-        return type === "receive"
-          ? operation.call_contract.args.from
-          : operation.call_contract.args.to;
+        return type === "receive" ? operation.call_contract.args.from : operation.call_contract.args.to;
       }
       return "N/A";
     },
 
-    // older
     async fetchData() {
       if (this.activeTab === "nfts") {
         await this.fetchNFTs();
@@ -314,29 +325,7 @@ export default {
 
     truncateDescription(description) {
       if (!description) return "No description";
-      return description.length > 30
-        ? description.slice(0, 30) + "..."
-        : description;
-    },
-
-    getOperationType(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
-      if (operation.call_contract) {
-        return `Call Contract: ${operation.call_contract.contract_id}`;
-      }
-      return "Unknown Operation";
-    },
-
-    getFromAddress(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
-      return operation.call_contract
-        ? operation.call_contract.args.from
-        : "N/A";
-    },
-
-    getToAddress(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
-      return operation.call_contract ? operation.call_contract.args.to : "N/A";
+      return description.length > 30 ? description.slice(0, 30) + "..." : description;
     },
   },
 };
@@ -421,10 +410,7 @@ export default {
   text-overflow: ellipsis;
 }
 
-.loading,
-.error-message,
-.no-nfts,
-.no-activity {
+.loading, .error-message, .no-nfts, .no-activity {
   text-align: center;
   padding: 20px;
   color: #777777;
@@ -441,19 +427,16 @@ export default {
   margin-top: auto;
   color: var(--primary-light);
   grid-column: 1 / -1;
-  width: 1em;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
 }
 
 .kollection-link img {
   width: 1.5em;
 }
 
-.kollection-link a,
-.kollection-link a:visited {
+.kollection-link a, .kollection-link a:visited {
   color: var(--primary-light);
   text-decoration: none;
   display: flex;
@@ -477,14 +460,32 @@ export default {
 .transaction-icon {
   font-size: 24px;
   margin-right: 10px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.transaction-icon.sent {
+  color: #ff4d4d;
+}
+
+.transaction-icon.received {
+  color: #4caf50;
+}
+
+.transaction-id {
+  font-size: 12px;
+  color: #777777;
 }
 
 .transaction-details {
   flex-grow: 1;
 }
 
-.transaction-top,
-.transaction-bottom {
+.transaction-top, .transaction-bottom {
   display: flex;
   justify-content: space-between;
 }
@@ -494,9 +495,7 @@ export default {
   color: #ffffff;
 }
 
-.transaction-date,
-.transaction-type,
-.transaction-address {
+.transaction-date, .transaction-type, .transaction-address {
   font-size: 12px;
   color: #777777;
 }
@@ -508,29 +507,84 @@ export default {
   white-space: nowrap;
 }
 
+.coins-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
 .coin-item {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background-color: #252525;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  padding: 12px;
+  background-color: #1E1E1E;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.coin-icon-and-name {
+  display: flex;
+  align-items: center;
 }
 
 .coin-image {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.coin-name-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.coin-symbol {
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFFFFF;
+}
+
+.coin-name {
+  font-size: 14px;
+  color: #777777;
+}
+
+.coin-balance-value {
+  text-align: right;
 }
 
 .coin-balance {
-  flex-grow: 1;
-  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFFFFF;
+  display: block;
 }
 
-.notpermanent {
-  color: #ff6b6b;
-  text-decoration: none;
-  margin-left: 10px;
+.coin-value {
+  font-size: 14px;
+  color: #777777;
+}
+
+.manage-tokens {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.manage-tokens span {
+  color: #777777;
+  font-size: 14px;
 }
 </style>
