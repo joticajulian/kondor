@@ -52,22 +52,24 @@ async function preparePopup(sender?: Sender) {
   } catch (error) {
     tabIdRequester = sender.tab.id;
     chrome.windows.getCurrent((currentWindow) => {
-      const popupWidth = 400;
-      const popupHeight = 600;
-      
-      // Position the popup in the top-right corner of the current window
-      const left = currentWindow.left + currentWindow.width - popupWidth;
-      const top = currentWindow.top;
+      if (currentWindow) {
+        const popupWidth = 400;
+        const popupHeight = 600;
+        
+        // Position the popup in the top-right corner of the current window
+        const left = (currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth;
+        const top = currentWindow.top || 0;
 
-      chrome.windows.create({
-        focused: true,
-        url: "popup.html",
-        type: "popup",
-        width: popupWidth,
-        height: popupHeight,
-        left: Math.round(left),
-        top: Math.round(top)
-      });
+        chrome.windows.create({
+          focused: true,
+          url: "popup.html",
+          type: "popup",
+          width: popupWidth,
+          height: popupHeight,
+          left: Math.round(left),
+          top: Math.round(top)
+        });
+      }
     });
   }
 }
