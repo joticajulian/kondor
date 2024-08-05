@@ -27,3 +27,8 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Aider-specific files to ignore
+.aider.chat.history.md
+.aider.input.history
+.aider.tags.cache.v3/
