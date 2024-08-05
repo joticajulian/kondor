@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.9",
-    "@types/chrome": "^0.0.176",
+    "@types/chrome": "^0.0.269",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "@vue/cli-plugin-babel": "~4.5.0",

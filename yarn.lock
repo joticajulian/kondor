@@ -1517,10 +1517,10 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/chrome@^0.0.176":
-  version "0.0.176"
-  resolved "https://registry.npmjs.org/@types/chrome/-/chrome-0.0.176.tgz"
-  integrity sha512-LOveFOMIUhMJjvRzZv5whGBpncP/gdJ4hcxeAqg94wGi6CyKaCmLgFSofgItf85GuLTl/0BQ6J/Y1e8BqZWfEg==
+"@types/chrome@^0.0.269":
+  version "0.0.269"
+  resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.269.tgz#5bc2a536bb72a3332119742f31b42b5250d39905"
+  integrity sha512-vF7x8YywnhXX2F06njQ/OE7a3Qeful43C5GUOsUksXWk89WoSFUU3iLeZW8lDpVO9atm8iZIEiLQTRC3H7NOXQ==
   dependencies:
     "@types/filesystem" "*"
     "@types/har-format" "*"

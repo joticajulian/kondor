@@ -1683,7 +1683,6 @@ input {
 }
 
 .op-body {
-  background: #dedede;
   padding: 1px 6px 8px 6px;
   word-break: break-all;
   border-bottom-left-radius: 1em;
@@ -1727,7 +1726,6 @@ input {
 
 .sig-details {
   flex: 8;
-  background: #dedede;
   padding: 0.7em 0.5em;
 }
 
