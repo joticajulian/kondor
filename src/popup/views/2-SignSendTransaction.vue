@@ -11,7 +11,7 @@
       <Footnote
         message="Be careful of unknown contracts as they could be malicious. Please interact only with contracts you trust"
       />
-      <div class="advanced">
+      <!-- <div class="advanced">
         Advanced
         <div class="checkbox-wrapper-2">
           <input
@@ -20,14 +20,15 @@
             class="sc-gJwTLC ikxBAC"
           >
         </div>
-      </div>
+      </div> -->
       <div>
         Signature {{ send ? "and send" : "" }} requested by
         <div class="requester">
           {{ requester.origin }}
         </div>
       </div>
-      <div
+
+      <!-- <div
         v-if="advanced"
         class="group-add-signer"
       >
@@ -107,7 +108,9 @@
             :disabled="externalSigners"
           >
         </div>
-      </div>
+      </div> -->
+
+
       <div class="subtitle">
         Operations
       </div>
@@ -1703,7 +1706,6 @@ input {
 }
 
 .ev-body {
-  background: #dedede;
   padding: 1px 6px 8px 6px;
   word-break: break-all;
 }
