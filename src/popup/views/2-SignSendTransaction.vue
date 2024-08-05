@@ -202,30 +202,10 @@
           @onError="alertDanger($event)"
         />
       </div>
-      <div class="container">
-        <button
-          :disabled="!unlocked"
-          @click="checkEvents"
-        >
-          <span
-            v-if="loadingEvents"
-            class="loader2"
-          />
-          <span v-else>Check events</span>
-        </button>
-        <div
-          class="cancel-button"
-          @click="skipEvents"
-        >
-          <span
-            v-if="loadingSkipEvents"
-            class="loader2"
-          />
-          <span
-            v-else
-          >Skip <br><span
-            class="not-recommended"
-          >(not recommended)</span></span>
+      <div v-if="!receipt && !readyToSend" class="container">
+        <div class="loading-events">
+          <span class="loader2"></span>
+          <span>Checking events...</span>
         </div>
       </div>
       <div
@@ -423,7 +403,7 @@ export default {
     },
   },
 
-  mounted() {
+  async mounted() {
     let requests;
     if (process.env.VUE_APP_ENV === "test") {
       requests = [
@@ -861,7 +841,10 @@ export default {
     this.request = requests[0];
     this.requester = this.request.sender;
     this.typeRequest = this.send ? "send" : "sign";
-    this.decodeTransaction();
+    await this.decodeTransaction();
+    if (this.unlocked) {
+      await this.checkEvents();
+    }
   },
 
   methods: {
