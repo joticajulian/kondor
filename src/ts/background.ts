@@ -58,7 +58,7 @@ async function preparePopup(sender?: Sender) {
   } catch (error) {
     console.log("ping2 message failed, creating new popup window", error);
     tabIdRequester = sender.tab.id;
-    const popupWidth = 400;
+    const popupWidth = 357;
     const popupHeight = 600;
 
     // Get the current window's information
