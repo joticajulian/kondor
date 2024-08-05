@@ -68,7 +68,7 @@ async function preparePopup(sender?: Sender) {
           height: popupHeight,
           left: Math.round(left),
           top: Math.round(top)
-        }, (window) => {
+        }, () => {
           if (chrome.runtime.lastError) {
             console.error("Error creating popup:", chrome.runtime.lastError);
           }
