@@ -148,19 +148,19 @@ export default {
       // load USD balance
       let price = 0;
       let balanceUSD = "$0 USD";
-      if (this.network.tag === "mainnet") {
+      if (this.network.tag === "mainnet" && t.symbol.toLowerCase() === "koin") {
         try {
           const response = await axios.get(
-            `https://api.coingecko.com/api/v3/simple/price?ids=${t.coingeckoId}&vs_currencies=usd`
+            'https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt'
           );
-          price = response.data[t.coingeckoId].usd;
+          price = parseFloat(response.data.data[0].last);
           const balanceNumber = Number(balance);
           balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
           this.tokenPrices[t.symbol] = price;
         } catch (error) {
-          console.error(`Error when loading price for ${t.symbol}`);
+          console.error(`Error when loading price for ${t.symbol} from MEXC API`);
           console.error(error);
-          balanceUSD = "USD Error";
+          balanceUSD = "USD Price Unavailable";
         }
       }
 
