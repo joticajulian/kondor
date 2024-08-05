@@ -67,7 +67,8 @@ async function preparePopup(sender?: Sender) {
           width: popupWidth,
           height: popupHeight,
           left: Math.round(left),
-          top: Math.round(top)
+          top: Math.round(top),
+          alwaysOnTop: true
         });
       }
     });
