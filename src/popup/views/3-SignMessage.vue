@@ -229,7 +229,6 @@ export default {
 
 .sig-details {
   flex: 8;
-  background: #dedede;
   padding: 0.7em 0.5em;
 }
 
