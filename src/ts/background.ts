@@ -61,20 +61,28 @@ async function preparePopup(sender?: Sender) {
     const popupWidth = 400;
     const popupHeight = 600;
 
-    chrome.windows.create({
-      focused: true,
-      url: chrome.runtime.getURL("popup.html"),
-      type: "popup",
-      width: popupWidth,
-      height: popupHeight,
-    }, (window) => {
-      if (chrome.runtime.lastError) {
-        console.error("Error creating popup:", chrome.runtime.lastError);
-      } else if (window) {
-        console.log("Popup window created successfully", window);
-      } else {
-        console.error("Window creation failed, but no error was thrown");
-      }
+    // Get the current window's information
+    chrome.windows.getCurrent({}, (currentWindow) => {
+      const top = currentWindow.top || 0;
+      const left = (currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth;
+
+      chrome.windows.create({
+        focused: true,
+        url: chrome.runtime.getURL("popup.html"),
+        type: "popup",
+        width: popupWidth,
+        height: popupHeight,
+        top: top,
+        left: left,
+      }, (window) => {
+        if (chrome.runtime.lastError) {
+          console.error("Error creating popup:", chrome.runtime.lastError);
+        } else if (window) {
+          console.log("Popup window created successfully", window);
+        } else {
+          console.error("Window creation failed, but no error was thrown");
+        }
+      });
     });
   }
 }
