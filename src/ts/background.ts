@@ -77,18 +77,10 @@ async function preparePopup(sender?: Sender) {
       }, (window) => {
         if (chrome.runtime.lastError) {
           console.error("Error creating popup:", chrome.runtime.lastError);
-        } else if (window && window.id) {
+        } else if (window) {
           console.log("Popup window created successfully", window);
-          // Set alwaysOnTop after creation
-          chrome.windows.update(window.id, {}, () => {
-            if (chrome.runtime.lastError) {
-              console.error("Error setting alwaysOnTop:", chrome.runtime.lastError);
-            } else {
-              console.log("Window set to always on top successfully");
-            }
-          });
         } else {
-          console.error("Window creation failed or window.id is undefined");
+          console.error("Window creation failed");
         }
       });
     });
