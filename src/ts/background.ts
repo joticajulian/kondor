@@ -45,18 +45,25 @@ const idHelper = {
 };
 
 async function preparePopup(sender?: Sender) {
-  if (!sender || !sender.tab) throw new Error("invalid command preparePopup");
+  console.log("preparePopup called", sender);
+  if (!sender || !sender.tab) {
+    console.error("Invalid sender or sender.tab");
+    throw new Error("invalid command preparePopup");
+  }
 
   try {
+    console.log("Attempting to send ping2 message");
     await messenger.sendExtensionMessage("popup", "ping2", {}, { timeout: 20 });
+    console.log("ping2 message sent successfully");
   } catch (error) {
+    console.log("ping2 message failed, creating new popup window", error);
     tabIdRequester = sender.tab.id;
     const popupWidth = 400;
     const popupHeight = 600;
 
     chrome.windows.create({
       focused: true,
-      url: "popup.html",
+      url: chrome.runtime.getURL("popup.html"),
       type: "popup",
       width: popupWidth,
       height: popupHeight,
@@ -64,7 +71,9 @@ async function preparePopup(sender?: Sender) {
       if (chrome.runtime.lastError) {
         console.error("Error creating popup:", chrome.runtime.lastError);
       } else if (window) {
-        console.log("Popup window created successfully");
+        console.log("Popup window created successfully", window);
+      } else {
+        console.error("Window creation failed, but no error was thrown");
       }
     });
   }
