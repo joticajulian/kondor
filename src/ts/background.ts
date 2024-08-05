@@ -51,24 +51,22 @@ async function preparePopup(sender?: Sender) {
     await messenger.sendExtensionMessage("popup", "ping2", {}, { timeout: 20 });
   } catch (error) {
     tabIdRequester = sender.tab.id;
-    chrome.tabs.get(sender.tab.id, (tab) => {
-      chrome.windows.get(tab.windowId, (window) => {
-        chrome.action.getBoundingClientRect((rect) => {
-          const popupWidth = 400;
-          const popupHeight = 600;
-          const left = window.left + rect.left + rect.width / 2 - popupWidth / 2;
-          const top = window.top + rect.top + rect.height;
-          
-          chrome.windows.create({
-            focused: true,
-            url: "popup.html",
-            type: "popup",
-            width: popupWidth,
-            height: popupHeight,
-            left: Math.round(left),
-            top: Math.round(top)
-          });
-        });
+    chrome.windows.getCurrent((currentWindow) => {
+      const popupWidth = 400;
+      const popupHeight = 600;
+      
+      // Position the popup in the top-right corner of the current window
+      const left = currentWindow.left + currentWindow.width - popupWidth;
+      const top = currentWindow.top;
+
+      chrome.windows.create({
+        focused: true,
+        url: "popup.html",
+        type: "popup",
+        width: popupWidth,
+        height: popupHeight,
+        left: Math.round(left),
+        top: Math.round(top)
       });
     });
   }
