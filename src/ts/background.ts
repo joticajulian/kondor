@@ -58,35 +58,37 @@ async function preparePopup(sender?: Sender) {
   } catch (error) {
     console.log("ping2 message failed, creating new popup window", error);
     tabIdRequester = sender.tab.id;
-    const popupWidth = 357;
+    const popupWidth = 400;
     const popupHeight = 600;
 
     // Get the current window's information
     chrome.windows.getCurrent({}, (currentWindow) => {
-      const top = (currentWindow.top || 0) + 120; 
-      const left = (currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 80;
+      const top = ((currentWindow.top || 0) + 120);
+      const left = ((currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 80);
 
       chrome.windows.create({
-        focused: true,
         url: chrome.runtime.getURL("popup.html"),
         type: "popup",
         width: popupWidth,
         height: popupHeight,
-        top: top,
-        left: left,
+        top,
+        left,
+        focused: true
       }, (window) => {
         if (chrome.runtime.lastError) {
           console.error("Error creating popup:", chrome.runtime.lastError);
-        } else if (window) {
+        } else if (window && window.id) {
           console.log("Popup window created successfully", window);
-          console.log("Popup window coordinates:", {
-            top: window.top,
-            left: window.left,
-            width: window.width,
-            height: window.height
+          // Set alwaysOnTop after creation
+          chrome.windows.update(window.id, {}, () => {
+            if (chrome.runtime.lastError) {
+              console.error("Error setting alwaysOnTop:", chrome.runtime.lastError);
+            } else {
+              console.log("Window set to always on top successfully");
+            }
           });
         } else {
-          console.error("Window creation failed, but no error was thrown");
+          console.error("Window creation failed or window.id is undefined");
         }
       });
     });
