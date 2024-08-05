@@ -79,6 +79,12 @@ async function preparePopup(sender?: Sender) {
           console.error("Error creating popup:", chrome.runtime.lastError);
         } else if (window) {
           console.log("Popup window created successfully", window);
+          console.log("Popup window coordinates:", {
+            top: window.top,
+            left: window.left,
+            width: window.width,
+            height: window.height
+          });
         } else {
           console.error("Window creation failed, but no error was thrown");
         }
