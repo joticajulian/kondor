@@ -51,16 +51,24 @@ async function preparePopup(sender?: Sender) {
     await messenger.sendExtensionMessage("popup", "ping2", {}, { timeout: 20 });
   } catch (error) {
     tabIdRequester = sender.tab.id;
-    chrome.system.display.getInfo((displays) => {
-      const { width, height } = displays[0].bounds;
-      chrome.windows.create({
-        focused: true,
-        url: "popup.html",
-        type: "popup",
-        width: 400,
-        height: 600,
-        left: Math.floor(width / 2 - 200), // Center horizontally
-        top: Math.floor(height / 2 - 300), // Center vertically
+    chrome.tabs.get(sender.tab.id, (tab) => {
+      chrome.windows.get(tab.windowId, (window) => {
+        chrome.action.getBoundingClientRect((rect) => {
+          const popupWidth = 400;
+          const popupHeight = 600;
+          const left = window.left + rect.left + rect.width / 2 - popupWidth / 2;
+          const top = window.top + rect.top + rect.height;
+          
+          chrome.windows.create({
+            focused: true,
+            url: "popup.html",
+            type: "popup",
+            width: popupWidth,
+            height: popupHeight,
+            left: Math.round(left),
+            top: Math.round(top)
+          });
+        });
       });
     });
   }
