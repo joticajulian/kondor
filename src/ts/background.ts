@@ -105,6 +105,19 @@ async function getChainIdFromStorage(
   return network.chainId;
 }
 
+function checkKondorWindows(): Promise<chrome.windows.Window[]> {
+  return new Promise((resolve) => {
+    chrome.windows.getAll({ populate: true }, (windows) => {
+      const kondorWindows = windows.filter((window) => {
+        return window.tabs?.some((tab) => {
+          return tab.url && tab.url.includes(chrome.runtime.id);
+        });
+      });
+      resolve(kondorWindows);
+    });
+  });
+}
+
 const messenger = new Messenger({
   // eslint-disable-next-line
   // @ts-ignore
