@@ -1,40 +1,42 @@
 <template>
   <div class="wrapper">
-    <div class="center-column">
-      <div class="accounts-information">
-        <h2>Get accounts</h2>
-        <!-- <div>{{ requester.origin }}</div> -->
-        <div>{{ requester.origin }} wants to know your address</div>
-        <br>
-        <div class="accounts-list">
-          <div
-            v-for="(account, index) in accounts"
-            :key="index"
-          >
-            <div class="item-checkbox">
-              <input
-                v-model="inputs[index]"
-                type="checkbox"
-                class="checkbox"
-              >
-              <span class="label-checkbox">{{ account.name }}</span>
-            </div>
-            <div class="account-address">
-              {{ account.address }}
-            </div>
-          </div>
+    <div class="content">
+      <div>
+        <div class="p-title">
+          Connect with Kondor
+        </div>
+        <div class="p-subtitle">
+          Select the account(s) to use on this site
         </div>
       </div>
+      
+      <div class="accounts-list">
+        <div
+          v-for="(account, index) in accounts"
+          :key="index"
+          class="account-item"
+          :class="{ 'selected': inputs[index] }"
+          @click="toggleAccount(index)"
+        >
+          <span class="account-name">{{ account.name }}</span>
+          <span class="account-address">{{ formatAddress(account.address) }}</span>
+        </div>
+      </div>
+
       <div>
+        <p class="warning">
+          Only connect with sites you trust.
+        </p>
+
         <div class="buttons">
           <button
-            class="cancel-button"
+            class="custom-button secondary"
             @click="cancel"
           >
             Cancel
           </button>
           <button
-            class="accept-button"
+            class="custom-button primary"
             @click="accept"
           >
             Accept
@@ -46,16 +48,14 @@
 </template>
 
 <script>
-// mixins
 import Message from "@/popup/mixins/Message";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 
 export default {
   name: "GetAccounts",
-
   mixins: [Storage, ViewHelper, Message],
-  data: function () {
+  data() {
     return {
       requester: "",
       id: -1,
@@ -63,49 +63,42 @@ export default {
       accounts: [],
     };
   },
-
   mounted() {
     const requests = this.$store.state.requests.filter(
       (r) => r.command === "getAccounts"
     );
-    /**
-     * TODO: for several requests create a list of requesters
-     * and ask to the user to select one to see the details
-     */
     const [request] = requests;
     this.requester = request.sender;
     this.id = request.id;
-
     this.loadAccounts();
   },
-
   methods: {
     async loadAccounts() {
       this.accounts = await this._getAccounts();
+      this.inputs = new Array(this.accounts.length).fill(false);
     },
-
+    toggleAccount(index) {
+      this.$set(this.inputs, index, !this.inputs[index]);
+    },
+    formatAddress(address) {
+      return `${address.slice(0, 10)}...${address.slice(-5)}`;
+    },
     async accept() {
-      const accounts = this.accounts
-        .map((account) => {
-          return {
-            name: account.name,
-            address: account.address,
-            signers: account.signers
-              ? account.signers.map((signer) => {
-                return {
-                  name: signer.name,
-                  address: signer.address,
-                };
-              })
-              : [],
-          };
-        })
-        .filter((account, index) => {
-          return this.inputs[index];
-        });
+      const selectedAccounts = this.accounts
+        .filter((_, index) => this.inputs[index])
+        .map((account) => ({
+          name: account.name,
+          address: account.address,
+          signers: account.signers
+            ? account.signers.map((signer) => ({
+              name: signer.name,
+              address: signer.address,
+            }))
+            : [],
+        }));
       const message = {
         id: this.id,
-        result: accounts,
+        result: selectedAccounts,
       };
       this.sendResponse("extension", message, this.requester);
       window.close();
@@ -121,48 +114,120 @@ export default {
   },
 };
 </script>
+
 <style scoped>
-label {
-  padding: 1em 0;
-}
 .wrapper {
-  height: 100%;
+  font-family: Poppins, sans-serif;
+    background-color: #1a1a1a;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
 }
-.center-column {
-  width: 75%;
-  font-weight: 400;
-  display: flex;
-  flex-direction: column;
-  margin: auto;
+
+.content {
+  width: 100%;
+    max-width: 400px;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
-.container {
-  width: 90%;
-  padding: 2em 0;
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  text-transform: none;
-  align-items: flex-start;
+
+.p-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
 }
+
+.p-subtitle {
+  font-size: 14px;
+  color: #777777;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.accounts-list {
+  margin-bottom: 20px;
+}
+
+.account-item {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.account-item:hover, .account-item.selected {
+  background-color: #3a3a3a;
+}
+.account-item.selected {
+  background-color: #e5b009;
+}
+
+.account-item.selected .account-name {
+  color: black;
+}
+
+.account-name {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.account-address {
+  display: block;
+  font-size: 14px;
+  color: #777777;
+}
+
+.warning {
+  font-size: 14px;
+  color: #e5b009;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 .buttons {
   display: flex;
-  justify-content: center;
-  flex-direction: column-reverse;
-  width: 100%;
+    justify-content: space-between;
+    gap: 1em;
+    flex-direction: row;
 }
-.accounts-information {
-  margin: 2em 0;
+
+.cancel-button, .accept-button {
+  width: 48%;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
-.account-address {
-  color: #929191;
-}
-.accept-button {
-  width: auto;
-}
+
 .cancel-button {
-  background: none;
-  color: var(--kondor-purple);
-  text-decoration: underline;
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+}
+
+.accept-button {
+  background-color: #7161ef;
+  color: #ffffff;
   border: none;
-  width: auto;
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.accept-button:hover {
+  background-color: #8674ff;
 }
 </style>

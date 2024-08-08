@@ -229,12 +229,12 @@ w-100 {
   border: none;
   border-radius: 8px;
   font-weight: 500;
-  cursor: pointer;
   transition: background-color 0.3s, opacity 0.3s;
   text-align: center;
   color: white;
   height: 20px;
   cursor: pointer !important;
+  padding: 1.2em;
 }
 
 .custom-button.primary {

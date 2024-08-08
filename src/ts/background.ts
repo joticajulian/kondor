@@ -63,8 +63,8 @@ async function preparePopup(sender?: Sender) {
 
     // Get the current window's information
     chrome.windows.getCurrent({}, (currentWindow) => {
-      const top = ((currentWindow.top || 0) + 120);
-      const left = ((currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 80);
+      const top = ((currentWindow.top || 0) + 80);
+      const left = ((currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 130);
 
       chrome.windows.create({
         url: chrome.runtime.getURL("popup.html"),
@@ -103,6 +103,19 @@ async function getChainIdFromStorage(
   const network = networks.find((n) => n.tag === networkTag);
   if (!network) throw new Error(`network ${networkTag} not found`);
   return network.chainId;
+}
+
+function checkKondorWindows(): Promise<chrome.windows.Window[]> {
+  return new Promise((resolve) => {
+    chrome.windows.getAll({ populate: true }, (windows) => {
+      const kondorWindows = windows.filter((window) => {
+        return window.tabs?.some((tab) => {
+          return tab.url && tab.url.includes(chrome.runtime.id);
+        });
+      });
+      resolve(kondorWindows);
+    });
+  });
 }
 
 const messenger = new Messenger({
