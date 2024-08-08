@@ -15,12 +15,17 @@
       >
         Check events
       </button>
-      <div class="advanced-toggle">
+
+      <div
+        class="advanced-toggle"
+        @click="toggleAdvanced"
+      >
         Advanced
         <div class="switch">
           <input
-            v-model="advanced"
+            v-model="showAdvanced"
             type="checkbox"
+            @click.stop
           >
           <span class="slider round" />
         </div>
@@ -32,7 +37,7 @@
       <h2>{{ sendingAmount }} KOIN</h2>
     </div>
 
-    <div v-if="advanced">
+    <div v-if="showAdvanced">
       <div class="subtitle">
         Headers
       </div>
@@ -306,7 +311,7 @@ export default {
 
   data: function () {
     return {
-      advanced: false,
+      showAdvanced: false,
       data: "",
       abis: null,
       cacheAbis: {},
@@ -358,6 +363,24 @@ export default {
         return this.requester.origin // Return the original if parsing fails
       }
     },
+    sendingAmount() {
+      if (!this.operations || this.operations.length === 0) return '0';
+    
+      const transferOperation = this.operations.find(op => 
+        op.args && op.args.some(arg => arg.field === 'Amount_in')
+      );
+    
+      if (transferOperation) {
+        const amountArg = transferOperation.args.find(arg => arg.field === 'Amount_in');
+        if (amountArg) {
+        // Convert from satoshis to KOIN (assuming 8 decimal places)
+          const amountInKoin = Number(amountArg.data) / 100000000;
+          return amountInKoin.toFixed(8);
+        }
+      }
+    
+      return '0';
+    },
   },
 
   watch: {
@@ -376,6 +399,9 @@ export default {
 
     payee: async function () {
       this.nonce = await this.provider.getNextNonce(this.payee || this.payer)
+    },
+    showAdvanced(newVal) {
+      console.log('showAdvanced changed:', newVal);
     },
   },
 
@@ -1526,6 +1552,12 @@ export default {
       this.sendResponse("extension", message, this.request.sender)
       window.close()
     },
+    toggleAdvanced() {
+      console.log("toggleAdvanced called, current state:", this.showAdvanced)
+      this.showAdvanced = !this.showAdvanced
+      console.log("New state:", this.showAdvanced)
+    },
+    
   },
 }
 </script>
@@ -1820,6 +1852,7 @@ input {
   font-size: 0.8em;
   color: var(--primary-gray);
   margin-top: -1.2em;
+  margin-bottom: 6em;
 }
 
 .wallet-interaction h2 {
@@ -1862,6 +1895,7 @@ input {
   display: flex;
   align-items: center;
   color: var(--primary-gray);
+  cursor: pointer;
 }
 
 .switch {
@@ -1870,7 +1904,6 @@ input {
   width: 40px;
   height: 22px;
   margin-left: 10px;
-  vertical-align: middle;
 }
 
 .switch input {
@@ -1967,5 +2000,25 @@ input:checked + .slider:before {
   font-size: 2.2em;
   color: #fff;
   font-weight: bold;
+}
+.advanced-toggle {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+}
+
+.advanced-toggle label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.advanced-toggle input[type="checkbox"] {
+  margin-right: 8px;
+}
+.custom-checkbox {
+  margin: 0 !important;
+  width: 1px;
+  height: 1px;
 }
 </style>
