@@ -63,8 +63,8 @@ async function preparePopup(sender?: Sender) {
 
     // Get the current window's information
     chrome.windows.getCurrent({}, (currentWindow) => {
-      const top = ((currentWindow.top || 0) + 120);
-      const left = ((currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 80);
+      const top = ((currentWindow.top || 0) + 80);
+      const left = ((currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 130);
 
       chrome.windows.create({
         url: chrome.runtime.getURL("popup.html"),

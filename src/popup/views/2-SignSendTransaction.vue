@@ -2,7 +2,9 @@
   <div class="tb-container">
     <div class="wallet-interaction">
       <div>Your wallet is interacting with:</div>
-      <div class="wi-title">{{ simplifiedDomain }}</div>
+      <div class="wi-title">
+        {{ simplifiedDomain }}
+      </div>
       <div>{{ requester.origin }}</div>
     </div>
 
@@ -159,7 +161,8 @@
     </div>
 
     <div class="warning-message">
-      Be careful of unknown contracts as they could be malicious. Please interact only with contracts you trust.
+      Be careful of unknown contracts as they could be malicious. Please
+      interact only with contracts you trust.
     </div>
 
     <div v-if="!unlocked">
@@ -248,13 +251,13 @@
 
     <div class="action-buttons">
       <button
-        class="cancel-btn"
+        class="custom-button secondary"
         @click="cancel"
       >
         Cancel
       </button>
-      <button 
-        class="sign-btn" 
+      <button
+        class="custom-button primary"
         :disabled="!unlocked || !readyToSend"
         @click="sendTransaction"
       >
@@ -1811,11 +1814,12 @@ input {
 }
 .wallet-interaction {
   text-align: left;
-    background-color: var(--primary-darker);
-    width: 92%;
-    padding: 1em 1em 1.4em 1em;
-    font-size: .8em;
-    color: var(--primary-gray)
+  background-color: var(--primary-darker);
+  width: 94%;
+  padding: 1em 1em 1em 2em;
+  font-size: 0.8em;
+  color: var(--primary-gray);
+  margin-top: -1.2em;
 }
 
 .wallet-interaction h2 {
@@ -1839,20 +1843,19 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 10px 20px;
   width: 92%;
+  position: absolute;
+  top: 7.3em;
 }
 
 .check-events-btn {
   background-color: transparent;
-    color: var(--primary-gray);
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    text-align: left;
-    text-decoration: underline;
-
+  color: var(--primary-gray);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  text-decoration: underline;
 }
 
 .advanced-toggle {
@@ -1884,7 +1887,7 @@ input {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 34px;
 }
 
@@ -1896,7 +1899,7 @@ input {
   left: 2px;
   bottom: 2px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 
@@ -1909,11 +1912,12 @@ input:checked + .slider:before {
 }
 
 .sending-info {
-  background-color: #2a2a2a;
-  padding: 20px;
-  border-radius: 10px;
+  background-color: var(--primary-darker);
+  padding: 1.5em;
+  border-radius: 0.9em;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.5em;
+  width: 100%;
 }
 
 .sending-info p {
@@ -1927,20 +1931,21 @@ input:checked + .slider:before {
 }
 
 .warning-message {
-  background-color: #ffa500;
-  color: #000;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  color: #ffa500;
+  padding: 1.2em 3em;
 }
 
 .action-buttons {
   display: flex;
+  margin-bottom: 4em;
   justify-content: space-between;
-  margin-top: 20px;
+  width: 90%;
+  padding: 0 2em;
+  gap: 1em;
 }
 
-.cancel-btn, .sign-btn {
+.cancel-btn,
+.sign-btn {
   width: 48%;
   padding: 15px;
   border: none;
