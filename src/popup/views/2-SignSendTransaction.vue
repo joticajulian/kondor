@@ -1,60 +1,40 @@
 <template>
-  <div class="container">
-    <div class="top-bar">
-      <div class="tb-title">
-        {{ simplifiedDomain }}
-      </div>
-      <div class="tb-subtitle">
-        {{ requester.origin }}
-      </div>
+  <div class="tb-container">
+    <div class="wallet-interaction">
+      <div>Your wallet is interacting with:</div>
+      <div class="wi-title">{{ simplifiedDomain }}</div>
+      <div>{{ requester.origin }}</div>
     </div>
-    
-    <div class="column">
-      <Footnote
-        v-if="footnoteMessage"
-        :message="footnoteMessage"
-      />
-      <!-- <div class="title">
-        Signature request {{ send ? "and send" : "" }}
-      </div> -->
-      <Footnote
-        message="Be careful of unknown contracts as they could be malicious. Please interact only with contracts you trust"
-      />
-      <div class="advanced">
+
+    <div class="check-events-row">
+      <button
+        class="check-events-btn"
+        @click="checkEvents"
+      >
+        Check events
+      </button>
+      <div class="advanced-toggle">
         Advanced
-        <div class="checkbox-wrapper-2">
+        <div class="switch">
           <input
             v-model="advanced"
             type="checkbox"
-            class="sc-gJwTLC ikxBAC"
           >
+          <span class="slider round" />
         </div>
       </div>
+    </div>
 
-      <div
-        v-if="advanced"
-        class="group-add-signer"
-      >
-        <select v-model="typeRequest">
-          <option value="sign">
-            Only sign transaction
-          </option>
-          <option value="send">
-            Sign and send transaction
-          </option>
-        </select>
-      </div>
+    <div class="sending-info">
+      <p>You are sending</p>
+      <h2>{{ sendingAmount }} KOIN</h2>
+    </div>
 
-      <div
-        v-if="advanced"
-        class="subtitle"
-      >
+    <div v-if="advanced">
+      <div class="subtitle">
         Headers
       </div>
-      <div
-        v-if="advanced"
-        class="tx-header"
-      >
+      <div class="tx-header">
         <div class="group-input">
           <label for="network">Network</label>
           <input
@@ -112,7 +92,6 @@
           >
         </div>
       </div>
-
       <div class="subtitle">
         Operations
       </div>
@@ -153,7 +132,7 @@
         </div>
       </div>
       <div class="subtitle">
-        Signaturesssss
+        Signatures
       </div>
       <div
         v-for="(signer, i) in signers"
@@ -169,7 +148,6 @@
           </div>
         </div>
         <div
-          v-if="advanced"
           class="sig-delete"
           @click="removeSigner(i)"
         >
@@ -178,134 +156,110 @@
           </div>
         </div>
       </div>
+    </div>
 
+    <div class="warning-message">
+      Be careful of unknown contracts as they could be malicious. Please interact only with contracts you trust.
+    </div>
+
+    <div v-if="!unlocked">
+      <Unlock
+        @onUnlock="afterUnlocked()"
+        @onError="alertDanger($event)"
+      />
+    </div>
+
+    <div
+      v-if="receipt"
+      class="subtitle"
+    >
+      Events
+    </div>
+    <div
+      v-for="(ev, i) in events"
+      :key="'ev' + i"
+      class="operation"
+    >
       <div
-        v-if="advanced"
-        class="group-add-signer"
+        v-if="receipt"
+        class="ev-header"
+        :class="ev.style"
       >
-        <select v-model="signerSelected">
-          <option
-            v-for="account in accounts"
-            :key="account.address"
-            :value="account.address"
-          >
-            {{ account.name }} - {{ account.address }}
-          </option>
-        </select>
-
-        <button @click="addSigner(signerSelected)">
-          Add signer
-        </button>
-      </div>
-
-      <div v-if="!unlocked">
-        <Unlock
-          @onUnlock="afterUnlocked()"
-          @onError="alertDanger($event)"
-        />
-      </div>
-      <div
-        v-if="!receipt && !readyToSend"
-        class="container"
-      >
-        <div class="loading-events">
-          <span class="loader2" />
-          <span>Checking events...</span>
+        <div class="contract-id">
+          {{ ev.contractId }}
+        </div>
+        <div class="op-title">
+          {{ ev.title }}
+        </div>
+        <div class="op-subtitle">
+          {{ ev.subtitle }}
         </div>
       </div>
       <div
         v-if="receipt"
-        class="subtitle"
-      >
-        Events
-      </div>
-      <div
-        v-for="(ev, i) in events"
-        :key="'ev' + i"
-        class="operation"
+        class="ev-body"
       >
         <div
-          v-if="receipt"
-          class="ev-header"
-          :class="ev.style"
+          v-for="(arg, j) in ev.args"
+          :key="'fe' + j"
         >
-          <div class="contract-id">
-            {{ ev.contractId }}
+          <div class="field-name">
+            {{ arg.field }}
           </div>
-          <div class="op-title">
-            {{ ev.title }}
-          </div>
-          <div class="op-subtitle">
-            {{ ev.subtitle }}
-          </div>
-        </div>
-        <div
-          v-if="receipt"
-          class="ev-body"
-        >
-          <div
-            v-for="(arg, j) in ev.args"
-            :key="'fe' + j"
-          >
-            <div class="field-name">
-              {{ arg.field }}
-            </div>
-            <div class="field-data">
-              {{ arg.data }}
-            </div>
-          </div>
-        </div>
-        <div
-          v-if="receipt"
-          class="ev-foot"
-          :class="ev.style"
-        >
-          <div>Impacted accounts</div>
-          <div
-            v-for="(imp, k) in ev.impacted"
-            :key="'imp' + k"
-            class="ev-impacted-account"
-          >
-            {{ imp }}
-          </div>
-          <div style="margin-top: 0.5em">
-            {{
-              ev.impactsUserAccounts
-                ? "It impacts your accounts"
-                : "It doesn't impact your accounts"
-            }}
+          <div class="field-data">
+            {{ arg.data }}
           </div>
         </div>
       </div>
       <div
         v-if="receipt"
-        class="mana-used"
+        class="ev-foot"
+        :class="ev.style"
       >
-        Mana limit: {{ maxMana }}
-      </div>
-      <div
-        v-if="receipt"
-        class="mana-used"
-      >
-        Mana consumption: {{ manaUsed }}
-      </div>
-      <div
-        v-if="readyToSend"
-        class="container"
-      >
-        <button
-          :disabled="!unlocked"
-          @click="sendTransaction"
-        >
-          Send
-        </button>
+        <div>Impacted accounts</div>
         <div
-          class="cancel-button"
-          @click="cancel"
+          v-for="(imp, k) in ev.impacted"
+          :key="'imp' + k"
+          class="ev-impacted-account"
         >
-          Cancel
+          {{ imp }}
+        </div>
+        <div style="margin-top: 0.5em">
+          {{
+            ev.impactsUserAccounts
+              ? "It impacts your accounts"
+              : "It doesn't impact your accounts"
+          }}
         </div>
       </div>
+    </div>
+    <div
+      v-if="receipt"
+      class="mana-used"
+    >
+      Mana limit: {{ maxMana }}
+    </div>
+    <div
+      v-if="receipt"
+      class="mana-used"
+    >
+      Mana consumption: {{ manaUsed }}
+    </div>
+
+    <div class="action-buttons">
+      <button
+        class="cancel-btn"
+        @click="cancel"
+      >
+        Cancel
+      </button>
+      <button 
+        class="sign-btn" 
+        :disabled="!unlocked || !readyToSend"
+        @click="sendTransaction"
+      >
+        Sign
+      </button>
     </div>
   </div>
 </template>
@@ -321,7 +275,7 @@ import Sandbox from "@/shared/mixins/Sandbox"
 
 // components
 import Unlock from "@/shared/components/Unlock.vue"
-import Footnote from "@/shared/components/Footnote.vue"
+// import Footnote from "@/shared/components/Footnote.vue"
 
 import { estimateAndAdjustMana } from "../../../lib/utils"
 
@@ -336,7 +290,7 @@ function fromHexToUtf8(hex) {
 export default {
   name: "SignSendTransaction",
 
-  components: { Unlock, Footnote },
+  components: { Unlock },
 
   mixins: [Storage, Sandbox, ViewHelper, Message],
 
@@ -388,18 +342,17 @@ export default {
       loadingSkipEvents: false,
     }
   },
-
   computed: {
     simplifiedDomain() {
       try {
-        const url = new URL(this.requester.origin);
-        const hostname = url.hostname;
+        const url = new URL(this.requester.origin)
+        const hostname = url.hostname
         // Split the hostname by dots and get the second last part for the domain
-        const parts = hostname.split('.');
+        const parts = hostname.split(".")
         // Return the second last part, or the first part if there are only two parts
-        return parts.length > 2 ? parts[parts.length - 2] : parts[0];
+        return parts.length > 2 ? parts[parts.length - 2] : parts[0]
       } catch (error) {
-        return this.requester.origin; // Return the original if parsing fails
+        return this.requester.origin // Return the original if parsing fails
       }
     },
   },
@@ -422,7 +375,8 @@ export default {
       this.nonce = await this.provider.getNextNonce(this.payee || this.payer)
     },
   },
-  async mounted() {
+
+  mounted() {
     let requests
     if (process.env.VUE_APP_ENV === "test") {
       requests = [
@@ -860,10 +814,7 @@ export default {
     this.request = requests[0]
     this.requester = this.request.sender
     this.typeRequest = this.send ? "send" : "sign"
-    await this.decodeTransaction()
-    if (this.unlocked) {
-      await this.checkEvents()
-    }
+    this.decodeTransaction()
   },
 
   methods: {
@@ -1617,7 +1568,6 @@ input {
 }
 
 .requester {
-  background-color: #c7c7c7;
   padding: 6px;
   margin: 5px 0px;
 }
@@ -1834,19 +1784,183 @@ input {
 }
 .top-bar {
   display: flex;
-    padding: 1em;
-    background: #000;
-    width: 100%;
-    justify-content: flex-start;
-    flex-direction: column;
-    align-items: center;
+  padding: 1em;
+  background: #000;
+  width: 94%;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding-left: 4em;
 }
 .tb-title {
   color: white;
   font-size: 1.5em;
-} 
+}
 .tb-subtitle {
   color: #777777;
-  font-size: .9em;
-} 
+  font-size: 0.9em;
+}
+.tb-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: space-between;
+}
+.logo img {
+  display: none;
+}
+.wallet-interaction {
+  text-align: left;
+    background-color: var(--primary-darker);
+    width: 92%;
+    padding: 1em 1em 1.4em 1em;
+    font-size: .8em;
+    color: var(--primary-gray)
+}
+
+.wallet-interaction h2 {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.wallet-interaction h1 {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.wallet-interaction p {
+  font-size: 14px;
+  color: #888;
+}
+
+.check-events-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  width: 92%;
+}
+
+.check-events-btn {
+  background-color: transparent;
+    color: var(--primary-gray);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    text-decoration: underline;
+
+}
+
+.advanced-toggle {
+  display: flex;
+  align-items: center;
+  color: var(--primary-gray);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #7161ef;
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+.sending-info {
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sending-info p {
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.sending-info h2 {
+  color: #fff;
+  font-size: 24px;
+}
+
+.warning-message {
+  background-color: #ffa500;
+  color: #000;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.cancel-btn, .sign-btn {
+  width: 48%;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #444;
+  color: #fff;
+}
+
+.sign-btn {
+  background-color: #7161ef;
+  color: #fff;
+}
+.wi-title {
+  font-size: 2.2em;
+  color: #fff;
+  font-weight: bold;
+}
 </style>
