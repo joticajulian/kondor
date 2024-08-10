@@ -27,7 +27,7 @@
     <router-link
       v-if="hasAccounts"
       to="/importSeedPhrase"
-      class="button"
+      class="button w-vw"
     >
       <button class="custom-button secondary">
         Forgot password?
@@ -120,7 +120,7 @@ input {
   height: 100%;
   text-align: center;
   line-height: 1.5em;
-  justify-content: space-between;
+  justify-content: center;
 }
 .button-group {
   display: flex;
@@ -135,6 +135,7 @@ input {
   margin: 2em 0;
   line-height: 1.2em;
   text-align: center;
+  margin-bottom: 5em;
 }
 .logo {
   display: flex;
@@ -152,5 +153,8 @@ input {
 .unlock {
   width: 70%;
   margin-top: 3em;
+}
+.w-vw {
+  width: 100vw
 }
 </style>

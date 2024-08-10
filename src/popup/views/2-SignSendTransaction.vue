@@ -34,10 +34,18 @@
 
     <div class="sending-info">
       <p>You are sending</p>
-      <h2>{{ sendingAmount }} KOIN</h2>
+      <h2 v-if="typeof koinTransferAmount === 'number'">
+        {{ koinTransferAmount.toFixed(2) }} KOIN
+      </h2>
+      <h2 v-else>
+        Loading transfer amount...
+      </h2>
     </div>
 
-    <div v-if="showAdvanced">
+    <div
+      v-if="showAdvanced"
+      class="advanced-container"
+    >
       <div class="subtitle">
         Headers
       </div>
@@ -311,6 +319,7 @@ export default {
 
   data: function () {
     return {
+      koinTransferAmount: null,
       showAdvanced: false,
       data: "",
       abis: null,
@@ -403,385 +412,391 @@ export default {
     showAdvanced(newVal) {
       console.log('showAdvanced changed:', newVal);
     },
+    koinTransferAmount(newVal, oldVal) {
+      console.log(`koinTransferAmount changed from ${oldVal} to ${newVal}`);
+    }
   },
 
-  mounted() {
-    let requests
-    if (process.env.VUE_APP_ENV === "test") {
-      requests = [
-        {
-          id: "270815b4-8c3e-4b53-b9ac-82ba3854c206",
-          command: "signer:signTransaction",
-          args: {
-            signerAddress: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
-            transaction: {
-              operations: [
-                {
-                  call_contract: {
-                    args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
-                    contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                    entry_point: 670398154,
+  async mounted() {
+    console.log("Component mounted");
+    try {
+      let requests
+      if (process.env.VUE_APP_ENV === "test") {
+        requests = [
+          {
+            id: "270815b4-8c3e-4b53-b9ac-82ba3854c206",
+            command: "signer:signTransaction",
+            args: {
+              signerAddress: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
+              transaction: {
+                operations: [
+                  {
+                    call_contract: {
+                      args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
+                      contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                      entry_point: 670398154,
+                    },
                   },
-                },
-                {
-                  call_contract: {
-                    args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
-                    contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                    entry_point: 6703981540,
+                  {
+                    call_contract: {
+                      args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
+                      contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                      entry_point: 6703981540,
+                    },
                   },
-                },
-                {
-                  upload_contract: {
-                    contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                    bytecode:
+                  {
+                    upload_contract: {
+                      contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                      bytecode:
                       "TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQgY29uc2VjdGV0dXIgYWRpcGlzaWNpbmcgZWxpdC4gTWF4aW1lIG1vbGxpdGlhLAptb2xlc3RpYWUgcXVhcyB2ZWwgc2ludCBjb21tb2RpIHJlcHVkaWFuZGFlIGNvbnNlcXV1bnR1ciB2b2x1cHRhdHVtIGxhYm9ydW0KbnVtcXVhbSBibGFuZGl0aWlzIGhhcnVtIHF1aXNxdWFtIGVpdXMgc2VkIG9kaXQgZnVnaWF0IGl1c3RvIGZ1Z2EgcHJhZXNlbnRpdW0Kb3B0aW8sIGVhcXVlIHJlcnVtISBQcm92aWRlbnQgc2ltaWxpcXVlIGFjY3VzYW50aXVtIG5lbW8gYXV0ZW0uIFZlcml0YXRpcwpvYmNhZWNhdGkgdGVuZXR1ciBpdXJlIGVpdXMgZWFydW0gdXQgbW9sZXN0aWFzIGFyY2hpdGVjdG8gdm9sdXB0YXRlIGFsaXF1YW0KbmloaWwsIGV2ZW5pZXQgYWxpcXVpZCBjdWxwYSBvZmZpY2lhIGF1dCEgSW1wZWRpdCBzaXQgc3VudCBxdWFlcmF0LCBvZGl0LAp0ZW5ldHVyIGVycm9yLCBoYXJ1bSBuZXNjaXVudCBpcHN1bSBkZWJpdGlzIHF1YXMgYWxpcXVpZC4gUmVwcmVoZW5kZXJpdCwKcXVpYS4gUXVvIG5lcXVlIGVycm9yIHJlcHVkaWFuZGFlIGZ1Z2E_IElwc2EgbGF1ZGFudGl1bSBtb2xlc3RpYXMgZW9zIApzYXBpZW50ZSBvZmZpY2lpcyBtb2RpIGF0IHN1bnQgZXhjZXB0dXJpIGV4cGVkaXRhIHNpbnQ_IFNlZCBxdWlidXNkYW0KcmVjdXNhbmRhZSBhbGlhcyBlcnJvciBoYXJ1bSBtYXhpbWUgYWRpcGlzY2kgYW1ldCBsYWJvcnVtLiBQZXJzcGljaWF0",
-                    abi: "{}",
-                    authorizes_call_contract: true,
-                    authorizes_transaction_application: true,
-                    authorizes_upload_contract: false,
+                      abi: "{}",
+                      authorizes_call_contract: true,
+                      authorizes_transaction_application: true,
+                      authorizes_upload_contract: false,
+                    },
                   },
-                },
-              ],
-              header: {
-                chain_id: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
-                rc_limit: "0",
-                nonce: "KAE=",
-                operation_merkle_root:
+                ],
+                header: {
+                  chain_id: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
+                  rc_limit: "0",
+                  nonce: "KAE=",
+                  operation_merkle_root:
                   "EiBCeHF0tLBk6Dq0yIrlZ2Z9CzO4tv5FsYv868D6fjHeAg==",
-                payer: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
+                  payer: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
+                },
+                signatures: [
+                  "IEUp4G5lT_6kuCvCKEvq20ZvBZoiJd-U3vs4MdZ8u7XgKDm4X7gmyUugp8ggt0lX1hjvA3KJYVRfV63FWnko35A=",
+                ],
+                id: "0x1220d66c608bf375cdd310f021fc61d2c084f7bcc52734a688dfd302dce2daa6c2e3",
               },
-              signatures: [
-                "IEUp4G5lT_6kuCvCKEvq20ZvBZoiJd-U3vs4MdZ8u7XgKDm4X7gmyUugp8ggt0lX1hjvA3KJYVRfV63FWnko35A=",
-              ],
-              id: "0x1220d66c608bf375cdd310f021fc61d2c084f7bcc52734a688dfd302dce2daa6c2e3",
-            },
-            abis: {
-              "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ": {
-                methods: {
-                  name: {
-                    argument: "koinos.contracts.token.name_arguments",
-                    return: "koinos.contracts.token.name_result",
-                    "entry-point": "0x82a3537f",
-                    description: "Returns the token name",
-                    "read-only": true,
-                    entry_point: 2191741823,
+              abis: {
+                "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ": {
+                  methods: {
+                    name: {
+                      argument: "koinos.contracts.token.name_arguments",
+                      return: "koinos.contracts.token.name_result",
+                      "entry-point": "0x82a3537f",
+                      description: "Returns the token name",
+                      "read-only": true,
+                      entry_point: 2191741823,
+                    },
+                    symbol: {
+                      argument: "koinos.contracts.token.symbol_arguments",
+                      return: "koinos.contracts.token.symbol_result",
+                      "entry-point": "0xb76a7ca1",
+                      description: "Returns the token symbol",
+                      "read-only": true,
+                      entry_point: 3077209249,
+                    },
+                    decimals: {
+                      argument: "koinos.contracts.token.decimals_arguments",
+                      return: "koinos.contracts.token.decimals_result",
+                      "entry-point": "0xee80fd2f",
+                      description: "Returns the token decimal precision",
+                      "read-only": true,
+                      entry_point: 4001430831,
+                    },
+                    total_supply: {
+                      argument: "koinos.contracts.token.total_supply_arguments",
+                      return: "koinos.contracts.token.total_supply_result",
+                      "entry-point": "0xb0da3934",
+                      description: "Returns the token total supply",
+                      "read-only": true,
+                      entry_point: 2967091508,
+                    },
+                    balance_of: {
+                      argument: "koinos.contracts.token.balance_of_arguments",
+                      return: "koinos.contracts.token.balance_of_result",
+                      "entry-point": "0x5c721497",
+                      description: "Checks the balance at an address",
+                      "read-only": true,
+                      entry_point: 1550980247,
+                    },
+                    transfer: {
+                      argument: "koinos.contracts.token.transfer_arguments",
+                      return: "koinos.contracts.token.transfer_result",
+                      "entry-point": "0x27f576ca",
+                      description: "Transfers the token",
+                      "read-only": false,
+                      entry_point: 670398154,
+                      format: {
+                        value: {
+                          type: "number",
+                          decimals: 8,
+                          symbol: "KOIN",
+                        },
+                      },
+                    },
+                    mint: {
+                      argument: "koinos.contracts.token.mint_arguments",
+                      return: "koinos.contracts.token.mint_result",
+                      "entry-point": "0xdc6f17bb",
+                      description: "Mints the token",
+                      "read-only": false,
+                      entry_point: 3698268091,
+                    },
+                    burn: {
+                      argument: "koinos.contracts.token.burn_arguments",
+                      return: "koinos.contracts.token.burn_result",
+                      "entry-point": "0x859facc5",
+                      description: "Burns the token",
+                      "read-only": false,
+                      entry_point: 2241834181,
+                    },
                   },
-                  symbol: {
-                    argument: "koinos.contracts.token.symbol_arguments",
-                    return: "koinos.contracts.token.symbol_result",
-                    "entry-point": "0xb76a7ca1",
-                    description: "Returns the token symbol",
-                    "read-only": true,
-                    entry_point: 3077209249,
-                  },
-                  decimals: {
-                    argument: "koinos.contracts.token.decimals_arguments",
-                    return: "koinos.contracts.token.decimals_result",
-                    "entry-point": "0xee80fd2f",
-                    description: "Returns the token decimal precision",
-                    "read-only": true,
-                    entry_point: 4001430831,
-                  },
-                  total_supply: {
-                    argument: "koinos.contracts.token.total_supply_arguments",
-                    return: "koinos.contracts.token.total_supply_result",
-                    "entry-point": "0xb0da3934",
-                    description: "Returns the token total supply",
-                    "read-only": true,
-                    entry_point: 2967091508,
-                  },
-                  balance_of: {
-                    argument: "koinos.contracts.token.balance_of_arguments",
-                    return: "koinos.contracts.token.balance_of_result",
-                    "entry-point": "0x5c721497",
-                    description: "Checks the balance at an address",
-                    "read-only": true,
-                    entry_point: 1550980247,
-                  },
-                  transfer: {
-                    argument: "koinos.contracts.token.transfer_arguments",
-                    return: "koinos.contracts.token.transfer_result",
-                    "entry-point": "0x27f576ca",
-                    description: "Transfers the token",
-                    "read-only": false,
-                    entry_point: 670398154,
-                    format: {
-                      value: {
-                        type: "number",
-                        decimals: 8,
-                        symbol: "KOIN",
+                  events: {
+                    "koinos.contracts.token.transfer_event": {
+                      argument: "koinos.contracts.token.transfer_event",
+                      format: {
+                        value: {
+                          type: "number",
+                          decimals: 8,
+                          symbol: "KOIN",
+                        },
                       },
                     },
                   },
-                  mint: {
-                    argument: "koinos.contracts.token.mint_arguments",
-                    return: "koinos.contracts.token.mint_result",
-                    "entry-point": "0xdc6f17bb",
-                    description: "Mints the token",
-                    "read-only": false,
-                    entry_point: 3698268091,
-                  },
-                  burn: {
-                    argument: "koinos.contracts.token.burn_arguments",
-                    return: "koinos.contracts.token.burn_result",
-                    "entry-point": "0x859facc5",
-                    description: "Burns the token",
-                    "read-only": false,
-                    entry_point: 2241834181,
-                  },
-                },
-                events: {
-                  "koinos.contracts.token.transfer_event": {
-                    argument: "koinos.contracts.token.transfer_event",
-                    format: {
-                      value: {
-                        type: "number",
-                        decimals: 8,
-                        symbol: "KOIN",
-                      },
-                    },
-                  },
-                },
-                koilib_types: {
-                  nested: {
-                    koinos: {
-                      nested: {
-                        contracts: {
-                          nested: {
-                            token: {
-                              nested: {
-                                name_arguments: {
-                                  fields: {},
-                                },
-                                name_result: {
-                                  fields: {
-                                    value: {
-                                      type: "string",
-                                      id: 1,
-                                    },
+                  koilib_types: {
+                    nested: {
+                      koinos: {
+                        nested: {
+                          contracts: {
+                            nested: {
+                              token: {
+                                nested: {
+                                  name_arguments: {
+                                    fields: {},
                                   },
-                                },
-                                symbol_arguments: {
-                                  fields: {},
-                                },
-                                symbol_result: {
-                                  fields: {
-                                    value: {
-                                      type: "string",
-                                      id: 1,
-                                    },
-                                  },
-                                },
-                                decimals_arguments: {
-                                  fields: {},
-                                },
-                                decimals_result: {
-                                  fields: {
-                                    value: {
-                                      type: "uint32",
-                                      id: 1,
-                                    },
-                                  },
-                                },
-                                total_supply_arguments: {
-                                  fields: {},
-                                },
-                                total_supply_result: {
-                                  fields: {
-                                    value: {
-                                      type: "uint64",
-                                      id: 1,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  name_result: {
+                                    fields: {
+                                      value: {
+                                        type: "string",
+                                        id: 1,
                                       },
                                     },
                                   },
-                                },
-                                balance_of_arguments: {
-                                  fields: {
-                                    owner: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
+                                  symbol_arguments: {
+                                    fields: {},
+                                  },
+                                  symbol_result: {
+                                    fields: {
+                                      value: {
+                                        type: "string",
+                                        id: 1,
                                       },
                                     },
                                   },
-                                },
-                                balance_of_result: {
-                                  fields: {
-                                    value: {
-                                      type: "uint64",
-                                      id: 1,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  decimals_arguments: {
+                                    fields: {},
+                                  },
+                                  decimals_result: {
+                                    fields: {
+                                      value: {
+                                        type: "uint32",
+                                        id: 1,
                                       },
                                     },
                                   },
-                                },
-                                transfer_arguments: {
-                                  fields: {
-                                    from: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
-                                      },
-                                    },
-                                    to: {
-                                      type: "bytes",
-                                      id: 2,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
-                                      },
-                                    },
-                                    value: {
-                                      type: "uint64",
-                                      id: 3,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  total_supply_arguments: {
+                                    fields: {},
+                                  },
+                                  total_supply_result: {
+                                    fields: {
+                                      value: {
+                                        type: "uint64",
+                                        id: 1,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                transfer_result: {
-                                  fields: {},
-                                },
-                                mint_arguments: {
-                                  fields: {
-                                    to: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
-                                      },
-                                    },
-                                    value: {
-                                      type: "uint64",
-                                      id: 2,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  balance_of_arguments: {
+                                    fields: {
+                                      owner: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                mint_result: {
-                                  fields: {},
-                                },
-                                burn_arguments: {
-                                  fields: {
-                                    from: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
-                                      },
-                                    },
-                                    value: {
-                                      type: "uint64",
-                                      id: 2,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  balance_of_result: {
+                                    fields: {
+                                      value: {
+                                        type: "uint64",
+                                        id: 1,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                burn_result: {
-                                  fields: {},
-                                },
-                                balance_object: {
-                                  fields: {
-                                    value: {
-                                      type: "uint64",
-                                      id: 1,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  transfer_arguments: {
+                                    fields: {
+                                      from: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
+                                      },
+                                      to: {
+                                        type: "bytes",
+                                        id: 2,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
+                                      },
+                                      value: {
+                                        type: "uint64",
+                                        id: 3,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                mana_balance_object: {
-                                  fields: {
-                                    balance: {
-                                      type: "uint64",
-                                      id: 1,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  transfer_result: {
+                                    fields: {},
+                                  },
+                                  mint_arguments: {
+                                    fields: {
+                                      to: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
                                       },
-                                    },
-                                    mana: {
-                                      type: "uint64",
-                                      id: 2,
-                                      options: {
-                                        jstype: "JS_STRING",
-                                      },
-                                    },
-                                    last_mana_update: {
-                                      type: "uint64",
-                                      id: 3,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                      value: {
+                                        type: "uint64",
+                                        id: 2,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                burn_event: {
-                                  fields: {
-                                    from: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
+                                  mint_result: {
+                                    fields: {},
+                                  },
+                                  burn_arguments: {
+                                    fields: {
+                                      from: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
                                       },
-                                    },
-                                    value: {
-                                      type: "uint64",
-                                      id: 2,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                      value: {
+                                        type: "uint64",
+                                        id: 2,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                mint_event: {
-                                  fields: {
-                                    to: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
-                                      },
-                                    },
-                                    value: {
-                                      type: "uint64",
-                                      id: 2,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  burn_result: {
+                                    fields: {},
+                                  },
+                                  balance_object: {
+                                    fields: {
+                                      value: {
+                                        type: "uint64",
+                                        id: 1,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
-                                },
-                                transfer_event: {
-                                  fields: {
-                                    from: {
-                                      type: "bytes",
-                                      id: 1,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
+                                  mana_balance_object: {
+                                    fields: {
+                                      balance: {
+                                        type: "uint64",
+                                        id: 1,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
+                                      },
+                                      mana: {
+                                        type: "uint64",
+                                        id: 2,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
+                                      },
+                                      last_mana_update: {
+                                        type: "uint64",
+                                        id: 3,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
-                                    to: {
-                                      type: "bytes",
-                                      id: 2,
-                                      options: {
-                                        "(koinos.btype)": "ADDRESS",
+                                  },
+                                  burn_event: {
+                                    fields: {
+                                      from: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
+                                      },
+                                      value: {
+                                        type: "uint64",
+                                        id: 2,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
-                                    value: {
-                                      type: "uint64",
-                                      id: 3,
-                                      options: {
-                                        jstype: "JS_STRING",
+                                  },
+                                  mint_event: {
+                                    fields: {
+                                      to: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
+                                      },
+                                      value: {
+                                        type: "uint64",
+                                        id: 2,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
+                                      },
+                                    },
+                                  },
+                                  transfer_event: {
+                                    fields: {
+                                      from: {
+                                        type: "bytes",
+                                        id: 1,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
+                                      },
+                                      to: {
+                                        type: "bytes",
+                                        id: 2,
+                                        options: {
+                                          "(koinos.btype)": "ADDRESS",
+                                        },
+                                      },
+                                      value: {
+                                        type: "uint64",
+                                        id: 3,
+                                        options: {
+                                          jstype: "JS_STRING",
+                                        },
                                       },
                                     },
                                   },
@@ -796,54 +811,74 @@ export default {
                 },
               },
             },
-          },
-          sender: {
-            id: "eghigpjkddlhegjaibgjlnfnkgdnmnlh",
-            url: "https://koinosblocks.com/address/19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-            origin: "https://koinosblocks.com",
-            frameId: 0,
-            documentId: "F6D0BCBD9A19559A679F6714294A63A2",
-            documentLifecycle: "active",
-            tab: {
-              active: true,
-              audible: false,
-              autoDiscardable: true,
-              discarded: false,
-              groupId: -1,
-              height: 577,
-              highlighted: true,
-              id: 2018223012,
-              incognito: false,
-              index: 14,
-              mutedInfo: {
-                muted: false,
-              },
-              openerTabId: 2018223007,
-              pinned: false,
-              selected: true,
-              status: "complete",
-              title: "Koinosblocks.com - address details",
+            sender: {
+              id: "eghigpjkddlhegjaibgjlnfnkgdnmnlh",
               url: "https://koinosblocks.com/address/19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-              width: 1280,
-              windowId: 2018222470,
+              origin: "https://koinosblocks.com",
+              frameId: 0,
+              documentId: "F6D0BCBD9A19559A679F6714294A63A2",
+              documentLifecycle: "active",
+              tab: {
+                active: true,
+                audible: false,
+                autoDiscardable: true,
+                discarded: false,
+                groupId: -1,
+                height: 577,
+                highlighted: true,
+                id: 2018223012,
+                incognito: false,
+                index: 14,
+                mutedInfo: {
+                  muted: false,
+                },
+                openerTabId: 2018223007,
+                pinned: false,
+                selected: true,
+                status: "complete",
+                title: "Koinosblocks.com - address details",
+                url: "https://koinosblocks.com/address/19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+                width: 1280,
+                windowId: 2018222470,
+              },
             },
           },
-        },
-      ]
-    } else {
-      requests = this.$store.state.requests.filter((r) => {
-        if (this.send) return r.command === "signer:sendTransaction"
-        return r.command === "signer:signTransaction"
-      })
-    }
-    /**
+        ]
+      } else {
+        requests = this.$store.state.requests.filter((r) => {
+          if (this.send) return r.command === "signer:sendTransaction"
+          return r.command === "signer:signTransaction"
+        })
+      }
+      /**
      * TODO: for several requests create a list of requesters
      * and ask to the user to select one to see the details
      */
-    this.request = requests[0]
-    this.requester = this.request.sender
-    this.typeRequest = this.send ? "send" : "sign"
-    this.decodeTransaction()
+      this.request = requests[0]
+      this.requester = this.request.sender
+      this.typeRequest = this.send ? "send" : "sign"
+      console.log("Starting decodeTransaction");
+    
+      await this.decodeTransaction()
+    
+    
+        .then(() => {
+          console.log("KOIN transfer amount:", this.koinTransferAmount)
+        })
+        .catch(error => {
+          console.error("Error during setup:", error)
+          this.alertDanger(error.message)
+        })    
+      console.log("Starting checkEvents");
+      await this.checkEvents();
+      console.log("checkEvents completed");
+
+      console.log("Final KOIN transfer amount:", this.koinTransferAmount);
+    } catch (error) {
+      console.error("Error during component initialization:", error);
+      this.alertDanger(error.message);
+    }
+    console.log(`Final KOIN transfer amount: ${this.koinTransferAmount}`);
   },
 
   methods: {
@@ -1411,10 +1446,12 @@ export default {
     },
 
     async checkEvents() {
+      console.log("checkEvents method started")
       this.loadingEvents = true
       try {
         // TODO: throw error if there are requests.length > 1
         if (process.env.VUE_APP_ENV === "test") {
+          console.log("Running in test mode")
           this.receipt = {
             id: "0x1220cf763bc42c18091fddf7a9d3c2963f95102b64a019d76c20215163ca9d900ff2",
             payer: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
@@ -1446,6 +1483,7 @@ export default {
           }
         } else {
           await this.buildTransaction()
+          console.log("Transaction built")
           if (this.optimizeMana) {
             const { payer, payee } = await this.useManaMeter()
             await this.signTransaction()
@@ -1470,17 +1508,41 @@ export default {
           this.payee = this.transaction.transaction.header.payee
           this.payer = this.transaction.transaction.header.payer
         }
+        console.log("Full receipt:", JSON.stringify(this.receipt, null, 2));
         this.events = []
+        this.koinTransferAmount = 0
         if (this.receipt.events) {
+          console.log(`Processing ${this.receipt.events.length} events`);
           for (let i = 0; i < this.receipt.events.length; i += 1) {
             const event = this.receipt.events[i]
+            console.log(`Processing event ${i + 1}:`, JSON.stringify(event, null, 2));
             await this.beautifyAction("event", event)
+            console.log(`Beautified event ${i + 1}:`, JSON.stringify(this.events[this.events.length - 1], null, 2));
+            if (event.name === "koinos.contracts.token.transfer_event" &&
+            event.source === this.network.koinContractId) {
+              const decodedEvent = await this.koinContract.decodeEvent(event);
+              this.koinTransferAmount = utils.formatUnits(decodedEvent.args.value, 8);
+            }
+
+            if (event.source === this.network.koinContractId &&
+            event.name === "koinos.contracts.token.transfer_event") {
+              console.log("KOIN transfer event detected");
+              const decodedEvent = await this.koinContract.decodeEvent(event);
+              console.log("Decoded KOIN transfer event:", JSON.stringify(decodedEvent, null, 2));
+              const amount = Number(utils.formatUnits(decodedEvent.args.value, 8));
+              console.log(`KOIN transfer amount: ${amount}`);
+              this.koinTransferAmount += amount; // A
+            }
           }
         }
+        console.log(`Final KOIN transfer amount: ${this.koinTransferAmount}`);
+
+        console.log("Total KOIN transfer amount:", this.koinTransferAmount);
         this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`
         this.readyToSend = true
         this.loadingEvents = false
       } catch (error) {
+        console.error("Error in checkEvents:", error);
         this.readyToSend = false
         this.loadingEvents = false
         this.alertDanger(error.message)
@@ -2020,5 +2082,8 @@ input:checked + .slider:before {
   margin: 0 !important;
   width: 1px;
   height: 1px;
+}
+.advanced-container {
+  width: 80%;
 }
 </style>
