@@ -1518,11 +1518,13 @@ export default {
             console.log(`Processing event ${i + 1}:`, JSON.stringify(event, null, 2));
             await this.beautifyAction("event", event)
             console.log(`Beautified event ${i + 1}:`, JSON.stringify(this.events[this.events.length - 1], null, 2));
+            /*
             if (event.name === "koinos.contracts.token.transfer_event" &&
             event.source === this.network.koinContractId) {
               const decodedEvent = await this.koinContract.decodeEvent(event);
               this.koinTransferAmount = utils.formatUnits(decodedEvent.args.value, 8);
             }
+            */
 
             if (event.source === this.network.koinContractId &&
             event.name === "koinos.contracts.token.transfer_event") {
