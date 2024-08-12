@@ -37,6 +37,7 @@
           </button>
           <button
             class="custom-button primary"
+            :disabled="!hasSelectedAccount"
             @click="accept"
           >
             Accept
@@ -63,6 +64,11 @@ export default {
       accounts: [],
     };
   },
+  computed: {
+    hasSelectedAccount() {
+      return this.inputs.some(input => input);
+    }
+  },
   mounted() {
     const requests = this.$store.state.requests.filter(
       (r) => r.command === "getAccounts"
@@ -76,6 +82,11 @@ export default {
     async loadAccounts() {
       this.accounts = await this._getAccounts();
       this.inputs = new Array(this.accounts.length).fill(false);
+      
+      // Automatically select the first account
+      if (this.accounts.length > 0) {
+        this.$set(this.inputs, 0, true);
+      }
     },
     toggleAccount(index) {
       this.$set(this.inputs, index, !this.inputs[index]);
