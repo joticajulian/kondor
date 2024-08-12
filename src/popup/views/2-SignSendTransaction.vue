@@ -11,7 +11,7 @@
     <div class="check-events-row">
       <button
         class="check-events-btn"
-        @click="checkEvents"
+        @click="toggleEventDetails"
       >
         Check events
       </button>
@@ -185,81 +185,83 @@
       />
     </div>
 
-    <div
-      v-if="receipt"
-      class="subtitle"
-    >
-      Events
-    </div>
-    <div
-      v-for="(ev, i) in events"
-      :key="'ev' + i"
-      class="operation"
-    >
+    <div v-if="showDetailedEvents">
       <div
         v-if="receipt"
-        class="ev-header"
-        :class="ev.style"
+        class="subtitle"
       >
-        <div class="contract-id">
-          {{ ev.contractId }}
-        </div>
-        <div class="op-title">
-          {{ ev.title }}
-        </div>
-        <div class="op-subtitle">
-          {{ ev.subtitle }}
-        </div>
+        Events
       </div>
       <div
-        v-if="receipt"
-        class="ev-body"
+        v-for="(ev, i) in events"
+        :key="'ev' + i"
+        class="operation"
       >
         <div
-          v-for="(arg, j) in ev.args"
-          :key="'fe' + j"
+          v-if="receipt"
+          class="ev-header"
+          :class="ev.style"
         >
-          <div class="field-name">
-            {{ arg.field }}
+          <div class="contract-id">
+            {{ ev.contractId }}
           </div>
-          <div class="field-data">
-            {{ arg.data }}
+          <div class="op-title">
+            {{ ev.title }}
+          </div>
+          <div class="op-subtitle">
+            {{ ev.subtitle }}
+          </div>
+        </div>
+        <div
+          v-if="receipt"
+          class="ev-body"
+        >
+          <div
+            v-for="(arg, j) in ev.args"
+            :key="'fe' + j"
+          >
+            <div class="field-name">
+              {{ arg.field }}
+            </div>
+            <div class="field-data">
+              {{ arg.data }}
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="receipt"
+          class="ev-foot"
+          :class="ev.style"
+        >
+          <div>Impacted accounts</div>
+          <div
+            v-for="(imp, k) in ev.impacted"
+            :key="'imp' + k"
+            class="ev-impacted-account"
+          >
+            {{ imp }}
+          </div>
+          <div style="margin-top: 0.5em">
+            {{
+              ev.impactsUserAccounts
+                ? "It impacts your accounts"
+                : "It doesn't impact your accounts"
+            }}
           </div>
         </div>
       </div>
       <div
         v-if="receipt"
-        class="ev-foot"
-        :class="ev.style"
+        class="mana-used"
       >
-        <div>Impacted accounts</div>
-        <div
-          v-for="(imp, k) in ev.impacted"
-          :key="'imp' + k"
-          class="ev-impacted-account"
-        >
-          {{ imp }}
-        </div>
-        <div style="margin-top: 0.5em">
-          {{
-            ev.impactsUserAccounts
-              ? "It impacts your accounts"
-              : "It doesn't impact your accounts"
-          }}
-        </div>
+        Mana limit: {{ maxMana }}
       </div>
-    </div>
-    <div
-      v-if="receipt"
-      class="mana-used"
-    >
-      Mana limit: {{ maxMana }}
-    </div>
-    <div
-      v-if="receipt"
-      class="mana-used"
-    >
-      Mana consumption: {{ manaUsed }}
+      <div
+        v-if="receipt"
+        class="mana-used"
+      >
+        Mana consumption: {{ manaUsed }}
+      </div>
     </div>
 
     <div class="action-buttons">
@@ -357,6 +359,7 @@ export default {
       cacheNicknames: {},
       loadingEvents: false,
       loadingSkipEvents: false,
+      showDetailedEvents: false,
     }
   },
   computed: {
@@ -1621,6 +1624,9 @@ export default {
       this.showAdvanced = !this.showAdvanced
       console.log("New state:", this.showAdvanced)
     },
+    toggleEventDetails() {
+      this.showDetailedEvents = !this.showDetailedEvents;
+    },
     
   },
 }
@@ -1636,6 +1642,7 @@ export default {
   font-size: 1.2em;
   font-weight: 600;
   margin: 1em 0em 0.5em 0em;
+  padding: 0 1.2em;
 }
 
 .wrapper {
@@ -1692,6 +1699,7 @@ input {
 
 .operation {
   margin-bottom: 1em;
+  padding: 1.2em;
 }
 
 .red {
@@ -1704,14 +1712,6 @@ input {
 
 .bgUploadContract {
   background: #308b9b;
-}
-
-.bgEvent {
-  background: #c19b10;
-}
-
-.bgOperation {
-  background: var(--kondor-purple);
 }
 
 .op-header {
@@ -2087,5 +2087,9 @@ input:checked + .slider:before {
 }
 .advanced-container {
   width: 80%;
+}
+.mana-used {
+  font-size: 1.2em;
+  padding: 0 1.2em;
 }
 </style>
