@@ -17,7 +17,7 @@ const manifest = {
   description: "Koinos Wallet in your browser",
   version: testMode ? "0.0.0" : packageJson.version,
   manifest_version: 3,
-  permissions: ["storage", "tabs", "windows", "system.display"],
+  permissions: ["storage", "windows"],
   background: {
     service_worker: "js/background.js",
   },
