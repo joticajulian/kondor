@@ -33,6 +33,7 @@
             : ''
         "
         @input="validateToDebounced()"
+        @paste="onPaste"
         @keyup="changeTo()"
       >
       <span
@@ -122,7 +123,7 @@
       </button>
       <button
         :disabled="
-          !isToValidated || !isToValid || !isAmountValid || makingTransfer
+          !isSendButtonEnabled
         "
         class="primary"
         @click="transfer"
@@ -190,6 +191,11 @@ export default {
       tokenId2: "",
       makingTransfer: false,
     };
+  },
+  computed: {
+    isSendButtonEnabled() {
+      return this.isToValid && this.amount > 0 && this.isAmountValid && !this.makingTransfer;
+    }
   },
 
   watch: {
@@ -653,7 +659,15 @@ export default {
     cancel() {
       router.back();
     },
-  },
+    onPaste(event) {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.to = event.target.value;  // Force the v-model to update
+          this.validateToDebounced();    // Trigger the validation again
+        });
+      });
+    },
+  }
 };
 </script>
 <style scoped>
