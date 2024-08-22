@@ -29,7 +29,7 @@
       to="/importSeedPhrase"
       class="button w-vw"
     >
-      <button class="custom-button secondary">
+      <button class="custom-button secondary mt-1">
         Forgot password?
       </button>
     </router-link>
@@ -102,6 +102,9 @@ export default {
 input {
   margin: 0 !important;
 }
+.group {
+  margin-bottom: 2em;
+}
 .title {
   font-family: "Poppins", sans-serif;
   padding: 1em;
@@ -120,7 +123,7 @@ input {
   height: 100%;
   text-align: center;
   line-height: 1.5em;
-  justify-content: center;
+  justify-content: space-between;
 }
 .button-group {
   display: flex;
@@ -153,8 +156,12 @@ input {
 .unlock {
   width: 70%;
   margin-top: 3em;
+  height: 100%;
 }
 .w-vw {
   width: 100vw
+}
+.mt-1 {
+  margin-top: 4em;
 }
 </style>

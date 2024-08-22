@@ -116,6 +116,7 @@ export default {
   display: flex;
   justify-content: center;
   margin: 1em 0;
+  height: 100%;
 }
 
 .width-96 {
@@ -159,5 +160,6 @@ export default {
   box-sizing: border-box;
   padding-right: 2em;
   background: none;
+  color: white;
 }
 </style>

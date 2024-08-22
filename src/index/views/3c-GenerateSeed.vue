@@ -71,7 +71,7 @@
           placeholder="Confirm password"
         >
         <button
-          class=""
+          class="custom-button primary"
           @click="createNewWallet"
         >
           next

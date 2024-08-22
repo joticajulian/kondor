@@ -22,7 +22,7 @@
         @keyup.enter="unlock"
       >
       <button
-        class="custom-button primary"
+        class="custom-button primary m-0"
         @click="unlock"
       >
         {{ labelButton }}
@@ -163,5 +163,8 @@ input {
   display: flex;
   justify-content: center;
   margin-bottom: 4em;
+}
+.m-0 {
+  margin: 0;
 }
 </style>
