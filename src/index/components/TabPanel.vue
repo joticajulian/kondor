@@ -147,14 +147,14 @@
             <span class="coin-value">${{ calculateUsdValue(coin) }} USD</span>
           </div>
         </div>
-        <div class="manage-tokens">
+        <!-- <div class="manage-tokens">
           <img
             src="../../../public/images/settings-icon.svg"
             alt="Settings"
             class="settings-icon"
           >
           <span>Manage token list</span>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

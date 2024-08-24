@@ -307,6 +307,7 @@ button {
   width: 18px;
   height: 18px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .account-list {
@@ -342,7 +343,9 @@ button {
   justify-content: flex-start;
 }
 .options-item:hover {
-  background: #353535;
+  background: var(--primary-dark);
+  border-radius: .5em;
+  cursor: pointer;
 }
 .chip {
   background-color: #2a2a2a;
