@@ -130,7 +130,7 @@ export default {
 .wrapper {
   font-family: Poppins, sans-serif;
     background-color: #1a1a1a;
-    color: #fff;
+    color: var(--primary-light);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -156,7 +156,7 @@ export default {
 
 .p-subtitle {
   font-size: 14px;
-  color: #777777;
+  color: var(--primary-gray);
   margin-bottom: 20px;
   text-align: center;
 }
@@ -195,7 +195,7 @@ export default {
 .account-address {
   display: block;
   font-size: 14px;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .warning {
@@ -224,13 +224,13 @@ export default {
 
 .cancel-button {
   background-color: transparent;
-  color: #ffffff;
+  color: var(--primary-light);
   border: 1px solid #ffffff;
 }
 
 .accept-button {
   background-color: #7161ef;
-  color: #ffffff;
+  color: var(--primary-light);
   border: none;
 }
 

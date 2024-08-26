@@ -292,7 +292,7 @@ export default {
 
 .wi-title {
   font-size: 2.2em;
-  color: #fff;
+  color: var(--primary-light);
   font-weight: bold;
 }
 
@@ -350,7 +350,7 @@ export default {
   width: 18px;
   left: 2px;
   bottom: 2px;
-  background-color: white;
+  background-color: var(--kondor-light);
   transition: 0.4s;
   border-radius: 50%;
 }
@@ -377,7 +377,7 @@ input:checked + .slider:before {
 }
 
 .sending-info h2 {
-  color: #fff;
+  color: var(--primary-light);
 }
 
 .warning-message {
@@ -407,12 +407,12 @@ input:checked + .slider:before {
 
 .cancel-btn {
   background-color: #444;
-  color: #fff;
+  color: var(--primary-light);
 }
 
 .sign-btn {
   background-color: #7161ef;
-  color: #fff;
+  color: var(--primary-light);
 }
 
 .message {

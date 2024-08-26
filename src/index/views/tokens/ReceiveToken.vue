@@ -72,7 +72,7 @@ export default {
 .back-button {
   background: none;
   border: none;
-  color: white;
+  color: var(--kondor-light);
   font-size: 24px;
   cursor: pointer;
 }
@@ -104,7 +104,7 @@ h1 {
   justify-content: space-between;
   align-items: center;
   width: 85%;
-  color: #777777;
+  color: var(--primary-gray);
   width: 78%;
 }
 .account-info span {
@@ -116,7 +116,7 @@ h1 {
 
 .pill-button {
   background-color: var(--kondor-purple);
-  color: white;
+  color: var(--kondor-light);
   border: none;
   border-radius: 9999px;
   padding: 6px 12px;

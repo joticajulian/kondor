@@ -1703,11 +1703,11 @@ input {
 }
 
 .red {
-  background: #dd3d3d;
+  background: var(--kondor-red);
 }
 
 .gray {
-  background: #7e7e7e;
+  background: var(--primary-gray);
 }
 
 .bgUploadContract {
@@ -1716,7 +1716,7 @@ input {
 
 .op-header {
   padding: 8px 6px;
-  color: white;
+  color: var(--kondor-light);
   margin-top: 0.5em;
   border-top-left-radius: 1em;
   border-top-right-radius: 1em;
@@ -1750,7 +1750,7 @@ input {
 
 .ev-header {
   padding: 8px 6px;
-  color: white;
+  color: var(--kondor-light);
   margin-top: 0.5em;
   border-top-left-radius: 1em;
   border-top-right-radius: 1em;
@@ -1763,7 +1763,7 @@ input {
 
 .ev-foot {
   padding: 8px 6px;
-  color: white;
+  color: var(--kondor-light);
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
 }
@@ -1793,9 +1793,9 @@ input {
 .sig-delete {
   flex: 1;
   display: flex;
-  background: #dd3d3d;
+  background: var(--kondor-red);
   font-size: 1.5em;
-  color: #ffffff;
+  color: var(--primary-light);
   cursor: pointer;
 }
 
@@ -1819,7 +1819,7 @@ input {
 
 .checkbox-wrapper-2 .ikxBAC {
   appearance: none;
-  background-color: #dfe1e4;
+  background-color: var(--primary-light);
   border-radius: 72px;
   border-style: none;
   flex-shrink: 0;
@@ -1846,7 +1846,7 @@ input {
 }
 
 .checkbox-wrapper-2 .ikxBAC::after {
-  background-color: #fff;
+  background-color: var(--primary-light);
   border-radius: 50%;
   content: "";
   height: 14px;
@@ -1870,7 +1870,7 @@ input {
 }
 
 .checkbox-wrapper-2 .ikxBAC:checked::after {
-  background-color: #fff;
+  background-color: var(--primary-light);
   left: 13px;
 }
 
@@ -1884,18 +1884,18 @@ input {
 .top-bar {
   display: flex;
   padding: 1em;
-  background: #000;
+  background: var(--primary-darker);
   width: 94%;
   justify-content: flex-start;
   flex-direction: column;
   padding-left: 4em;
 }
 .tb-title {
-  color: white;
+  color: var(--kondor-light);
   font-size: 1.5em;
 }
 .tb-subtitle {
-  color: #777777;
+  color: var(--primary-gray);
   font-size: 0.9em;
 }
 .tb-container {
@@ -1927,7 +1927,7 @@ input {
 
 .wallet-interaction h1 {
   font-size: 24px;
-  color: #fff;
+  color: var(--primary-light);
   margin-bottom: 5px;
 }
 
@@ -1995,7 +1995,7 @@ input {
   width: 18px;
   left: 2px;
   bottom: 2px;
-  background-color: white;
+  background-color: var(--kondor-light);
   transition: 0.4s;
   border-radius: 50%;
 }
@@ -2023,7 +2023,7 @@ input:checked + .slider:before {
 }
 
 .sending-info h2 {
-  color: #fff;
+  color: var(--primary-light);
   font-size: 24px;
 }
 
@@ -2053,16 +2053,16 @@ input:checked + .slider:before {
 
 .cancel-btn {
   background-color: #444;
-  color: #fff;
+  color: var(--primary-light);
 }
 
 .sign-btn {
   background-color: #7161ef;
-  color: #fff;
+  color: var(--primary-light);
 }
 .wi-title {
   font-size: 2.2em;
-  color: #fff;
+  color: var(--primary-light);
   font-weight: bold;
 }
 .advanced-toggle {

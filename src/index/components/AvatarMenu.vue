@@ -1,30 +1,15 @@
 <template>
   <div class="dropdown-container">
-    <div
-      class="avatar-menu"
-      @click="openDropdown()"
-    >
-      <img
-        :src="avatar"
-        alt="identicon for selected address"
-      >
+    <div class="avatar-menu" @click="openDropdown()">
+      <img :src="avatar" alt="identicon for selected address" />
     </div>
-    <div
-      class="dropdown-wrapper"
-      :class="{ show: showDropdown }"
-    >
+    <div class="dropdown-wrapper" :class="{ show: showDropdown }">
       <div class="dropdown-content">
         <div>
           <div class="dropdown-info">
             <span class="heading">My accounts</span>
-            <button
-              class="chip"
-              @click="lock()"
-            >
-              <img
-                src="../../../public/images/lock.svg"
-                alt=""
-              >
+            <button class="chip" @click="lock()">
+              <img src="../../../public/images/lock.svg" alt="" />
             </button>
           </div>
 
@@ -55,49 +40,37 @@
 
         <div class="option">
           <div v-if="$store.state.mnemonic0">
-            <div
-              class="options-item"
-              @click="createAccount"
-            >
+            <div class="options-item" @click="createAccount">
               <img
                 src="../../../public/images/icon-add.png"
                 alt="create account icon"
-              >
+              />
               Create account
             </div>
           </div>
           <div v-else>
-            <div
-              class="options-item"
-              @click="addSeed"
-            >
+            <div class="options-item" @click="addSeed">
               <img
                 src="../../../public/images/icon-add.png"
                 alt="add seed icon"
-              >
+              />
               Add seed to wallet
             </div>
           </div>
-          <div
-            class="options-item"
-            @click="importAccount"
-          >
-            <img
-              src="../../../public/images/icon-import.png"
-              alt=""
-            > Import
+          <div class="options-item" @click="importAccount">
+            <img src="../../../public/images/icon-import.png" alt="" /> Import
             account
           </div>
 
-          <div
-            class="options-item"
-            @click="openOptions"
-          >
-            <img
-              src="../../../public/images/icon-settings-wrench.png"
-              alt=""
-            >
+          <div class="options-item" @click="openOptions">
+            <img src="../../../public/images/icon-settings-wrench.png" alt="" />
             Settings
+          </div>
+          <div class="network-toggle">
+            <label>
+              <input type="checkbox" v-model="isTestnetMode" />
+              Testnet
+            </label>
           </div>
         </div>
       </div>
@@ -107,12 +80,12 @@
 
 <script>
 /* eslint-disable no-undef */
-import router from "@/index/router";
-import { createAvatar } from "@dicebear/avatars";
-import * as identiconStyle from "@dicebear/avatars-identicon-sprites";
+import router from "@/index/router"
+import { createAvatar } from "@dicebear/avatars"
+import * as identiconStyle from "@dicebear/avatars-identicon-sprites"
 
 // mixins
-import Storage from "@/shared/mixins/Storage";
+import Storage from "@/shared/mixins/Storage"
 
 export default {
   mixins: [Storage],
@@ -120,31 +93,56 @@ export default {
   data() {
     return {
       showDropdown: false,
-    };
+      mainnetColor: '#ffffff',
+      testnetColor: '#ead29e',
+      greenColor: '#32cd32',
+    }
   },
 
   computed: {
     avatar() {
       const account =
-        this.$store.state.accounts[this.$store.state.currentIndexAccount];
-      if (!account || !account.address) return "";
+        this.$store.state.accounts[this.$store.state.currentIndexAccount]
+      if (!account || !account.address) return ""
       const identicon = createAvatar(identiconStyle, {
         seed: account.address,
         dataUri: true,
-      });
-      return identicon;
+      })
+      return identicon
+    },
+    isTestnetMode: {
+      get() {
+        return this.$store.state.currentNetwork === 1 // Assuming 1 is the index for testnet
+      },
+      set(value) {
+        const networkIndex = value ? 1 : 0 // 1 for testnet, 0 for mainnet
+        this.$store.state.currentNetwork = networkIndex
+        this._setCurrentNetwork(this.$store.state.networks[networkIndex].tag)
+      },
+    },
+  },
+
+  watch: {
+    isTestnetMode: {
+      handler(newValue) {
+        console.log(`Network changed to ${newValue ? 'testnet' : 'mainnet'}`);
+        const root = document.documentElement;
+        root.style.setProperty('--primary-light', newValue ? this.testnetColor : this.mainnetColor);
+        root.style.setProperty('--network-green', newValue ? this.testnetColor : this.greenColor);
+      },
+      immediate: true,
     },
   },
 
   methods: {
     openDropdown() {
-      console.log("openDropdown called"); // Add this line
+      console.log("openDropdown called") // Add this line
       if (!this.showDropdown) {
-        this.showDropdown = true;
-        document.body.style.overflow = "hidden";
+        this.showDropdown = true
+        document.body.style.overflow = "hidden"
         setTimeout(() => {
-          window.addEventListener("click", this.closeDropdown);
-        }, 0);
+          window.addEventListener("click", this.closeDropdown)
+        }, 0)
       }
     },
 
@@ -154,44 +152,44 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false;
-        window.removeEventListener("click", this.closeDropdown);
+        this.showDropdown = false
+        window.removeEventListener("click", this.closeDropdown)
       }
     },
 
     async selectAccount(index) {
-      this.$store.state.currentIndexAccount = index;
-      await this._setCurrentIndexAccount(index);
-      this.closeDropdown();
+      this.$store.state.currentIndexAccount = index
+      await this._setCurrentIndexAccount(index)
+      this.closeDropdown()
     },
 
     createAccount() {
-      router.push("/createAccount");
-      this.closeDropdown();
+      router.push("/createAccount")
+      this.closeDropdown()
     },
 
     importAccount() {
-      router.push("/importAccount");
-      this.closeDropdown();
+      router.push("/importAccount")
+      this.closeDropdown()
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true");
-      this.closeDropdown();
+      router.push("/generateSeed?privateKeyExist=true")
+      this.closeDropdown()
     },
 
     openOptions() {
-      chrome.runtime.openOptionsPage();
-      this.closeDropdown();
+      chrome.runtime.openOptionsPage()
+      this.closeDropdown()
     },
 
     async lock() {
-      await this._removePasswordsFromSession();
-      router.push("/");
-      this.closeDropdown();
+      await this._removePasswordsFromSession()
+      router.push("/")
+      this.closeDropdown()
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -220,7 +218,7 @@ export default {
   left: -100%;
   width: calc(var(--app-width) - 2em);
   height: 100%;
-  background: #111;
+  background: var(--primary-darker);
   z-index: 10;
   padding: 0.5em 0;
   display: flex;
@@ -241,7 +239,7 @@ export default {
   border: none;
   width: calc(var(--app-width) - 2em);
   position: absolute;
-  background: #111;
+  background: var(--primary-darker);
   z-index: 10;
   padding: 0.5em 0;
   height: 90%;
@@ -264,8 +262,8 @@ export default {
 }
 
 .dropdown-item:hover {
-  background: #353535;
-  color: white;
+  background: var(--primary-dark-light);
+  color: var(--kondor-light);
 }
 
 button {
@@ -277,7 +275,7 @@ button {
 .address {
   font-size: 0.6em;
   margin-top: 0.1em;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .dropdown-info {
@@ -344,13 +342,13 @@ button {
 }
 .options-item:hover {
   background: var(--primary-dark);
-  border-radius: .5em;
+  border-radius: 0.5em;
   cursor: pointer;
 }
 .chip {
   background-color: #2a2a2a;
   padding: 0.5em 1em !important;
-  color: #777;
+  color: var(--primary-gray);
   padding: 10px;
   border-radius: 2em;
   cursor: pointer;
@@ -359,5 +357,89 @@ button {
   align-items: center;
   font-size: 0.8em;
   cursor: pointer !important;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #e9a210;
+  border-color: #5e5ce6;
+}
+input[type="checkbox"] {
+  width: 0.1em;
+  height: 0.1em;
+  border: 1px solid #3a3a3c;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  vertical-align: middle;
+  position: relative;
+  padding: 0.5em;
+  margin: 0;
+}
+.network-toggle label {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1em;
+  padding: 1em;
+  font-weight: 500;
+  margin: 0 1.2em;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.network-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--kondor-purple);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
 </style>

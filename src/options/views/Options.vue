@@ -255,7 +255,7 @@ export default {
 input {
   margin-bottom: 0;
   max-width: 100%;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 /* tabs */
@@ -309,7 +309,7 @@ input {
   width: 50%;
   margin: 0 auto;
   padding: 4em;
-  background-color: #222222;
+  background-color: var(--primary-dark)222;
 }
 
 .logo {

@@ -12,7 +12,7 @@
         type="text"
         placeholder="Name"
         @keyup.enter="accept"
-      >
+      />
     </div>
     <div>
       <input
@@ -21,7 +21,7 @@
         type="checkbox"
         name="watch-mode"
         value="watch-mode"
-      >
+      />
       <label for="watch-mode">Import in watch mode (no private key)</label>
     </div>
     <div v-if="watchMode">
@@ -32,7 +32,7 @@
         type="text"
         placeholder="Address"
         @keyup.enter="accept"
-      >
+      />
     </div>
     <div v-else>
       <label for="privateKey">Private Key</label>
@@ -42,32 +42,22 @@
         type="text"
         placeholder="Private Key"
         @keyup.enter="accept"
-      >
+      />
     </div>
     <div class="actions">
-      <button
-        class="secondary"
-        @click="cancel"
-      >
-        cancel
-      </button>
-      <button
-        class="primary"
-        @click="accept"
-      >
-        accept
-      </button>
+      <button class="custom-button secondary" @click="cancel">cancel</button>
+      <button class="custom-button primary" @click="accept">accept</button>
     </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
-import PageTitle from "@/shared/components/PageTitle.vue";
+import router from "@/index/router"
+import PageTitle from "@/shared/components/PageTitle.vue"
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
 
 export default {
   components: { PageTitle },
@@ -78,7 +68,7 @@ export default {
       watchMode: false,
       address: "",
       privateKey: "",
-    };
+    }
   },
 
   methods: {
@@ -90,25 +80,25 @@ export default {
           passwordId: 0,
           watchMode: this.watchMode,
           address: this.address,
-        });
+        })
 
         this.$store.state.currentIndexAccount =
-          this.$store.state.accounts.length - 1;
+          this.$store.state.accounts.length - 1
         await this._setCurrentIndexAccount(
           this.$store.state.currentIndexAccount
-        );
-        router.back();
+        )
+        router.back()
       } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
+        this.alertDanger(error.message)
+        throw error
       }
     },
 
     cancel() {
-      router.back();
+      router.back()
     },
   },
-};
+}
 </script>
 <style scoped>
 input {
@@ -125,21 +115,19 @@ input[type="checkbox"] {
 
 label {
   font-size: 0.8em;
-  color: #777;
+  color: var(--primary-gray);
 }
 .container {
   min-height: 20em;
-  margin: 4em 2em;
+  margin: 2em 4em;
   align-items: center;
   gap: 1em;
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
 }
 .container > * {
   width: 100%;
-}
-button.secondary {
-  background-color: #ddd;
-  border-color: #ddd;
-  color: #000;
 }
 .actions {
   display: flex;

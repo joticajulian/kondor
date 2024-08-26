@@ -516,22 +516,22 @@ input {
 
 .actions > button > .material-icons {
   background: var(--kondor-purple);
-  color: white;
+  color: var(--kondor-light);
   padding: 0.3em;
   border-radius: 50%;
 }
 
 .actions > button:disabled {
   background: white;
-  color: #999;
+  color: var(--primary-gray);
 }
 .actions > button:disabled > .material-icons {
-  background: #999;
+  background: var(--primary-gray);
 }
 
 .notpermanent {
   background-color: var(--kondor-red);
-  color: white;
+  color: var(--kondor-light);
   border-radius: 8px;
   padding: 0.2rem 0.6rem;
   margin: 0.5em 2em 0em 2em;

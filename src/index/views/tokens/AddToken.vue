@@ -1,7 +1,11 @@
 <template>
   <div class="container">
-    <h1>Add Token</h1>
-
+    <div class="screen-heading">
+    <PageTitle
+        title="Add Token"
+        subtitle="Add a token to your main account"
+      />
+    </div>
     <!-- Dropdown for selecting tokens -->
     <div class="selection-group">
       <select
@@ -79,6 +83,8 @@ import { Contract, Provider, utils } from "koilib"
 import axios from "axios"
 import router from "@/index/router"
 import emptyToken from "@/shared/assets/empty-token.png"
+import PageTitle from "../../../shared/components/PageTitle"
+
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper"
@@ -90,6 +96,7 @@ function fromUtf8ToHex(text) {
 }
 
 export default {
+  components: { PageTitle },
   mixins: [Storage, Sandbox, ViewHelper],
   data() {
     return {
@@ -268,9 +275,13 @@ export default {
 </script>
 
 <style scoped>
+input {
+  width: 88% !important;
+  margin: 0 !important;
+}
 .container {
   min-height: 20em;
-  margin: 2em;
+  margin: 2em 4em;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -279,6 +290,8 @@ export default {
 
 .row {
   margin-top: 1em;
+  width: 100%;
+  text-align: center;
 }
 
 .advanced-content {
@@ -293,7 +306,7 @@ export default {
 }
 
 .warning-notification {
-  color: white;
+  color: var(--kondor-light);
   background-color: #ef6161;
   padding: 1em;
   margin: 1em 0em;
@@ -314,11 +327,11 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  align-items: center;
+  align-items: flex-start;
 }
 .button-group {
   display: flex;
-  width: 90%;
+  width: 100%;
   gap: 1em;
   flex-direction: row-reverse;
 }

@@ -69,7 +69,7 @@ export default {
 }
 
 .spinner {
-  background: #ffffff66;
+  background: var(--primary-light);
   height: 100%;
   width: 100%;
   border-radius: 40%;
@@ -77,7 +77,7 @@ export default {
 }
 
 .color2 {
-  background-color: #ffffff;
+  background-color: var(--primary-light);
 }
 
 .shine {

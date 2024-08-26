@@ -146,7 +146,7 @@ export default {
   padding: 0;
   width: auto;
   background: white;
-  border-color: white;
+  border-color: var(--kondor-light);
   color: black;
 }
 
@@ -160,6 +160,6 @@ export default {
   box-sizing: border-box;
   padding-right: 2em;
   background: none;
-  color: white;
+  color: var(--kondor-light);
 }
 </style>

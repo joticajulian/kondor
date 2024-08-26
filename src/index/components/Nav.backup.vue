@@ -94,12 +94,12 @@ select,
 select:focus-visible,
 select:focus {
   background: var(--kondor-purple);
-  color: white;
+  color: var(--kondor-light);
   font-size: 1em;
   height: 45px;
   padding: 1em;
   margin: 0;
-  border-color: #ffffff;
+  border-color: var(--primary-light);
   border-radius: 22px;
   appearance: none;
   cursor: pointer;
@@ -124,13 +124,13 @@ select:focus {
 
 .back-button {
   cursor: pointer;
-  color: white;
+  color: var(--kondor-light);
   padding-right: 21px;
 }
 
 .header {
   background: var(--kondor-purple);
-  color: white;
+  color: var(--kondor-light);
   display: flex;
   gap: 1em;
   align-items: center;
@@ -148,7 +148,7 @@ select:focus {
 
 .lock-button {
   cursor: pointer;
-  color: white;
+  color: var(--kondor-light);
   font-weight: bold;
   width: 45px;
   text-align: right;

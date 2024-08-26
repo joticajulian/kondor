@@ -51,8 +51,7 @@ export default {
   padding: 8px 20px;
   text-align: left;
   transition: all 0.3s;
-  font-family: "Inter" sans-serif !important;
-  background: #292929;
+  background: var(--primary-dark-light);
   color: #f7d4d4;
 }
 

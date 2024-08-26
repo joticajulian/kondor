@@ -152,7 +152,7 @@ export default {
   border: none;
   width: calc(var(--app-width) - 2em);
   position: absolute;
-  background: #111111;
+  background: var(--primary-darker);
   z-index: 10;
   padding: 0.5em 0;
   border: 1px solid rgb(25 25 25);
@@ -173,13 +173,13 @@ export default {
 }
 
 .dropdown-item:hover {
-  background: #353535;
-  color: white;
+  background: var(--primary-dark-light);
+  color: var(--kondor-light);
 }
 
 a,
 a:visited {
-  color: var(--primary-light);
+  color: var(--primary-light) !important;
   font-size: 1em;
 }
 
@@ -212,8 +212,8 @@ a:visited {
   width: auto;
   border-radius: 22px;
   background-color: transparent;
-  color: white;
-  border-color: white;
+  color: var(--kondor-light);
+  border-color: var(--kondor-light);
 }
 .heading {
   font-size: 1.2em;
@@ -224,7 +224,7 @@ a:visited {
   margin: 0;
   width: auto;
   background: none;
-  color: #ffffff;
+  color: var(--primary-light);
 }
 .link-item {
   text-transform: capitalize;
@@ -247,8 +247,8 @@ a:visited {
   left: 50%;
   margin-top: 0.3em;
   transform: translateX(-50%);
-  background-color: #111;
-  color: #fff;
+  background-color: var(--primary-darker);
+  color: var(--primary-light);
   text-align: center;
   padding: 1em 2em;
   border-radius: 4px;
@@ -260,7 +260,7 @@ a:visited {
 }
 .tooltip span {
   font-size: 0.8em;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .current-account:hover .tooltip {
@@ -277,8 +277,8 @@ a:visited {
   border: none;
   margin: 0;
   width: auto;
-  background: #fff;
-  color: #000;
+  background: var(--primary-light);
+  color: var(--primary-darker);
   padding: 0;
   margin-left: 0.5em;
 }

@@ -95,6 +95,6 @@ textarea {
   width: 85% !important;
   height: 100px;
   background: none !important;
-  color: #777777;
+  color: var(--primary-gray);
 }
 </style>

@@ -1,10 +1,12 @@
 <template>
   <div class="app-status">
     <div class="message">
-      <img
-        src="../../../public/images/kondor-mark.svg"
-        alt="Kondor logo mark"
-      >
+      <router-link to="/dashboard" class="logo-link">
+        <img
+          src="../../../public/images/kondor-mark.svg"
+          alt="Kondor logo mark"
+        >
+      </router-link>
       <span class="title">
         {{ title }}
       </span>
@@ -24,7 +26,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Room for short messages",
+      default: "Kondor v0.91.2",
     },
     isActive: {
       type: Boolean,
@@ -41,19 +43,33 @@ export default {
   gap: 1em;
 }
 .app-status {
-  background: #1a1a1a;
-  color: #777777;
+  background: var(--primary-darker);
+  color: var(--primary-gray);
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
-  padding: 0.5em 1em;
+  padding: 1em;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo-link img {
+  transition: opacity 0.3s ease;
+}
+
+.logo-link:hover img {
+  opacity: 0.8;
 }
 
 .menu-button {
   background: none;
   border: none;
-  color: #777777;
+  color: var(--primary-gray);
   cursor: pointer;
 }
 
@@ -68,11 +84,11 @@ export default {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: #32cd32;
+  background-color: var(--network-green);
 }
 
 .status-indicator.active {
-  background-color: #32cd32;
+  background-color: var(--network-green);
 }
 .indicator-container {
   height: 100%;
@@ -105,7 +121,7 @@ export default {
 }
 
 .icon {
-  color: white;
+  color: var(--kondor-light);
   font-size: 24px;
 }
 </style>

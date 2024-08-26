@@ -6,39 +6,31 @@
         subtitle="Add an account to your main account"
       />
     </div>
-    <div class="input-group">
-      <input
-        v-model="name"
-        class="input"
-        type="text"
-        placeholder="Name"
-        @keyup.enter="accept"
-      >
+    <div class="bottom-section">
+      <div class="input-group">
+        <input
+          v-model="name"
+          class="input"
+          type="text"
+          placeholder="Name"
+          @keyup.enter="accept"
+        />
+      </div>
       <div class="button-group">
-        <button
-          class="custom-button primary"
-          @click="accept"
-        >
-          Create
-        </button>
-        <button
-          class="custom-button secondary"
-          @click="cancel"
-        >
-          cancel
-        </button>
+        <button class="custom-button primary" @click="accept">Create</button>
+        <button class="custom-button secondary" @click="cancel">cancel</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router";
-import PageTitle from "@/shared/components/PageTitle";
+import router from "@/index/router"
+import PageTitle from "@/shared/components/PageTitle"
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper";
-import Storage from "@/shared/mixins/Storage";
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
 
 export default {
   components: { PageTitle },
@@ -46,7 +38,7 @@ export default {
   data() {
     return {
       name: "",
-    };
+    }
   },
 
   methods: {
@@ -55,39 +47,37 @@ export default {
         await this._addAccount({
           name: this.name,
           passwordId: 0,
-        });
+        })
         this.$store.state.currentIndexAccount =
-          this.$store.state.accounts.length - 1;
+          this.$store.state.accounts.length - 1
         await this._setCurrentIndexAccount(
           this.$store.state.currentIndexAccount
-        );
-        router.back();
+        )
+        router.back()
       } catch (error) {
-        this.alertDanger(error.message);
-        throw error;
+        this.alertDanger(error.message)
+        throw error
       }
     },
 
     cancel() {
-      router.back();
+      router.back()
     },
   },
-};
+}
 </script>
 <style scoped>
 .container {
-  margin: 4em;
+  margin: 2em 4em;
   display: flex;
   align-items: center;
   height: 100%;
 }
 .button-group {
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
-  margin-top: 1em;
-  gap: 1em;
   width: 100%;
+  gap: 1em;
+  flex-direction: row-reverse;
 }
 input {
   width: 88% !important;
@@ -97,5 +87,15 @@ input {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+.input-group button {
+  position: relative;
+}
+.bottom-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2em;
 }
 </style>

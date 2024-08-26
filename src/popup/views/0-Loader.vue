@@ -28,7 +28,7 @@ export default {
   width: 77%;
   margin: 2em 0;
   line-height: 1.2em;
-  color: var(--primary-color);
+  color: var(--primary-darker);
   text-align: center;
 }
 .logo {
@@ -39,7 +39,7 @@ export default {
   padding-bottom: 8px;
 }
 .link:hover {
-  color: white;
+  color: var(--kondor-light);
 }
 .recover {
   margin-top: 3em;
