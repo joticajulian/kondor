@@ -5,7 +5,7 @@
     </h1>
     <p class="mana tooltip">
       Mana {{ manaPercent }}%
-      <span class="tooltiptext"> {{ liquidKoin }} Liquid KOIN </span>
+      <span class="tooltiptext"> {{ liquidKoin }} <br> Liquid KOIN </span>
     </p>
     <div class="action-buttons">
       <button
@@ -92,7 +92,7 @@ export default {
 
 <style scoped>
 .wallet-balance {
-  padding: 1.5em 1.5em 0 1.5em;
+  padding: 0em 1.5em;
   font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
@@ -108,7 +108,7 @@ export default {
 
 .mana {
   background-color: #2a2a2a;
-  color: #777777;
+  color: var(--primary-gray);
   display: inline-block;
   padding: 0.3em 1em;
   border-radius: 1.5em;
@@ -121,8 +121,8 @@ export default {
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 9em;
-  background-color: #111;
-  color: #fff;
+  background-color: var(--primary-darker);
+  color: var(--primary-light);
   text-align: center;
   border-radius: 6px;
   padding: 1em;
@@ -133,6 +133,7 @@ export default {
   margin-left: -80px;
   opacity: 0;
   transition: opacity 1s;
+  cursor: default;
 }
 
 .tooltip .tooltiptext::after {
@@ -144,17 +145,18 @@ export default {
   border-width: 5px;
   border-style: solid;
   border-color: transparent transparent #111 transparent;
+  cursor: default;
 }
 
 .tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
+  cursor: default;
 }
 
 .action-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
   width: 100%;
   gap: 1em;
 }
@@ -162,7 +164,7 @@ export default {
 .action-button {
   background-color: #2a2a2a;
   border: none;
-  color: white;
+  color: var(--kondor-light);
   padding: 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -188,6 +190,6 @@ export default {
 
 .more {
   font-weight: bold;
-  color: #777777;
+  color: var(--primary-gray);
 }
 </style>

@@ -71,7 +71,7 @@
           placeholder="Confirm password"
         >
         <button
-          class=""
+          class="custom-button primary"
           @click="createNewWallet"
         >
           next
@@ -172,7 +172,7 @@ export default {
 </script>
 <style scoped>
 textarea {
-  color: white;
+  color: var(--kondor-light);
   background: none;
 }
 label {

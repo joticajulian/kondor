@@ -23,8 +23,8 @@ export default {
 </script>
 <style scoped>
 .page-title {
-  background-color: #222222;
-  color: #ffffff;
+  background-color: var(--primary-dark)222;
+  color: var(--primary-light);
   padding: 20px;
   text-align: center;
 }
@@ -36,7 +36,7 @@ h1 {
 
 p {
   font-size: 14px;
-  color: #777777;
+  color: var(--primary-gray);
   margin: 10px 0 0;
 }
 </style>

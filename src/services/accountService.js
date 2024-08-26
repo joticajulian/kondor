@@ -6,7 +6,7 @@ const API_BASE_URL =
 export const getAccountHistory = async (address, limit = 20) => {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/account/${address}/history`,
+      `${API_BASE_URL}/account/${address}/history?limit=40&ascending=false`,
       {
         params: { limit },
       }

@@ -6,42 +6,40 @@
         :key="tab"
         :class="{ active: activeTab === tab.toLowerCase() }"
         @click="setActiveTab(tab.toLowerCase())"
-      >{{ tab }}</a>
+        >{{ tab }}</a
+      >
     </div>
     <div class="panel">
       <div v-if="activeTab === 'nfts'">
-        <div
-          v-if="loading"
-          class="loading"
-        >
-          Loading NFTs...
-        </div>
-        <div
-          v-else-if="error"
-          class="error-message"
-        >
+        <div v-if="loading" class="loading">Loading NFTs...</div>
+        <div v-else-if="error" class="error-message">
           {{ error }}
         </div>
         <div v-else>
           <div v-if="nfts && nfts.length > 0">
             <div class="nft-grid">
-              <div
-                v-for="nft in nfts"
-                :key="nft.id"
-                class="nft-item"
-              >
+              <div v-for="nft in nfts" :key="nft.id" class="nft-item">
                 <img
                   v-if="nft.metadata && nft.metadata.image"
                   :src="nft.metadata.image"
                   :alt="nft.metadata.name"
                   class="nft-image"
-                >
+                />
                 <div class="nft-info">
                   <h3 class="nft-name">
-                    {{ nft.metadata ? nft.metadata.name || "Untitled" : "Untitled" }}
+                    {{
+                      nft.metadata
+                        ? nft.metadata.name || "Untitled"
+                        : "Untitled"
+                    }}
                   </h3>
                   <p class="nft-description">
-                    {{ nft.metadata ? truncateDescription(nft.metadata.description) || "No description" : "No description" }}
+                    {{
+                      nft.metadata
+                        ? truncateDescription(nft.metadata.description) ||
+                          "No description"
+                        : "No description"
+                    }}
                   </p>
                 </div>
               </div>
@@ -52,68 +50,66 @@
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img
-                  src="../../../public/images/kollection-logo.svg"
-                  alt=""
-                >
+                <img src="../../../public/images/kollection-logo.svg" alt="" />
                 <span>View on Kollection</span>
               </a>
             </div>
           </div>
-          <div
-            v-else
-            class="no-nfts"
-          >
-            No NFTs found for this address
-          </div>
+          <div v-else class="no-nfts">No NFTs found for this address</div>
         </div>
       </div>
 
       <div v-if="activeTab === 'activity'">
-        <div
-          v-if="loadingActivity"
-          class="loading"
-        >
+        <div v-if="loadingActivity" class="loading">
           Loading transaction history...
         </div>
-        <div
-          v-else-if="activityError"
-          class="error-message"
-        >
+        <div v-else-if="activityError" class="error-message">
           {{ activityError }}
         </div>
         <div
-          v-else-if="!transactions || transactions.length === 0"
+          v-else-if="!filteredTransactions || filteredTransactions.length === 0"
           class="no-activity"
         >
           No transaction history available
         </div>
-        <div
-          v-else
-          class="transaction-list"
-        >
+        <div v-else class="transaction-list">
           <div
-            v-for="transaction in transactions"
+            v-for="transaction in filteredTransactions"
             :key="transaction.trx.transaction.id"
             class="transaction-item"
           >
-            <div 
+            <div
               class="transaction-icon"
-              :class="{ 'sent': getTransactionType(transaction) === 'send', 'received': getTransactionType(transaction) === 'receive' }"
+              :class="{
+                sent: getTransactionType(transaction) === 'send',
+                received: getTransactionType(transaction) === 'receive',
+              }"
             >
               {{ getTransactionType(transaction) === "receive" ? "↓" : "↑" }}
             </div>
             <div class="transaction-details">
               <div class="transaction-top">
                 <span class="transaction-amount">
-                  {{ formatTransactionAmount(transaction) }} {{ getTokenSymbol(transaction) }}
+                  {{ formatTransactionAmount(transaction) }}
+                  {{ getTokenSymbol(transaction) }}
                 </span>
-                <span class="transaction-id">{{ getTruncatedTransactionId(transaction) }}</span>
+                <span
+                  class="transaction-id"
+                  @click="openTransactionUrl(transaction)"
+                >
+                  {{ getTruncatedTransactionId(transaction) }}
+                </span>
               </div>
               <div class="transaction-bottom">
-                <span class="transaction-type">{{ getTransactionType(transaction) }}</span>
+                <span class="transaction-type">{{
+                  getTransactionType(transaction)
+                }}</span>
                 <span class="transaction-address">
-                  {{ getTransactionType(transaction) === "receive" ? "From: " : "To: " }}
+                  {{
+                    getTransactionType(transaction) === "receive"
+                      ? "From: "
+                      : "To: "
+                  }}
                   {{ getTransactionAddress(transaction) }}
                 </span>
               </div>
@@ -122,21 +118,10 @@
         </div>
       </div>
 
-      <div
-        v-if="activeTab === 'coins'"
-        class="coins-container"
-      >
-        <div
-          v-for="(coin, symbol) in coins"
-          :key="symbol"
-          class="coin-item"
-        >
+      <div v-if="activeTab === 'coins'" class="coins-container">
+        <div v-for="(coin, symbol) in coins" :key="symbol" class="coin-item">
           <div class="coin-icon-and-name">
-            <img
-              :src="coin.image"
-              :alt="symbol"
-              class="coin-image"
-            >
+            <img :src="coin.image" :alt="symbol" class="coin-image" />
             <div class="coin-name-container">
               <span class="coin-symbol">{{ coin.symbol }}</span>
               <span class="coin-name">{{ coin.name }}</span>
@@ -147,22 +132,14 @@
             <span class="coin-value">${{ calculateUsdValue(coin) }} USD</span>
           </div>
         </div>
-        <div class="manage-tokens">
-          <img
-            src="../../../public/images/settings-icon.svg"
-            alt="Settings"
-            class="settings-icon"
-          >
-          <span>Manage token list</span>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { getAccountHistory } from "@/services/accountService";
+import axios from "axios"
+import { getAccountHistory } from "@/services/accountService"
 
 export default {
   props: {
@@ -189,90 +166,118 @@ export default {
       transactions: [],
       loadingActivity: false,
       activityError: null,
-    };
+    }
   },
 
   computed: {
     kollectionProfileUrl() {
-      return `https://kollection.app/profile/${this.address}`;
+      return `https://kollection.app/profile/${this.address}`
+    },
+    filteredTransactions() {
+      return this.transactions.filter((transaction) => {
+        const amount = this.getTransactionAmount(transaction)
+        return amount !== null && amount !== 0
+      })
     },
   },
 
   watch: {
     address: "fetchData",
     activeTab: "fetchData",
+    coins: {
+      handler(newCoins) {
+        console.log("Coins updated:", newCoins)
+      },
+      deep: true,
+    },
   },
 
   mounted() {
-    this.fetchData();
+    console.log("Coins object:", this.coins)
+    this.fetchData()
   },
 
   methods: {
     getTransactionType(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
-      if (operation.call_contract && operation.call_contract.args.from === this.address) {
-        return "send";
+      const operation = transaction.trx.transaction.operations[0]
+      if (
+        operation.call_contract &&
+        operation.call_contract.args.from === this.address
+      ) {
+        return "send"
       }
-      return "receive";
+      return "receive"
     },
 
     getTransactionAmount(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
+      const operation = transaction.trx.transaction.operations[0]
       if (operation.call_contract && operation.call_contract.args.value) {
-        return (parseInt(operation.call_contract.args.value) / 1e8).toFixed(8);
+        const value = BigInt(operation.call_contract.args.value)
+        const decimals = this.getTokenDecimals(
+          operation.call_contract.contract_id
+        )
+        return Number(value) / Math.pow(10, decimals)
       }
-      return "N/A";
+      return null
     },
 
     formatTransactionAmount(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
-      if (operation.call_contract && operation.call_contract.args.value) {
-        const amount = (parseInt(operation.call_contract.args.value) / 1e8);
-        if (amount % 1 === 0) {
-          return amount.toFixed(2);
-        } else {
-          return amount.toString();
-        }
-      }
-      return "N/A";
+      const amount = this.getTransactionAmount(transaction)
+      if (amount === null) return "N/A"
+      return amount % 1 === 0 ? amount.toFixed(2) : amount.toString()
     },
 
     getTruncatedTransactionId(transaction) {
-      const id = transaction.trx.transaction.id;
-      return id ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}` : 'N/A';
+      const id = transaction.trx.transaction.id
+      return id
+        ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}`
+        : "N/A"
     },
 
     getTokenSymbol(transaction) {
-      return "KOIN";
+      const operation = transaction.trx.transaction.operations[0]
+      if (operation.call_contract) {
+        return this.getTokenSymbolById(operation.call_contract.contract_id)
+      }
+      return "Unknown"
     },
 
     getTransactionDate(transaction) {
-      return "Date not available";
+      return "Date not available"
     },
 
     getTransactionAddress(transaction) {
-      const operation = transaction.trx.transaction.operations[0];
-      const type = this.getTransactionType(transaction);
+      const operation = transaction.trx.transaction.operations[0]
+      const type = this.getTransactionType(transaction)
       if (operation.call_contract) {
-        return type === "receive" ? operation.call_contract.args.from : operation.call_contract.args.to;
+        const address =
+          type === "receive"
+            ? operation.call_contract.args.from
+            : operation.call_contract.args.to
+        return this.truncateAddress(address)
       }
-      return "N/A";
+      return "N/A"
+    },
+
+    truncateAddress(address) {
+      if (!address) return "N/A"
+      return `${address.slice(0, 4)}...${address.slice(-4)}`
     },
 
     async fetchData() {
       if (this.activeTab === "nfts") {
-        await this.fetchNFTs();
+        await this.fetchNFTs()
       } else if (this.activeTab === "activity") {
-        await this.fetchAccountHistory();
+        await this.fetchAccountHistory()
       }
     },
 
     async fetchNFTs() {
-      if (!this.address) return;
+      if (!this.address) return
 
-      this.loading = true;
-      this.error = null;
-      this.nfts = null;
+      this.loading = true
+      this.error = null
+      this.nfts = null
 
       try {
         const response = await axios.get(
@@ -282,68 +287,135 @@ export default {
               Accept: "application/json",
             },
           }
-        );
+        )
 
         if (response.data && Array.isArray(response.data.data)) {
-          this.nfts = response.data.data;
-          console.log("NFTs loaded:", this.nfts);
+          this.nfts = response.data.data
+          console.log("NFTs loaded:", this.nfts)
         } else {
-          this.error = "Unexpected API response structure";
-          console.error("API response:", response.data);
+          this.error = "Unexpected API response structure"
+          console.error("API response:", response.data)
         }
 
         if (this.nfts && this.nfts.length === 0) {
-          this.error = "No NFTs found for this address";
+          this.error = "No NFTs found for this address"
         }
       } catch (err) {
-        this.error = `Failed to fetch NFTs: ${err.message}`;
-        console.error("Error fetching NFTs:", err);
+        this.error = `Failed to fetch NFTs: ${err.message}`
+        console.error("Error fetching NFTs:", err)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     async fetchAccountHistory() {
-      if (!this.address) return;
+      if (!this.address) return
 
-      this.loadingActivity = true;
-      this.activityError = null;
-      this.transactions = [];
+      this.loadingActivity = true
+      this.activityError = null
+      this.transactions = []
 
       try {
-        const data = await getAccountHistory(this.address);
-        this.transactions = data;
-        console.log("Account history loaded:", this.transactions);
+        const data = await getAccountHistory(this.address)
+        this.transactions = data
+        console.log("Account history loaded:", this.transactions)
       } catch (err) {
-        this.activityError = `Failed to fetch account history: ${err.message}`;
-        console.error("Error fetching account history:", err);
+        this.activityError = `Failed to fetch account history: ${err.message}`
+        console.error("Error fetching account history:", err)
       } finally {
-        this.loadingActivity = false;
+        this.loadingActivity = false
       }
     },
 
     setActiveTab(tab) {
-      this.activeTab = tab;
-      this.fetchData();
+      this.activeTab = tab
+      this.fetchData()
     },
 
     truncateDescription(description) {
-      if (!description) return "No description";
-      return description.length > 30 ? description.slice(0, 30) + "..." : description;
+      if (!description) return "No description"
+      return description.length > 30
+        ? description.slice(0, 30) + "..."
+        : description
     },
+
     calculateUsdValue(coin) {
-      const price = this.prices[coin.symbol];
-      if (!price) return "N/A";
-      return (Number(coin.balance) * price).toFixed(2);
+      const price = this.prices[coin.symbol]
+      if (!price) return "N/A"
+      return (Number(coin.balance) * price).toFixed(2)
+    },
+
+    getTokenSymbolById(contractId) {
+      // This method should return the token symbol based on the contract ID
+      // You'll need to maintain a mapping of contract IDs to token symbols
+      const tokenMap = {
+        "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": "KOIN",
+        "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr": "VHP",
+        "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM": "ETH",
+        "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH": "USDT",
+        "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7": "BTC",
+        "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy": "pVHP",
+        "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS": "KAN",
+        "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ": "BTK",
+        "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD": "KCT",
+        "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG": "DRUGS",
+        "17t977jJZ7DYKPQsjqtStbpvmde1DditXW": "UP",
+        "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx": "PUNKSK",
+        "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8": "OGAS",
+        "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC": "EGG",
+        "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ": "DGK",
+        "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755": "KROK",
+        "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP": "KG",
+        "1EoGf6wPB632JudW1P12aSByLJdeNajWoU": "MEOW",
+        "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf": "GAS",
+        "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA": "RWA",
+        "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf": "RUN",
+        "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": "BALD",
+      }
+      return tokenMap[contractId] || "Unknown"
+    },
+
+    getTokenDecimals(contractId) {
+      // This method should return the number of decimals for the token
+      const decimalMap = {
+        "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": 8, // KOIN
+        "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr": 8, // VHP
+        "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM": 8, // ETH
+        "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH": 8, // USDT
+        "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7": 8, // BTC
+        "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy": 8, // pVHP
+        "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS": 8, // KAN
+        "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ": 8, // BTK
+        "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD": 8, // KCT
+        "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG": 8, // DRUGS
+        "17t977jJZ7DYKPQsjqtStbpvmde1DditXW": 8, // UP
+        "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx": 8, // PUNKSK
+        "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8": 8, // OGAS
+        "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC": 8, // EGG
+        "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ": 8, // DGK
+        "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755": 8, // KROK
+        "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP": 8, // KG
+        "1EoGf6wPB632JudW1P12aSByLJdeNajWoU": 8, // MEOW
+        "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf": 8, // GAS
+        "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA": 8, // RWA
+        "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf": 8, // RUN
+        "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": 8, // BALD
+      }
+      return decimalMap[contractId] || 8 // Default to 8 decimals if unknown
+    },
+    openTransactionUrl(transaction) {
+      const transactionId = transaction.trx.transaction.id
+      const url = `https://koinosblocks.com/tx/${transactionId}`
+      window.open(url, "_blank")
     },
   },
-};
+}
 </script>
 
 <style scoped>
 .bottom {
-  background: #181818;
-  color: #ffffff;
+  background: var(--primary-dark);
+  color: var(--primary-light);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -352,13 +424,13 @@ export default {
 .tabs-container {
   display: flex;
   justify-content: space-around;
-  background: #252525;
+  background: var(--primary-dark);
   padding: 10px;
   margin-bottom: 10px;
 }
 
 .tabs-container a {
-  color: #777777;
+  color: var(--primary-gray);
   text-decoration: none;
   cursor: pointer;
   padding: 5px 15px;
@@ -367,13 +439,13 @@ export default {
 
 .tabs-container a.active {
   background-color: #383838;
-  color: #ffffff;
+  color: var(--primary-light);
 }
 
 .panel {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 0 0.5em;
 }
 
 .nft-grid {
@@ -404,7 +476,7 @@ export default {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--primary-light);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -413,16 +485,19 @@ export default {
 .nft-description {
   margin: 5px 0 0;
   font-size: 12px;
-  color: #777777;
+  color: var(--primary-gray);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.loading, .error-message, .no-nfts, .no-activity {
+.loading,
+.error-message,
+.no-nfts,
+.no-activity {
   text-align: center;
   padding: 20px;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .error-message {
@@ -445,8 +520,9 @@ export default {
   width: 1.5em;
 }
 
-.kollection-link a, .kollection-link a:visited {
-  color: var(--primary-light);
+.kollection-link a,
+.kollection-link a:visited {
+  color: var(--primary-light) !important;
   text-decoration: none;
   display: flex;
   gap: 1em;
@@ -487,26 +563,29 @@ export default {
 
 .transaction-id {
   font-size: 12px;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .transaction-details {
   flex-grow: 1;
 }
 
-.transaction-top, .transaction-bottom {
+.transaction-top,
+.transaction-bottom {
   display: flex;
   justify-content: space-between;
 }
 
 .transaction-amount {
   font-weight: bold;
-  color: #ffffff;
+  color: var(--primary-light);
 }
 
-.transaction-date, .transaction-type, .transaction-address {
+.transaction-date,
+.transaction-type,
+.transaction-address {
   font-size: 12px;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .transaction-address {
@@ -519,7 +598,6 @@ export default {
 .coins-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   padding: 10px;
 }
 
@@ -528,7 +606,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background-color: #1E1E1E;
+  background-color: #1e1e1e;
   border-radius: 12px;
   margin-bottom: 8px;
 }
@@ -552,13 +630,12 @@ export default {
 
 .coin-symbol {
   font-size: 16px;
-  font-weight: bold;
-  color: #FFFFFF;
+  color: var(--primary-light);
 }
 
 .coin-name {
   font-size: 14px;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .coin-balance-value {
@@ -567,14 +644,13 @@ export default {
 
 .coin-balance {
   font-size: 16px;
-  font-weight: bold;
-  color: #FFFFFF;
+  color: var(--primary-light);
   display: block;
 }
 
 .coin-value {
   font-size: 14px;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .manage-tokens {
@@ -593,7 +669,17 @@ export default {
 }
 
 .manage-tokens span {
-  color: #777777;
+  color: var(--primary-gray);
   font-size: 14px;
+}
+
+.transaction-id {
+  cursor: pointer;
+  text-decoration: underline;
+  color: var(--kondor-purple);
+}
+
+.transaction-id:hover {
+  color: var(--kondor-purple);
 }
 </style>

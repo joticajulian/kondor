@@ -116,7 +116,7 @@
     </div>
     <div class="actions">
       <button
-        class="secondary"
+        class="custom-button secondary"
         @click="cancel"
       >
         cancel
@@ -125,7 +125,7 @@
         :disabled="
           !isSendButtonEnabled
         "
-        class="primary"
+        class="custom-button primary"
         @click="transfer"
       >
         <span
@@ -677,7 +677,8 @@ export default {
 .container {
   padding: 2.5em;
   margin: 0;
-  background: #222222 !important;
+  background: var(--primary-dark) !important;
+  padding: 2em 4em;
 }
 
 .container > * {
@@ -691,7 +692,7 @@ export default {
 .token select {
   width: 100%;
   max-width: unset;
-  padding: 1em;
+  padding: 1.5em;
 }
 
 .actions {
@@ -699,12 +700,6 @@ export default {
   flex-direction: row;
   gap: 1em;
   justify-content: stretch;
-}
-
-button.secondary {
-  background-color: #ddd;
-  border-color: #ddd;
-  color: #000;
 }
 
 label,
@@ -722,6 +717,8 @@ input[type="checkbox"] {
 
 label {
   margin-top: 0.5em;
+  color: var(--primary-gray);
+  margin-left: 0.5em;
 }
 
 input.invalid {
@@ -745,7 +742,7 @@ input.invalid {
   margin-bottom: 0.5em;
   border: 1px solid #ddd;
   border-radius: 4px;
-  color: #777;
+  color: var(--primary-gray);
   padding-left: 2em;
 }
 
@@ -767,6 +764,7 @@ input.invalid {
 
 .group-free-mana {
   display: flex;
+  margin-left: .5em;
 }
 
 .success {
@@ -784,6 +782,7 @@ input.invalid {
 .row {
   display: flex;
   justify-content: space-between;
+  margin-left: .5em;
 }
 
 a {

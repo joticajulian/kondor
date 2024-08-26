@@ -116,6 +116,7 @@ export default {
   display: flex;
   justify-content: center;
   margin: 1em 0;
+  height: 100%;
 }
 
 .width-96 {
@@ -145,7 +146,7 @@ export default {
   padding: 0;
   width: auto;
   background: white;
-  border-color: white;
+  border-color: var(--kondor-light);
   color: black;
 }
 
@@ -159,5 +160,6 @@ export default {
   box-sizing: border-box;
   padding-right: 2em;
   background: none;
+  color: var(--kondor-light);
 }
 </style>

@@ -159,7 +159,7 @@ export default {
 }
 
 .checkbox-wrapper-2 .ikxBAC::after {
-  background-color: #fff;
+  background-color: var(--primary-light);
   border-radius: 50%;
   content: "";
   height: 14px;
@@ -183,7 +183,7 @@ export default {
 }
 
 .checkbox-wrapper-2 .ikxBAC:checked::after {
-  background-color: #fff;
+  background-color: var(--primary-light);
   left: 13px;
 }
 

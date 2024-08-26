@@ -67,7 +67,7 @@ export default {
   grid-template-rows: 1fr;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
-  background: #1a1a1a;
+  background: var(--primary-darker);
   padding: 0.5rem 1em;
 }
 
@@ -75,12 +75,13 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-left: .5em;
 }
 
 .navbar-title {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #777777;
+  color: var(--primary-gray);
 }
 
 .navbar-right {
@@ -92,8 +93,8 @@ export default {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #1a1a1a;
+  background: var(--primary-light);
+  color: var(--primary-darker);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,7 +104,7 @@ export default {
 .icon-button {
   background: none;
   border: none;
-  color: white;
+  color: var(--kondor-light);
   cursor: pointer;
   padding: 0.25rem;
 }
@@ -116,7 +117,7 @@ export default {
   font-size: 1.25rem;
 }
 .white {
-  color: white;
+  color: var(--kondor-light);
 }
 </style>
 Last edited 8 minutes ago Claude
