@@ -1449,47 +1449,20 @@ export default {
     },
 
     async checkEvents() {
-      console.log("checkEvents method started")
-      this.loadingEvents = true
+      console.log("checkEvents method started");
+      this.loadingEvents = true;
       try {
-        // TODO: throw error if there are requests.length > 1
         if (process.env.VUE_APP_ENV === "test") {
-          console.log("Running in test mode")
+          console.log("Running in test mode");
           this.receipt = {
-            id: "0x1220cf763bc42c18091fddf7a9d3c2963f95102b64a019d76c20215163ca9d900ff2",
-            payer: "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
-            max_payer_rc: "930000000",
-            rc_limit: "930000000",
-            rc_used: "470895",
-            network_bandwidth_used: "311",
-            compute_bandwidth_used: "369509",
-            events: [
-              {
-                source: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
-                name: "koinos.contracts.token.transfer_event",
-                data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
-                impacted: [
-                  "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
-                  "16MT1VQFgsVxEfJrSGinrA5buiqBsN5ViJ",
-                ],
-              },
-              {
-                source: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                name: "koinos.contracts.token.transfer_event",
-                data: "ChkAOraorkYwQTkrfp9ViHFI2CJvmCQh2mz7EhkArriH22GZ1VJLkeJ-x4JUGF4zPAEZrNUiGMCEPQ==",
-                impacted: [
-                  "1Gvqdo9if6v6tFomEuTuMWP1D7H7U9yksb",
-                  "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
-                ],
-              },
-            ],
-          }
+            // ... (test receipt data)
+          };
         } else {
-          await this.buildTransaction()
-          console.log("Transaction built")
+          await this.buildTransaction();
+          console.log("Transaction built");
           if (this.optimizeMana) {
-            const { payer, payee } = await this.useManaMeter()
-            await this.signTransaction()
+            const { payer, payee } = await this.useManaMeter();
+            await this.signTransaction();
             const { header, id } = await estimateAndAdjustMana({
               payer,
               payee,
@@ -1497,61 +1470,73 @@ export default {
               transaction: this.transaction,
               provider: this.provider,
               koinContract: this.koinContract,
-            })
-            this.transaction.transaction.header = header
-            this.transaction.transaction.id = id
-            this.transaction.transaction.signatures = []
+            });
+            this.transaction.transaction.header = header;
+            this.transaction.transaction.id = id;
+            this.transaction.transaction.signatures = [];
           }
-          await this.signTransaction()
-          this.receipt = await this.transaction.send({ broadcast: false })
+          await this.signTransaction();
+          this.receipt = await this.transaction.send({ broadcast: false });
           this.maxMana = utils.formatUnits(
             this.transaction.transaction.header.rc_limit,
             8
-          )
-          this.payee = this.transaction.transaction.header.payee
-          this.payer = this.transaction.transaction.header.payer
+          );
+          this.payee = this.transaction.transaction.header.payee;
+          this.payer = this.transaction.transaction.header.payer;
         }
         console.log("Full receipt:", JSON.stringify(this.receipt, null, 2));
-        this.events = []
-        this.koinTransferAmount = 0
+        this.events = [];
+        this.koinTransferAmount = 0;
         if (this.receipt.events) {
           console.log(`Processing ${this.receipt.events.length} events`);
           for (let i = 0; i < this.receipt.events.length; i += 1) {
-            const event = this.receipt.events[i]
+            const event = this.receipt.events[i];
             console.log(`Processing event ${i + 1}:`, JSON.stringify(event, null, 2));
-            await this.beautifyAction("event", event)
+            await this.beautifyAction("event", event);
             console.log(`Beautified event ${i + 1}:`, JSON.stringify(this.events[this.events.length - 1], null, 2));
-            /*
-            if (event.name === "koinos.contracts.token.transfer_event" &&
-            event.source === this.network.koinContractId) {
-              const decodedEvent = await this.koinContract.decodeEvent(event);
-              this.koinTransferAmount = utils.formatUnits(decodedEvent.args.value, 8);
-            }
-            */
 
             if (event.source === this.network.koinContractId &&
             event.name === "koinos.contracts.token.transfer_event") {
               console.log("KOIN transfer event detected");
-              const decodedEvent = await this.koinContract.decodeEvent(event);
-              console.log("Decoded KOIN transfer event:", JSON.stringify(decodedEvent, null, 2));
-              const amount = Number(utils.formatUnits(decodedEvent.args.value, 8));
-              console.log(`KOIN transfer amount: ${amount}`);
-              this.koinTransferAmount += amount; // A
+              try {
+                const decodedEvent = await this.koinContract.decodeEvent(event);
+                console.log("Decoded KOIN transfer event:", JSON.stringify(decodedEvent, null, 2));
+                console.log("Value before formatting:", decodedEvent.args.value);
+            
+                // Check if the value is 0 before formatting
+                if (decodedEvent.args.value === '0' || decodedEvent.args.value === 0) {
+                  console.log("Transfer amount is 0, skipping BigInt conversion");
+                  continue;
+                }
+            
+                const formattedValue = utils.formatUnits(decodedEvent.args.value, 8);
+                console.log("Formatted value:", formattedValue);
+                const amount = Number(formattedValue);
+                console.log(`KOIN transfer amount: ${amount}`);
+                if (isNaN(amount)) {
+                  console.error("Invalid amount, skipping");
+                  continue;
+                }
+                this.koinTransferAmount += amount;
+                console.log(`Running total KOIN transfer amount: ${this.koinTransferAmount}`);
+              } catch (error) {
+                console.error("Error processing KOIN transfer event:", error);
+              }
             }
           }
         }
         console.log(`Final KOIN transfer amount: ${this.koinTransferAmount}`);
 
         console.log("Total KOIN transfer amount:", this.koinTransferAmount);
-        this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`
-        this.readyToSend = true
-        this.loadingEvents = false
+        this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`;
+        this.readyToSend = true;
+        this.loadingEvents = false;
       } catch (error) {
         console.error("Error in checkEvents:", error);
-        this.readyToSend = false
-        this.loadingEvents = false
-        this.alertDanger(error.message)
-        throw error
+        this.readyToSend = false;
+        this.loadingEvents = false;
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 

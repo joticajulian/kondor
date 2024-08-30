@@ -6,17 +6,17 @@
           Connect with Kondor
         </div>
         <div class="p-subtitle">
-          Select the account(s) to use on this site
+          Select the account to use on this site
         </div>
       </div>
-      
+
       <div class="accounts-list">
         <div
           v-for="(account, index) in accounts"
           :key="index"
           class="account-item"
-          :class="{ 'selected': inputs[index] }"
-          @click="toggleAccount(index)"
+          :class="{ 'selected': selectedIndex === index }"
+          @click="selectAccount(index)"
         >
           <span class="account-name">{{ account.name }}</span>
           <span class="account-address">{{ formatAddress(account.address) }}</span>
@@ -37,7 +37,7 @@
           </button>
           <button
             class="custom-button primary"
-            :disabled="!hasSelectedAccount"
+            :disabled="selectedIndex === null"
             @click="accept"
           >
             Accept
@@ -60,14 +60,9 @@ export default {
     return {
       requester: "",
       id: -1,
-      inputs: [],
+      selectedIndex: null,
       accounts: [],
     };
-  },
-  computed: {
-    hasSelectedAccount() {
-      return this.inputs.some(input => input);
-    }
   },
   mounted() {
     const requests = this.$store.state.requests.filter(
@@ -81,38 +76,36 @@ export default {
   methods: {
     async loadAccounts() {
       this.accounts = await this._getAccounts();
-      this.inputs = new Array(this.accounts.length).fill(false);
-      
       // Automatically select the first account
       if (this.accounts.length > 0) {
-        this.$set(this.inputs, 0, true);
+        this.selectedIndex = 0;
       }
     },
-    toggleAccount(index) {
-      this.$set(this.inputs, index, !this.inputs[index]);
+    selectAccount(index) {
+      this.selectedIndex = index;
     },
     formatAddress(address) {
       return `${address.slice(0, 10)}...${address.slice(-5)}`;
     },
     async accept() {
-      const selectedAccounts = this.accounts
-        .filter((_, index) => this.inputs[index])
-        .map((account) => ({
-          name: account.name,
-          address: account.address,
-          signers: account.signers
-            ? account.signers.map((signer) => ({
-              name: signer.name,
-              address: signer.address,
-            }))
-            : [],
-        }));
-      const message = {
-        id: this.id,
-        result: selectedAccounts,
-      };
-      this.sendResponse("extension", message, this.requester);
-      window.close();
+      if (this.selectedIndex !== null) {
+        const selectedAccount = this.accounts[this.selectedIndex];
+        const message = {
+          id: this.id,
+          result: [{
+            name: selectedAccount.name,
+            address: selectedAccount.address,
+            signers: selectedAccount.signers
+              ? selectedAccount.signers.map((signer) => ({
+                name: signer.name,
+                address: signer.address,
+              }))
+              : [],
+          }],
+        };
+        this.sendResponse("extension", message, this.requester);
+        window.close();
+      }
     },
     cancel() {
       const message = {
@@ -129,22 +122,22 @@ export default {
 <style scoped>
 .wrapper {
   font-family: Poppins, sans-serif;
-    background-color: #1a1a1a;
-    color: var(--primary-light);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
+  background-color: #1a1a1a;
+  color: var(--primary-light);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
 }
 
 .content {
   width: 100%;
-    max-width: 400px;
-    height: 90%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  max-width: 400px;
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .p-title {
@@ -177,6 +170,7 @@ export default {
 .account-item:hover, .account-item.selected {
   background-color: #3a3a3a;
 }
+
 .account-item.selected {
   background-color: #e5b009;
 }
@@ -207,38 +201,13 @@ export default {
 
 .buttons {
   display: flex;
-    justify-content: space-between;
-    gap: 1em;
-    flex-direction: row;
+  justify-content: space-between;
+  gap: 1em;
+  flex-direction: row;
 }
 
-.cancel-button, .accept-button {
-  width: 48%;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.cancel-button {
-  background-color: transparent;
-  color: var(--primary-light);
-  border: 1px solid #ffffff;
-}
-
-.accept-button {
-  background-color: #7161ef;
-  color: var(--primary-light);
-  border: none;
-}
-
-.cancel-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.accept-button:hover {
-  background-color: #8674ff;
+.custom-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
