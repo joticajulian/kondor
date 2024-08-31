@@ -1,21 +1,28 @@
 <template>
   <div class="receive-koin">
-    <div class="header">
+    <!-- <div class="header">
       <h1>Receive Koin</h1>
-    </div>
+    </div> -->
 
     <div class="middle">
-      <div class="qr-placeholder">
-        <!-- We'll replace this with the actual QR code later -->
-        <div class="placeholder-square" />
+      <div class="qr-code">
+        <qrcode-vue
+          :value="currentAddress"
+          :size="200"
+          level="H"
+        />
       </div>
 
       <div class="account-info">
-        <span class="account-label">17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW</span>
-        <span>
+        <span class="account-label">{{ currentAddress }}</span>
+        <span
+          class="copy-icon"
+          @click="copyAddress"
+        >
           <img
-            src="../../../../public/images/copy-solid.svg"
-            alt=""
+            src="../../../../public/images/copy-icon.svg"
+            alt="Copy address"
+            title="Copy address"
           >
         </span>
       </div>
@@ -27,7 +34,7 @@
 
     <button
       class="custom-button secondary"
-      @click="close()"
+      @click="close"
     >
       Close
     </button>
@@ -35,65 +42,97 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+import QrcodeVue from "qrcode.vue"
+
 export default {
   name: "ReceiveKoin",
+  components: {
+    QrcodeVue,
+  },
+  data() {
+    return {
+      currentAddress: "",
+    }
+  },
+  computed: {
+    ...mapState(["accounts", "currentIndexAccount"]),
+  },
+  mounted() {
+    this.getCurrentAddress()
+  },
   methods: {
+    getCurrentAddress() {
+      const currentAccount = this.accounts[this.currentIndexAccount]
+      if (currentAccount) {
+        this.currentAddress = currentAccount.address
+      }
+    },
     copyAddress() {
-      // needs implementation
+      if (this.currentAddress) {
+        navigator.clipboard
+          .writeText(this.currentAddress)
+          .then(() => {
+            this.$store.dispatch("setAlert", {
+              show: true,
+              type: "success",
+              message: "Address copied to clipboard",
+            })
+          })
+          .catch((err) => {
+            console.error("Failed to copy address: ", err)
+            this.$store.dispatch("setAlert", {
+              show: true,
+              type: "error",
+              message: "Failed to copy address",
+            })
+          })
+      }
     },
     close() {
-      this.$router.push({ name: "Dashboard" });
+      this.$router.push({ name: "Dashboard" })
     },
   },
-};
+}
 </script>
 
 <style scoped>
-.middle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 .receive-koin {
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
-  padding: 0 2em;
+  padding: 2em;
 }
 
 .header {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  color: var(--kondor-light);
-  font-size: 24px;
-  cursor: pointer;
+  width: 100%;
 }
 
 h1 {
   margin: 0;
   flex-grow: 1;
   text-align: center;
-  font-size: 20px;
+  font-size: 24px;
+  color: var(--kondor-light);
 }
 
-.qr-placeholder {
+.middle {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.placeholder-square {
-  width: 170px;
-  height: 170px;
-  background-color: rgb(86, 86, 86);
+.qr-code {
+  margin-bottom: 20px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .account-info {
@@ -103,56 +142,33 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 85%;
+  width: 82%;
   color: var(--primary-gray);
-  width: 78%;
+  margin-bottom: 20px;
 }
-.account-info span {
-  width: 12px;
-}
+
 .account-label {
-  font-size: 0.6em;
+  font-size: 0.8em;
+  word-break: break-all;
+  margin-right: 10px;
 }
 
-.pill-button {
-  background-color: var(--kondor-purple);
-  color: var(--kondor-light);
-  border: none;
-  border-radius: 9999px;
-  padding: 6px 12px;
-  font-size: 0.7em;
+.copy-icon {
   cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.copy-icon img {
   width: 20px;
-}
-
-.pill-button:hover {
-  background-color: #6b4fd9; /* Slightly darker shade for hover state */
-}
-
-.pill-button:active {
-  background-color: #5a40b8; /* Even darker for active/pressed state */
+  height: 20px;
 }
 
 .info-text {
   color: #888;
-  font-size: 10px;
-  text-align: center;
-  margin-bottom: 20px;
-  width: 80%;
-}
-
-.footer {
-  margin-top: auto;
-  border-top: 1px solid #2a2a2a;
-  padding-top: 10px;
-}
-
-.footer-text {
-  color: #888;
   font-size: 12px;
+  text-align: center;
+  width: 100%;
+  margin: 0;
 }
 </style>

@@ -13,7 +13,7 @@ const icons = {
 };
 
 const manifest = {
-  name: "Kondor",
+  name: "Kondor Beta",
   description: "Koinos Wallet in your browser",
   version: testMode ? "0.0.0" : packageJson.version,
   manifest_version: 3,

@@ -1,15 +1,30 @@
 <template>
   <div class="dropdown-container">
-    <div class="avatar-menu" @click="openDropdown()">
-      <img :src="avatar" alt="identicon for selected address" />
+    <div
+      class="avatar-menu"
+      @click="openDropdown()"
+    >
+      <img
+        :src="avatar"
+        alt="identicon for selected address"
+      >
     </div>
-    <div class="dropdown-wrapper" :class="{ show: showDropdown }">
+    <div
+      class="dropdown-wrapper"
+      :class="{ show: showDropdown }"
+    >
       <div class="dropdown-content">
         <div>
           <div class="dropdown-info">
             <span class="heading">My accounts</span>
-            <button class="chip" @click="lock()">
-              <img src="../../../public/images/lock.svg" alt="" />
+            <button
+              class="chip"
+              @click="lock()"
+            >
+              <img
+                src="../../../public/images/lock.svg"
+                alt=""
+              >
             </button>
           </div>
 
@@ -40,38 +55,59 @@
 
         <div class="option">
           <div v-if="$store.state.mnemonic0">
-            <div class="options-item" @click="createAccount">
+            <div
+              class="options-item"
+              @click="createAccount"
+            >
               <img
                 src="../../../public/images/icon-add.png"
                 alt="create account icon"
-              />
+              >
               Create account
             </div>
           </div>
           <div v-else>
-            <div class="options-item" @click="addSeed">
+            <div
+              class="options-item"
+              @click="addSeed"
+            >
               <img
                 src="../../../public/images/icon-add.png"
                 alt="add seed icon"
-              />
+              >
               Add seed to wallet
             </div>
           </div>
-          <div class="options-item" @click="importAccount">
-            <img src="../../../public/images/icon-import.png" alt="" /> Import
+          <div
+            class="options-item"
+            @click="importAccount"
+          >
+            <img
+              src="../../../public/images/icon-import.png"
+              alt=""
+            > Import
             account
           </div>
 
-          <div class="options-item" @click="openOptions">
-            <img src="../../../public/images/icon-settings-wrench.png" alt="" />
+          <div
+            class="options-item"
+            @click="openOptions"
+          >
+            <img
+              src="../../../public/images/icon-settings-wrench.png"
+              alt=""
+            >
             Settings
           </div>
-          <div class="network-toggle">
+          <!-- <div class="network-toggle">
             <label>
-              <input type="checkbox" v-model="isTestnetMode" />
+              <input
+                v-model="isTestnetMode"
+                type="checkbox"
+              >
               Testnet
             </label>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>

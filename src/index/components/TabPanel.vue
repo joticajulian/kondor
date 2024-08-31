@@ -6,25 +6,36 @@
         :key="tab"
         :class="{ active: activeTab === tab.toLowerCase() }"
         @click="setActiveTab(tab.toLowerCase())"
-        >{{ tab }}</a
-      >
+      >{{ tab }}</a>
     </div>
     <div class="panel">
       <div v-if="activeTab === 'nfts'">
-        <div v-if="loading" class="loading">Loading NFTs...</div>
-        <div v-else-if="error" class="error-message">
+        <div
+          v-if="loading"
+          class="loading"
+        >
+          Loading NFTs...
+        </div>
+        <div
+          v-else-if="error"
+          class="error-message"
+        >
           {{ error }}
         </div>
         <div v-else>
           <div v-if="nfts && nfts.length > 0">
             <div class="nft-grid">
-              <div v-for="nft in nfts" :key="nft.id" class="nft-item">
+              <div
+                v-for="nft in nfts"
+                :key="nft.id"
+                class="nft-item"
+              >
                 <img
                   v-if="nft.metadata && nft.metadata.image"
                   :src="nft.metadata.image"
                   :alt="nft.metadata.name"
                   class="nft-image"
-                />
+                >
                 <div class="nft-info">
                   <h3 class="nft-name">
                     {{
@@ -50,20 +61,34 @@
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img src="../../../public/images/kollection-logo.svg" alt="" />
+                <img
+                  src="../../../public/images/kollection-logo.svg"
+                  alt=""
+                >
                 <span>View on Kollection</span>
               </a>
             </div>
           </div>
-          <div v-else class="no-nfts">No NFTs found for this address</div>
+          <div
+            v-else
+            class="no-nfts"
+          >
+            No NFTs found for this address
+          </div>
         </div>
       </div>
 
       <div v-if="activeTab === 'activity'">
-        <div v-if="loadingActivity" class="loading">
+        <div
+          v-if="loadingActivity"
+          class="loading"
+        >
           Loading transaction history...
         </div>
-        <div v-else-if="activityError" class="error-message">
+        <div
+          v-else-if="activityError"
+          class="error-message"
+        >
           {{ activityError }}
         </div>
         <div
@@ -72,7 +97,10 @@
         >
           No transaction history available
         </div>
-        <div v-else class="transaction-list">
+        <div
+          v-else
+          class="transaction-list"
+        >
           <div
             v-for="transaction in filteredTransactions"
             :key="transaction.trx.transaction.id"
@@ -118,10 +146,21 @@
         </div>
       </div>
 
-      <div v-if="activeTab === 'coins'" class="coins-container">
-        <div v-for="(coin, symbol) in coins" :key="symbol" class="coin-item">
+      <div
+        v-if="activeTab === 'coins'"
+        class="coins-container"
+      >
+        <div
+          v-for="(coin, symbol) in filteredCoins"
+          :key="symbol"
+          class="coin-item"
+        >
           <div class="coin-icon-and-name">
-            <img :src="coin.image" :alt="symbol" class="coin-image" />
+            <img
+              :src="getTokenImageById(coin.contractId)"
+              :alt="symbol"
+              class="coin-image"
+            >
             <div class="coin-name-container">
               <span class="coin-symbol">{{ coin.symbol }}</span>
               <span class="coin-name">{{ coin.name }}</span>
@@ -179,6 +218,11 @@ export default {
         return amount !== null && amount !== 0
       })
     },
+    filteredCoins() {
+      return Object.fromEntries(
+        Object.entries(this.coins).filter(([, coin]) => parseFloat(coin.balance) > 0)
+      );
+    },
   },
 
   watch: {
@@ -212,6 +256,7 @@ export default {
     getTransactionAmount(transaction) {
       const operation = transaction.trx.transaction.operations[0]
       if (operation.call_contract && operation.call_contract.args.value) {
+        // eslint-disable-next-line no-undef
         const value = BigInt(operation.call_contract.args.value)
         const decimals = this.getTokenDecimals(
           operation.call_contract.contract_id
@@ -242,9 +287,9 @@ export default {
       return "Unknown"
     },
 
-    getTransactionDate(transaction) {
-      return "Date not available"
-    },
+    // getTransactionDate(transaction) {
+    //   return "Date not available"
+    // },
 
     getTransactionAddress(transaction) {
       const operation = transaction.trx.transaction.operations[0]
@@ -269,7 +314,14 @@ export default {
         await this.fetchNFTs()
       } else if (this.activeTab === "activity") {
         await this.fetchAccountHistory()
+      }  else if (this.activeTab === "coins") {
+        await this.refreshCoins()
       }
+    },
+
+    async refreshCoins() {
+      console.log("Refreshing coins...")
+      this.$emit('refresh-coins')
     },
 
     async fetchNFTs() {
@@ -329,7 +381,11 @@ export default {
 
     setActiveTab(tab) {
       this.activeTab = tab
-      this.fetchData()
+      if (tab === 'coins') {
+        this.refreshCoins()
+      } else {
+        this.fetchData()
+      }
     },
 
     truncateDescription(description) {
@@ -373,6 +429,34 @@ export default {
         "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": "BALD",
       }
       return tokenMap[contractId] || "Unknown"
+    },
+
+    getTokenImageById(contractId) {
+      const tokenImageMap = {
+        "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png",
+        "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png",
+        "15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd.png",
+        "14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N.png",
+        "15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png",
+        "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy.png",
+        "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS.png",
+        "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ.png",
+        "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD.png",
+        "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG.png",
+        "17t977jJZ7DYKPQsjqtStbpvmde1DditXW": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/17t977jJZ7DYKPQsjqtStbpvmde1DditXW.png",
+        "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx.png",
+        "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8.png",
+        "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC.png",
+        "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ.png",
+        "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KroK111wVj8QU3ydFHqPpNyVtfgV8n755.png",
+        "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP.png",
+        "1EoGf6wPB632JudW1P12aSByLJdeNajWoU": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1EoGf6wPB632JudW1P12aSByLJdeNajWoU.png",
+        "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf.png",
+        "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png",
+        "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png",
+        "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png",
+      };
+      return tokenImageMap[contractId] || "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png"
     },
 
     getTokenDecimals(contractId) {
@@ -617,8 +701,8 @@ export default {
 }
 
 .coin-image {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   margin-right: 12px;
 }

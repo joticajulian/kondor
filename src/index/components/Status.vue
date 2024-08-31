@@ -26,7 +26,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Kondor v0.91.2",
+      default: "Kondor v0.91.3",
     },
     isActive: {
       type: Boolean,
