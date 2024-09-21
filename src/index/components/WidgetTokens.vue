@@ -269,6 +269,14 @@ export default {
       console.log("Starting handleRefreshCoins");
       try {
         console.log("About to call loadTokens");
+        await new Promise((resolve) => {
+          const interval = setInterval(() => {
+            if (this.network && this.provider) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, 2);
+        });
         await this.loadTokens();
         console.log("loadTokens completed successfully");
       } catch (error) {
