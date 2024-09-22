@@ -54,6 +54,15 @@
         </div>
 
         <div class="option">
+          <div
+            class="options-item"
+            @click="toogleNetwork"
+          >
+            <img
+              src="../../../public/images/icon-import.png"
+              alt=""
+            > Switch to {{ $store.state.currentNetwork === 1 ? "mainnet" : "testnet" }}
+          </div>
           <div v-if="$store.state.mnemonic0">
             <div
               class="options-item"
@@ -99,15 +108,6 @@
             >
             Settings
           </div>
-          <!-- <div class="network-toggle">
-            <label>
-              <input
-                v-model="isTestnetMode"
-                type="checkbox"
-              >
-              Testnet
-            </label>
-          </div> -->
         </div>
       </div>
     </div>
@@ -197,6 +197,14 @@ export default {
       this.$store.state.currentIndexAccount = index
       await this._setCurrentIndexAccount(index)
       this.closeDropdown()
+    },
+
+    toogleNetwork() {
+      if (this.$store.state.currentNetwork) {
+        this.$store.state.currentNetwork = 0;
+      } else {
+        this.$store.state.currentNetwork = 1;
+      }
     },
 
     createAccount() {

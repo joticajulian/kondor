@@ -187,7 +187,7 @@ export default {
       required: true,
     },
     coins: {
-      type: Object,
+      type: Array,
       required: true,
     },
     prices: {
@@ -219,9 +219,7 @@ export default {
       })
     },
     filteredCoins() {
-      return Object.fromEntries(
-        Object.entries(this.coins).filter(([, coin]) => parseFloat(coin.balance) > 0)
-      );
+      return this.coins.filter(coin => parseFloat(coin.balance) > 0);
     },
   },
 
