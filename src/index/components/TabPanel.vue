@@ -92,7 +92,7 @@
           {{ activityError }}
         </div>
         <div
-          v-else-if="!filteredTransactions || filteredTransactions.length === 0"
+          v-else-if="!filteredEvents || filteredEvents.length === 0"
           class="no-activity"
         >
           No transaction history available
@@ -102,43 +102,38 @@
           class="transaction-list"
         >
           <div
-            v-for="transaction in filteredTransactions"
-            :key="transaction.trx.transaction.id"
+            v-for="event in filteredEvents"
+            :key="event.txId"
             class="transaction-item"
           >
             <div
               class="transaction-icon"
               :class="{
-                sent: getTransactionType(transaction) === 'send',
-                received: getTransactionType(transaction) === 'receive',
+                sent: event.type === 'send',
+                received: event.type === 'receive',
               }"
             >
-              {{ getTransactionType(transaction) === "receive" ? "↓" : "↑" }}
+              {{ event.type === "receive" ? "↓" : "↑" }}
             </div>
             <div class="transaction-details">
               <div class="transaction-top">
                 <span class="transaction-amount">
-                  {{ formatTransactionAmount(transaction) }}
-                  {{ getTokenSymbol(transaction) }}
+                  {{ event.amountFormatted }}
+                  {{ event.token.symbol }}
                 </span>
                 <span
                   class="transaction-id"
-                  @click="openTransactionUrl(transaction)"
+                  @click="openTransactionUrl(event.txId)"
                 >
-                  {{ getTruncatedTransactionId(transaction) }}
+                  {{ getTruncatedTransactionId(event.txId) }}
                 </span>
               </div>
               <div class="transaction-bottom">
                 <span class="transaction-type">{{
-                  getTransactionType(transaction)
+                  event.type
                 }}</span>
                 <span class="transaction-address">
-                  {{
-                    getTransactionType(transaction) === "receive"
-                      ? "From: "
-                      : "To: "
-                  }}
-                  {{ getTransactionAddress(transaction) }}
+                  {{ event.summary }}
                 </span>
               </div>
             </div>
@@ -178,9 +173,45 @@
 
 <script>
 import axios from "axios"
+import { Contract, utils } from "koilib"
 import { getAccountHistory } from "@/services/accountService"
 
+// mixins
+import ViewHelper from "@/shared/mixins/ViewHelper"
+import Storage from "@/shared/mixins/Storage"
+import Sandbox from "@/shared/mixins/Sandbox"
+
+// TODO: do not hardcode the tokens. Use a dynamic approach
+// like calling the nicknames or call a special contract or api
+// to query the tokens. Also, store custom tokens in the local storage.
+const defaultTokens = [
+  { network: "mainnet", address: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL", symbol: "KOIN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png", },
+  { network: "mainnet", address: "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr", symbol: "VHP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png", },
+  { network: "mainnet", address: "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM", symbol: "ETH", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd.png", },
+  { network: "mainnet", address: "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH", symbol: "USDT", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N.png", },
+  { network: "mainnet", address: "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7", symbol: "BTC", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png", },
+  { network: "mainnet", address: "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy", symbol: "pVHP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy.png", },
+  { network: "mainnet", address: "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS", symbol: "KAN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS.png", },
+  { network: "mainnet", address: "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ", symbol: "BTK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ.png", },
+  { network: "mainnet", address: "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD", symbol: "KCT", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD.png", },
+  { network: "mainnet", address: "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG", symbol: "DRUGS", decimals: 8,image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG.png", },
+  { network: "mainnet", address: "17t977jJZ7DYKPQsjqtStbpvmde1DditXW", symbol: "UP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/17t977jJZ7DYKPQsjqtStbpvmde1DditXW.png", },
+  { network: "mainnet", address: "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx", symbol: "PUNKSK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx.png", },
+  { network: "mainnet", address: "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8", symbol: "OGAS", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8.png", },
+  { network: "mainnet", address: "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC", symbol: "EGG", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC.png", },
+  { network: "mainnet", address: "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ", symbol: "DGK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ.png", },
+  { network: "mainnet", address: "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755", symbol: "KROK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KroK111wVj8QU3ydFHqPpNyVtfgV8n755.png", },
+  { network: "mainnet", address: "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP", symbol: "KG", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP.png", },
+  { network: "mainnet", address: "1EoGf6wPB632JudW1P12aSByLJdeNajWoU", symbol: "MEOW", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1EoGf6wPB632JudW1P12aSByLJdeNajWoU.png", },
+  { network: "mainnet", address: "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf", symbol: "GAS", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf.png", },
+  { network: "mainnet", address: "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA", symbol: "RWA", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png", },
+  { network: "mainnet", address: "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf", symbol: "RUN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png", },
+  { network: "mainnet", address: "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs", symbol: "BALD", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png", },
+];
+
 export default {
+  mixins: [Storage, Sandbox, ViewHelper],
+
   props: {
     address: {
       type: String,
@@ -205,6 +236,7 @@ export default {
       transactions: [],
       loadingActivity: false,
       activityError: null,
+      serializer: null,
     }
   },
 
@@ -212,11 +244,83 @@ export default {
     kollectionProfileUrl() {
       return `https://kollection.app/profile/${this.address}`
     },
-    filteredTransactions() {
-      return this.transactions.filter((transaction) => {
-        const amount = this.getTransactionAmount(transaction)
-        return amount !== null && amount !== 0
-      })
+    filteredEvents() {
+      const events = [];
+      this.transactions.forEach(async tx => {
+        if (!tx) return;
+        let rawEvents = [];
+        let recordId = "";
+        if (tx.trx) {
+          if (tx.trx.receipt.events) {
+            rawEvents = tx.trx.receipt.events;
+            recordId = tx.trx.transaction.id;
+          }
+        } else if (tx.block) {
+          if (tx.block.receipt.events) {
+            rawEvents = tx.block.receipt.events;
+            recordId = tx.block.header.height;
+          }
+        }
+
+        const eventsProcessed = ( // await Promise.all(
+          rawEvents.map(e => { // async (e) => {
+            const token = defaultTokens.find(t => t.address === e.source);
+            if (!token || !["transfer_event", "mint_event", "burn_event"].find(name => e.name.includes(name))) {
+              return {};
+            }
+            if (!e.data) return {};
+            const args = e.data;
+
+            /*
+            let args;
+            if (e.data) args = e.data;
+            else {
+              const abiEvents = {};
+              abiEvents[e.name] = e.name
+                // from "koinos.contracts.token.transfer_event" get "transfer_event"
+                .slice(e.name.lastIndexOf(".") + 1)
+                // replace to "transfer_arguments"
+                .replace("_event", "_arguments")
+              const contract = new Contract({
+                id: e.source,
+                abi: {
+                  ...utils.tokenAbi,
+                  events: abiEvents,
+                },
+                serializer: this.serializer,
+              });
+            
+              const decoded = await contract.decodeEvent(e);
+              args = decoded.args;
+            }
+            */
+            let amountFloat = Number(args.value) / Math.pow(10, token.decimals);
+            const type = args.to === this.address ? "receive" : "send";
+            let summary = "";
+            if (e.name.includes("transfer")) {
+              if (type === "receive") summary = `From ${this.truncateAddress(args.from)}`;
+              else summary = `To ${this.truncateAddress(args.to)}`;
+            } else if (e.name.includes("burn")) {
+              summary = "Burn";
+            } else if (e.name.includes("mint")) {
+              summary = "Mint";
+            }
+
+            return {
+              ...e,
+              txId: recordId,
+              args,
+              token,
+              type,
+              amountFormatted: amountFloat.toFixed(2),
+              summary,
+            };
+          })
+        );
+        events.push(...eventsProcessed.filter(e => !!e.source));
+      });
+
+      return events;
     },
     filteredCoins() {
       return this.coins.filter(coin => parseFloat(coin.balance) > 0);
@@ -234,72 +338,19 @@ export default {
     },
   },
 
-  mounted() {
+  async mounted() {
+    this.serializer = await this.newSandboxSerializer(
+      utils.tokenAbi.koilib_types
+    );
     console.log("Coins object:", this.coins)
     this.fetchData()
   },
 
   methods: {
-    getTransactionType(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
-      if (
-        operation.call_contract &&
-        operation.call_contract.args.from === this.address
-      ) {
-        return "send"
-      }
-      return "receive"
-    },
-
-    getTransactionAmount(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
-      if (operation.call_contract && operation.call_contract.args.value) {
-        // eslint-disable-next-line no-undef
-        const value = BigInt(operation.call_contract.args.value)
-        const decimals = this.getTokenDecimals(
-          operation.call_contract.contract_id
-        )
-        return Number(value) / Math.pow(10, decimals)
-      }
-      return null
-    },
-
-    formatTransactionAmount(transaction) {
-      const amount = this.getTransactionAmount(transaction)
-      if (amount === null) return "N/A"
-      return amount % 1 === 0 ? amount.toFixed(2) : amount.toString()
-    },
-
-    getTruncatedTransactionId(transaction) {
-      const id = transaction.trx.transaction.id
+    getTruncatedTransactionId(id) {
       return id
         ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}`
         : "N/A"
-    },
-
-    getTokenSymbol(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
-      if (operation.call_contract) {
-        return this.getTokenSymbolById(operation.call_contract.contract_id)
-      }
-      return "Unknown"
-    },
-
-    // getTransactionDate(transaction) {
-    //   return "Date not available"
-    // },
-
-    getTransactionAddress(transaction) {
-      const operation = transaction.trx.transaction.operations[0]
-      const type = this.getTransactionType(transaction)
-      if (operation.call_contract) {
-        const address =
-          type === "receive"
-            ? operation.call_contract.args.from
-            : operation.call_contract.args.to
-        return this.truncateAddress(address)
-      }
-      return "N/A"
     },
 
     truncateAddress(address) {
@@ -399,95 +450,15 @@ export default {
       return (Number(coin.balance) * price).toFixed(2)
     },
 
-    getTokenSymbolById(contractId) {
-      // This method should return the token symbol based on the contract ID
-      // You'll need to maintain a mapping of contract IDs to token symbols
-      const tokenMap = {
-        "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": "KOIN",
-        "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr": "VHP",
-        "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM": "ETH",
-        "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH": "USDT",
-        "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7": "BTC",
-        "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy": "pVHP",
-        "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS": "KAN",
-        "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ": "BTK",
-        "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD": "KCT",
-        "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG": "DRUGS",
-        "17t977jJZ7DYKPQsjqtStbpvmde1DditXW": "UP",
-        "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx": "PUNKSK",
-        "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8": "OGAS",
-        "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC": "EGG",
-        "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ": "DGK",
-        "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755": "KROK",
-        "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP": "KG",
-        "1EoGf6wPB632JudW1P12aSByLJdeNajWoU": "MEOW",
-        "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf": "GAS",
-        "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA": "RWA",
-        "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf": "RUN",
-        "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": "BALD",
-      }
-      return tokenMap[contractId] || "Unknown"
-    },
-
     getTokenImageById(contractId) {
-      const tokenImageMap = {
-        "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png",
-        "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png",
-        "15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd.png",
-        "14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N.png",
-        "15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png",
-        "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy.png",
-        "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS.png",
-        "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ.png",
-        "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD.png",
-        "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG.png",
-        "17t977jJZ7DYKPQsjqtStbpvmde1DditXW": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/17t977jJZ7DYKPQsjqtStbpvmde1DditXW.png",
-        "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx.png",
-        "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8.png",
-        "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC.png",
-        "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ.png",
-        "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KroK111wVj8QU3ydFHqPpNyVtfgV8n755.png",
-        "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP.png",
-        "1EoGf6wPB632JudW1P12aSByLJdeNajWoU": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1EoGf6wPB632JudW1P12aSByLJdeNajWoU.png",
-        "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf.png",
-        "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png",
-        "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png",
-        "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png",
-      };
-      return tokenImageMap[contractId] || "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png"
+      const token = defaultTokens.find(t => t.address === contractId);
+      if (token) return token.image;
+      return "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png";
     },
 
-    getTokenDecimals(contractId) {
-      // This method should return the number of decimals for the token
-      const decimalMap = {
-        "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": 8, // KOIN
-        "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr": 8, // VHP
-        "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM": 8, // ETH
-        "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH": 8, // USDT
-        "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7": 8, // BTC
-        "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy": 8, // pVHP
-        "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS": 8, // KAN
-        "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ": 8, // BTK
-        "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD": 8, // KCT
-        "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG": 8, // DRUGS
-        "17t977jJZ7DYKPQsjqtStbpvmde1DditXW": 8, // UP
-        "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx": 8, // PUNKSK
-        "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8": 8, // OGAS
-        "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC": 8, // EGG
-        "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ": 8, // DGK
-        "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755": 8, // KROK
-        "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP": 8, // KG
-        "1EoGf6wPB632JudW1P12aSByLJdeNajWoU": 8, // MEOW
-        "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf": 8, // GAS
-        "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA": 8, // RWA
-        "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf": 8, // RUN
-        "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs": 8, // BALD
-      }
-      return decimalMap[contractId] || 8 // Default to 8 decimals if unknown
-    },
-    openTransactionUrl(transaction) {
-      const transactionId = transaction.trx.transaction.id
-      const url = `https://koinosblocks.com/tx/${transactionId}`
+    openTransactionUrl(txId) {
+      // TODO: support testnet
+      const url = `https://koinosblocks.com/tx/${txId}`
       window.open(url, "_blank")
     },
   },
