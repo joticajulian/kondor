@@ -173,7 +173,7 @@
 
 <script>
 import axios from "axios"
-import { Contract, utils } from "koilib"
+import { Contract, Provider, utils } from "koilib"
 import { getAccountHistory } from "@/services/accountService"
 
 // mixins
@@ -207,6 +207,9 @@ const defaultTokens = [
   { network: "mainnet", address: "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA", symbol: "RWA", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png", },
   { network: "mainnet", address: "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf", symbol: "RUN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png", },
   { network: "mainnet", address: "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs", symbol: "BALD", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png", },
+
+  { network: "harbinger", address: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju", symbol: "tKOIN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png", },
+  { network: "harbinger", address: "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi", symbol: "VHP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png", },
 ];
 
 export default {
@@ -237,99 +240,15 @@ export default {
       loadingActivity: false,
       activityError: null,
       serializer: null,
+      provider: null,
+      networkTag: null,
+      filteredEvents: [],
     }
   },
 
   computed: {
     kollectionProfileUrl() {
       return `https://kollection.app/profile/${this.address}`
-    },
-    filteredEvents() {
-      const events = [];
-      this.transactions.forEach(async tx => {
-        if (!tx) return;
-        let rawEvents = [];
-        let recordId = "";
-        let txOrBlockLink = "";
-        let txOrBlockText = "";
-        if (tx.trx) {
-          if (tx.trx.receipt.events) {
-            rawEvents = tx.trx.receipt.events;
-            recordId = tx.trx.transaction.id;
-            txOrBlockLink = `https://koinosblocks.com/tx/${recordId}`;
-            txOrBlockText = this.getTruncatedTransactionId(recordId);
-          }
-        } else if (tx.block) {
-          if (tx.block.receipt.events) {
-            rawEvents = tx.block.receipt.events;
-            recordId = tx.block.header.height;
-            txOrBlockLink = `https://koinosblocks.com/block/${recordId}`;
-            txOrBlockText = `Block ${recordId}`;
-          }
-        }
-
-        const eventsProcessed = ( // await Promise.all(
-          rawEvents.map(e => { // async (e) => {
-            const token = defaultTokens.find(t => t.address === e.source);
-            if (!token || !["transfer_event", "mint_event", "burn_event"].find(name => e.name.includes(name))) {
-              return {};
-            }
-            if (!e.data) return {};
-            const args = e.data;
-
-            /*
-            let args;
-            if (e.data) args = e.data;
-            else {
-              const abiEvents = {};
-              abiEvents[e.name] = e.name
-                // from "koinos.contracts.token.transfer_event" get "transfer_event"
-                .slice(e.name.lastIndexOf(".") + 1)
-                // replace to "transfer_arguments"
-                .replace("_event", "_arguments")
-              const contract = new Contract({
-                id: e.source,
-                abi: {
-                  ...utils.tokenAbi,
-                  events: abiEvents,
-                },
-                serializer: this.serializer,
-              });
-            
-              const decoded = await contract.decodeEvent(e);
-              args = decoded.args;
-            }
-            */
-            let amountFloat = Number(args.value) / Math.pow(10, token.decimals);
-            const type = args.to === this.address ? "receive" : "send";
-            let summary = "";
-            if (e.name.includes("transfer")) {
-              if (type === "receive") summary = `From ${this.truncateAddress(args.from)}`;
-              else summary = `To ${this.truncateAddress(args.to)}`;
-            } else if (e.name.includes("burn")) {
-              summary = "Burn";
-            } else if (e.name.includes("mint")) {
-              summary = "Mint";
-            }
-            
-
-            return {
-              ...e,
-              txId: recordId,
-              args,
-              token,
-              type,
-              amountFormatted: amountFloat.toFixed(2),
-              summary,
-              txOrBlockLink,
-              txOrBlockText,
-            };
-          })
-        );
-        events.push(...eventsProcessed.filter(e => !!e.source));
-      });
-
-      return events;
     },
     filteredCoins() {
       return this.coins.filter(coin => parseFloat(coin.balance) > 0);
@@ -345,6 +264,13 @@ export default {
       },
       deep: true,
     },
+    "$store.state.currentNetwork": function () {
+      this.provider = new Provider(
+        this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
+      );
+      this.networkTag = this.$store.state.networks[this.$store.state.currentNetwork].tag;
+      this.filteredEvents = [];
+    },
   },
 
   async mounted() {
@@ -352,6 +278,12 @@ export default {
       utils.tokenAbi.koilib_types
     );
     console.log("Coins object:", this.coins)
+    
+    this.provider = new Provider(
+      this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
+    );
+    this.networkTag = this.$store.state.networks[this.$store.state.currentNetwork].tag;
+
     this.fetchData()
   },
 
@@ -426,9 +358,100 @@ export default {
       this.transactions = []
 
       try {
-        const data = await getAccountHistory(this.address)
-        this.transactions = data
+        const data = await this.provider.call("account_history.get_account_history", {
+          address: this.address,
+          ascending: false,
+          limit: 40,
+        });
+
+        this.transactions = data.values;
         console.log("Account history loaded:", this.transactions)
+        
+        if (!this.transactions) {
+          this.filteredEvents = [];
+          return;
+        }
+        const events = [];
+        await Promise.all(this.transactions.map(async tx => {
+          if (!tx) return;
+          let rawEvents = [];
+          let recordId = "";
+          let txOrBlockLink = "";
+          let txOrBlockText = "";
+          if (tx.trx) {
+            if (tx.trx.receipt.events) {
+              rawEvents = tx.trx.receipt.events;
+              recordId = tx.trx.transaction.id;
+              txOrBlockLink = `https://koinosblocks.com/tx/${recordId}`;
+              txOrBlockText = this.getTruncatedTransactionId(recordId);
+            }
+          } else if (tx.block) {
+            if (tx.block.receipt.events) {
+              rawEvents = tx.block.receipt.events;
+              recordId = tx.block.header.height;
+              txOrBlockLink = `https://koinosblocks.com/block/${recordId}`;
+              txOrBlockText = `Block ${recordId}`;
+            }
+          }
+  
+          const eventsProcessed = await Promise.all(
+            rawEvents.map(async (e) => {
+              const token = defaultTokens.find(t => t.address === e.source && t.network === this.networkTag);
+              if (!token || !["transfer_event", "mint_event", "burn_event"].find(name => e.name.includes(name))) {
+                return {};
+              }
+              if (!e.data) return {};
+              //const args = e.data;
+  
+              const abiEvents = {};
+              abiEvents[e.name] = { 
+                argument: e.name
+                  // from "koinos.contracts.token.transfer_event" get "transfer_event"
+                  .slice(e.name.lastIndexOf(".") + 1)
+                  // replace to "transfer_arguments"
+                  .replace("_event", "_arguments")
+              };
+              const contract = new Contract({
+                id: e.source,
+                abi: {
+                  ...utils.tokenAbi,
+                  events: abiEvents,
+                },
+                serializer: this.serializer,
+              });
+              
+              const { args } = await contract.decodeEvent(e);
+              
+              let amountFloat = Number(args.value) / Math.pow(10, token.decimals);
+              const type = args.to === this.address ? "receive" : "send";
+              let summary = "";
+              if (e.name.includes("transfer")) {
+                if (type === "receive") summary = `From ${this.truncateAddress(args.from)}`;
+                else summary = `To ${this.truncateAddress(args.to)}`;
+              } else if (e.name.includes("burn")) {
+                summary = "Burn";
+              } else if (e.name.includes("mint")) {
+                summary = "Mint";
+              }
+              
+  
+              return {
+                ...e,
+                txId: recordId,
+                args,
+                token,
+                type,
+                amountFormatted: amountFloat.toFixed(2),
+                summary,
+                txOrBlockLink,
+                txOrBlockText,
+              };
+            })
+          );
+          events.push(...eventsProcessed.filter(e => !!e.source));
+        }));
+  
+        this.filteredEvents = events;
       } catch (err) {
         this.activityError = `Failed to fetch account history: ${err.message}`
         console.error("Error fetching account history:", err)
