@@ -102,8 +102,8 @@
           class="transaction-list"
         >
           <div
-            v-for="event in filteredEvents"
-            :key="event.txId"
+            v-for="(event, id) in filteredEvents"
+            :key="id"
             class="transaction-item"
           >
             <div
@@ -123,9 +123,9 @@
                 </span>
                 <span
                   class="transaction-id"
-                  @click="openTransactionUrl(event.txId)"
+                  @click="openTransactionUrl(event.txOrBlockLink)"
                 >
-                  {{ getTruncatedTransactionId(event.txId) }}
+                  {{ event.txOrBlockText }}
                 </span>
               </div>
               <div class="transaction-bottom">
@@ -250,15 +250,21 @@ export default {
         if (!tx) return;
         let rawEvents = [];
         let recordId = "";
+        let txOrBlockLink = "";
+        let txOrBlockText = "";
         if (tx.trx) {
           if (tx.trx.receipt.events) {
             rawEvents = tx.trx.receipt.events;
             recordId = tx.trx.transaction.id;
+            txOrBlockLink = `https://koinosblocks.com/tx/${recordId}`;
+            txOrBlockText = this.getTruncatedTransactionId(recordId);
           }
         } else if (tx.block) {
           if (tx.block.receipt.events) {
             rawEvents = tx.block.receipt.events;
             recordId = tx.block.header.height;
+            txOrBlockLink = `https://koinosblocks.com/block/${recordId}`;
+            txOrBlockText = `Block ${recordId}`;
           }
         }
 
@@ -305,6 +311,7 @@ export default {
             } else if (e.name.includes("mint")) {
               summary = "Mint";
             }
+            
 
             return {
               ...e,
@@ -314,6 +321,8 @@ export default {
               type,
               amountFormatted: amountFloat.toFixed(2),
               summary,
+              txOrBlockLink,
+              txOrBlockText,
             };
           })
         );
@@ -456,9 +465,7 @@ export default {
       return "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png";
     },
 
-    openTransactionUrl(txId) {
-      // TODO: support testnet
-      const url = `https://koinosblocks.com/tx/${txId}`
+    openTransactionUrl(url) {
       window.open(url, "_blank")
     },
   },
