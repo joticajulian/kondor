@@ -421,7 +421,7 @@ export default {
                 serializer: this.serializer,
               });
               
-              const { args } = await contract.decodeEvent(e);console.log({args});
+              const { args } = await contract.decodeEvent(e);
               
               let amountFloat = Number(args.value) / Math.pow(10, token.decimals);
               const type = args.to === this.address ? "receive" : "send";
