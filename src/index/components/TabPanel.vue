@@ -378,18 +378,20 @@ export default {
           let recordId = "";
           let txOrBlockLink = "";
           let txOrBlockText = "";
+          const { explorer } = this.$store.state.networks[this.$store.state.currentNetwork];
+
           if (tx.trx) {
             if (tx.trx.receipt.events) {
               rawEvents = tx.trx.receipt.events;
               recordId = tx.trx.transaction.id;
-              txOrBlockLink = `https://koinosblocks.com/tx/${recordId}`;
+              txOrBlockLink = `${explorer.tx}/${recordId}`;
               txOrBlockText = this.getTruncatedTransactionId(recordId);
             }
           } else if (tx.block) {
             if (tx.block.receipt.events) {
               rawEvents = tx.block.receipt.events;
               recordId = tx.block.header.height;
-              txOrBlockLink = `https://koinosblocks.com/block/${recordId}`;
+              txOrBlockLink = `${explorer.block}/${recordId}`;
               txOrBlockText = `Block ${recordId}`;
             }
           }
@@ -401,7 +403,6 @@ export default {
                 return {};
               }
               if (!e.data) return {};
-              //const args = e.data;
   
               const abiEvents = {};
               abiEvents[e.name] = { 
@@ -420,7 +421,7 @@ export default {
                 serializer: this.serializer,
               });
               
-              const { args } = await contract.decodeEvent(e);
+              const { args } = await contract.decodeEvent(e);console.log({args});
               
               let amountFloat = Number(args.value) / Math.pow(10, token.decimals);
               const type = args.to === this.address ? "receive" : "send";
@@ -434,7 +435,6 @@ export default {
                 summary = "Mint";
               }
               
-  
               return {
                 ...e,
                 txId: recordId,

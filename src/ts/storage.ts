@@ -43,6 +43,7 @@ export interface Network {
   tag: string;
   chainId: string;
   rpcNodes: string[];
+  explorer?: { tx: string; block: string; };
   koinContractId: string;
   nicknamesContractId?: string;
   kapNameServiceContractId?: string;
@@ -57,6 +58,10 @@ export const DEFAULT_NETWORKS: Network[] = [
     tag: "mainnet",
     chainId: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
     rpcNodes: ["https://api.koinos.io", "https://api.koinosblocks.com"],
+    explorer: {
+      tx: "https://koinosblocks.com/tx",
+      block: "https://koinosblocks.com/block",
+    },
     koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
     nicknamesContractId: "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz",
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
@@ -77,6 +82,10 @@ export const DEFAULT_NETWORKS: Network[] = [
       "https://harbinger-api.koinos.io",
       "https://testnet.koinosblocks.com",
     ],
+    explorer: {
+      tx: "https://harbinger.koinosblocks.com/tx",
+      block: "https://harbinger.koinosblocks.com/block",
+    },
     koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
     nicknamesContractId: "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR",
     // freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
@@ -125,9 +134,10 @@ export async function getNetworks(strict = true): Promise<Network[]> {
       "kapProfileContractId",
       "freeManaSharer",
       "manaMeter",
+      "explorer",
     ] as const;
     fields.forEach((field) => {
-      network[field] = DEFAULT_NETWORKS[i][field]! as string & string[];
+      network[field] = DEFAULT_NETWORKS[i][field]! as string & string[] & { tx: string; block: string; };
     });
   });
 
