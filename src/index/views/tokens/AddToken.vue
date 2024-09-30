@@ -60,14 +60,10 @@
       </button>
 
       <div v-else class="second-confirmation">
-        <div v-if="!tokenInKoinDX" class="warning-notification">
-          This token is not listed in KoinDX. It is extremely important that you
-          add only trusted tokens; Otherwise, you risk losing funds.
-        </div>
-        <div v-if="!tokenPermanentAddress" class="warning-notification">
+        <!-- <div v-if="!tokenPermanentAddress" class="warning-notification">
           The token address is not permanent and could be changed at any time.
           Only continue if you understand the risks.
-        </div>
+        </div> -->
         <button @click="accept2" class="custom-button primary">
           Yes, add token
         </button>
@@ -95,6 +91,11 @@ function fromUtf8ToHex(text) {
   return utils.toHexString(new TextEncoder().encode(text))
 }
 
+function fromHexToUtf8(hex) {
+  const hex2 = hex.startsWith("0x") ? hex.slice(2) : hex;
+  return new TextDecoder().decode(utils.toUint8Array(hex2));
+}
+
 export default {
   components: { PageTitle },
   mixins: [Storage, Sandbox, ViewHelper],
@@ -108,7 +109,6 @@ export default {
       provider: null,
       tokens: [],
       requestSecondConfirmation: false,
-      tokenInKoinDX: false,
       tokenPermanentAddress: true,
       loading: false,
       koindxTokens: [], // To store the list of tokens from KoinDX
@@ -171,7 +171,7 @@ export default {
     async fetchKoindxTokens() {
       try {
         const response = await axios.get(
-          "https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/mainnet.json"
+          `https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/${this.network.tag}.json`
         )
         this.koindxTokens = response.data.tokens
       } catch (error) {
@@ -188,10 +188,18 @@ export default {
 
     onTokenSelected() {
       if (this.selectedToken && !this.showAdvanced) {
-        this.name = this.selectedToken.name
         this.tokenAddress = this.selectedToken.address // Set the contract address
-        this.tokenInKoinDX = true // As the token is selected from KoinDX list
       }
+    },
+
+    async getNicknameFromAddress(address) {
+      const { result } = await this.nicknames.get_main_token({
+        value: address,
+      });
+      if (!result || !result.token_id) {
+        throw new Error(`No nickname for address ${address}`);
+      }
+      return fromHexToUtf8(result.token_id);
     },
 
     async accept() {
@@ -199,8 +207,8 @@ export default {
         this.loading = true
         const newToken = {
           network: this.network.tag,
-          contractId: this.tokenAddress,
-          nickname: this.name,
+          contractId: "",
+          nickname: "",
           symbol: "",
           decimals: 0,
           image: emptyToken,
@@ -209,8 +217,44 @@ export default {
           noAddresses: [],
         }
 
-        if (!this.tokenAddress) {
-          throw new Error("Token address is required")
+        if (!this.name) {
+          if (!this.tokenAddress) {
+            throw new Error("Set a nickname or select a token from the list");
+          }
+          this.name = await this.getNicknameFromAddress(this.tokenAddress);
+        }
+
+        const tokenId = `0x${fromUtf8ToHex(this.name)}`;
+        try {
+          const { result } = await this.nicknames.get_address({
+            value: this.name,
+          });
+          newToken.contractId = result.value;
+          newToken.nickname = this.name;
+          newToken.permanentAddress =
+            !!result.address_modifiable_only_by_governance ||
+            !!result.permanent_address;
+          this.tokenPermanentAddress = newToken.permanentAddress;
+        } catch (error) {
+          console.log(error);
+          throw new Error(
+            `nickname @${this.name} not found in ${this.network.tag} network`
+          );
+        }
+
+        try {
+          const { result: resultMetadata } = await this.nicknames.metadata_of(
+            {
+              token_id: tokenId,
+            }
+          );
+          const metadata = JSON.parse(resultMetadata.value);
+          if (metadata.image) newToken.image = metadata.image;
+        } catch (error) {
+          console.error(
+            `error when loading metadata of token @${newToken.nickname}`
+          );
+          console.error(error);
         }
 
         const contract = new Contract({
@@ -248,8 +292,8 @@ export default {
           this.tokens.push(newToken)
         }
 
-        this.requestSecondConfirmation =
-          !this.tokenInKoinDX || !this.tokenPermanentAddress
+        // this.requestSecondConfirmation = !this.tokenPermanentAddress;
+        this.requestSecondConfirmation = false; // TODO: request confirmation
         if (!this.requestSecondConfirmation) {
           await this._setTokens(this.tokens)
           router.back()

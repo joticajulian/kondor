@@ -151,8 +151,13 @@
           class="coin-item"
         >
           <div class="coin-icon-and-name">
-            <img
+            <!-- <img
               :src="getTokenImageById(coin.contractId)"
+              :alt="symbol"
+              class="coin-image"
+            > -->
+            <img
+              :src="coin.image"
               :alt="symbol"
               class="coin-image"
             >
@@ -251,7 +256,8 @@ export default {
       return `https://kollection.app/profile/${this.address}`
     },
     filteredCoins() {
-      return this.coins.filter(coin => parseFloat(coin.balance) > 0);
+      // return this.coins.filter(coin => parseFloat(coin.balance) > 0);
+      return this.coins;
     },
   },
 
