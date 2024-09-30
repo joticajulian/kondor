@@ -24,7 +24,7 @@
         </option>
       </select>
 
-      <input
+      <input v-if="useNickname"
         v-model="name"
         type="text"
         placeholder="Nickname"
@@ -38,13 +38,28 @@
           <span v-else class="material-icons">expand_less</span>
         </a>
       </div>
-      <div v-if="showAdvanced" class="advanced-content">
+      <!-- <div v-if="showAdvanced" class="advanced-content">
         <input
           v-model="tokenAddress"
           type="text"
           placeholder="Token address"
           @keyup.enter="accept"
         />
+      </div> -->
+      <div v-if="showAdvanced">
+        <input
+          v-model="tokenToRemove"
+          type="text"
+          placeholder="Token to remove"
+          @keyup.enter="remove"
+        />
+
+        <button
+        @click="remove"
+        class="custom-button primary"
+      >
+        <span class="custom-button primary">remove</span>
+      </button>
       </div>
     </div>
 
@@ -104,6 +119,7 @@ export default {
       showAdvanced: false,
       name: "",
       tokenAddress: "",
+      tokenToRemove: "",
       nicknames: null,
       network: null,
       provider: null,
@@ -113,6 +129,7 @@ export default {
       loading: false,
       koindxTokens: [], // To store the list of tokens from KoinDX
       selectedToken: "", // To store the selected token from the dropdown
+      useNickname: false,
     }
   },
 
@@ -173,7 +190,10 @@ export default {
         const response = await axios.get(
           `https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/${this.network.tag}.json`
         )
-        this.koindxTokens = response.data.tokens
+        this.koindxTokens = [
+          ...response.data.tokens,
+          { name: "Other", symbol: "use nickname" },
+        ];
       } catch (error) {
         console.error("Failed to fetch KoinDX tokens", error)
       }
@@ -188,7 +208,12 @@ export default {
 
     onTokenSelected() {
       if (this.selectedToken && !this.showAdvanced) {
-        this.tokenAddress = this.selectedToken.address // Set the contract address
+        if (this.selectedToken.name === "Other" && this.selectedToken.symbol === "use nickname") {
+          this.useNickname = true;
+        } else {
+          this.tokenAddress = this.selectedToken.address // Set the contract address
+          this.useNickname = false;
+        }
       }
     },
 
@@ -217,11 +242,16 @@ export default {
           noAddresses: [],
         }
 
-        if (!this.name) {
+        if (!this.useNickname) {
           if (!this.tokenAddress) {
-            throw new Error("Set a nickname or select a token from the list");
+            throw new Error("Select a token from the list");
           }
-          this.name = await this.getNicknameFromAddress(this.tokenAddress);
+          if (["koin", "vhp"].includes(this.tokenAddress)) {
+            // when KoinDX uses names instead of addresses
+            this.name = this.tokenAddress;
+          } else {
+            this.name = await this.getNicknameFromAddress(this.tokenAddress);
+          }
         }
 
         const tokenId = `0x${fromUtf8ToHex(this.name)}`;
@@ -313,6 +343,26 @@ export default {
 
     cancel() {
       router.back()
+    },
+
+    async remove() {
+      const contractIdOrNickname = this.tokenToRemove.trim();
+      let id;
+      if (contractIdOrNickname.startsWith("1")) {
+        id = this.tokens.findIndex((t) => t.contractId === contractIdOrNickname);
+      } else {
+        id = this.tokens.findIndex((t) => t.nickname === contractIdOrNickname);
+      }
+      this.tokens.splice(id, 1);
+      const tokens = (await this._getTokens()).filter((t) => {
+        if (t.network !== this.network.tag) return true;
+        if (contractIdOrNickname.startsWith("1")) {
+          return t.contractId !== contractIdOrNickname;
+        }
+        return t.nickname !== contractIdOrNickname;
+      });
+      await this._setTokens(tokens);
+      router.back();
     },
   },
 }
