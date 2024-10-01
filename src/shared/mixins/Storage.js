@@ -183,7 +183,7 @@ export default {
             network: "harbinger",
             contractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
             nickname: "koin",
-            symbol: "KOIN",
+            symbol: "tKOIN",
             decimals: 8,
             image:
               "https://files.peakd.com/file/peakd-hive/jga/AJizr3uSbFj2e8s3k5LBeARYf7g8p4xUrRNbHGEwNuEm25sAykFpvkLMZiGNgvG.png",

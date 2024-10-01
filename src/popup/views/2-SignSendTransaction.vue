@@ -9,12 +9,12 @@
     </div>
 
     <div class="check-events-row">
-      <button
+      <!--<button
         class="check-events-btn"
         @click="toggleEventDetails"
       >
         Check events
-      </button>
+      </button>-->
 
       <div
         class="advanced-toggle"
@@ -41,6 +41,32 @@
         Loading transfer amount...
       </h2>
     </div>
+
+    <!--
+    <div class="sending-info">
+      <p>@KOIN transfer</p>
+      <h2>
+        Transfer 400.00 KOIN
+      </h2>
+    </div>
+
+    <div class="sending-info">
+      <p>Summary</p>
+      <h2>
+        NFT 0x3456
+      </h2>
+      <h2>
+        4 KOIN -> 4 VHP
+      </h2>
+    </div>
+
+    <div class="sending-info">
+      <p>You burn/mint</p>
+      <h2>
+        4 KOIN -> 4 VHP
+      </h2>
+    </div>
+    -->
 
     <div
       v-if="showAdvanced"
@@ -878,7 +904,7 @@ export default {
           this.alertDanger(error.message)
         })    
       console.log("Starting checkEvents");
-      await this.checkEvents();
+      await this.checkEvents(); // todo
       console.log("checkEvents completed");
 
       console.log("Final KOIN transfer amount:", this.koinTransferAmount);
@@ -1905,8 +1931,6 @@ input {
   padding: 1em 1em 1em 2em;
   font-size: 0.8em;
   color: var(--primary-gray);
-  margin-top: -1.2em;
-  margin-bottom: 6em;
 }
 
 .wallet-interaction h2 {
@@ -1928,11 +1952,9 @@ input {
 
 .check-events-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 92%;
-  position: absolute;
-  top: 7.3em;
+  flex-direction: column;
+  align-items: end;
+  width: 100%;
 }
 
 .check-events-btn {
@@ -2005,6 +2027,7 @@ input:checked + .slider:before {
   text-align: center;
   margin-bottom: 1.5em;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .sending-info p {

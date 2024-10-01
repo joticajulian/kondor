@@ -5,7 +5,7 @@
       src="sandbox.html"
       @load="$store.state.sandboxLoaded = true"
     />
-    <Nav />
+    <!--<Nav />-->
     <router-view />
     <Alert
       :type="$store.state.alertType"
@@ -21,6 +21,6 @@ import Nav from "@/index/components/Nav";
 import Alert from "@/shared/components/Alert";
 
 export default {
-  components: { Nav, Alert },
+  components: { /*Nav,*/ Alert },
 };
 </script>
