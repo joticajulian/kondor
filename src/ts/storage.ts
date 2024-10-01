@@ -44,7 +44,6 @@ export interface Network {
   chainId: string;
   rpcNodes: string[];
   explorer?: { tx: string; block: string; };
-  koinContractId: string;
   nicknamesContractId?: string;
   kapNameServiceContractId?: string;
   kapProfileContractId?: string;
@@ -62,7 +61,6 @@ export const DEFAULT_NETWORKS: Network[] = [
       tx: "https://koinosblocks.com/tx",
       block: "https://koinosblocks.com/block",
     },
-    koinContractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
     nicknamesContractId: "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz",
     kapNameServiceContractId: "13tmzDmfqCsbYT26C4CmKxq86d33senqH3",
     kapProfileContractId: "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB",
@@ -86,7 +84,6 @@ export const DEFAULT_NETWORKS: Network[] = [
       tx: "https://harbinger.koinosblocks.com/tx",
       block: "https://harbinger.koinosblocks.com/block",
     },
-    koinContractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
     nicknamesContractId: "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR",
     // freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
     freeManaSharer: "1A5ovJ6htWqnh8qDiXPQMuWmqxtVr2q3Gn",
@@ -128,7 +125,6 @@ export async function getNetworks(strict = true): Promise<Network[]> {
   networks!.forEach((network, i) => {
     const fields = [
       "chainId",
-      "koinContractId",
       "nicknamesContractId",
       "kapNameServiceContractId",
       "kapProfileContractId",

@@ -207,21 +207,6 @@ export default {
       this.networks.forEach((n) => {
         n.rpcNodesText = n.rpcNodes.join(",");
       });
-      this.networks[0].name = "Koinos Mainnet";
-      this.networks[0].tag = "mainnet";
-      this.networks[0].koinContractId = "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL";
-      this.networks[0].kapNameServiceContractId =
-        "13tmzDmfqCsbYT26C4CmKxq86d33senqH3";
-      this.networks[0].kapProfileContractId =
-        "1EttfMuvTXGh8oE6vLiRF5JfqBvRiofFkB";
-      this.networks[0].nicknamesContractId =
-        "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz";
-
-      this.networks[1].name = "Koinos Harbinger (testnet)";
-      this.networks[1].tag = "harbinger";
-      this.networks[1].koinContractId = "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ";
-      this.networks[1].nicknamesContractId =
-        "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR";
     },
 
     async updateNetworks() {

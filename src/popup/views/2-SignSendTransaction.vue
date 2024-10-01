@@ -355,6 +355,7 @@ export default {
       isOldKondor: false,
       nicknames: null,
       koinContract: null,
+      koinContractId: "",
       freeManaSharer: null,
       cacheNicknames: {},
       loadingEvents: false,
@@ -861,6 +862,10 @@ export default {
       this.requester = this.request.sender
       this.typeRequest = this.send ? "send" : "sign"
       console.log("Starting decodeTransaction");
+      const tokens = await this._getTokens();
+      const koinToken = tokens.find(t => t.nickname === "koin");
+      if (!koinToken) throw new Error("Koin contract ID not found");
+      this.koinContractId = koinToken.contractId;
     
       await this.decodeTransaction()
     
@@ -1216,7 +1221,7 @@ export default {
         })
 
         this.koinContract = new Contract({
-          id: this.network.koinContractId,
+          id: this.koinContractId,
           abi: {
             ...utils.tokenAbi,
             events: {

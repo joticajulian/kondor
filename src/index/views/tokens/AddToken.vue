@@ -155,7 +155,8 @@ export default {
   methods: {
     async loadNetwork() {
       try {
-        this.$store.state.networks = await this._getNetworks()
+        this.$store.state.networks = await this._getNetworks();
+        this.tokens = await this._getTokens();
         const currentTag = await this._getCurrentNetwork()
         this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
           (n) => n.tag === currentTag
@@ -305,7 +306,6 @@ export default {
         newToken.symbol = symbol.value
         newToken.decimals = decimals.value
 
-        this.tokens = await this._getTokens()
         const existingId = this.tokens.findIndex(
           (t) =>
             t.contractId === newToken.contractId &&
@@ -346,23 +346,32 @@ export default {
     },
 
     async remove() {
-      const contractIdOrNickname = this.tokenToRemove.trim();
-      let id;
-      if (contractIdOrNickname.startsWith("1")) {
-        id = this.tokens.findIndex((t) => t.contractId === contractIdOrNickname);
-      } else {
-        id = this.tokens.findIndex((t) => t.nickname === contractIdOrNickname);
-      }
-      this.tokens.splice(id, 1);
-      const tokens = (await this._getTokens()).filter((t) => {
-        if (t.network !== this.network.tag) return true;
+      try {
+        const contractIdOrNickname = this.tokenToRemove.trim();
+        let id;
         if (contractIdOrNickname.startsWith("1")) {
-          return t.contractId !== contractIdOrNickname;
+          id = this.tokens.findIndex((t) => t.contractId === contractIdOrNickname);
+        } else {
+          id = this.tokens.findIndex((t) => t.nickname === contractIdOrNickname);
         }
-        return t.nickname !== contractIdOrNickname;
-      });
-      await this._setTokens(tokens);
-      router.back();
+  
+        if (id < 0) throw new Error("Token not found");
+        if (this.tokens[id].nickname === "koin") throw new Error("Koin cannot be removed");
+
+        this.tokens.splice(id, 1);
+        const tokens = (await this._getTokens()).filter((t) => {
+          if (t.network !== this.network.tag) return true;
+          if (contractIdOrNickname.startsWith("1")) {
+            return t.contractId !== contractIdOrNickname;
+          }
+          return t.nickname !== contractIdOrNickname;
+        });
+        await this._setTokens(tokens);
+        router.back();
+      } catch (error) {
+        this.alertDanger(error.message);
+        throw error;
+      }
     },
   },
 }

@@ -569,8 +569,11 @@ export default {
           serializer: this.serializer,
         }).functions;
 
+        const koinToken = this.miniTokens.find(t => t.nickname === "koin");
+        if (!koinToken) throw new Error("Koin contract id not found");
+
         const koinContract = new Contract({
-          id: this.network.koinContractId,
+          id: koinToken.contractId,
           abi: {
             ...utils.tokenAbi,
             events: {
