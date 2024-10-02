@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div class="sending-info">
+    <!--<div class="sending-info">
       <p>You are sending</p>
       <h2 v-if="typeof koinTransferAmount === 'number'">
         {{ koinTransferAmount.toFixed(2) }} KOIN
@@ -40,6 +40,62 @@
       <h2 v-else>
         Loading transfer amount...
       </h2>
+    </div>-->
+
+    <div
+      v-for="(op, i) in operations"
+      :key="'op' + i"
+      class="operation"
+    >
+      <div
+        class="op-header"
+        :class="op.style"
+      >
+        <div
+          class="op-header-image"
+        >
+          <img
+            src="https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png"
+            alt="operation-icon"
+          >
+        </div>
+        <div
+          v-if="op.nickname || true"
+          class="op-title"
+        >
+          {{ op.nickname }} KOIN - {{  op.title }}
+        </div>
+        <!--<div
+          v-if="op.call_contract"
+          class="contract-id"
+        >
+          {{ op.contractId }}
+        </div>
+        <div class="op-title">
+          {{ op.title }}
+        </div>
+        <div class="op-subtitle">
+          {{ op.subtitle }}
+        </div>-->
+        <div
+          class="op-viewmore"
+          @click="toggleViewMoreOperation(i)" 
+        >{{ op.viewMore ? "View less" : "View more" }}</div>
+      </div>
+      <div v-if="op.viewMore" class="op-body">
+        <div
+          v-for="(arg, j) in op.args"
+          :key="'f' + j"
+          class="op-body-row"
+        >
+          <div class="field-name">
+            {{ arg.field }}
+          </div>
+          <div class="field-data">
+            {{ arg.data }}
+          </div>
+        </div>
+      </div>
     </div>
 
     <!--
@@ -131,45 +187,6 @@
             type="text"
             :disabled="externalSigners"
           >
-        </div>
-      </div>
-      <div class="subtitle">
-        Operations
-      </div>
-      <div
-        v-for="(op, i) in operations"
-        :key="'op' + i"
-        class="operation"
-      >
-        <div
-          class="op-header"
-          :class="op.style"
-        >
-          <div
-            v-if="op.call_contract"
-            class="contract-id"
-          >
-            {{ op.contractId }}
-          </div>
-          <div class="op-title">
-            {{ op.title }}
-          </div>
-          <div class="op-subtitle">
-            {{ op.subtitle }}
-          </div>
-        </div>
-        <div class="op-body">
-          <div
-            v-for="(arg, j) in op.args"
-            :key="'f' + j"
-          >
-            <div class="field-name">
-              {{ arg.field }}
-            </div>
-            <div class="field-data">
-              {{ arg.data }}
-            </div>
-          </div>
         </div>
       </div>
       <div class="subtitle">
@@ -1021,9 +1038,7 @@ export default {
         : action.source
 
       const resolvedName = await this.resolveAddress(contractId)
-      let contractIdName = resolvedName
-        ? `${contractId} - @${resolvedName} contract`
-        : contractId
+      let contractIdName = contractId;
 
       const accContract = this.accounts.find((a) => a.address === contractId)
       if (accContract) contractIdName = `${contractId} - ${accContract.name}`
@@ -1085,6 +1100,7 @@ export default {
           this.operations.push({
             call_contract: true,
             contractId: contractIdName,
+            nickname: resolvedName,
             title: firstUpperCase(contract.abi.methods[name].name || name),
             subtitle: contract.abi.methods[name].description || "",
             args,
@@ -1635,11 +1651,19 @@ export default {
       this.sendResponse("extension", message, this.request.sender)
       window.close()
     },
+
+    toggleViewMoreOperation(i) {
+      const copyOperations = JSON.parse(JSON.stringify(this.operations));
+      copyOperations[i].viewMore = !copyOperations[i].viewMore;
+      this.operations = copyOperations;
+    },
+
     toggleAdvanced() {
       console.log("toggleAdvanced called, current state:", this.showAdvanced)
       this.showAdvanced = !this.showAdvanced
       console.log("New state:", this.showAdvanced)
     },
+
     toggleEventDetails() {
       this.showDetailedEvents = !this.showDetailedEvents;
     },
@@ -1716,6 +1740,8 @@ input {
 .operation {
   margin-bottom: 1em;
   padding: 1.2em;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .red {
@@ -1731,11 +1757,28 @@ input {
 }
 
 .op-header {
-  padding: 8px 6px;
+  padding: 1rem;
   color: var(--kondor-light);
   margin-top: 0.5em;
   border-top-left-radius: 1em;
   border-top-right-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--primary-dark-light);
+}
+
+.op-header-image {
+  width: 4em;
+  height: 4em;
+  padding: 1em;
+  background-color: var(--kondor-purple30);
+  border-radius: 50%;
+}
+
+.op-header-image img {
+  width: 100%;
+  height: 100%;
 }
 
 .contract-id {
@@ -1752,16 +1795,35 @@ input {
   font-size: 0.8em;
 }
 
+.op-viewmore {
+  font-size: 0.8em;
+  color: var(--kondor-purple);
+  margin-top: 0.3rem;
+  cursor: pointer;
+}
+
 .op-body {
-  padding: 1px 6px 8px 6px;
+  padding: 0 0.8rem 0.5rem 0.8rem;
   word-break: break-all;
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
+  background-color: var(--primary-dark-light);
+  background-color: var(--primary-dark-light);
+  border-top: 1px dashed;
+  border-top-color: gray;
+}
+
+.op-body-row {
+  display: flex;
+  margin: 1rem 0;
+  justify-content: space-between;
 }
 
 .field-name {
-  margin: 9px 0 5px 0;
   color: gray;
+  min-width: 5.5rem;
+  max-width: 5.5rem;
+  margin-right: 0.5rem
 }
 
 .ev-header {

@@ -3,7 +3,8 @@
   
   /* --kondor-light: #f7dcbf; */
   --kondor-gray: #828282;
-  --kondor-purple: #6d6ff3;
+  --kondor-purple: #7061ef;
+  --kondor-purple30: #7061ef40;
   --kondor-red: #ef6161;
   --kondor-lighter: #c8c1d1;
   --gray-light: #f3f3f3;
@@ -12,7 +13,7 @@
   --primary-dark: #222222;
   --primary-light: #ffffff;
   --primary-darker: #111111;
-  --primary-dark-light: #353535;
+  --primary-dark-light: #2a2a2a;
   --primary-gray: #777777;
   --network-green: #32cd32;
 }
