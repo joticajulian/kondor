@@ -33,7 +33,8 @@ export const testRequests = [
           },
         ],
         header: {
-          chain_id: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
+          // chain_id: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
+          chain_id: "EiBZK_GGVP0H_fXVAM3j6EAuz3-B-l3ejxRSewi7qIBfSA==",
           rc_limit: "0",
           nonce: "KAE=",
           operation_merkle_root:

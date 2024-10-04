@@ -8,16 +8,6 @@
       <div>{{ requester.origin }}</div>
     </div>
 
-    <!--<div class="sending-info">
-      <p>You are sending</p>
-      <h2 v-if="typeof koinTransferAmount === 'number'">
-        {{ koinTransferAmount.toFixed(2) }} KOIN
-      </h2>
-      <h2 v-else>
-        Loading transfer amount...
-      </h2>
-    </div>-->
-
     <div
       v-for="(op, i) in operations"
       :key="'op' + i"
@@ -31,7 +21,7 @@
           class="op-header-image"
         >
           <img
-            src="https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png"
+            :src="op.contractMetadata && op.contractMetadata.image ? op.contractMetadata.image : 'https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png'"
             alt="operation-icon"
           >
         </div>
@@ -39,7 +29,7 @@
           v-if="op.nickname || true"
           class="op-title"
         >
-          {{ op.nickname }} KOIN - {{  op.title }}
+        {{ op.contractMetadata && op.contractMetadata.nickname ? op.contractMetadata.nickname + " -" : "" }} {{  op.title }}
         </div>
         <div
           class="op-viewmore"
@@ -68,7 +58,11 @@
         v-if="receipt"
         class="subtitle"
       >
-        Events
+        Events <span
+            v-if="loadingEvents"
+            class="loader2"
+          ></span>
+          <div v-if="!loadingEvents" @click="checkEvents">X</div>
       </div>
       <div
         v-for="(ev, i) in filteredEvents"
@@ -84,16 +78,16 @@
             class="op-header-image2"
           >
             <img
-              src="https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png"
+              :src="ev.contractMetadata && ev.contractMetadata.image ? ev.contractMetadata.image : 'https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png'"
               alt="operation-icon"
             >
           </div>
           <div class="op-title">
-            NICK - {{ ev.title }}
+            {{ ev.contractMetadata && ev.contractMetadata.nickname ? ev.contractMetadata.nickname + " -" : "" }} {{ ev.title }}
           </div>
           <div
             class="op-viewmore"
-            @click="toggleViewMoreEvent(i)" 
+            @click="toggleViewMoreEvent(ev.id)" 
           >{{ ev.viewMore ? "View less" : "View more" }}</div>
         </div>
         <div
@@ -139,33 +133,17 @@
           </div>
         </div>
       </div>
+      <div
+        v-if="showAllEvents || events.length > filteredEvents.length"
+        class="op-viewmore"
+        style="padding: 0 2em;"
+        @click="toggleFilteredEvents"
+      >
+        {{ showAllEvents ? "View less events" : `View the other ${events.length - filteredEvents.length} events` }}
+      </div>
     </div>
 
-    <!--
-    <div class="sending-info">
-      <p>@KOIN transfer</p>
-      <h2>
-        Transfer 400.00 KOIN
-      </h2>
-    </div>
-
-    <div class="sending-info">
-      <p>Summary</p>
-      <h2>
-        NFT 0x3456
-      </h2>
-      <h2>
-        4 KOIN -> 4 VHP
-      </h2>
-    </div>
-
-    <div class="sending-info">
-      <p>You burn/mint</p>
-      <h2>
-        4 KOIN -> 4 VHP
-      </h2>
-    </div>
-    -->
+    
 
     <div class="check-events-row">
       <!--<button
@@ -372,8 +350,8 @@ export default {
 
   data: function () {
     return {
-      koinTransferAmount: null,
       showAdvanced: false,
+      showAllEvents: false,
       data: "",
       abis: null,
       cacheAbis: {},
@@ -417,9 +395,11 @@ export default {
   },
   computed: {
     filteredEvents() {
+      if (this.showAllEvents) return this.events;
       return this.events.filter(e => {
-        return !!e.contractMetadata;
+        return !!e.contractMetadata && e.impactsUserAccounts;
       });
+      // return this.events;
     },
     simplifiedDomain() {
       try {
@@ -432,24 +412,6 @@ export default {
       } catch (error) {
         return this.requester.origin // Return the original if parsing fails
       }
-    },
-    sendingAmount() {
-      if (!this.operations || this.operations.length === 0) return '0';
-    
-      const transferOperation = this.operations.find(op => 
-        op.args && op.args.some(arg => arg.field === 'Amount_in')
-      );
-    
-      if (transferOperation) {
-        const amountArg = transferOperation.args.find(arg => arg.field === 'Amount_in');
-        if (amountArg) {
-        // Convert from satoshis to KOIN (assuming 8 decimal places)
-          const amountInKoin = Number(amountArg.data) / 100000000;
-          return amountInKoin.toFixed(8);
-        }
-      }
-    
-      return '0';
     },
   },
 
@@ -473,9 +435,6 @@ export default {
     showAdvanced(newVal) {
       console.log('showAdvanced changed:', newVal);
     },
-    koinTransferAmount(newVal, oldVal) {
-      console.log(`koinTransferAmount changed from ${oldVal} to ${newVal}`);
-    }
   },
 
   async mounted() {
@@ -503,26 +462,14 @@ export default {
       this.koinContractId = koinToken.contractId;
       
       console.log("Starting decodeTransaction");
-      await this.decodeTransaction()
-    
-    
-        .then(() => {
-          console.log("KOIN transfer amount:", this.koinTransferAmount)
-        })
-        .catch(error => {
-          console.error("Error during setup:", error)
-          this.alertDanger(error.message)
-        })    
+      await this.decodeTransaction()    
       console.log("Starting checkEvents");
       await this.checkEvents(); // todo
       console.log("checkEvents completed");
-
-      console.log("Final KOIN transfer amount:", this.koinTransferAmount);
     } catch (error) {
       console.error("Error during component initialization:", error);
       this.alertDanger(error.message);
     }
-    console.log(`Final KOIN transfer amount: ${this.koinTransferAmount}`);
   },
 
   methods: {
@@ -530,12 +477,12 @@ export default {
       const contractId = contract.getId()
 
       // take it from cache
-      if (this.cacheAbis[contractId]) return this.cacheAbis[contractId]
+      if (this.cacheAbis[contractId]) return this.cacheAbis[contractId].abi;
 
       // try to get the ABI from local storage
       let abi = await this._getAbi(this.networkTag, contractId)
       if (abi) {
-        this.cacheAbis[contractId] = abi
+        this.cacheAbis[contractId] = { success: true, abi };
         return abi
       }
 
@@ -549,7 +496,7 @@ export default {
         // empty
       }
       if (abi) {
-        this.cacheAbis[contractId] = abi
+        this.cacheAbis[contractId] = { success: true, abi };
         return abi
       }
 
@@ -559,16 +506,18 @@ export default {
         this.abiUploadContract.contractId === contractId
       ) {
         abi = JSON.parse(this.abiUploadContract.abi)
-        this.cacheAbis[contractId] = abi
+        this.cacheAbis[contractId] = { success: true, abi };
         return abi
       }
 
       // try to get ABI from the request
       if (this.abis && this.abis[contractId]) {
         abi = this.abis[contractId]
-        this.cacheAbis[contractId] = abi
+        this.cacheAbis[contractId] = { success: true, abi };
         return abi
       }
+
+      this.cacheAbis[contractId] = { success: false, abi: undefined };
       return undefined
     },
 
@@ -605,16 +554,25 @@ export default {
     },
 
     async resolveAddress(address) {
-      if (this.cacheNicknames[address]) return this.cacheNicknames[address]
       if (!address) return ""
+      if (this.cacheNicknames[address]) {
+        return this.cacheNicknames[address].value;
+      }
       const { result } = await this.nicknames.get_tokens_by_owner({
         owner: address,
         limit: 1,
       })
-      if (!result || !result.token_ids || !result.token_ids[0]) {
-        return ""
+      if (result && result.token_ids && result.token_ids[0]) {
+        this.cacheNicknames[address] = {
+          success: true,
+          value: fromHexToUtf8(result.token_ids[0]),
+        }
+      } else {
+        this.cacheNicknames[address] = {
+          success: false,
+          value: "",
+        };
       }
-      this.cacheNicknames[address] = fromHexToUtf8(result.token_ids[0])
       return this.cacheNicknames[address]
     },
 
@@ -661,7 +619,7 @@ export default {
           provider: this.provider,
         })
         const abi = await this.getAbi(contract)
-        if (!abi) throw new Error(`no abi found for ${contractId}`)
+        if (!abi || !abi.methods) throw new Error(`no abi found for ${contractId}`)
         Object.keys(abi.methods).forEach((m) => {
           if (abi.methods[m].entry_point === undefined) {
             abi.methods[m].entry_point = Number(abi.methods[m]["entry-point"])
@@ -735,6 +693,7 @@ export default {
             title = abi.events[action.name].name
 
           this.events.push({
+            id: this.events.length,
             contractId: contractIdName,
             title,
             subtitle,
@@ -774,6 +733,7 @@ export default {
 
         if (isEvent) {
           this.events.push({
+            id: this.events.length,
             contractId: contractIdName,
             title: firstUpperCase(action.name),
             subtitle:
@@ -1136,7 +1096,6 @@ export default {
         }
         console.log("Full receipt:", JSON.stringify(this.receipt, null, 2));
         this.events = [];
-        this.koinTransferAmount = 0;
         if (this.receipt.events) {
           console.log(`Processing ${this.receipt.events.length} events`);
           for (let i = 0; i < this.receipt.events.length; i += 1) {
@@ -1144,40 +1103,8 @@ export default {
             console.log(`Processing event ${i + 1}:`, JSON.stringify(event, null, 2));
             await this.beautifyAction("event", event);
             console.log(`Beautified event ${i + 1}:`, JSON.stringify(this.events[this.events.length - 1], null, 2));
-
-            if (event.source === this.network.koinContractId &&
-            event.name === "koinos.contracts.token.transfer_event") {
-              console.log("KOIN transfer event detected");
-              try {
-                const decodedEvent = await this.koinContract.decodeEvent(event);
-                console.log("Decoded KOIN transfer event:", JSON.stringify(decodedEvent, null, 2));
-                console.log("Value before formatting:", decodedEvent.args.value);
-            
-                // Check if the value is 0 before formatting
-                if (decodedEvent.args.value === '0' || decodedEvent.args.value === 0) {
-                  console.log("Transfer amount is 0, skipping BigInt conversion");
-                  continue;
-                }
-            
-                const formattedValue = utils.formatUnits(decodedEvent.args.value, 8);
-                console.log("Formatted value:", formattedValue);
-                const amount = Number(formattedValue);
-                console.log(`KOIN transfer amount: ${amount}`);
-                if (isNaN(amount)) {
-                  console.error("Invalid amount, skipping");
-                  continue;
-                }
-                this.koinTransferAmount += amount;
-                console.log(`Running total KOIN transfer amount: ${this.koinTransferAmount}`);
-              } catch (error) {
-                console.error("Error processing KOIN transfer event:", error);
-              }
-            }
           }
         }
-        console.log(`Final KOIN transfer amount: ${this.koinTransferAmount}`);
-
-        console.log("Total KOIN transfer amount:", this.koinTransferAmount);
         this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`;
         this.readyToSend = true;
         this.loadingEvents = false;
@@ -1271,6 +1198,10 @@ export default {
       console.log("toggleAdvanced called, current state:", this.showAdvanced)
       this.showAdvanced = !this.showAdvanced
       console.log("New state:", this.showAdvanced)
+    },
+
+    toggleFilteredEvents() {
+      this.showAllEvents = !this.showAllEvents;
     },
 
     toggleEventDetails() {
@@ -1396,6 +1327,7 @@ input {
 .op-header-image img, .op-header-image2 img {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
 }
 
 .contract-id {
