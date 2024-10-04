@@ -4,6 +4,14 @@
       v-if="hasAccounts"
       class="unlock"
     >
+    <!--
+    <div class="logo">
+      <img
+        src="../../../public/images/kondor-logo.png"
+        alt=""
+      >
+    </div>
+    -->
       <Unlock
         @onUnlock="unlock()"
         @onError="alertDanger($event)"
@@ -144,6 +152,7 @@ input {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 4em;
 }
 .recover {
   margin-top: 1em;

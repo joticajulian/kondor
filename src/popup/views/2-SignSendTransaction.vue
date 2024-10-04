@@ -8,30 +8,6 @@
       <div>{{ requester.origin }}</div>
     </div>
 
-    <div class="check-events-row">
-      <!--<button
-        class="check-events-btn"
-        @click="toggleEventDetails"
-      >
-        Check events
-      </button>-->
-
-      <div
-        class="advanced-toggle"
-        @click="toggleAdvanced"
-      >
-        Advanced
-        <div class="switch">
-          <input
-            v-model="showAdvanced"
-            type="checkbox"
-            @click.stop
-          >
-          <span class="slider round" />
-        </div>
-      </div>
-    </div>
-
     <!--<div class="sending-info">
       <p>You are sending</p>
       <h2 v-if="typeof koinTransferAmount === 'number'">
@@ -65,24 +41,13 @@
         >
           {{ op.nickname }} KOIN - {{  op.title }}
         </div>
-        <!--<div
-          v-if="op.call_contract"
-          class="contract-id"
-        >
-          {{ op.contractId }}
-        </div>
-        <div class="op-title">
-          {{ op.title }}
-        </div>
-        <div class="op-subtitle">
-          {{ op.subtitle }}
-        </div>-->
         <div
           class="op-viewmore"
           @click="toggleViewMoreOperation(i)" 
         >{{ op.viewMore ? "View less" : "View more" }}</div>
       </div>
       <div v-if="op.viewMore" class="op-body">
+        <div class="op-contractid"> {{ op.contractId }}</div>
         <div
           v-for="(arg, j) in op.args"
           :key="'f' + j"
@@ -93,6 +58,84 @@
           </div>
           <div class="field-data">
             {{ arg.data }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="true" style="width: 100%;">
+      <div
+        v-if="receipt"
+        class="subtitle"
+      >
+        Events
+      </div>
+      <div
+        v-for="(ev, i) in filteredEvents"
+        :key="'ev' + i"
+        class="operation"
+      >
+        <div
+          v-if="receipt"
+          class="op-header"
+          :class="ev.style"
+        >
+          <div
+            class="op-header-image2"
+          >
+            <img
+              src="https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png"
+              alt="operation-icon"
+            >
+          </div>
+          <div class="op-title">
+            NICK - {{ ev.title }}
+          </div>
+          <div
+            class="op-viewmore"
+            @click="toggleViewMoreEvent(i)" 
+          >{{ ev.viewMore ? "View less" : "View more" }}</div>
+        </div>
+        <div
+          v-if="receipt && ev.viewMore"
+          class="op-body2"
+        >
+          <div class="op-contractid"> {{ ev.contractId }}</div>
+          <div class="op-subtitle">
+            {{ ev.subtitle }}
+          </div>
+          <div
+            v-for="(arg, j) in ev.args"
+            :key="'fe' + j"
+            class="op-body-row"
+          >
+            <div class="field-name">
+              {{ arg.field }}
+            </div>
+            <div class="field-data">
+              {{ arg.data }}
+            </div>
+          </div>
+        </div>
+        <div
+          v-if="receipt && ev.viewMore"
+          class="op-body"
+          :class="ev.style"
+        >
+          <div class="op-contractid" style="margin-bottom: 0.5em;">Impacted accounts</div>
+          <div
+            v-for="(imp, k) in ev.impacted"
+            :key="'imp' + k"
+            class="ev-impacted-account"
+          >
+            {{ imp }}
+          </div>
+          <div style="margin-top: 0.5em; color: var(--primary-gray);">
+            {{
+              ev.impactsUserAccounts
+                ? "It impacts your accounts"
+                : "It doesn't impact your accounts"
+            }}
           </div>
         </div>
       </div>
@@ -124,13 +167,27 @@
     </div>
     -->
 
+    <div class="check-events-row">
+      <!--<button
+        class="check-events-btn"
+        @click="toggleEventDetails"
+      >
+        Check events
+      </button>-->
+
+      <div
+        class="op-viewmore"
+        @click="toggleAdvanced"
+      >
+        {{ showAdvanced ? "View less" : "Advanced" }}
+      </div>
+    </div>
+
+
     <div
       v-if="showAdvanced"
       class="advanced-container"
     >
-      <div class="subtitle">
-        Headers
-      </div>
       <div class="tx-header">
         <div class="group-input">
           <label for="network">Network</label>
@@ -214,85 +271,23 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="warning-message">
-      Be careful of unknown contracts as they could be malicious. Please
-      interact only with contracts you trust.
-    </div>
-
-    <div v-if="!unlocked">
-      <Unlock
-        @onUnlock="afterUnlocked()"
-        @onError="alertDanger($event)"
-      />
-    </div>
-
-    <div v-if="showDetailedEvents">
-      <div
-        v-if="receipt"
-        class="subtitle"
-      >
-        Events
-      </div>
-      <div
-        v-for="(ev, i) in events"
-        :key="'ev' + i"
-        class="operation"
-      >
-        <div
-          v-if="receipt"
-          class="ev-header"
-          :class="ev.style"
-        >
-          <div class="contract-id">
-            {{ ev.contractId }}
-          </div>
-          <div class="op-title">
-            {{ ev.title }}
-          </div>
-          <div class="op-subtitle">
-            {{ ev.subtitle }}
-          </div>
-        </div>
-        <div
-          v-if="receipt"
-          class="ev-body"
-        >
-          <div
-            v-for="(arg, j) in ev.args"
-            :key="'fe' + j"
+      <div class="group-add-signer">
+        <select v-model="signerSelected">
+          <option
+            v-for="account in accounts"
+            :key="account.address"
+            :value="account.address"
           >
-            <div class="field-name">
-              {{ arg.field }}
-            </div>
-            <div class="field-data">
-              {{ arg.data }}
-            </div>
-          </div>
-        </div>
-        <div
-          v-if="receipt"
-          class="ev-foot"
-          :class="ev.style"
-        >
-          <div>Impacted accounts</div>
-          <div
-            v-for="(imp, k) in ev.impacted"
-            :key="'imp' + k"
-            class="ev-impacted-account"
-          >
-            {{ imp }}
-          </div>
-          <div style="margin-top: 0.5em">
-            {{
-              ev.impactsUserAccounts
-                ? "It impacts your accounts"
-                : "It doesn't impact your accounts"
-            }}
-          </div>
-        </div>
+            {{ account.name }} - {{ account.address }}
+          </option>
+        </select>
+
+        <button @click="addSigner(signerSelected)">
+          Add signer
+        </button>
       </div>
+
       <div
         v-if="receipt"
         class="mana-used"
@@ -305,6 +300,18 @@
       >
         Mana consumption: {{ manaUsed }}
       </div>
+    </div>
+
+    <div class="warning-message">
+      Be careful of unknown contracts as they could be malicious. Please
+      interact only with contracts you trust.
+    </div>
+
+    <div v-if="!unlocked">
+      <Unlock
+        @onUnlock="afterUnlocked()"
+        @onError="alertDanger($event)"
+      />
     </div>
 
     <div class="action-buttons">
@@ -339,6 +346,7 @@ import Unlock from "@/shared/components/Unlock.vue"
 // import Footnote from "@/shared/components/Footnote.vue"
 
 import { estimateAndAdjustMana } from "../../../lib/utils"
+import { testReceipt, testRequests } from "../../services/utils";
 
 function firstUpperCase(s) {
   return s.charAt(0).toUpperCase() + s.slice(1)
@@ -404,9 +412,15 @@ export default {
       loadingEvents: false,
       loadingSkipEvents: false,
       showDetailedEvents: false,
+      tokens: null,
     }
   },
   computed: {
+    filteredEvents() {
+      return this.events.filter(e => {
+        return !!e.contractMetadata;
+      });
+    },
     simplifiedDomain() {
       try {
         const url = new URL(this.requester.origin)
@@ -469,428 +483,7 @@ export default {
     try {
       let requests
       if (process.env.VUE_APP_ENV === "test") {
-        requests = [
-          {
-            id: "270815b4-8c3e-4b53-b9ac-82ba3854c206",
-            command: "signer:signTransaction",
-            args: {
-              signerAddress: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
-              transaction: {
-                operations: [
-                  {
-                    call_contract: {
-                      args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
-                      contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                      entry_point: 670398154,
-                    },
-                  },
-                  {
-                    call_contract: {
-                      args: "ChkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LEhkARM5N2YfZUX1Go4HMs9lxNxlKNTc0Tu7LGAo=",
-                      contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                      entry_point: 6703981540,
-                    },
-                  },
-                  {
-                    upload_contract: {
-                      contract_id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                      bytecode:
-                      "TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQgY29uc2VjdGV0dXIgYWRpcGlzaWNpbmcgZWxpdC4gTWF4aW1lIG1vbGxpdGlhLAptb2xlc3RpYWUgcXVhcyB2ZWwgc2ludCBjb21tb2RpIHJlcHVkaWFuZGFlIGNvbnNlcXV1bnR1ciB2b2x1cHRhdHVtIGxhYm9ydW0KbnVtcXVhbSBibGFuZGl0aWlzIGhhcnVtIHF1aXNxdWFtIGVpdXMgc2VkIG9kaXQgZnVnaWF0IGl1c3RvIGZ1Z2EgcHJhZXNlbnRpdW0Kb3B0aW8sIGVhcXVlIHJlcnVtISBQcm92aWRlbnQgc2ltaWxpcXVlIGFjY3VzYW50aXVtIG5lbW8gYXV0ZW0uIFZlcml0YXRpcwpvYmNhZWNhdGkgdGVuZXR1ciBpdXJlIGVpdXMgZWFydW0gdXQgbW9sZXN0aWFzIGFyY2hpdGVjdG8gdm9sdXB0YXRlIGFsaXF1YW0KbmloaWwsIGV2ZW5pZXQgYWxpcXVpZCBjdWxwYSBvZmZpY2lhIGF1dCEgSW1wZWRpdCBzaXQgc3VudCBxdWFlcmF0LCBvZGl0LAp0ZW5ldHVyIGVycm9yLCBoYXJ1bSBuZXNjaXVudCBpcHN1bSBkZWJpdGlzIHF1YXMgYWxpcXVpZC4gUmVwcmVoZW5kZXJpdCwKcXVpYS4gUXVvIG5lcXVlIGVycm9yIHJlcHVkaWFuZGFlIGZ1Z2E_IElwc2EgbGF1ZGFudGl1bSBtb2xlc3RpYXMgZW9zIApzYXBpZW50ZSBvZmZpY2lpcyBtb2RpIGF0IHN1bnQgZXhjZXB0dXJpIGV4cGVkaXRhIHNpbnQ_IFNlZCBxdWlidXNkYW0KcmVjdXNhbmRhZSBhbGlhcyBlcnJvciBoYXJ1bSBtYXhpbWUgYWRpcGlzY2kgYW1ldCBsYWJvcnVtLiBQZXJzcGljaWF0",
-                      abi: "{}",
-                      authorizes_call_contract: true,
-                      authorizes_transaction_application: true,
-                      authorizes_upload_contract: false,
-                    },
-                  },
-                ],
-                header: {
-                  chain_id: "EiBncD4pKRIQWco_WRqo5Q-xnXR7JuO3PtZv983mKdKHSQ==",
-                  rc_limit: "0",
-                  nonce: "KAE=",
-                  operation_merkle_root:
-                  "EiBCeHF0tLBk6Dq0yIrlZ2Z9CzO4tv5FsYv868D6fjHeAg==",
-                  payer: "17Gp6JfuPjFMAzdNMGNbyFDCYS6zN428aW",
-                },
-                signatures: [
-                  "IEUp4G5lT_6kuCvCKEvq20ZvBZoiJd-U3vs4MdZ8u7XgKDm4X7gmyUugp8ggt0lX1hjvA3KJYVRfV63FWnko35A=",
-                ],
-                id: "0x1220d66c608bf375cdd310f021fc61d2c084f7bcc52734a688dfd302dce2daa6c2e3",
-              },
-              abis: {
-                "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ": {
-                  methods: {
-                    name: {
-                      argument: "koinos.contracts.token.name_arguments",
-                      return: "koinos.contracts.token.name_result",
-                      "entry-point": "0x82a3537f",
-                      description: "Returns the token name",
-                      "read-only": true,
-                      entry_point: 2191741823,
-                    },
-                    symbol: {
-                      argument: "koinos.contracts.token.symbol_arguments",
-                      return: "koinos.contracts.token.symbol_result",
-                      "entry-point": "0xb76a7ca1",
-                      description: "Returns the token symbol",
-                      "read-only": true,
-                      entry_point: 3077209249,
-                    },
-                    decimals: {
-                      argument: "koinos.contracts.token.decimals_arguments",
-                      return: "koinos.contracts.token.decimals_result",
-                      "entry-point": "0xee80fd2f",
-                      description: "Returns the token decimal precision",
-                      "read-only": true,
-                      entry_point: 4001430831,
-                    },
-                    total_supply: {
-                      argument: "koinos.contracts.token.total_supply_arguments",
-                      return: "koinos.contracts.token.total_supply_result",
-                      "entry-point": "0xb0da3934",
-                      description: "Returns the token total supply",
-                      "read-only": true,
-                      entry_point: 2967091508,
-                    },
-                    balance_of: {
-                      argument: "koinos.contracts.token.balance_of_arguments",
-                      return: "koinos.contracts.token.balance_of_result",
-                      "entry-point": "0x5c721497",
-                      description: "Checks the balance at an address",
-                      "read-only": true,
-                      entry_point: 1550980247,
-                    },
-                    transfer: {
-                      argument: "koinos.contracts.token.transfer_arguments",
-                      return: "koinos.contracts.token.transfer_result",
-                      "entry-point": "0x27f576ca",
-                      description: "Transfers the token",
-                      "read-only": false,
-                      entry_point: 670398154,
-                      format: {
-                        value: {
-                          type: "number",
-                          decimals: 8,
-                          symbol: "KOIN",
-                        },
-                      },
-                    },
-                    mint: {
-                      argument: "koinos.contracts.token.mint_arguments",
-                      return: "koinos.contracts.token.mint_result",
-                      "entry-point": "0xdc6f17bb",
-                      description: "Mints the token",
-                      "read-only": false,
-                      entry_point: 3698268091,
-                    },
-                    burn: {
-                      argument: "koinos.contracts.token.burn_arguments",
-                      return: "koinos.contracts.token.burn_result",
-                      "entry-point": "0x859facc5",
-                      description: "Burns the token",
-                      "read-only": false,
-                      entry_point: 2241834181,
-                    },
-                  },
-                  events: {
-                    "koinos.contracts.token.transfer_event": {
-                      argument: "koinos.contracts.token.transfer_event",
-                      format: {
-                        value: {
-                          type: "number",
-                          decimals: 8,
-                          symbol: "KOIN",
-                        },
-                      },
-                    },
-                  },
-                  koilib_types: {
-                    nested: {
-                      koinos: {
-                        nested: {
-                          contracts: {
-                            nested: {
-                              token: {
-                                nested: {
-                                  name_arguments: {
-                                    fields: {},
-                                  },
-                                  name_result: {
-                                    fields: {
-                                      value: {
-                                        type: "string",
-                                        id: 1,
-                                      },
-                                    },
-                                  },
-                                  symbol_arguments: {
-                                    fields: {},
-                                  },
-                                  symbol_result: {
-                                    fields: {
-                                      value: {
-                                        type: "string",
-                                        id: 1,
-                                      },
-                                    },
-                                  },
-                                  decimals_arguments: {
-                                    fields: {},
-                                  },
-                                  decimals_result: {
-                                    fields: {
-                                      value: {
-                                        type: "uint32",
-                                        id: 1,
-                                      },
-                                    },
-                                  },
-                                  total_supply_arguments: {
-                                    fields: {},
-                                  },
-                                  total_supply_result: {
-                                    fields: {
-                                      value: {
-                                        type: "uint64",
-                                        id: 1,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  balance_of_arguments: {
-                                    fields: {
-                                      owner: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  balance_of_result: {
-                                    fields: {
-                                      value: {
-                                        type: "uint64",
-                                        id: 1,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  transfer_arguments: {
-                                    fields: {
-                                      from: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      to: {
-                                        type: "bytes",
-                                        id: 2,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      value: {
-                                        type: "uint64",
-                                        id: 3,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  transfer_result: {
-                                    fields: {},
-                                  },
-                                  mint_arguments: {
-                                    fields: {
-                                      to: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      value: {
-                                        type: "uint64",
-                                        id: 2,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  mint_result: {
-                                    fields: {},
-                                  },
-                                  burn_arguments: {
-                                    fields: {
-                                      from: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      value: {
-                                        type: "uint64",
-                                        id: 2,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  burn_result: {
-                                    fields: {},
-                                  },
-                                  balance_object: {
-                                    fields: {
-                                      value: {
-                                        type: "uint64",
-                                        id: 1,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  mana_balance_object: {
-                                    fields: {
-                                      balance: {
-                                        type: "uint64",
-                                        id: 1,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                      mana: {
-                                        type: "uint64",
-                                        id: 2,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                      last_mana_update: {
-                                        type: "uint64",
-                                        id: 3,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  burn_event: {
-                                    fields: {
-                                      from: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      value: {
-                                        type: "uint64",
-                                        id: 2,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  mint_event: {
-                                    fields: {
-                                      to: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      value: {
-                                        type: "uint64",
-                                        id: 2,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                  transfer_event: {
-                                    fields: {
-                                      from: {
-                                        type: "bytes",
-                                        id: 1,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      to: {
-                                        type: "bytes",
-                                        id: 2,
-                                        options: {
-                                          "(koinos.btype)": "ADDRESS",
-                                        },
-                                      },
-                                      value: {
-                                        type: "uint64",
-                                        id: 3,
-                                        options: {
-                                          jstype: "JS_STRING",
-                                        },
-                                      },
-                                    },
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            sender: {
-              id: "eghigpjkddlhegjaibgjlnfnkgdnmnlh",
-              url: "https://koinosblocks.com/address/19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-              origin: "https://koinosblocks.com",
-              frameId: 0,
-              documentId: "F6D0BCBD9A19559A679F6714294A63A2",
-              documentLifecycle: "active",
-              tab: {
-                active: true,
-                audible: false,
-                autoDiscardable: true,
-                discarded: false,
-                groupId: -1,
-                height: 577,
-                highlighted: true,
-                id: 2018223012,
-                incognito: false,
-                index: 14,
-                mutedInfo: {
-                  muted: false,
-                },
-                openerTabId: 2018223007,
-                pinned: false,
-                selected: true,
-                status: "complete",
-                title: "Koinosblocks.com - address details",
-                url: "https://koinosblocks.com/address/19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
-                width: 1280,
-                windowId: 2018222470,
-              },
-            },
-          },
-        ]
+        requests = testRequests;
       } else {
         requests = this.$store.state.requests.filter((r) => {
           if (this.send) return r.command === "signer:sendTransaction"
@@ -904,12 +497,12 @@ export default {
       this.request = requests[0]
       this.requester = this.request.sender
       this.typeRequest = this.send ? "send" : "sign"
-      console.log("Starting decodeTransaction");
-      const tokens = await this._getTokens();
-      const koinToken = tokens.find(t => t.nickname === "koin");
+      this.tokens = await this._getTokens();
+      const koinToken = this.tokens.find(t => t.nickname === "koin");
       if (!koinToken) throw new Error("Koin contract ID not found");
       this.koinContractId = koinToken.contractId;
-    
+      
+      console.log("Starting decodeTransaction");
       await this.decodeTransaction()
     
     
@@ -1035,7 +628,8 @@ export default {
       if (!isOperation && !isEvent) throw new Error(`invalid type ${type}`)
       const contractId = isOperation
         ? action.call_contract.contract_id
-        : action.source
+        : action.source;
+      const contractMetadata = this.tokens.find(t => t.contractId === contractId);
 
       const resolvedName = await this.resolveAddress(contractId)
       let contractIdName = contractId;
@@ -1105,6 +699,8 @@ export default {
             subtitle: contract.abi.methods[name].description || "",
             args,
             style: { bgOperation: true },
+            viewMore: false,
+            contractMetadata,
           })
         }
 
@@ -1149,6 +745,8 @@ export default {
               bgEvent: impactsUserAccounts,
               gray: !impactsUserAccounts,
             },
+            viewMore: false,
+            contractMetadata,
           })
         }
       } catch (error) {
@@ -1159,7 +757,7 @@ export default {
             contractId: contractIdName,
             title: action.call_contract.entry_point,
             subtitle:
-              "⚠️ This operation couldn't be decoded. Only continue if you know what you are doing.",
+              "⚠️ This operation couldn't be decoded",
             args: [
               {
                 field: "Args",
@@ -1169,6 +767,8 @@ export default {
             style: {
               red: true,
             },
+            viewMore: false,
+            contractMetadata,
           })
         }
 
@@ -1177,7 +777,7 @@ export default {
             contractId: contractIdName,
             title: firstUpperCase(action.name),
             subtitle:
-              "⚠️ This event couldn't be decoded. Only continue if you understand the risks.",
+              "⚠️ This event couldn't be decoded",
             args: [
               {
                 field: "Args",
@@ -1190,6 +790,8 @@ export default {
               red: impactsUserAccounts,
               gray: !impactsUserAccounts,
             },
+            viewMore: false,
+            contractMetadata,
           })
         }
       }
@@ -1359,6 +961,7 @@ export default {
                 },
               ],
               style: { bgUploadContract: true },
+              viewMore: false,
             })
           } else if (op.set_system_call) {
             const title = "Set system call ⚙️"
@@ -1376,6 +979,7 @@ export default {
                 },
               ],
               style: { bgUploadContract: true },
+              viewMore: false,
             })
           } else if (op.set_system_contract) {
             const title = "Set system contract ⚙️"
@@ -1393,6 +997,7 @@ export default {
                 },
               ],
               style: { bgUploadContract: true },
+              viewMore: false,
             })
           } else {
             await this.beautifyAction("operation", op)
@@ -1501,9 +1106,7 @@ export default {
       try {
         if (process.env.VUE_APP_ENV === "test") {
           console.log("Running in test mode");
-          this.receipt = {
-            // ... (test receipt data)
-          };
+          this.receipt = testReceipt;
         } else {
           await this.buildTransaction();
           console.log("Transaction built");
@@ -1658,6 +1261,12 @@ export default {
       this.operations = copyOperations;
     },
 
+    toggleViewMoreEvent(i) {
+      const copyEvents = JSON.parse(JSON.stringify(this.events));
+      copyEvents[i].viewMore = !copyEvents[i].viewMore;
+      this.events = copyEvents;
+    },
+
     toggleAdvanced() {
       console.log("toggleAdvanced called, current state:", this.showAdvanced)
       this.showAdvanced = !this.showAdvanced
@@ -1776,7 +1385,15 @@ input {
   border-radius: 50%;
 }
 
-.op-header-image img {
+.op-header-image2 {
+  width: 4em;
+  height: 4em;
+  padding: 1em;
+  background-color: var(--kondor-lighter30);
+  border-radius: 50%;
+}
+
+.op-header-image img, .op-header-image2 img {
   width: 100%;
   height: 100%;
 }
@@ -1793,6 +1410,7 @@ input {
 .op-subtitle {
   margin-top: 0.5em;
   font-size: 0.8em;
+  text-align: center;
 }
 
 .op-viewmore {
@@ -1802,15 +1420,55 @@ input {
   cursor: pointer;
 }
 
+.op-contractid {
+  width: 100%;
+  text-align: center;
+  color: gray;
+  font-size: 0.8em;
+}
+
 .op-body {
   padding: 0 0.8rem 0.5rem 0.8rem;
   word-break: break-all;
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
   background-color: var(--primary-dark-light);
+  border-top: 1px dashed;
+  border-top-color: gray;
+  animation: slideIn 0.1s ease-in-out;
+  /* animation: slideOut 0.5s ease-out; */
+}
+
+.op-body2 {
+  padding: 0 0.8rem 0.5rem 0.8rem;
+  word-break: break-all;
   background-color: var(--primary-dark-light);
   border-top: 1px dashed;
   border-top-color: gray;
+  animation: slideIn 0.1s ease-in-out;
+  /* animation: slideOut 0.5s ease-out; */
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50%);
+  }
 }
 
 .op-body-row {
@@ -1824,6 +1482,10 @@ input {
   min-width: 5.5rem;
   max-width: 5.5rem;
   margin-right: 0.5rem
+}
+
+.field-data {
+
 }
 
 .ev-header {
@@ -1847,7 +1509,8 @@ input {
 }
 
 .ev-impacted-account {
-  font-size: 0.8em;
+  /* font-size: 0.8em; */
+  margin-top: 0.3em;
 }
 
 .signature {
@@ -1857,7 +1520,7 @@ input {
 
 .sig-details {
   flex: 8;
-  padding: 0.7em 0.5em;
+  padding: 0.7em 0em;
 }
 
 .sig-details .name {
@@ -1884,7 +1547,7 @@ input {
 .group-add-signer {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .group-add-signer button {
@@ -2017,6 +1680,8 @@ input {
   flex-direction: column;
   align-items: end;
   width: 100%;
+  padding: 0 1em;
+  box-sizing: border-box;
 }
 
 .check-events-btn {
@@ -2103,8 +1768,11 @@ input:checked + .slider:before {
 }
 
 .warning-message {
-  color: #ffa500;
-  padding: 1.2em 3em;
+  background-color: #ffa500;
+  color: var(--primary-darker);
+  padding: 1em;
+  margin: 1rem;
+  border-radius: 1em;
 }
 
 .action-buttons {
@@ -2161,10 +1829,12 @@ input:checked + .slider:before {
   height: 1px;
 }
 .advanced-container {
-  width: 80%;
+  width: 100%;
+  padding: 0 1em;
+  box-sizing: border-box;
+  /* background-color: var(--primary-dark-light); */
 }
 .mana-used {
   font-size: 1.2em;
-  padding: 0 1.2em;
 }
 </style>
