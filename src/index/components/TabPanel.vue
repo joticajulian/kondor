@@ -364,6 +364,11 @@ export default {
       this.transactions = []
 
       try {
+        if (!this.provider) {
+          this.provider = new Provider(
+            this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
+          );
+        }
         const data = await this.provider.call("account_history.get_account_history", {
           address: this.address,
           ascending: false,
