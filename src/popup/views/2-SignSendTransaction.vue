@@ -339,6 +339,10 @@ function fromHexToUtf8(hex) {
   return new TextDecoder().decode(utils.toUint8Array(hex))
 }
 
+function fromUtf8ToHex(utf8) {
+  return "0x" + utils.toHexString(new TextEncoder().encode(utf8));
+}
+
 export default {
   name: "SignSendTransaction",
 
@@ -391,6 +395,7 @@ export default {
       koinContract: null,
       freeManaSharer: null,
       cacheNicknames: {},
+      cacheNicknameImages: {},
       loadingEvents: false,
       loadingSkipEvents: false,
       showDetailedEvents: false,
@@ -598,14 +603,13 @@ export default {
       if (this.cacheNicknames[address]) {
         return this.cacheNicknames[address].value;
       }
-      const { result } = await this.nicknames.get_tokens_by_owner({
-        owner: address,
-        limit: 1,
-      })
-      if (result && result.token_ids && result.token_ids[0]) {
+      const { result } = await this.nicknames.get_main_token({
+        value: address,
+      });
+      if (result && result.token_id) {
         this.cacheNicknames[address] = {
           success: true,
-          value: fromHexToUtf8(result.token_ids[0]),
+          value: fromHexToUtf8(result.token_id),
         }
       } else {
         this.cacheNicknames[address] = {
@@ -614,6 +618,40 @@ export default {
         };
       }
       return this.cacheNicknames[address].value;
+    },
+
+    async getNicknameImage(nickname) {
+      if (!nickname) return ""
+      if (this.cacheNicknameImages[nickname]) {
+        return this.cacheNicknameImages[nickname].value;
+      }
+
+      try {
+        const { result: resultMetadata } = await this.nicknames.metadata_of(
+          {
+            token_id: fromUtf8ToHex(nickname),
+          }
+        );
+        const metadata = JSON.parse(resultMetadata.value);
+        if (!metadata.image) {
+          throw new Error(`no image in metadata of ${nickname}`);
+        }
+        this.cacheNicknameImages[nickname] = {
+          success: true,
+          value: metadata.image,
+        };
+      } catch (error) {
+        console.error(
+          `error when loading metadata of token @${nickname}`
+        );
+        console.error(error);
+
+        this.cacheNicknameImages[nickname] = {
+          success: false,
+          value: "",
+        };
+      }
+      return this.cacheNicknameImages[nickname].value;
     },
 
     /**
@@ -627,9 +665,15 @@ export default {
       const contractId = isOperation
         ? action.call_contract.contract_id
         : action.source;
-      const contractMetadata = this.tokens.find(t => t.contractId === contractId);
-
+      let contractMetadata = this.tokens.find(t => t.contractId === contractId);
       const resolvedName = await this.resolveAddress(contractId)
+      if (!contractMetadata) {
+        contractMetadata = { 
+          nickname: resolvedName,
+          image: await this.getNicknameImage(resolvedName),
+        };
+      }
+
       let contractIdName = contractId;
 
       const accContract = this.accounts.find((a) => a.address === contractId)
