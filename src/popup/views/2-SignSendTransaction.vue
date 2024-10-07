@@ -60,9 +60,14 @@
       >
         Events <span
             v-if="loadingEvents"
-            class="loader2"
+            class="loader2" style="vertical-align: middle;"
           ></span>
-          <div v-if="!loadingEvents" @click="checkEvents">X</div>
+          <div v-if="!loadingEvents" @click="checkEvents" class="update-events">
+            <img
+                src="../../../public/images/circle-arrow-icon.svg"
+                alt=""
+              >
+          </div>
       </div>
       <div
         v-for="(ev, i) in filteredEvents"
@@ -384,7 +389,6 @@ export default {
       isOldKondor: false,
       nicknames: null,
       koinContract: null,
-      koinContractId: "",
       freeManaSharer: null,
       cacheNicknames: {},
       loadingEvents: false,
@@ -456,16 +460,14 @@ export default {
       this.request = requests[0]
       this.requester = this.request.sender
       this.typeRequest = this.send ? "send" : "sign"
-      this.tokens = await this._getTokens();
-      const koinToken = this.tokens.find(t => t.nickname === "koin");
-      if (!koinToken) throw new Error("Koin contract ID not found");
-      this.koinContractId = koinToken.contractId;
       
       console.log("Starting decodeTransaction");
-      await this.decodeTransaction()    
-      console.log("Starting checkEvents");
-      await this.checkEvents(); // todo
-      console.log("checkEvents completed");
+      await this.decodeTransaction()
+      if (this.unlocked) {
+        console.log("Starting checkEvents");
+        await this.checkEvents(); // todo
+        console.log("checkEvents completed");
+      }
     } catch (error) {
       console.error("Error during component initialization:", error);
       this.alertDanger(error.message);
@@ -824,8 +826,13 @@ export default {
           ),
         })
 
+        this.tokens = await this._getTokens();
+        const koinToken = this.tokens.find(t => t.nickname === "koin" && t.network === this.network.tag);
+        console.log({tokens: this.tokens, network: this.network});
+        if (!koinToken) throw new Error("Koin contract ID not found");
+
         this.koinContract = new Contract({
-          id: this.koinContractId,
+          id: koinToken.contractId,
           abi: {
             ...utils.tokenAbi,
             events: {
@@ -978,6 +985,7 @@ export default {
 
     afterUnlocked() {
       this.unlocked = true
+      this.checkEvents()
     },
 
     async buildTransaction() {
@@ -1147,6 +1155,7 @@ export default {
     },
 
     async sendTransaction() {
+      if (!this.readyToSend) await this.skipEvents();
       let message = { id: this.request.id }
 
       try {
@@ -1418,6 +1427,13 @@ input {
 
 .field-data {
 
+}
+
+.update-events {
+  height: 1rem;
+  display: inline-flex;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 .ev-header {
