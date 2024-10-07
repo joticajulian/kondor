@@ -481,6 +481,44 @@ export default {
       // take it from cache
       if (this.cacheAbis[contractId]) return this.cacheAbis[contractId].abi;
 
+      // use the default abi for tokens
+      const token = this.tokens.find(t => t.contractId === contractId);
+      if (token) {
+        const abi = JSON.parse(JSON.stringify(utils.tokenAbi));
+        abi.methods.burn = {
+          argument: "token.burn_args",
+          return: "",
+          description: "Burn tokens",
+          read_only: false,
+          entry_point: 0x859facc5,
+        };
+        const format = {
+          value: {
+            type: "number",
+            decimals: token.decimals,
+            symbol: token.symbol,
+          }
+        };
+        abi.methods.mint.format = format;
+        abi.methods.burn.format = format;
+        abi.methods.transfer.format = format;
+        abi.methods.approve.format = format;
+
+        abi.events = {
+          "token.transfer_event": { argument: "token.transfer_args", format },
+          "token.mint_event": { argument: "token.mint_args", format },
+          "token.burn_event": { argument: "token.burn_args", format },
+          "token.approve_event": { argument: "token.approve_args", format },
+          "koinos.contracts.token.transfer_event": { argument: "token.transfer_args", format },
+          "koinos.contracts.token.mint_event": { argument: "token.mint_args", format },
+          "koinos.contracts.token.burn_event": { argument: "token.burn_args", format },
+          "koinos.contracts.token.approve_event": { argument: "token.approve_args", format },
+        };
+
+        this.cacheAbis[contractId] = { success: true, abi };
+        return abi;
+      }
+
       // try to get the ABI from local storage
       let abi = await this._getAbi(this.networkTag, contractId)
       if (abi) {
@@ -575,7 +613,7 @@ export default {
           value: "",
         };
       }
-      return this.cacheNicknames[address]
+      return this.cacheNicknames[address].value;
     },
 
     /**
@@ -686,13 +724,19 @@ export default {
             })
           )
 
-          let title = firstUpperCase(decodedEvent.name)
+          let title = decodedEvent.name;
           if (
             abi.events &&
             abi.events[action.name] &&
             abi.events[action.name].name
           )
             title = abi.events[action.name].name
+
+          title = title
+            .slice(title.lastIndexOf(".") + 1)
+            .replace(/_/g, " ")
+            // .replace(" event", "");
+          title = firstUpperCase(title);
 
           this.events.push({
             id: this.events.length,
