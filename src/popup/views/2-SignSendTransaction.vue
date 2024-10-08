@@ -17,61 +17,82 @@
         class="op-header"
         :class="op.style"
       >
-        <div
-          class="op-header-image"
-        >
-          <img v-if="op.contractMetadata && op.contractMetadata.image"
-            :src="op.contractMetadata.image"
-            alt="operation-icon"
+        <div class="op-group">
+          <div
+            class="op-header-image"
           >
-          <img v-else
-            src="../../../public/images/check.svg"
-            alt="operation-icon"
+            <img
+              v-if="op.contractMetadata && op.contractMetadata.image"
+              :src="op.contractMetadata.image"
+              alt="operation-icon"
+            >
+            <img
+              v-else
+              src="../../../public/images/check.svg"
+              alt="operation-icon"
+            >
+          </div>
+          <div
+            v-if="op.nickname || true"
+            class="op-title"
           >
-        </div>
-        <div
-          v-if="op.nickname || true"
-          class="op-title"
-        >
-        {{ op.contractMetadata && op.contractMetadata.nickname ? op.contractMetadata.nickname + " -" : "" }} {{  op.title }}
+            {{ op.contractMetadata && op.contractMetadata.nickname ? op.contractMetadata.nickname + " -" : "" }} {{ op.title }}
+          </div>
         </div>
         <div
           class="op-viewmore"
           @click="toggleViewMoreOperation(i)" 
-        >{{ op.viewMore ? "View less" : "View more" }}</div>
-      </div>
-      <div v-if="op.viewMore" class="op-body">
-        <div class="op-contractid"> {{ op.contractId }}</div>
-        <div
-          v-for="(arg, j) in op.args"
-          :key="'f' + j"
-          class="op-body-row"
         >
-          <div class="field-name">
-            {{ arg.field }}
-          </div>
-          <div class="field-data">
-            {{ arg.data }}
-          </div>
+          {{ op.viewMore ? "▲" : "▼" }}
         </div>
       </div>
+      <transition name="fade">
+        <div
+          v-if="op.viewMore"
+          class="op-body"
+        >
+          <div class="op-contractid">
+            {{ op.contractId }}
+          </div>
+          <div
+            v-for="(arg, j) in op.args"
+            :key="'f' + j"
+            class="op-body-row"
+          >
+            <div class="field-name">
+              {{ arg.field }}
+            </div>
+            <div class="field-data">
+              {{ arg.data }}
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
 
-    <div v-if="true" style="width: 100%;">
+    <div
+      v-if="true"
+      style="width: 100%;"
+    >
       <div
         v-if="receipt"
         class="subtitle"
       >
         Events <span
-            v-if="loadingEvents"
-            class="loader2" style="vertical-align: middle;"
-          ></span>
-          <div v-if="!loadingEvents" @click="checkEvents" class="update-events">
-            <img
-                src="../../../public/images/circle-arrow-icon.svg"
-                alt=""
-              >
-          </div>
+          v-if="loadingEvents"
+          class="loader2"
+          style="vertical-align: middle;"
+        />
+        <div
+          v-if="!loadingEvents"
+          class="update-events"
+          @click="checkEvents"
+        >
+          <img
+            src="../../../public/images/circle-arrow-icon.svg"
+            alt=""
+          >
+        </div>
       </div>
       <div
         v-for="(ev, i) in filteredEvents"
@@ -83,64 +104,79 @@
           class="op-header"
           :class="ev.style"
         >
-          <div
-            class="op-header-image2"
-          >
-            <img
-              :src="ev.contractMetadata && ev.contractMetadata.image ? ev.contractMetadata.image : 'https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png'"
-              alt="operation-icon"
+          <div class="op-group">
+            <div
+              class="op-header-image2"
             >
-          </div>
-          <div class="op-title">
-            {{ ev.contractMetadata && ev.contractMetadata.nickname ? ev.contractMetadata.nickname + " -" : "" }} {{ ev.title }}
+              <img
+                :src="ev.contractMetadata && ev.contractMetadata.image ? ev.contractMetadata.image : 'https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png'"
+                alt="operation-icon"
+              >
+            </div>
+            <div class="op-title">
+              {{ ev.contractMetadata && ev.contractMetadata.nickname ? ev.contractMetadata.nickname + " -" : "" }} {{ ev.title }}
+            </div>
           </div>
           <div
             class="op-viewmore"
             @click="toggleViewMoreEvent(ev.id)" 
-          >{{ ev.viewMore ? "View less" : "View more" }}</div>
-        </div>
-        <div
-          v-if="receipt && ev.viewMore"
-          class="op-body2"
-        >
-          <div class="op-contractid"> {{ ev.contractId }}</div>
-          <div class="op-subtitle">
-            {{ ev.subtitle }}
-          </div>
-          <div
-            v-for="(arg, j) in ev.args"
-            :key="'fe' + j"
-            class="op-body-row"
           >
-            <div class="field-name">
-              {{ arg.field }}
-            </div>
-            <div class="field-data">
-              {{ arg.data }}
-            </div>
+            {{ ev.viewMore ? "▲" : "▼" }}
           </div>
         </div>
-        <div
-          v-if="receipt && ev.viewMore"
-          class="op-body"
-          :class="ev.style"
-        >
-          <div class="op-contractid" style="margin-bottom: 0.5em;">Impacted accounts</div>
+        <transition name="fade">
           <div
-            v-for="(imp, k) in ev.impacted"
-            :key="'imp' + k"
-            class="ev-impacted-account"
+            v-if="receipt && ev.viewMore"
+            class="op-body2"
           >
-            {{ imp }}
+            <div class="op-contractid">
+              {{ ev.contractId }}
+            </div>
+            <div class="op-subtitle">
+              {{ ev.subtitle }}
+            </div>
+            <div
+              v-for="(arg, j) in ev.args"
+              :key="'fe' + j"
+              class="op-body-row"
+            >
+              <div class="field-name">
+                {{ arg.field }}
+              </div>
+              <div class="field-data">
+                {{ arg.data }}
+              </div>
+            </div>
           </div>
-          <div style="margin-top: 0.5em; color: var(--primary-gray);">
-            {{
-              ev.impactsUserAccounts
-                ? "It impacts your accounts"
-                : "It doesn't impact your accounts"
-            }}
+        </transition>
+        <transition name="fade">
+          <div
+            v-if="receipt && ev.viewMore"
+            class="op-body"
+            :class="ev.style"
+          >
+            <div
+              class="op-contractid"
+              style="margin-bottom: 0.5em;"
+            >
+              Impacted accounts
+            </div>
+            <div
+              v-for="(imp, k) in ev.impacted"
+              :key="'imp' + k"
+              class="ev-impacted-account"
+            >
+              {{ imp }}
+            </div>
+            <div style="margin-top: 0.5em; color: var(--primary-gray);">
+              {{
+                ev.impactsUserAccounts
+                  ? "It impacts your accounts"
+                  : "It doesn't impact your accounts"
+              }}
+            </div>
           </div>
-        </div>
+        </transition>
       </div>
       <div
         v-if="showAllEvents || events.length > filteredEvents.length"
@@ -474,7 +510,7 @@ export default {
       await this.decodeTransaction()
       if (this.unlocked) {
         console.log("Starting checkEvents");
-        await this.checkEvents(); // todo
+        await this.checkEvents()
         console.log("checkEvents completed");
       }
     } catch (error) {
@@ -1070,7 +1106,7 @@ export default {
         if (this.isOldKoilib || this.isOldKondor)
           this.footnoteMessage = `This website is using an old version of ${
             this.isOldKondor ? "kondor" : ""
-          }${this.isOldKondor && this.isOldKoilib ? " and " : ""}${
+          }${this.isOldKoilib ? " and " : ""}${
             this.isOldKoilib ? "koilib" : ""
           }. Its support will be deprecated in a future release`
       } catch (error) {
@@ -1292,15 +1328,11 @@ export default {
     },
 
     toggleViewMoreOperation(i) {
-      const copyOperations = JSON.parse(JSON.stringify(this.operations));
-      copyOperations[i].viewMore = !copyOperations[i].viewMore;
-      this.operations = copyOperations;
+      this.$set(this.operations[i], 'viewMore', !this.operations[i].viewMore);
     },
 
     toggleViewMoreEvent(i) {
-      const copyEvents = JSON.parse(JSON.stringify(this.events));
-      copyEvents[i].viewMore = !copyEvents[i].viewMore;
-      this.events = copyEvents;
+      this.$set(this.events[i], 'viewMore', !this.events[i].viewMore);
     },
 
     toggleAdvanced() {
@@ -1387,7 +1419,6 @@ input {
 }
 
 .operation {
-  margin-bottom: 1em;
   padding: 1.2em;
   box-sizing: border-box;
   width: 100%;
@@ -1408,30 +1439,38 @@ input {
 .op-header {
   padding: 1rem;
   color: var(--kondor-light);
-  margin-top: 0.5em;
+  margin-top: .5em;
   border-top-left-radius: 1em;
   border-top-right-radius: 1em;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   background-color: var(--primary-dark-light);
+  justify-content: space-between;
+  gap: 1em;
 }
 
 .op-header-image {
-  width: 4em;
-  height: 4em;
-  padding: 1em;
+  width: 3em;
+  height: 3em;
+  padding: .8em;
   background-color: var(--kondor-purple30);
   border-radius: 50%;
   display: flex;
   justify-content: center;
 }
 
+.op-group {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
 .op-header-image2 {
-  width: 4em;
-  height: 4em;
-  padding: 1em;
-  background-color: var(--kondor-lighter30);
+  width: 3em;
+  height: 3em;
+  padding: .8em;
+  background-color: var(--kondor-purple30);
   border-radius: 50%;
   display: flex;
   justify-content: center;
@@ -1459,67 +1498,34 @@ input {
 }
 
 .op-viewmore {
-  font-size: 0.8em;
-  color: var(--kondor-purple);
+  font-size: 1.2em;
+  color: white;
   margin-top: 0.3rem;
   cursor: pointer;
 }
 
 .op-contractid {
   width: 100%;
-  text-align: center;
   color: gray;
-  font-size: 0.8em;
 }
 
-.op-body {
-  padding: 0 0.8rem 0.5rem 0.8rem;
-  word-break: break-all;
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
-  background-color: var(--primary-dark-light);
-  border-top: 1px dashed;
-  border-top-color: gray;
-  animation: slideIn 0.1s ease-in-out;
-  /* animation: slideOut 0.5s ease-out; */
-}
-
+.op-body,
 .op-body2 {
   padding: 0 0.8rem 0.5rem 0.8rem;
   word-break: break-all;
   background-color: var(--primary-dark-light);
-  border-top: 1px dashed;
-  border-top-color: gray;
-  animation: slideIn 0.1s ease-in-out;
-  /* animation: slideOut 0.5s ease-out; */
 }
 
-@keyframes slideIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-50%);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideOut {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-50%);
-  }
+.op-body {
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
 }
 
 .op-body-row {
   display: flex;
-  margin: 1rem 0;
+  margin: .5rem 0;
   justify-content: space-between;
+  flex-direction: column;
 }
 
 .field-name {
@@ -1888,5 +1894,18 @@ input:checked + .slider:before {
 }
 .mana-used {
   font-size: 1.2em;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease, max-height 0.5s ease;
+  max-height: 1000px;
+  overflow: hidden;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  max-height: 0;
 }
 </style>
