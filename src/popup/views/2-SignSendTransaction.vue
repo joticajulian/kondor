@@ -20,8 +20,12 @@
         <div
           class="op-header-image"
         >
-          <img
-            :src="op.contractMetadata && op.contractMetadata.image ? op.contractMetadata.image : 'https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png'"
+          <img v-if="op.contractMetadata && op.contractMetadata.image"
+            :src="op.contractMetadata.image"
+            alt="operation-icon"
+          >
+          <img v-else
+            src="../../../public/images/check.svg"
             alt="operation-icon"
           >
         </div>

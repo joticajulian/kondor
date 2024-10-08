@@ -284,11 +284,15 @@ export default {
       utils.tokenAbi.koilib_types
     );
     console.log("Coins object:", this.coins)
-    
+
+    this.$store.state.networks = await this._getNetworks()
+    this.networkTag = await this._getCurrentNetwork()
+    this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
+      (n) => n.tag === this.networkTag
+    );
     this.provider = new Provider(
       this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
     );
-    this.networkTag = this.$store.state.networks[this.$store.state.currentNetwork].tag;
 
     this.fetchData()
   },
