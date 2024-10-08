@@ -406,7 +406,7 @@ export default {
     filteredEvents() {
       if (this.showAllEvents) return this.events;
       return this.events.filter(e => {
-        return !!e.contractMetadata && e.impactsUserAccounts;
+        return !!e.contractMetadata && !!e.contractMetadata.symbol && e.impactsUserAccounts;
       });
       // return this.events;
     },
@@ -513,6 +513,10 @@ export default {
           "token.transfer_event": { argument: "token.transfer_args", format },
           "token.mint_event": { argument: "token.mint_args", format },
           "token.burn_event": { argument: "token.burn_args", format },
+          "token.approve": { argument: "token.approve_args", format },
+          "token.transfer": { argument: "token.transfer_args", format },
+          "token.mint": { argument: "token.mint_args", format },
+          "token.burn": { argument: "token.burn_args", format },
           "token.approve_event": { argument: "token.approve_args", format },
           "koinos.contracts.token.transfer_event": { argument: "token.transfer_args", format },
           "koinos.contracts.token.mint_event": { argument: "token.mint_args", format },
@@ -1158,6 +1162,10 @@ export default {
 
     async checkEvents() {
       console.log("checkEvents method started");
+      if (this.loadingEvents) {
+        console.error("loading events is already processing");
+        return;
+      }
       this.loadingEvents = true;
       try {
         if (process.env.VUE_APP_ENV === "test") {
@@ -1411,6 +1419,8 @@ input {
   padding: 1em;
   background-color: var(--kondor-purple30);
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
 }
 
 .op-header-image2 {
@@ -1419,10 +1429,12 @@ input {
   padding: 1em;
   background-color: var(--kondor-lighter30);
   border-radius: 50%;
+  display: flex;
+  justify-content: center;
 }
 
 .op-header-image img, .op-header-image2 img {
-  width: 100%;
+  max-width: 100%;
   height: 100%;
   border-radius: 50%;
 }
