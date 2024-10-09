@@ -113,8 +113,13 @@
                 alt="operation-icon"
               >
             </div>
-            <div class="op-title">
-              {{ ev.contractMetadata && ev.contractMetadata.nickname ? ev.contractMetadata.nickname + " -" : "" }} {{ ev.title }}
+            <div class="op-title-group">
+              <div class="op-title">
+                {{ ev.contractMetadata && ev.contractMetadata.nickname ? ev.contractMetadata.nickname + " -" : "" }} {{ ev.title }}
+              </div>
+              <div v-if="ev.positiveValue" class="op-positive-value">
+                {{ ev.positiveValue }}
+              </div>
             </div>
           </div>
           <div
@@ -628,14 +633,30 @@ export default {
         // empty
       }
 
-      if (!format || !format[argName]) return data
+      if (!format || !format[argName]) {
+        // Try to find a matching key ignoring case
+        const matchingKey = Object.keys(format || {}).find(key => key.toLowerCase() === argName.toLowerCase());
+        if (matchingKey) {
+          format = { [argName]: format[matchingKey] };
+        } else {
+          return data;
+        }
+      }
 
       // beautify numbers
       switch (format[argName].type) {
       case "number": {
-        return `${utils.formatUnits(data, format[argName].decimals)} ${
-          format[argName].symbol
-        }`
+        const decimals = format[argName].decimals || 0
+        const symbol = format[argName].symbol || ''
+        const amount = utils.formatUnits(data, decimals)
+          
+        // Format the number with commas for thousands separators
+        const formattedAmount = new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: decimals
+        }).format(parseFloat(amount))
+
+        return `${formattedAmount} ${symbol}`.trim()
       }
       default:
         return data
@@ -798,6 +819,30 @@ export default {
             format = contract.abi.events[decodedEvent.name].format
             subtitle = contract.abi.events[decodedEvent.name].description || ""
           }
+
+          // Create a format object for all fields ending with "_amount"
+          format = format || {};
+          Object.keys(decodedEvent.args).forEach(argName => {
+            if (argName.toLowerCase().endsWith('_amount')) {
+              const tokenName = argName.slice(0, -7).toUpperCase(); // Remove '_amount' and capitalize
+              const token = this.tokens.find(t => t.symbol.toUpperCase() === tokenName);
+              format[argName] = {
+                type: "number",
+                decimals: token ? token.decimals : 8,
+                symbol: token ? token.symbol : tokenName
+              };
+            }
+          });
+
+          // Special handling for swap events (keep this for backwards compatibility)
+          if (decodedEvent.name.toLowerCase().includes('swap')) {
+            const tokenA = this.tokens.find(t => t.contractId === contractId);
+            const tokenB = this.tokens.find(t => t.contractId !== contractId);
+            
+            format.amount_in_a = format.amount_in_a || { type: "number", decimals: tokenA ? tokenA.decimals : 8, symbol: tokenA ? tokenA.symbol : '' };
+            format.amount_out_b = format.amount_out_b || { type: "number", decimals: tokenB ? tokenB.decimals : 8, symbol: tokenB ? tokenB.symbol : '' };
+          }
+
           let args = await Promise.all(
             Object.keys(decodedEvent.args).map(async (argName) => {
               const field = firstUpperCase(argName)
@@ -805,7 +850,7 @@ export default {
                 field,
                 data: await this.applyFormat(
                   format,
-                  argName,
+                  argName.toLowerCase(),
                   decodedEvent.args[argName]
                 ),
               }
@@ -823,8 +868,25 @@ export default {
           title = title
             .slice(title.lastIndexOf(".") + 1)
             .replace(/_/g, " ")
-            // .replace(" event", "");
           title = firstUpperCase(title);
+
+          // Determine the positive value to display
+          let positiveValue = null;
+          if (title.toLowerCase().includes('transfer')) {
+            const valueArg = args.find(arg => arg.field.toLowerCase() === 'value');
+            if (valueArg) {
+              positiveValue = valueArg.data;
+            }
+          } else {
+            // Fallback to previous logic for non-transfer events
+            const positiveValueArg = args.find(arg => {
+              const numericValue = parseFloat(arg.data);
+              return !isNaN(numericValue) && numericValue > 0;
+            });
+            if (positiveValueArg) {
+              positiveValue = positiveValueArg.data;
+            }
+          }
 
           this.events.push({
             id: this.events.length,
@@ -840,6 +902,7 @@ export default {
             },
             viewMore: false,
             contractMetadata,
+            positiveValue,
           })
         }
       } catch (error) {
@@ -1907,5 +1970,16 @@ input:checked + .slider:before {
 .fade-leave-to {
   opacity: 0;
   max-height: 0;
+}
+
+.op-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.op-positive-value {
+  font-size: 0.8em;
+  color: var(--kondor-green);
+  margin-top: 0.2em;
 }
 </style>
