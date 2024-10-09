@@ -108,8 +108,11 @@
             <div
               class="op-header-image2"
             >
-              <img
-                :src="ev.contractMetadata && ev.contractMetadata.image ? ev.contractMetadata.image : 'https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png'"
+              <img v-if="ev.contractMetadata && ev.contractMetadata.image"
+                :src="ev.contractMetadata.image"
+              >
+              <img v-else
+                src="../../../public/images/check.svg"
                 alt="operation-icon"
               >
             </div>
@@ -378,6 +381,10 @@ import { testReceipt, testRequests } from "../../services/utils";
 
 function firstUpperCase(s) {
   return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+function formatFieldName(f) {
+  return firstUpperCase(f.slice(f.lastIndexOf(".") + 1).split("_").join(" "));
 }
 
 function fromHexToUtf8(hex) {
@@ -649,7 +656,7 @@ export default {
         const decimals = format[argName].decimals || 0
         const symbol = format[argName].symbol || ''
         const amount = utils.formatUnits(data, decimals)
-          
+
         // Format the number with commas for thousands separators
         const formattedAmount = new Intl.NumberFormat('en-US', {
           minimumFractionDigits: 0,
@@ -785,11 +792,20 @@ export default {
         contract.serializer = await this.newSandboxSerializer(types)
         if (isOperation) {
           let { name, args } = await contract.decodeOperation(action)
-          const { format } = contract.abi.methods[name]
+          const format = contract.abi.methods[name].format || {};
           if (args) {
+            if (args.amount_in && args.amount_out_min && args.path && Array.isArray(args.path)) {
+              // special case for KoinDX
+              const tokenA = this.tokens.find(t => t.contractId === args.path[0] || t.nickname === args.path[0]);
+              format.amount_in = format.amount_in || { type: "number", decimals: tokenA ? tokenA.decimals : 8, symbol: tokenA ? tokenA.symbol : '' };
+
+              const tokenB = this.tokens.find(t => t.contractId === args.path[1] || t.nickname === args.path[1]);
+              format.amount_out_min = format.amount_out_min || { type: "number", decimals: tokenB ? tokenB.decimals : 8, symbol: tokenB ? tokenB.symbol : '' };
+            }
+
             args = await Promise.all(
               Object.keys(args).map(async (argName) => {
-                const field = firstUpperCase(argName)
+                const field = formatFieldName(argName)
                 return {
                   field,
                   data: await this.applyFormat(format, argName, args[argName]),
@@ -802,7 +818,7 @@ export default {
             call_contract: true,
             contractId: contractIdName,
             nickname: resolvedName,
-            title: firstUpperCase(contract.abi.methods[name].name || name),
+            title: formatFieldName(contract.abi.methods[name].name || name),
             subtitle: contract.abi.methods[name].description || "",
             args,
             style: { bgOperation: true },
@@ -834,18 +850,9 @@ export default {
             }
           });
 
-          // Special handling for swap events (keep this for backwards compatibility)
-          if (decodedEvent.name.toLowerCase().includes('swap')) {
-            const tokenA = this.tokens.find(t => t.contractId === contractId);
-            const tokenB = this.tokens.find(t => t.contractId !== contractId);
-            
-            format.amount_in_a = format.amount_in_a || { type: "number", decimals: tokenA ? tokenA.decimals : 8, symbol: tokenA ? tokenA.symbol : '' };
-            format.amount_out_b = format.amount_out_b || { type: "number", decimals: tokenB ? tokenB.decimals : 8, symbol: tokenB ? tokenB.symbol : '' };
-          }
-
           let args = await Promise.all(
             Object.keys(decodedEvent.args).map(async (argName) => {
-              const field = firstUpperCase(argName)
+              const field = formatFieldName(argName)
               return {
                 field,
                 data: await this.applyFormat(
@@ -865,10 +872,7 @@ export default {
           )
             title = abi.events[action.name].name
 
-          title = title
-            .slice(title.lastIndexOf(".") + 1)
-            .replace(/_/g, " ")
-          title = firstUpperCase(title);
+          title = formatFieldName(title);
 
           // Determine the positive value to display
           let positiveValue = null;
