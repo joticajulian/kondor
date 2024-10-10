@@ -4,7 +4,7 @@
       v-if="hasAccounts"
       class="unlock"
     >
-    <!--
+      <!--
     <div class="logo">
       <img
         src="../../../public/images/kondor-logo.png"
@@ -168,7 +168,7 @@ input {
   height: 100%;
 }
 .w-vw {
-  width: 100vw
+  width: 100vw;
 }
 .mt-1 {
   margin-top: 4em;

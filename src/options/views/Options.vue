@@ -294,7 +294,7 @@ input {
   width: 50%;
   margin: 0 auto;
   padding: 4em;
-  background-color: var(--primary-dark)222;
+  background-color: var(--primary-dark) 222;
 }
 
 .logo {

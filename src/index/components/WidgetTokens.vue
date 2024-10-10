@@ -15,20 +15,20 @@
 </template>
 
 <script>
-import axios from "axios"
-import router from "@/index/router"
-import { Contract, Provider, Signer, utils } from "koilib"
-import emptyToken from "@/shared/assets/empty-token.png"
-import WalletInfo from "./WalletInfo.vue"
-import TabPanel from "./TabPanel.vue"
+import axios from "axios";
+import router from "@/index/router";
+import { Contract, Provider, Signer, utils } from "koilib";
+import emptyToken from "@/shared/assets/empty-token.png";
+import WalletInfo from "./WalletInfo.vue";
+import TabPanel from "./TabPanel.vue";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Sandbox from "@/shared/mixins/Sandbox"
-import { formatTime } from "../../../lib/utils"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
+import { formatTime } from "../../../lib/utils";
 
-const FIVE_DAYS = 432e6 // 5 * 24 * 60 * 60 * 1000
+const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
 export default {
   components: { WalletInfo, TabPanel },
@@ -56,34 +56,34 @@ export default {
       manaPercent: 0,
       availablePercent: 0,
       tokenPrices: {},
-    }
+    };
   },
 
   computed: {
     balanceFormatted() {
-      if (!this.balance) return this.balance
-      const balanceNumber = Number(this.balance) || 0
-      if (Number.isNaN(balanceNumber)) return `Error ${balanceNumber}`
-      return balanceNumber.toLocaleString("en")
+      if (!this.balance) return this.balance;
+      const balanceNumber = Number(this.balance) || 0;
+      if (Number.isNaN(balanceNumber)) return `Error ${balanceNumber}`;
+      return balanceNumber.toLocaleString("en");
     },
     totalBalance() {
       return this.miniTokens
         .reduce((t, miniToken) => {
-          if (!miniToken.price) return t
-          return t + miniToken.price * Number(miniToken.balance)
+          if (!miniToken.price) return t;
+          return t + miniToken.price * Number(miniToken.balance);
         }, 0)
-        .toLocaleString()
+        .toLocaleString();
     },
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount(this.$store.state.currentIndexAccount)
+      this.loadAccount(this.$store.state.currentIndexAccount);
     },
     "$store.state.currentNetwork": async function () {
-      await this.loadNetwork()
-      this.tokenId = ""
-      this.loadAccount(this.$store.state.currentIndexAccount)
+      await this.loadNetwork();
+      this.tokenId = "";
+      this.loadAccount(this.$store.state.currentIndexAccount);
     },
   },
 
@@ -103,8 +103,8 @@ export default {
         await this.loadAccount(this.$store.state.currentIndexAccount);
       } else {
         this.$store.state.currentIndexAccount = index;
-      // the change will trigger the watch function which will
-      // call this.loadAccount
+        // the change will trigger the watch function which will
+        // call this.loadAccount
       }
       await this.updateSavedTokens();
       console.log("Saved tokens updated");
@@ -117,152 +117,152 @@ export default {
   methods: {
     async loadNetwork() {
       try {
-        this.$store.state.networks = await this._getNetworks()
-        const currentTag = await this._getCurrentNetwork()
+        this.$store.state.networks = await this._getNetworks();
+        const currentTag = await this._getCurrentNetwork();
         this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
           (n) => n.tag === currentTag
-        )
+        );
         this.network =
-          this.$store.state.networks[this.$store.state.currentNetwork]
-        this.provider = new Provider(this.network.rpcNodes)
+          this.$store.state.networks[this.$store.state.currentNetwork];
+        this.provider = new Provider(this.network.rpcNodes);
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 
     async loadTokenBalance(t) {
-      console.log(`Starting loadTokenBalance for ${t.nickname}`)
+      console.log(`Starting loadTokenBalance for ${t.nickname}`);
       const contract = new Contract({
         id: t.contractId,
         abi: utils.tokenAbi,
         provider: this.provider,
         serializer: this.serializer,
-      })
+      });
 
-      let balanceSatoshis
-      let balance
+      let balanceSatoshis;
+      let balance;
       try {
         const { result } = await contract.functions.balanceOf({
           owner: this.address,
-        })
-        balanceSatoshis = result.value
-        balance = utils.formatUnits(balanceSatoshis, t.decimals)
-        console.log(`Raw balance for ${t.nickname}:`, balanceSatoshis)
-        console.log(`Formatted balance for ${t.nickname}:`, balance)
+        });
+        balanceSatoshis = result.value;
+        balance = utils.formatUnits(balanceSatoshis, t.decimals);
+        console.log(`Raw balance for ${t.nickname}:`, balanceSatoshis);
+        console.log(`Formatted balance for ${t.nickname}:`, balance);
       } catch (error) {
         console.error(
           `Error while loading the balance of @${t.nickname}:`,
           error
-        )
+        );
         return {
           balanceSatoshis: "Error",
           balance: "Error",
           balanceWithSymbol: "Error",
           balanceUSD: "Error",
-        }
+        };
       }
 
       // load USD balance
-      let price = 0
-      let balanceUSD = "$0 USD"
+      let price = 0;
+      let balanceUSD = "$0 USD";
       if (this.network.tag === "mainnet" && t.nickname === "koin") {
         try {
           const response = await axios.get(
             "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
-          )
-          price = parseFloat(response.data.data[0].last)
-          const balanceNumber = Number(balance)
-          balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`
-          this.tokenPrices[t.symbol] = price
-          console.log(`USD price loaded for ${t.nickname}:`, price)
+          );
+          price = parseFloat(response.data.data[0].last);
+          const balanceNumber = Number(balance);
+          balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
+          this.tokenPrices[t.symbol] = price;
+          console.log(`USD price loaded for ${t.nickname}:`, price);
         } catch (error) {
           console.error(
             `Error when loading price for ${t.nickname} from MEXC API:`,
             error
-          )
-          balanceUSD = "USD Price Unavailable"
+          );
+          balanceUSD = "USD Price Unavailable";
         }
       }
 
       if (t.nickname === "koin") {
         // load mana
         try {
-          const balanceSatoshisNumber = Number(balanceSatoshis)
-          const rc = await this.provider.getAccountRc(this.address)
-          const initialMana = Number(rc)
-          const lastUpdateMana = Date.now()
+          const balanceSatoshisNumber = Number(balanceSatoshis);
+          const rc = await this.provider.getAccountRc(this.address);
+          const initialMana = Number(rc);
+          const lastUpdateMana = Date.now();
 
           // mana reserved in the mempool (pending state)
-          let reserved = 0
+          let reserved = 0;
           try {
             const res = await this.provider.call(
               "mempool.get_reserved_account_rc",
               { account: this.address }
-            )
+            );
             if (res && res.rc) {
-              reserved = Number(res.rc)
+              reserved = Number(res.rc);
               // in 3 minutes reserved will be 0
               setTimeout(() => {
-                reserved = 0
-              }, 180000)
+                reserved = 0;
+              }, 180000);
             }
           } catch (error) {
-            console.error("Error getting reserved account RC:", error)
+            console.error("Error getting reserved account RC:", error);
           }
 
           const updateMana = () => {
-            const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS)
+            const delta = Math.min(Date.now() - lastUpdateMana, FIVE_DAYS);
             let mana = Math.floor(
               initialMana + (delta * balanceSatoshisNumber) / FIVE_DAYS
-            )
-            mana = Math.min(mana, balanceSatoshisNumber)
+            );
+            mana = Math.min(mana, balanceSatoshisNumber);
             const timeRechargeMana = formatTime(balanceSatoshisNumber, {
               current: mana,
               reserved,
               balance: balanceSatoshisNumber,
-            })
+            });
             if (timeRechargeMana === "0 seconds")
-              this.timeRechargeMana = "Mana recharged"
+              this.timeRechargeMana = "Mana recharged";
             else {
-              this.timeRechargeMana = `Time to recharge: ${timeRechargeMana}`
+              this.timeRechargeMana = `Time to recharge: ${timeRechargeMana}`;
             }
-            this.manaPercent = Math.floor((mana / balanceSatoshisNumber) * 100)
-            mana = Math.max(0, mana - reserved)
+            this.manaPercent = Math.floor((mana / balanceSatoshisNumber) * 100);
+            mana = Math.max(0, mana - reserved);
             this.availablePercent = Math.floor(
               (mana / balanceSatoshisNumber) * 100
-            )
-            this.liquidKoin = utils.formatUnits(mana.toString(), 8)
-          }
+            );
+            this.liquidKoin = utils.formatUnits(mana.toString(), 8);
+          };
 
           if (balanceSatoshisNumber) {
-            updateMana()
-            clearInterval(this.intervalMana)
-            this.intervalMana = setInterval(updateMana, 1000)
+            updateMana();
+            clearInterval(this.intervalMana);
+            this.intervalMana = setInterval(updateMana, 1000);
           } else {
-            clearInterval(this.intervalMana)
-            this.timeRechargeMana = "No mana"
-            this.manaPercent = 0
-            this.availablePercent = 0
-            this.liquidKoin = "0"
+            clearInterval(this.intervalMana);
+            this.timeRechargeMana = "No mana";
+            this.manaPercent = 0;
+            this.availablePercent = 0;
+            this.liquidKoin = "0";
           }
-          console.log("Mana data loaded for KOIN")
+          console.log("Mana data loaded for KOIN");
         } catch (error) {
-          console.error("Error when loading mana:", error)
+          console.error("Error when loading mana:", error);
         }
-        this.showLiquidKoin = true
+        this.showLiquidKoin = true;
       } else {
-        this.showLiquidKoin = false
+        this.showLiquidKoin = false;
       }
 
-      console.log(`loadTokenBalance completed for ${t.nickname}`)
+      console.log(`loadTokenBalance completed for ${t.nickname}`);
       return {
         balanceSatoshis,
         balance,
         balanceWithSymbol: `${balance} ${t.symbol}`,
         balanceUSD,
         price,
-      }
+      };
     },
 
     async handleRefreshCoins() {
@@ -289,23 +289,23 @@ export default {
     },
 
     async updateSavedTokens() {
-      let tokens = await this._getTokens()
+      let tokens = await this._getTokens();
 
       tokens = await Promise.all(
         tokens.map(async (token) => {
-          token.image = emptyToken
-          if (!token.nickname) return token
+          token.image = emptyToken;
+          if (!token.nickname) return token;
 
           const networkId = this.$store.state.networks.findIndex(
             (n) => n.tag === token.network
-          )
-          const network = this.$store.state.networks[networkId]
-          const provider = new Provider(network.rpcNodes)
+          );
+          const network = this.$store.state.networks[networkId];
+          const provider = new Provider(network.rpcNodes);
 
           const nicknamesAbi = await this._getAbi(
             token.network,
             network.nicknamesContractId
-          )
+          );
 
           const nicknames = new Contract({
             id: network.nicknamesContractId,
@@ -314,49 +314,49 @@ export default {
             serializer: await this.newSandboxSerializer(
               nicknamesAbi.koilib_types
             ),
-          }).functions
+          }).functions;
 
           const tokenId = `0x${utils.toHexString(
             new TextEncoder().encode(token.nickname)
-          )}`
+          )}`;
 
           try {
             const { result: resultAddress } = await nicknames.get_address({
               value: token.nickname,
-            })
+            });
             if (!resultAddress || !resultAddress.value) {
-              return token
+              return token;
             }
-            token.contractId = resultAddress.value
+            token.contractId = resultAddress.value;
             token.permanentAddress =
               !!resultAddress.address_modifiable_only_by_governance ||
-              !!resultAddress.permanent_address
+              !!resultAddress.permanent_address;
           } catch (error) {
             console.error(
               `error when loading contract id of @${token.nickname}`
-            )
-            console.error(error)
-            return token
+            );
+            console.error(error);
+            return token;
           }
 
           try {
             const { result: resultMetadata } = await nicknames.metadata_of({
               token_id: tokenId,
-            })
-            const metadata = JSON.parse(resultMetadata.value)
-            if (metadata.image) token.image = metadata.image
+            });
+            const metadata = JSON.parse(resultMetadata.value);
+            if (metadata.image) token.image = metadata.image;
           } catch (error) {
             console.error(
               `error when loading metadata of token @${token.nickname}`
-            )
-            console.error(error)
+            );
+            console.error(error);
           }
 
-          return token
+          return token;
         })
-      )
+      );
 
-      await this._setTokens(tokens)
+      await this._setTokens(tokens);
     },
 
     async loadTokens() {
@@ -378,20 +378,26 @@ export default {
             console.log(`Processing token: ${token.nickname}`);
             // check network of token
             if (token.network !== this.network.tag) {
-              console.log(`Skipping token ${token.nickname} due to network mismatch`);
+              console.log(
+                `Skipping token ${token.nickname} due to network mismatch`
+              );
               continue;
             }
 
             // check current address
             if (token.addresses && token.addresses.length > 0) {
               if (!token.addresses.includes(this.address)) {
-                console.log(`Skipping token ${token.nickname} due to address mismatch`);
+                console.log(
+                  `Skipping token ${token.nickname} due to address mismatch`
+                );
                 continue;
               }
             }
             if (token.noAddresses && token.noAddresses.length > 0) {
               if (token.noAddresses.includes(this.address)) {
-                console.log(`Skipping token ${token.nickname} due to noAddresses match`);
+                console.log(
+                  `Skipping token ${token.nickname} due to noAddresses match`
+                );
                 continue;
               }
             }
@@ -401,7 +407,10 @@ export default {
               balance = await this.loadTokenBalance(token);
               console.log(`Balance loaded for ${token.nickname}:`, balance);
             } catch (balanceError) {
-              console.error(`Error loading balance for token ${token.nickname}:`, balanceError);
+              console.error(
+                `Error loading balance for token ${token.nickname}:`,
+                balanceError
+              );
               continue;
             }
 
@@ -410,20 +419,31 @@ export default {
               ...balance,
             };
 
-            if ((!this.tokenId && token.nickname === "koin") || token.contractId === this.tokenId) {
+            if (
+              (!this.tokenId && token.nickname === "koin") ||
+              token.contractId === this.tokenId
+            ) {
               try {
                 this.loadToken(miniToken);
               } catch (loadTokenError) {
-                console.error(`Error in loadToken for ${token.nickname}:`, loadTokenError);
+                console.error(
+                  `Error in loadToken for ${token.nickname}:`,
+                  loadTokenError
+                );
               }
             }
 
             // skip repeated tokens (if any)
-            if (!this.miniTokens.find((m) => m.contractId === token.contractId)) {
+            if (
+              !this.miniTokens.find((m) => m.contractId === token.contractId)
+            ) {
               this.miniTokens.push(miniToken);
             }
           } catch (tokenError) {
-            console.error(`Error processing token ${token.nickname}:`, tokenError);
+            console.error(
+              `Error processing token ${token.nickname}:`,
+              tokenError
+            );
             // Continue processing other tokens
           }
         }
@@ -484,33 +504,33 @@ export default {
     },
 
     async loadToken(t) {
-      this.tokenId = t.contractId
-      this.tokenName = t.nickname
-      this.tokenImage = t.image
-      this.tokenSymbol = t.symbol
+      this.tokenId = t.contractId;
+      this.tokenName = t.nickname;
+      this.tokenImage = t.image;
+      this.tokenSymbol = t.symbol;
       // this.tokenAddressPermanent = t.permanentAddress;
       // TODO: temporal code. Use previous line in the next version
       this.tokenAddressPermanent =
-        t.permanentAddress || t.nickname === "koin" || t.nickname === "vhp"
-      this.balance = t.balance
-      this.balanceWithSymbol = t.balanceWithSymbol
-      this.balanceUSD = t.balanceUSD
-      this.showLiquidKoin = t.nickname === "koin"
+        t.permanentAddress || t.nickname === "koin" || t.nickname === "vhp";
+      this.balance = t.balance;
+      this.balanceWithSymbol = t.balanceWithSymbol;
+      this.balanceUSD = t.balanceUSD;
+      this.showLiquidKoin = t.nickname === "koin";
     },
 
     clickBuy() {
-      router.push("/buy")
+      router.push("/buy");
     },
 
     sendToken() {
-      router.push(`/tokens/send?tokenId=${this.tokenId}`)
+      router.push(`/tokens/send?tokenId=${this.tokenId}`);
     },
 
     tokenSettings() {
-      router.push("/tokens/settings")
+      router.push("/tokens/settings");
     },
   },
-}
+};
 </script>
 <style scoped>
 .token {

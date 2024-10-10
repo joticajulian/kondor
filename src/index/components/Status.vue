@@ -1,7 +1,10 @@
 <template>
   <div class="app-status">
     <div class="message">
-      <router-link to="/dashboard" class="logo-link">
+      <router-link
+        to="/dashboard"
+        class="logo-link"
+      >
         <img
           src="../../../public/images/kondor-mark.svg"
           alt="Kondor logo mark"

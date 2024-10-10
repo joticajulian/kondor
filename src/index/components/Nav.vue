@@ -75,7 +75,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 
 .navbar-title {

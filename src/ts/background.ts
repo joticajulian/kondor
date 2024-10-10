@@ -63,26 +63,33 @@ async function preparePopup(sender?: Sender) {
 
     // Get the current window's information
     chrome.windows.getCurrent({}, (currentWindow) => {
-      const top = ((currentWindow.top || 0) + 80);
-      const left = ((currentWindow.left || 0) + (currentWindow.width || 0) - popupWidth - 130);
+      const top = (currentWindow.top || 0) + 80;
+      const left =
+        (currentWindow.left || 0) +
+        (currentWindow.width || 0) -
+        popupWidth -
+        130;
 
-      chrome.windows.create({
-        url: chrome.runtime.getURL("popup.html"),
-        type: "popup",
-        width: popupWidth,
-        height: popupHeight,
-        top,
-        left,
-        focused: true
-      }, (window) => {
-        if (chrome.runtime.lastError) {
-          console.error("Error creating popup:", chrome.runtime.lastError);
-        } else if (window) {
-          console.log("Popup window created successfully", window);
-        } else {
-          console.error("Window creation failed");
+      chrome.windows.create(
+        {
+          url: chrome.runtime.getURL("popup.html"),
+          type: "popup",
+          width: popupWidth,
+          height: popupHeight,
+          top,
+          left,
+          focused: true,
+        },
+        (window) => {
+          if (chrome.runtime.lastError) {
+            console.error("Error creating popup:", chrome.runtime.lastError);
+          } else if (window) {
+            console.log("Popup window created successfully", window);
+          } else {
+            console.error("Window creation failed");
+          }
         }
-      });
+      );
     });
   }
 }

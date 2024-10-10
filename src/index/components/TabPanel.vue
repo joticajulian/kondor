@@ -129,9 +129,7 @@
                 </span>
               </div>
               <div class="transaction-bottom">
-                <span class="transaction-type">{{
-                  event.type
-                }}</span>
+                <span class="transaction-type">{{ event.type }}</span>
                 <span class="transaction-address">
                   {{ event.summary }}
                 </span>
@@ -177,44 +175,211 @@
 </template>
 
 <script>
-import axios from "axios"
-import { Contract, Provider, utils } from "koilib"
-import { getAccountHistory } from "@/services/accountService"
+import axios from "axios";
+import { Contract, Provider, utils } from "koilib";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Sandbox from "@/shared/mixins/Sandbox"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
 
 // TODO: do not hardcode the tokens. Use a dynamic approach
 // like calling the nicknames or call a special contract or api
 // to query the tokens. Also, store custom tokens in the local storage.
 const defaultTokens = [
-  { network: "mainnet", address: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL", symbol: "KOIN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png", },
-  { network: "mainnet", address: "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr", symbol: "VHP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png", },
-  { network: "mainnet", address: "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM", symbol: "ETH", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd.png", },
-  { network: "mainnet", address: "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH", symbol: "USDT", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N.png", },
-  { network: "mainnet", address: "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7", symbol: "BTC", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png", },
-  { network: "mainnet", address: "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy", symbol: "pVHP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy.png", },
-  { network: "mainnet", address: "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS", symbol: "KAN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS.png", },
-  { network: "mainnet", address: "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ", symbol: "BTK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ.png", },
-  { network: "mainnet", address: "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD", symbol: "KCT", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD.png", },
-  { network: "mainnet", address: "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG", symbol: "DRUGS", decimals: 8,image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG.png", },
-  { network: "mainnet", address: "17t977jJZ7DYKPQsjqtStbpvmde1DditXW", symbol: "UP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/17t977jJZ7DYKPQsjqtStbpvmde1DditXW.png", },
-  { network: "mainnet", address: "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx", symbol: "PUNKSK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx.png", },
-  { network: "mainnet", address: "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8", symbol: "OGAS", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8.png", },
-  { network: "mainnet", address: "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC", symbol: "EGG", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC.png", },
-  { network: "mainnet", address: "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ", symbol: "DGK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ.png", },
-  { network: "mainnet", address: "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755", symbol: "KROK", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KroK111wVj8QU3ydFHqPpNyVtfgV8n755.png", },
-  { network: "mainnet", address: "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP", symbol: "KG", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP.png", },
-  { network: "mainnet", address: "1EoGf6wPB632JudW1P12aSByLJdeNajWoU", symbol: "MEOW", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1EoGf6wPB632JudW1P12aSByLJdeNajWoU.png", },
-  { network: "mainnet", address: "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf", symbol: "GAS", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf.png", },
-  { network: "mainnet", address: "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA", symbol: "RWA", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png", },
-  { network: "mainnet", address: "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf", symbol: "RUN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png", },
-  { network: "mainnet", address: "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs", symbol: "BALD", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png", },
+  {
+    network: "mainnet",
+    address: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+    symbol: "KOIN",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png",
+  },
+  {
+    network: "mainnet",
+    address: "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr",
+    symbol: "VHP",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png",
+  },
+  {
+    network: "mainnet",
+    address: "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM",
+    symbol: "ETH",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd.png",
+  },
+  {
+    network: "mainnet",
+    address: "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH",
+    symbol: "USDT",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N.png",
+  },
+  {
+    network: "mainnet",
+    address: "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7",
+    symbol: "BTC",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png",
+  },
+  {
+    network: "mainnet",
+    address: "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy",
+    symbol: "pVHP",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy.png",
+  },
+  {
+    network: "mainnet",
+    address: "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS",
+    symbol: "KAN",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS.png",
+  },
+  {
+    network: "mainnet",
+    address: "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ",
+    symbol: "BTK",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ.png",
+  },
+  {
+    network: "mainnet",
+    address: "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD",
+    symbol: "KCT",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD.png",
+  },
+  {
+    network: "mainnet",
+    address: "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG",
+    symbol: "DRUGS",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG.png",
+  },
+  {
+    network: "mainnet",
+    address: "17t977jJZ7DYKPQsjqtStbpvmde1DditXW",
+    symbol: "UP",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/17t977jJZ7DYKPQsjqtStbpvmde1DditXW.png",
+  },
+  {
+    network: "mainnet",
+    address: "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx",
+    symbol: "PUNKSK",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx.png",
+  },
+  {
+    network: "mainnet",
+    address: "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8",
+    symbol: "OGAS",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8.png",
+  },
+  {
+    network: "mainnet",
+    address: "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC",
+    symbol: "EGG",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC.png",
+  },
+  {
+    network: "mainnet",
+    address: "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ",
+    symbol: "DGK",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ.png",
+  },
+  {
+    network: "mainnet",
+    address: "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755",
+    symbol: "KROK",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KroK111wVj8QU3ydFHqPpNyVtfgV8n755.png",
+  },
+  {
+    network: "mainnet",
+    address: "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP",
+    symbol: "KG",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP.png",
+  },
+  {
+    network: "mainnet",
+    address: "1EoGf6wPB632JudW1P12aSByLJdeNajWoU",
+    symbol: "MEOW",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1EoGf6wPB632JudW1P12aSByLJdeNajWoU.png",
+  },
+  {
+    network: "mainnet",
+    address: "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf",
+    symbol: "GAS",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf.png",
+  },
+  {
+    network: "mainnet",
+    address: "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA",
+    symbol: "RWA",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png",
+  },
+  {
+    network: "mainnet",
+    address: "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf",
+    symbol: "RUN",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png",
+  },
+  {
+    network: "mainnet",
+    address: "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs",
+    symbol: "BALD",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png",
+  },
 
-  { network: "harbinger", address: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju", symbol: "tKOIN", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png", },
-  { network: "harbinger", address: "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi", symbol: "VHP", decimals: 8, image: "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png", },
+  {
+    network: "harbinger",
+    address: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
+    symbol: "tKOIN",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png",
+  },
+  {
+    network: "harbinger",
+    address: "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi",
+    symbol: "VHP",
+    decimals: 8,
+    image:
+      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png",
+  },
 ];
 
 export default {
@@ -248,12 +413,12 @@ export default {
       provider: null,
       networkTag: null,
       filteredEvents: [],
-    }
+    };
   },
 
   computed: {
     kollectionProfileUrl() {
-      return `https://kollection.app/profile/${this.address}`
+      return `https://kollection.app/profile/${this.address}`;
     },
     filteredCoins() {
       // return this.coins.filter(coin => parseFloat(coin.balance) > 0);
@@ -266,7 +431,7 @@ export default {
     activeTab: "fetchData",
     coins: {
       handler(newCoins) {
-        console.log("Coins updated:", newCoins)
+        console.log("Coins updated:", newCoins);
       },
       deep: true,
     },
@@ -274,7 +439,8 @@ export default {
       this.provider = new Provider(
         this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
       );
-      this.networkTag = this.$store.state.networks[this.$store.state.currentNetwork].tag;
+      this.networkTag =
+        this.$store.state.networks[this.$store.state.currentNetwork].tag;
       this.filteredEvents = [];
     },
   },
@@ -283,10 +449,10 @@ export default {
     this.serializer = await this.newSandboxSerializer(
       utils.tokenAbi.koilib_types
     );
-    console.log("Coins object:", this.coins)
+    console.log("Coins object:", this.coins);
 
-    this.$store.state.networks = await this._getNetworks()
-    this.networkTag = await this._getCurrentNetwork()
+    this.$store.state.networks = await this._getNetworks();
+    this.networkTag = await this._getCurrentNetwork();
     this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
       (n) => n.tag === this.networkTag
     );
@@ -294,42 +460,42 @@ export default {
       this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
     );
 
-    this.fetchData()
+    this.fetchData();
   },
 
   methods: {
     getTruncatedTransactionId(id) {
       return id
         ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}`
-        : "N/A"
+        : "N/A";
     },
 
     truncateAddress(address) {
-      if (!address) return "N/A"
-      return `${address.slice(0, 4)}...${address.slice(-4)}`
+      if (!address) return "N/A";
+      return `${address.slice(0, 4)}...${address.slice(-4)}`;
     },
 
     async fetchData() {
       if (this.activeTab === "nfts") {
-        await this.fetchNFTs()
+        await this.fetchNFTs();
       } else if (this.activeTab === "activity") {
-        await this.fetchAccountHistory()
-      }  else if (this.activeTab === "coins") {
-        await this.refreshCoins()
+        await this.fetchAccountHistory();
+      } else if (this.activeTab === "coins") {
+        await this.refreshCoins();
       }
     },
 
     async refreshCoins() {
-      console.log("Refreshing coins...")
-      this.$emit('refresh-coins')
+      console.log("Refreshing coins...");
+      this.$emit("refresh-coins");
     },
 
     async fetchNFTs() {
-      if (!this.address) return
+      if (!this.address) return;
 
-      this.loading = true
-      this.error = null
-      this.nfts = null
+      this.loading = true;
+      this.error = null;
+      this.nfts = null;
 
       try {
         const response = await axios.get(
@@ -339,175 +505,192 @@ export default {
               Accept: "application/json",
             },
           }
-        )
+        );
 
         if (response.data && Array.isArray(response.data.data)) {
-          this.nfts = response.data.data
-          console.log("NFTs loaded:", this.nfts)
+          this.nfts = response.data.data;
+          console.log("NFTs loaded:", this.nfts);
         } else {
-          this.error = "Unexpected API response structure"
-          console.error("API response:", response.data)
+          this.error = "Unexpected API response structure";
+          console.error("API response:", response.data);
         }
 
         if (this.nfts && this.nfts.length === 0) {
-          this.error = "No NFTs found for this address"
+          this.error = "No NFTs found for this address";
         }
       } catch (err) {
-        this.error = `Failed to fetch NFTs: ${err.message}`
-        console.error("Error fetching NFTs:", err)
+        this.error = `Failed to fetch NFTs: ${err.message}`;
+        console.error("Error fetching NFTs:", err);
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async fetchAccountHistory() {
-      if (!this.address) return
+      if (!this.address) return;
 
-      this.loadingActivity = true
-      this.activityError = null
-      this.transactions = []
+      this.loadingActivity = true;
+      this.activityError = null;
+      this.transactions = [];
 
       try {
         if (!this.provider) {
           this.provider = new Provider(
-            this.$store.state.networks[this.$store.state.currentNetwork].rpcNodes
+            this.$store.state.networks[
+              this.$store.state.currentNetwork
+            ].rpcNodes
           );
         }
-        const data = await this.provider.call("account_history.get_account_history", {
-          address: this.address,
-          ascending: false,
-          limit: 40,
-        });
+        const data = await this.provider.call(
+          "account_history.get_account_history",
+          {
+            address: this.address,
+            ascending: false,
+            limit: 40,
+          }
+        );
 
         this.transactions = data.values;
-        console.log("Account history loaded:", this.transactions)
-        
+        console.log("Account history loaded:", this.transactions);
+
         if (!this.transactions) {
           this.filteredEvents = [];
           return;
         }
         const events = [];
-        await Promise.all(this.transactions.map(async tx => {
-          if (!tx) return;
-          let rawEvents = [];
-          let recordId = "";
-          let txOrBlockLink = "";
-          let txOrBlockText = "";
-          const { explorer } = this.$store.state.networks[this.$store.state.currentNetwork];
+        await Promise.all(
+          this.transactions.map(async (tx) => {
+            if (!tx) return;
+            let rawEvents = [];
+            let recordId = "";
+            let txOrBlockLink = "";
+            let txOrBlockText = "";
+            const { explorer } =
+              this.$store.state.networks[this.$store.state.currentNetwork];
 
-          if (tx.trx) {
-            if (tx.trx.receipt.events) {
-              rawEvents = tx.trx.receipt.events;
-              recordId = tx.trx.transaction.id;
-              txOrBlockLink = `${explorer.tx}/${recordId}`;
-              txOrBlockText = this.getTruncatedTransactionId(recordId);
-            }
-          } else if (tx.block) {
-            if (tx.block.receipt.events) {
-              rawEvents = tx.block.receipt.events;
-              recordId = tx.block.header.height;
-              txOrBlockLink = `${explorer.block}/${recordId}`;
-              txOrBlockText = `Block ${recordId}`;
-            }
-          }
-  
-          const eventsProcessed = await Promise.all(
-            rawEvents.map(async (e) => {
-              const token = defaultTokens.find(t => t.address === e.source && t.network === this.networkTag);
-              if (!token || !["transfer_event", "mint_event", "burn_event"].find(name => e.name.includes(name))) {
-                return {};
+            if (tx.trx) {
+              if (tx.trx.receipt.events) {
+                rawEvents = tx.trx.receipt.events;
+                recordId = tx.trx.transaction.id;
+                txOrBlockLink = `${explorer.tx}/${recordId}`;
+                txOrBlockText = this.getTruncatedTransactionId(recordId);
               }
-              if (!e.data) return {};
-  
-              const abiEvents = {};
-              abiEvents[e.name] = { 
-                argument: e.name
-                  // from "koinos.contracts.token.transfer_event" get "transfer_event"
-                  .slice(e.name.lastIndexOf(".") + 1)
-                  // replace to "transfer_arguments"
-                  .replace("_event", "_arguments")
-              };
-              const contract = new Contract({
-                id: e.source,
-                abi: {
-                  ...utils.tokenAbi,
-                  events: abiEvents,
-                },
-                serializer: this.serializer,
-              });
-              
-              const { args } = await contract.decodeEvent(e);
-              
-              let amountFloat = Number(args.value) / Math.pow(10, token.decimals);
-              const type = args.to === this.address ? "receive" : "send";
-              let summary = "";
-              if (e.name.includes("transfer")) {
-                if (type === "receive") summary = `From ${this.truncateAddress(args.from)}`;
-                else summary = `To ${this.truncateAddress(args.to)}`;
-              } else if (e.name.includes("burn")) {
-                summary = "Burn";
-              } else if (e.name.includes("mint")) {
-                summary = "Mint";
+            } else if (tx.block) {
+              if (tx.block.receipt.events) {
+                rawEvents = tx.block.receipt.events;
+                recordId = tx.block.header.height;
+                txOrBlockLink = `${explorer.block}/${recordId}`;
+                txOrBlockText = `Block ${recordId}`;
               }
-              
-              return {
-                ...e,
-                txId: recordId,
-                args,
-                token,
-                type,
-                amountFormatted: amountFloat.toFixed(2),
-                summary,
-                txOrBlockLink,
-                txOrBlockText,
-              };
-            })
-          );
-          events.push(...eventsProcessed.filter(e => !!e.source));
-        }));
-  
+            }
+
+            const eventsProcessed = await Promise.all(
+              rawEvents.map(async (e) => {
+                const token = defaultTokens.find(
+                  (t) => t.address === e.source && t.network === this.networkTag
+                );
+                if (
+                  !token ||
+                  !["transfer_event", "mint_event", "burn_event"].find((name) =>
+                    e.name.includes(name)
+                  )
+                ) {
+                  return {};
+                }
+                if (!e.data) return {};
+
+                const abiEvents = {};
+                abiEvents[e.name] = {
+                  argument: e.name
+                    // from "koinos.contracts.token.transfer_event" get "transfer_event"
+                    .slice(e.name.lastIndexOf(".") + 1)
+                    // replace to "transfer_arguments"
+                    .replace("_event", "_arguments"),
+                };
+                const contract = new Contract({
+                  id: e.source,
+                  abi: {
+                    ...utils.tokenAbi,
+                    events: abiEvents,
+                  },
+                  serializer: this.serializer,
+                });
+
+                const { args } = await contract.decodeEvent(e);
+
+                let amountFloat =
+                  Number(args.value) / Math.pow(10, token.decimals);
+                const type = args.to === this.address ? "receive" : "send";
+                let summary = "";
+                if (e.name.includes("transfer")) {
+                  if (type === "receive")
+                    summary = `From ${this.truncateAddress(args.from)}`;
+                  else summary = `To ${this.truncateAddress(args.to)}`;
+                } else if (e.name.includes("burn")) {
+                  summary = "Burn";
+                } else if (e.name.includes("mint")) {
+                  summary = "Mint";
+                }
+
+                return {
+                  ...e,
+                  txId: recordId,
+                  args,
+                  token,
+                  type,
+                  amountFormatted: amountFloat.toFixed(2),
+                  summary,
+                  txOrBlockLink,
+                  txOrBlockText,
+                };
+              })
+            );
+            events.push(...eventsProcessed.filter((e) => !!e.source));
+          })
+        );
+
         this.filteredEvents = events;
       } catch (err) {
-        this.activityError = `Failed to fetch account history: ${err.message}`
-        console.error("Error fetching account history:", err)
+        this.activityError = `Failed to fetch account history: ${err.message}`;
+        console.error("Error fetching account history:", err);
       } finally {
-        this.loadingActivity = false
+        this.loadingActivity = false;
       }
     },
 
     setActiveTab(tab) {
-      this.activeTab = tab
-      if (tab === 'coins') {
-        this.refreshCoins()
+      this.activeTab = tab;
+      if (tab === "coins") {
+        this.refreshCoins();
       } else {
-        this.fetchData()
+        this.fetchData();
       }
     },
 
     truncateDescription(description) {
-      if (!description) return "No description"
+      if (!description) return "No description";
       return description.length > 30
         ? description.slice(0, 30) + "..."
-        : description
+        : description;
     },
 
     calculateUsdValue(coin) {
-      const price = this.prices[coin.symbol]
-      if (!price) return "N/A"
-      return (Number(coin.balance) * price).toFixed(2)
+      const price = this.prices[coin.symbol];
+      if (!price) return "N/A";
+      return (Number(coin.balance) * price).toFixed(2);
     },
 
     getTokenImageById(contractId) {
-      const token = defaultTokens.find(t => t.address === contractId);
+      const token = defaultTokens.find((t) => t.address === contractId);
       if (token) return token.image;
       return "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png";
     },
 
     openTransactionUrl(url) {
-      window.open(url, "_blank")
+      window.open(url, "_blank");
     },
   },
-}
+};
 </script>
 
 <style scoped>

@@ -17,10 +17,9 @@
 </template>
 
 <script>
-import Nav from "@/index/components/Nav";
 import Alert from "@/shared/components/Alert";
 
 export default {
-  components: { /*Nav,*/ Alert },
+  components: { Alert },
 };
 </script>

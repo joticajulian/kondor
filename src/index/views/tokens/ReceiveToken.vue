@@ -42,8 +42,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex"
-import QrcodeVue from "qrcode.vue"
+import { mapState } from "vuex";
+import QrcodeVue from "qrcode.vue";
 
 export default {
   name: "ReceiveKoin",
@@ -53,19 +53,19 @@ export default {
   data() {
     return {
       currentAddress: "",
-    }
+    };
   },
   computed: {
     ...mapState(["accounts", "currentIndexAccount"]),
   },
   mounted() {
-    this.getCurrentAddress()
+    this.getCurrentAddress();
   },
   methods: {
     getCurrentAddress() {
-      const currentAccount = this.accounts[this.currentIndexAccount]
+      const currentAccount = this.accounts[this.currentIndexAccount];
       if (currentAccount) {
-        this.currentAddress = currentAccount.address
+        this.currentAddress = currentAccount.address;
       }
     },
     copyAddress() {
@@ -77,23 +77,23 @@ export default {
               show: true,
               type: "success",
               message: "Address copied to clipboard",
-            })
+            });
           })
           .catch((err) => {
-            console.error("Failed to copy address: ", err)
+            console.error("Failed to copy address: ", err);
             this.$store.dispatch("setAlert", {
               show: true,
               type: "error",
               message: "Failed to copy address",
-            })
-          })
+            });
+          });
       }
     },
     close() {
-      this.$router.push({ name: "Dashboard" })
+      this.$router.push({ name: "Dashboard" });
     },
   },
-}
+};
 </script>
 
 <style scoped>

@@ -2,10 +2,13 @@
   <div class="dropdown-container">
     <div class="link-item">
       <div class="row">
-        <div class="current-account" @click="copyAddress">
+        <div
+          class="current-account"
+          @click="copyAddress"
+        >
           {{ currentAccount }}
           <div class="tooltip">
-            <span>{{ tooltipMessage }}</span> <br />
+            <span>{{ tooltipMessage }}</span> <br>
             {{ currentAddress }}
           </div>
         </div>
@@ -17,17 +20,29 @@
         >
         </div> -->
       </div>
-      <button class="menu-toggle dropdown-icon" @click="openDropdown()">
-        <img src="../../../public/images/ellipsis-vertical-light.svg" alt="edit account icon" />
+      <button
+        class="menu-toggle dropdown-icon"
+        @click="openDropdown()"
+      >
+        <img
+          src="../../../public/images/ellipsis-vertical-light.svg"
+          alt="edit account icon"
+        >
       </button>
     </div>
 
-    <div v-if="showDropdown" class="dropdown-content">
+    <div
+      v-if="showDropdown"
+      class="dropdown-content"
+    >
       <router-link
         class="options-item"
         :to="{ path: '/updateAccount', query: { address: currentAddress } }"
       >
-        <img src="../../../public/images/icon-edit.png" alt="" />
+        <img
+          src="../../../public/images/icon-edit.png"
+          alt=""
+        >
         Update account
       </router-link>
       <a
@@ -35,7 +50,10 @@
         :href="koinosblocksUrl + currentAddress"
         target="_blank"
       >
-        <img src="../../../public/images/icon-link.png" alt="link icon" />
+        <img
+          src="../../../public/images/icon-link.png"
+          alt="link icon"
+        >
         View on KoinosBlocks
       </a>
       <a
@@ -43,7 +61,10 @@
         :href="'https://koiner.app/addresses/' + currentAddress"
         target="_blank"
       >
-        <img src="../../../public/images/icon-link.png" alt="link icon" />
+        <img
+          src="../../../public/images/icon-link.png"
+          alt="link icon"
+        >
         View on Koiner
       </a>
       <a
@@ -51,7 +72,10 @@
         href="https://koinosbox.com/nicknames"
         target="_blank"
       >
-        <img src="../../../public/images/icon-link.png" alt="link icon" /> Edit
+        <img
+          src="../../../public/images/icon-link.png"
+          alt="link icon"
+        > Edit
         Nickname
       </a>
       <div>
@@ -60,7 +84,10 @@
           href="https://kap.domains/account"
           target="_blank"
         >
-          <img src="../../../public/images/icon-link.png" alt="link icon" />
+          <img
+            src="../../../public/images/icon-link.png"
+            alt="link icon"
+          >
           <span>Edit KAP Profile</span>
         </a>
       </div>
@@ -77,29 +104,29 @@ export default {
       currentAddress: "",
       koinosblocksUrl: "https://koinosblocks.com/address/",
       showDropdown: false,
-    }
+    };
   },
 
   watch: {
     "$store.state.currentIndexAccount": function () {
-      this.loadAccount()
+      this.loadAccount();
     },
     "$store.state.currentNetwork": function () {
-      this.updateLinks()
+      this.updateLinks();
     },
   },
 
   mounted() {
-    this.loadAccount()
+    this.loadAccount();
   },
 
   methods: {
     openDropdown() {
       if (!this.showDropdown) {
-        this.showDropdown = true
+        this.showDropdown = true;
         setTimeout(() => {
-          window.addEventListener("click", this.closeDropdown)
-        }, 0)
+          window.addEventListener("click", this.closeDropdown);
+        }, 0);
       }
     },
 
@@ -109,16 +136,16 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false
-        window.removeEventListener("click", this.closeDropdown)
+        this.showDropdown = false;
+        window.removeEventListener("click", this.closeDropdown);
       }
     },
 
     loadAccount() {
-      if (this.$store.state.accounts.length === 0) return
-      const index = this.$store.state.currentIndexAccount
-      this.currentAccount = this.$store.state.accounts[index].name
-      this.currentAddress = this.$store.state.accounts[index].address
+      if (this.$store.state.accounts.length === 0) return;
+      const index = this.$store.state.currentIndexAccount;
+      this.currentAccount = this.$store.state.accounts[index].name;
+      this.currentAddress = this.$store.state.accounts[index].address;
     },
 
     updateLinks() {
@@ -126,21 +153,21 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork].tag ===
         "harbinger"
       ) {
-        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/"
+        this.koinosblocksUrl = "https://harbinger.koinosblocks.com/address/";
       } else {
-        this.koinosblocksUrl = "https://koinosblocks.com/address/"
+        this.koinosblocksUrl = "https://koinosblocks.com/address/";
       }
     },
 
     copyAddress() {
-      navigator.clipboard.writeText(this.currentAddress)
-      this.tooltipMessage = "Copied!"
+      navigator.clipboard.writeText(this.currentAddress);
+      this.tooltipMessage = "Copied!";
       setTimeout(() => {
-        this.tooltipMessage = "Click to copy"
-      }, 2000)
+        this.tooltipMessage = "Click to copy";
+      }, 2000);
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -156,7 +183,7 @@ export default {
   z-index: 10;
   padding: 0.5em 0;
   border: 1px solid rgb(25 25 25);
-  border-radius: .5em;
+  border-radius: 0.5em;
 }
 
 .dropdown-item {
@@ -195,7 +222,7 @@ a:visited {
 }
 .options-item:hover {
   background: var(--primary-dark);
-  border-radius: .5em;
+  border-radius: 0.5em;
 }
 .address {
   font-size: 0.7em;
@@ -286,7 +313,7 @@ a:visited {
   font-size: 1em;
 }
 .dropdown-icon {
-  width: .3em;
+  width: 0.3em;
   cursor: pointer;
 }
 .row {

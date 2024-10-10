@@ -15,11 +15,13 @@
           v-for="(account, index) in accounts"
           :key="index"
           class="account-item"
-          :class="{ 'selected': selectedIndex === index }"
+          :class="{ selected: selectedIndex === index }"
           @click="selectAccount(index)"
         >
           <span class="account-name">{{ account.name }}</span>
-          <span class="account-address">{{ formatAddress(account.address) }}</span>
+          <span class="account-address">{{
+            formatAddress(account.address)
+          }}</span>
         </div>
       </div>
 
@@ -92,16 +94,18 @@ export default {
         const selectedAccount = this.accounts[this.selectedIndex];
         const message = {
           id: this.id,
-          result: [{
-            name: selectedAccount.name,
-            address: selectedAccount.address,
-            signers: selectedAccount.signers
-              ? selectedAccount.signers.map((signer) => ({
-                name: signer.name,
-                address: signer.address,
-              }))
-              : [],
-          }],
+          result: [
+            {
+              name: selectedAccount.name,
+              address: selectedAccount.address,
+              signers: selectedAccount.signers
+                ? selectedAccount.signers.map((signer) => ({
+                  name: signer.name,
+                  address: signer.address,
+                }))
+                : [],
+            },
+          ],
         };
         this.sendResponse("extension", message, this.requester);
         window.close();
@@ -167,7 +171,8 @@ export default {
   transition: background-color 0.3s ease;
 }
 
-.account-item:hover, .account-item.selected {
+.account-item:hover,
+.account-item.selected {
   background-color: #3a3a3a;
 }
 

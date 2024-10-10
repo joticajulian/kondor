@@ -61,7 +61,8 @@
             <img
               src="../../../public/images/icon-import.png"
               alt=""
-            > Switch to {{ $store.state.currentNetwork === 1 ? "mainnet" : "testnet" }}
+            > Switch
+            to {{ $store.state.currentNetwork === 1 ? "mainnet" : "testnet" }}
           </div>
           <div v-if="$store.state.mnemonic0">
             <div
@@ -116,12 +117,12 @@
 
 <script>
 /* eslint-disable no-undef */
-import router from "@/index/router"
-import { createAvatar } from "@dicebear/avatars"
-import * as identiconStyle from "@dicebear/avatars-identicon-sprites"
+import router from "@/index/router";
+import { createAvatar } from "@dicebear/avatars";
+import * as identiconStyle from "@dicebear/avatars-identicon-sprites";
 
 // mixins
-import Storage from "@/shared/mixins/Storage"
+import Storage from "@/shared/mixins/Storage";
 
 export default {
   mixins: [Storage],
@@ -129,31 +130,31 @@ export default {
   data() {
     return {
       showDropdown: false,
-      mainnetColor: '#ffffff',
-      testnetColor: '#ead29e',
-      greenColor: '#32cd32',
-    }
+      mainnetColor: "#ffffff",
+      testnetColor: "#ead29e",
+      greenColor: "#32cd32",
+    };
   },
 
   computed: {
     avatar() {
       const account =
-        this.$store.state.accounts[this.$store.state.currentIndexAccount]
-      if (!account || !account.address) return ""
+        this.$store.state.accounts[this.$store.state.currentIndexAccount];
+      if (!account || !account.address) return "";
       const identicon = createAvatar(identiconStyle, {
         seed: account.address,
         dataUri: true,
-      })
-      return identicon
+      });
+      return identicon;
     },
     isTestnetMode: {
       get() {
-        return this.$store.state.currentNetwork === 1 // Assuming 1 is the index for testnet
+        return this.$store.state.currentNetwork === 1; // Assuming 1 is the index for testnet
       },
       set(value) {
-        const networkIndex = value ? 1 : 0 // 1 for testnet, 0 for mainnet
-        this.$store.state.currentNetwork = networkIndex
-        this._setCurrentNetwork(this.$store.state.networks[networkIndex].tag)
+        const networkIndex = value ? 1 : 0; // 1 for testnet, 0 for mainnet
+        this.$store.state.currentNetwork = networkIndex;
+        this._setCurrentNetwork(this.$store.state.networks[networkIndex].tag);
       },
     },
   },
@@ -161,10 +162,16 @@ export default {
   watch: {
     isTestnetMode: {
       handler(newValue) {
-        console.log(`Network changed to ${newValue ? 'testnet' : 'mainnet'}`);
+        console.log(`Network changed to ${newValue ? "testnet" : "mainnet"}`);
         const root = document.documentElement;
-        root.style.setProperty('--primary-light', newValue ? this.testnetColor : this.mainnetColor);
-        root.style.setProperty('--network-green', newValue ? this.testnetColor : this.greenColor);
+        root.style.setProperty(
+          "--primary-light",
+          newValue ? this.testnetColor : this.mainnetColor
+        );
+        root.style.setProperty(
+          "--network-green",
+          newValue ? this.testnetColor : this.greenColor
+        );
       },
       immediate: true,
     },
@@ -172,13 +179,13 @@ export default {
 
   methods: {
     openDropdown() {
-      console.log("openDropdown called") // Add this line
+      console.log("openDropdown called"); // Add this line
       if (!this.showDropdown) {
-        this.showDropdown = true
-        document.body.style.overflow = "hidden"
+        this.showDropdown = true;
+        document.body.style.overflow = "hidden";
         setTimeout(() => {
-          window.addEventListener("click", this.closeDropdown)
-        }, 0)
+          window.addEventListener("click", this.closeDropdown);
+        }, 0);
       }
     },
 
@@ -188,15 +195,15 @@ export default {
         (this.$el.querySelector(".dropdown-content") &&
           !this.$el.querySelector(".dropdown-content").contains(e.target))
       ) {
-        this.showDropdown = false
-        window.removeEventListener("click", this.closeDropdown)
+        this.showDropdown = false;
+        window.removeEventListener("click", this.closeDropdown);
       }
     },
 
     async selectAccount(index) {
-      this.$store.state.currentIndexAccount = index
-      await this._setCurrentIndexAccount(index)
-      this.closeDropdown()
+      this.$store.state.currentIndexAccount = index;
+      await this._setCurrentIndexAccount(index);
+      this.closeDropdown();
     },
 
     toogleNetwork() {
@@ -208,32 +215,32 @@ export default {
     },
 
     createAccount() {
-      router.push("/createAccount")
-      this.closeDropdown()
+      router.push("/createAccount");
+      this.closeDropdown();
     },
 
     importAccount() {
-      router.push("/importAccount")
-      this.closeDropdown()
+      router.push("/importAccount");
+      this.closeDropdown();
     },
 
     addSeed() {
-      router.push("/generateSeed?privateKeyExist=true")
-      this.closeDropdown()
+      router.push("/generateSeed?privateKeyExist=true");
+      this.closeDropdown();
     },
 
     openOptions() {
-      chrome.runtime.openOptionsPage()
-      this.closeDropdown()
+      chrome.runtime.openOptionsPage();
+      this.closeDropdown();
     },
 
     async lock() {
-      await this._removePasswordsFromSession()
-      router.push("/")
-      this.closeDropdown()
+      await this._removePasswordsFromSession();
+      router.push("/");
+      this.closeDropdown();
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -457,7 +464,7 @@ input[type="checkbox"] {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  transition: .4s;
+  transition: 0.4s;
 }
 
 .slider:before {
@@ -468,7 +475,7 @@ input[type="checkbox"] {
   left: 4px;
   bottom: 4px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
 }
 
 input:checked + .slider {

@@ -5,7 +5,10 @@
     </h1>
     <p class="mana tooltip">
       Mana {{ manaPercent }}%
-      <span class="tooltiptext"> {{ liquidKoin }} <br> Liquid KOIN </span>
+      <span class="tooltiptext">
+        {{ liquidKoin }} <br>
+        Liquid KOIN
+      </span>
     </p>
     <div class="action-buttons">
       <button

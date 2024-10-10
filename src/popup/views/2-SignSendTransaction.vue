@@ -18,9 +18,7 @@
         :class="op.style"
       >
         <div class="op-group">
-          <div
-            class="op-header-image"
-          >
+          <div class="op-header-image">
             <img
               v-if="op.contractMetadata && op.contractMetadata.image"
               :src="op.contractMetadata.image"
@@ -36,12 +34,17 @@
             v-if="op.nickname || true"
             class="op-title"
           >
-            {{ op.contractMetadata && op.contractMetadata.nickname ? op.contractMetadata.nickname + " -" : "" }} {{ op.title }}
+            {{
+              op.contractMetadata && op.contractMetadata.nickname
+                ? op.contractMetadata.nickname + " -"
+                : ""
+            }}
+            {{ op.title }}
           </div>
         </div>
         <div
           class="op-viewmore"
-          @click="toggleViewMoreOperation(i)" 
+          @click="toggleViewMoreOperation(i)"
         >
           {{ op.viewMore ? "▲" : "▼" }}
         </div>
@@ -72,16 +75,17 @@
 
     <div
       v-if="true"
-      style="width: 100%;"
+      style="width: 100%"
     >
       <div
         v-if="receipt"
         class="subtitle"
       >
-        Events <span
+        Events
+        <span
           v-if="loadingEvents"
           class="loader2"
-          style="vertical-align: middle;"
+          style="vertical-align: middle"
         />
         <div
           v-if="!loadingEvents"
@@ -105,29 +109,37 @@
           :class="ev.style"
         >
           <div class="op-group">
-            <div
-              class="op-header-image2"
-            >
-              <img v-if="ev.contractMetadata && ev.contractMetadata.image"
+            <div class="op-header-image2">
+              <img
+                v-if="ev.contractMetadata && ev.contractMetadata.image"
                 :src="ev.contractMetadata.image"
               >
-              <img v-else
+              <img
+                v-else
                 src="../../../public/images/check.svg"
                 alt="operation-icon"
               >
             </div>
             <div class="op-title-group">
               <div class="op-title">
-                {{ ev.contractMetadata && ev.contractMetadata.nickname ? ev.contractMetadata.nickname + " -" : "" }} {{ ev.title }}
+                {{
+                  ev.contractMetadata && ev.contractMetadata.nickname
+                    ? ev.contractMetadata.nickname + " -"
+                    : ""
+                }}
+                {{ ev.title }}
               </div>
-              <div v-if="ev.positiveValue" class="op-positive-value">
+              <div
+                v-if="ev.positiveValue"
+                class="op-positive-value"
+              >
                 {{ ev.positiveValue }}
               </div>
             </div>
           </div>
           <div
             class="op-viewmore"
-            @click="toggleViewMoreEvent(ev.id)" 
+            @click="toggleViewMoreEvent(ev.id)"
           >
             {{ ev.viewMore ? "▲" : "▼" }}
           </div>
@@ -165,7 +177,7 @@
           >
             <div
               class="op-contractid"
-              style="margin-bottom: 0.5em;"
+              style="margin-bottom: 0.5em"
             >
               Impacted accounts
             </div>
@@ -176,7 +188,7 @@
             >
               {{ imp }}
             </div>
-            <div style="margin-top: 0.5em; color: var(--primary-gray);">
+            <div style="margin-top: 0.5em; color: var(--primary-gray)">
               {{
                 ev.impactsUserAccounts
                   ? "It impacts your accounts"
@@ -189,14 +201,16 @@
       <div
         v-if="showAllEvents || events.length > filteredEvents.length"
         class="op-viewmore"
-        style="padding: 0 2em;"
+        style="padding: 0 2em"
         @click="toggleFilteredEvents"
       >
-        {{ showAllEvents ? "View less events" : `View the other ${events.length - filteredEvents.length} events` }}
+        {{
+          showAllEvents
+            ? "View less events"
+            : `View the other ${events.length - filteredEvents.length} events`
+        }}
       </div>
     </div>
-
-    
 
     <div class="check-events-row">
       <!--<button
@@ -214,12 +228,14 @@
       </div>
     </div>
 
-
     <div
       v-if="showAdvanced"
       class="advanced-container"
     >
-      <div v-if="externalSigners" class="warning-message">
+      <div
+        v-if="externalSigners"
+        class="warning-message"
+      >
         It is not possible to modify the transaction because it is already
         signed by another address.
       </div>
@@ -368,31 +384,36 @@
 </template>
 
 <script>
-import { Signer, Contract, Provider, utils, Transaction } from "koilib"
+import { Signer, Contract, Provider, utils, Transaction } from "koilib";
 
 // mixins
-import Message from "@/popup/mixins/Message"
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Sandbox from "@/shared/mixins/Sandbox"
+import Message from "@/popup/mixins/Message";
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
 
 // components
-import Unlock from "@/shared/components/Unlock.vue"
+import Unlock from "@/shared/components/Unlock.vue";
 // import Footnote from "@/shared/components/Footnote.vue"
 
-import { estimateAndAdjustMana } from "../../../lib/utils"
+import { estimateAndAdjustMana } from "../../../lib/utils";
 import { testReceipt, testRequests } from "../../services/utils";
 
 function firstUpperCase(s) {
-  return s.charAt(0).toUpperCase() + s.slice(1)
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function formatFieldName(f) {
-  return firstUpperCase(f.slice(f.lastIndexOf(".") + 1).split("_").join(" "));
+  return firstUpperCase(
+    f
+      .slice(f.lastIndexOf(".") + 1)
+      .split("_")
+      .join(" ")
+  );
 }
 
 function fromHexToUtf8(hex) {
-  return new TextDecoder().decode(utils.toUint8Array(hex))
+  return new TextDecoder().decode(utils.toUint8Array(hex));
 }
 
 function fromUtf8ToHex(utf8) {
@@ -456,26 +477,30 @@ export default {
       loadingSkipEvents: false,
       showDetailedEvents: false,
       tokens: null,
-    }
+    };
   },
   computed: {
     filteredEvents() {
       if (this.showAllEvents) return this.events;
-      return this.events.filter(e => {
-        return !!e.contractMetadata && !!e.contractMetadata.symbol && e.impactsUserAccounts;
+      return this.events.filter((e) => {
+        return (
+          !!e.contractMetadata &&
+          !!e.contractMetadata.symbol &&
+          e.impactsUserAccounts
+        );
       });
       // return this.events;
     },
     simplifiedDomain() {
       try {
-        const url = new URL(this.requester.origin)
-        const hostname = url.hostname
+        const url = new URL(this.requester.origin);
+        const hostname = url.hostname;
         // Split the hostname by dots and get the second last part for the domain
-        const parts = hostname.split(".")
+        const parts = hostname.split(".");
         // Return the second last part, or the first part if there are only two parts
-        return parts.length > 2 ? parts[parts.length - 2] : parts[0]
+        return parts.length > 2 ? parts[parts.length - 2] : parts[0];
       } catch (error) {
-        return this.requester.origin // Return the original if parsing fails
+        return this.requester.origin; // Return the original if parsing fails
       }
     },
   },
@@ -483,50 +508,50 @@ export default {
   watch: {
     useFreeMana: async function (newVal) {
       if (newVal) {
-        this.payer = this.network.freeManaSharer
-        this.payee = this.request.args.transaction.header.payer
+        this.payer = this.network.freeManaSharer;
+        this.payee = this.request.args.transaction.header.payer;
       } else {
-        this.payer = this.request.args.transaction.header.payer
+        this.payer = this.request.args.transaction.header.payer;
       }
     },
 
     payer: async function () {
-      this.nonce = await this.provider.getNextNonce(this.payee || this.payer)
+      this.nonce = await this.provider.getNextNonce(this.payee || this.payer);
     },
 
     payee: async function () {
-      this.nonce = await this.provider.getNextNonce(this.payee || this.payer)
+      this.nonce = await this.provider.getNextNonce(this.payee || this.payer);
     },
     showAdvanced(newVal) {
-      console.log('showAdvanced changed:', newVal);
+      console.log("showAdvanced changed:", newVal);
     },
   },
 
   async mounted() {
     console.log("Component mounted");
     try {
-      let requests
+      let requests;
       if (process.env.VUE_APP_ENV === "test") {
         requests = testRequests;
       } else {
         requests = this.$store.state.requests.filter((r) => {
-          if (this.send) return r.command === "signer:sendTransaction"
-          return r.command === "signer:signTransaction"
-        })
+          if (this.send) return r.command === "signer:sendTransaction";
+          return r.command === "signer:signTransaction";
+        });
       }
       /**
-     * TODO: for several requests create a list of requesters
-     * and ask to the user to select one to see the details
-     */
-      this.request = requests[0]
-      this.requester = this.request.sender
-      this.typeRequest = this.send ? "send" : "sign"
-      
+       * TODO: for several requests create a list of requesters
+       * and ask to the user to select one to see the details
+       */
+      this.request = requests[0];
+      this.requester = this.request.sender;
+      this.typeRequest = this.send ? "send" : "sign";
+
       console.log("Starting decodeTransaction");
-      await this.decodeTransaction()
+      await this.decodeTransaction();
       if (this.unlocked) {
         console.log("Starting checkEvents");
-        await this.checkEvents()
+        await this.checkEvents();
         console.log("checkEvents completed");
       }
     } catch (error) {
@@ -537,13 +562,13 @@ export default {
 
   methods: {
     async getAbi(contract) {
-      const contractId = contract.getId()
+      const contractId = contract.getId();
 
       // take it from cache
       if (this.cacheAbis[contractId]) return this.cacheAbis[contractId].abi;
 
       // use the default abi for tokens
-      const token = this.tokens.find(t => t.contractId === contractId);
+      const token = this.tokens.find((t) => t.contractId === contractId);
       if (token) {
         const abi = JSON.parse(JSON.stringify(utils.tokenAbi));
         abi.methods.burn = {
@@ -558,7 +583,7 @@ export default {
             type: "number",
             decimals: token.decimals,
             symbol: token.symbol,
-          }
+          },
         };
         abi.methods.mint.format = format;
         abi.methods.burn.format = format;
@@ -574,10 +599,22 @@ export default {
           "token.mint": { argument: "token.mint_args", format },
           "token.burn": { argument: "token.burn_args", format },
           "token.approve_event": { argument: "token.approve_args", format },
-          "koinos.contracts.token.transfer_event": { argument: "token.transfer_args", format },
-          "koinos.contracts.token.mint_event": { argument: "token.mint_args", format },
-          "koinos.contracts.token.burn_event": { argument: "token.burn_args", format },
-          "koinos.contracts.token.approve_event": { argument: "token.approve_args", format },
+          "koinos.contracts.token.transfer_event": {
+            argument: "token.transfer_args",
+            format,
+          },
+          "koinos.contracts.token.mint_event": {
+            argument: "token.mint_args",
+            format,
+          },
+          "koinos.contracts.token.burn_event": {
+            argument: "token.burn_args",
+            format,
+          },
+          "koinos.contracts.token.approve_event": {
+            argument: "token.approve_args",
+            format,
+          },
         };
 
         this.cacheAbis[contractId] = { success: true, abi };
@@ -585,10 +622,10 @@ export default {
       }
 
       // try to get the ABI from local storage
-      let abi = await this._getAbi(this.networkTag, contractId)
+      let abi = await this._getAbi(this.networkTag, contractId);
       if (abi) {
         this.cacheAbis[contractId] = { success: true, abi };
-        return abi
+        return abi;
       }
 
       // try to get the ABI from the network
@@ -596,13 +633,13 @@ export default {
         abi = await contract.fetchAbi({
           updateFunctions: false,
           updateSerializer: false,
-        })
+        });
       } catch (error) {
         // empty
       }
       if (abi) {
         this.cacheAbis[contractId] = { success: true, abi };
-        return abi
+        return abi;
       }
 
       // try to get the ABI from contract upload
@@ -610,35 +647,35 @@ export default {
         this.abiUploadContract &&
         this.abiUploadContract.contractId === contractId
       ) {
-        abi = JSON.parse(this.abiUploadContract.abi)
+        abi = JSON.parse(this.abiUploadContract.abi);
         this.cacheAbis[contractId] = { success: true, abi };
-        return abi
+        return abi;
       }
 
       // try to get ABI from the request
       if (this.abis && this.abis[contractId]) {
-        abi = this.abis[contractId]
+        abi = this.abis[contractId];
         this.cacheAbis[contractId] = { success: true, abi };
-        return abi
+        return abi;
       }
 
       this.cacheAbis[contractId] = { success: false, abi: undefined };
-      return undefined
+      return undefined;
     },
 
     async applyFormat(format, argName, data) {
       // display address names
-      const acc = this.accounts.find((a) => a.address === data)
+      const acc = this.accounts.find((a) => a.address === data);
       if (acc) {
-        return `${acc.name} - ${data}`
+        return `${acc.name} - ${data}`;
       }
 
       // resolve nickname if it is an address
       try {
-        const isAddress = utils.isChecksumAddress(data)
+        const isAddress = utils.isChecksumAddress(data);
         if (isAddress) {
-          const resolvedName = await this.resolveAddress(data)
-          if (resolvedName) return `@${resolvedName} - ${data}`
+          const resolvedName = await this.resolveAddress(data);
+          if (resolvedName) return `@${resolvedName} - ${data}`;
         }
       } catch {
         // empty
@@ -646,7 +683,9 @@ export default {
 
       if (!format || !format[argName]) {
         // Try to find a matching key ignoring case
-        const matchingKey = Object.keys(format || {}).find(key => key.toLowerCase() === argName.toLowerCase());
+        const matchingKey = Object.keys(format || {}).find(
+          (key) => key.toLowerCase() === argName.toLowerCase()
+        );
         if (matchingKey) {
           format = { [argName]: format[matchingKey] };
         } else {
@@ -657,25 +696,25 @@ export default {
       // beautify numbers
       switch (format[argName].type) {
       case "number": {
-        const decimals = format[argName].decimals || 0
-        const symbol = format[argName].symbol || ''
-        const amount = utils.formatUnits(data, decimals)
+        const decimals = format[argName].decimals || 0;
+        const symbol = format[argName].symbol || "";
+        const amount = utils.formatUnits(data, decimals);
 
         // Format the number with commas for thousands separators
-        const formattedAmount = new Intl.NumberFormat('en-US', {
+        const formattedAmount = new Intl.NumberFormat("en-US", {
           minimumFractionDigits: 0,
-          maximumFractionDigits: decimals
-        }).format(parseFloat(amount))
+          maximumFractionDigits: decimals,
+        }).format(parseFloat(amount));
 
-        return `${formattedAmount} ${symbol}`.trim()
+        return `${formattedAmount} ${symbol}`.trim();
       }
       default:
-        return data
+        return data;
       }
     },
 
     async resolveAddress(address) {
-      if (!address) return ""
+      if (!address) return "";
       if (this.cacheNicknames[address]) {
         return this.cacheNicknames[address].value;
       }
@@ -686,7 +725,7 @@ export default {
         this.cacheNicknames[address] = {
           success: true,
           value: fromHexToUtf8(result.token_id),
-        }
+        };
       } else {
         this.cacheNicknames[address] = {
           success: false,
@@ -697,17 +736,15 @@ export default {
     },
 
     async getNicknameImage(nickname) {
-      if (!nickname) return ""
+      if (!nickname) return "";
       if (this.cacheNicknameImages[nickname]) {
         return this.cacheNicknameImages[nickname].value;
       }
 
       try {
-        const { result: resultMetadata } = await this.nicknames.metadata_of(
-          {
-            token_id: fromUtf8ToHex(nickname),
-          }
-        );
+        const { result: resultMetadata } = await this.nicknames.metadata_of({
+          token_id: fromUtf8ToHex(nickname),
+        });
         const metadata = JSON.parse(resultMetadata.value);
         if (!metadata.image) {
           throw new Error(`no image in metadata of ${nickname}`);
@@ -717,9 +754,7 @@ export default {
           value: metadata.image,
         };
       } catch (error) {
-        console.error(
-          `error when loading metadata of token @${nickname}`
-        );
+        console.error(`error when loading metadata of token @${nickname}`);
         console.error(error);
 
         this.cacheNicknameImages[nickname] = {
@@ -735,16 +770,18 @@ export default {
      * or an event
      */
     async beautifyAction(type, action) {
-      const isOperation = type === "operation"
-      const isEvent = type === "event"
-      if (!isOperation && !isEvent) throw new Error(`invalid type ${type}`)
+      const isOperation = type === "operation";
+      const isEvent = type === "event";
+      if (!isOperation && !isEvent) throw new Error(`invalid type ${type}`);
       const contractId = isOperation
         ? action.call_contract.contract_id
         : action.source;
-      let contractMetadata = this.tokens.find(t => t.contractId === contractId);
-      const resolvedName = await this.resolveAddress(contractId)
+      let contractMetadata = this.tokens.find(
+        (t) => t.contractId === contractId
+      );
+      const resolvedName = await this.resolveAddress(contractId);
       if (!contractMetadata) {
-        contractMetadata = { 
+        contractMetadata = {
           nickname: resolvedName,
           image: await this.getNicknameImage(resolvedName),
         };
@@ -752,70 +789,90 @@ export default {
 
       let contractIdName = contractId;
 
-      const accContract = this.accounts.find((a) => a.address === contractId)
-      if (accContract) contractIdName = `${contractId} - ${accContract.name}`
+      const accContract = this.accounts.find((a) => a.address === contractId);
+      if (accContract) contractIdName = `${contractId} - ${accContract.name}`;
 
-      let impacted = []
-      let impactsUserAccounts = false
+      let impacted = [];
+      let impactsUserAccounts = false;
       if (isEvent && action.impacted) {
         impacted = await Promise.all(
           action.impacted.map(async (imp) => {
-            const acc = this.accounts.find((a) => a.address === imp)
+            const acc = this.accounts.find((a) => a.address === imp);
             if (acc) {
-              impactsUserAccounts = true
-              return `${imp} - ${acc.name}`
+              impactsUserAccounts = true;
+              return `${imp} - ${acc.name}`;
             }
 
-            const resolvedName = await this.resolveAddress(imp)
-            if (resolvedName) return `${imp} - @${resolvedName}`
-            return imp
+            const resolvedName = await this.resolveAddress(imp);
+            if (resolvedName) return `${imp} - @${resolvedName}`;
+            return imp;
           })
-        )
+        );
       }
 
       try {
         const contract = new Contract({
           id: contractId,
           provider: this.provider,
-        })
-        const abi = await this.getAbi(contract)
-        if (!abi || !abi.methods) throw new Error(`no abi found for ${contractId}`)
+        });
+        const abi = await this.getAbi(contract);
+        if (!abi || !abi.methods)
+          throw new Error(`no abi found for ${contractId}`);
         Object.keys(abi.methods).forEach((m) => {
           if (abi.methods[m].entry_point === undefined) {
-            abi.methods[m].entry_point = Number(abi.methods[m]["entry-point"])
+            abi.methods[m].entry_point = Number(abi.methods[m]["entry-point"]);
           }
           if (abi.methods[m].read_only === undefined) {
-            abi.methods[m].read_only = abi.methods[m]["read-only"]
+            abi.methods[m].read_only = abi.methods[m]["read-only"];
           }
-        })
-        contract.abi = abi
-        let types
-        if (abi.koilib_types) types = abi.koilib_types
-        else if (abi.types) types = abi.types
-        else throw new Error(`no koilib_types or types defined in the abi`)
-        contract.serializer = await this.newSandboxSerializer(types)
+        });
+        contract.abi = abi;
+        let types;
+        if (abi.koilib_types) types = abi.koilib_types;
+        else if (abi.types) types = abi.types;
+        else throw new Error(`no koilib_types or types defined in the abi`);
+        contract.serializer = await this.newSandboxSerializer(types);
         if (isOperation) {
-          let { name, args } = await contract.decodeOperation(action)
+          let { name, args } = await contract.decodeOperation(action);
           const format = contract.abi.methods[name].format || {};
           if (args) {
-            if (args.amount_in && args.amount_out_min && args.path && Array.isArray(args.path)) {
+            if (
+              args.amount_in &&
+              args.amount_out_min &&
+              args.path &&
+              Array.isArray(args.path)
+            ) {
               // special case for KoinDX
-              const tokenA = this.tokens.find(t => t.contractId === args.path[0] || t.nickname === args.path[0]);
-              format.amount_in = format.amount_in || { type: "number", decimals: tokenA ? tokenA.decimals : 8, symbol: tokenA ? tokenA.symbol : '' };
+              const tokenA = this.tokens.find(
+                (t) =>
+                  t.contractId === args.path[0] || t.nickname === args.path[0]
+              );
+              format.amount_in = format.amount_in || {
+                type: "number",
+                decimals: tokenA ? tokenA.decimals : 8,
+                symbol: tokenA ? tokenA.symbol : "",
+              };
 
-              const tokenB = this.tokens.find(t => t.contractId === args.path[1] || t.nickname === args.path[1]);
-              format.amount_out_min = format.amount_out_min || { type: "number", decimals: tokenB ? tokenB.decimals : 8, symbol: tokenB ? tokenB.symbol : '' };
+              const tokenB = this.tokens.find(
+                (t) =>
+                  t.contractId === args.path[1] || t.nickname === args.path[1]
+              );
+              format.amount_out_min = format.amount_out_min || {
+                type: "number",
+                decimals: tokenB ? tokenB.decimals : 8,
+                symbol: tokenB ? tokenB.symbol : "",
+              };
             }
 
             args = await Promise.all(
               Object.keys(args).map(async (argName) => {
-                const field = formatFieldName(argName)
+                const field = formatFieldName(argName);
                 return {
                   field,
                   data: await this.applyFormat(format, argName, args[argName]),
-                }
+                };
               })
-            )
+            );
           }
 
           this.operations.push({
@@ -828,35 +885,37 @@ export default {
             style: { bgOperation: true },
             viewMore: false,
             contractMetadata,
-          })
+          });
         }
 
         if (isEvent) {
-          let decodedEvent = await contract.decodeEvent(action)
-          let format = null
-          let subtitle = ""
+          let decodedEvent = await contract.decodeEvent(action);
+          let format = null;
+          let subtitle = "";
           if (contract.abi.events && contract.abi.events[decodedEvent.name]) {
-            format = contract.abi.events[decodedEvent.name].format
-            subtitle = contract.abi.events[decodedEvent.name].description || ""
+            format = contract.abi.events[decodedEvent.name].format;
+            subtitle = contract.abi.events[decodedEvent.name].description || "";
           }
 
           // Create a format object for all fields ending with "_amount"
           format = format || {};
-          Object.keys(decodedEvent.args).forEach(argName => {
-            if (argName.toLowerCase().endsWith('_amount')) {
+          Object.keys(decodedEvent.args).forEach((argName) => {
+            if (argName.toLowerCase().endsWith("_amount")) {
               const tokenName = argName.slice(0, -7).toUpperCase(); // Remove '_amount' and capitalize
-              const token = this.tokens.find(t => t.symbol.toUpperCase() === tokenName);
+              const token = this.tokens.find(
+                (t) => t.symbol.toUpperCase() === tokenName
+              );
               format[argName] = {
                 type: "number",
                 decimals: token ? token.decimals : 8,
-                symbol: token ? token.symbol : tokenName
+                symbol: token ? token.symbol : tokenName,
               };
             }
           });
 
           let args = await Promise.all(
             Object.keys(decodedEvent.args).map(async (argName) => {
-              const field = formatFieldName(argName)
+              const field = formatFieldName(argName);
               return {
                 field,
                 data: await this.applyFormat(
@@ -864,9 +923,9 @@ export default {
                   argName.toLowerCase(),
                   decodedEvent.args[argName]
                 ),
-              }
+              };
             })
-          )
+          );
 
           let title = decodedEvent.name;
           if (
@@ -874,20 +933,22 @@ export default {
             abi.events[action.name] &&
             abi.events[action.name].name
           )
-            title = abi.events[action.name].name
+            title = abi.events[action.name].name;
 
           title = formatFieldName(title);
 
           // Determine the positive value to display
           let positiveValue = null;
-          if (title.toLowerCase().includes('transfer')) {
-            const valueArg = args.find(arg => arg.field.toLowerCase() === 'value');
+          if (title.toLowerCase().includes("transfer")) {
+            const valueArg = args.find(
+              (arg) => arg.field.toLowerCase() === "value"
+            );
             if (valueArg) {
               positiveValue = valueArg.data;
             }
           } else {
             // Fallback to previous logic for non-transfer events
-            const positiveValueArg = args.find(arg => {
+            const positiveValueArg = args.find((arg) => {
               const numericValue = parseFloat(arg.data);
               return !isNaN(numericValue) && numericValue > 0;
             });
@@ -911,17 +972,16 @@ export default {
             viewMore: false,
             contractMetadata,
             positiveValue,
-          })
+          });
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
         if (isOperation) {
           this.operations.push({
             call_contract: true,
             contractId: contractIdName,
             title: action.call_contract.entry_point,
-            subtitle:
-              "⚠️ This operation couldn't be decoded",
+            subtitle: "⚠️ This operation couldn't be decoded",
             args: [
               {
                 field: "Args",
@@ -933,7 +993,7 @@ export default {
             },
             viewMore: false,
             contractMetadata,
-          })
+          });
         }
 
         if (isEvent) {
@@ -941,8 +1001,7 @@ export default {
             id: this.events.length,
             contractId: contractIdName,
             title: firstUpperCase(action.name),
-            subtitle:
-              "⚠️ This event couldn't be decoded",
+            subtitle: "⚠️ This event couldn't be decoded",
             args: [
               {
                 field: "Args",
@@ -957,56 +1016,56 @@ export default {
             },
             viewMore: false,
             contractMetadata,
-          })
+          });
         }
       }
     },
 
     addSigner(address, signature = "") {
-      const acc = this.accounts.find((a) => a.address === address)
+      const acc = this.accounts.find((a) => a.address === address);
       if (acc) {
         this.signers.push({
           name: acc.name,
           address,
           signature,
-        })
+        });
       } else {
         this.signers.push({
           name: "Unknown account",
           address,
           signature,
-        })
-        this.externalSigners = true
-        this.optimizeMana = false
+        });
+        this.externalSigners = true;
+        this.optimizeMana = false;
       }
     },
 
     removeSigner(i) {
-      this.signers.splice(i, 1)
+      this.signers.splice(i, 1);
     },
 
     async decodeTransaction() {
       try {
-        this.accounts = await this._getAccounts()
-        const networks = await this._getNetworks()
+        this.accounts = await this._getAccounts();
+        const networks = await this._getNetworks();
 
-        const { header } = this.request.args.transaction
-        this.network = networks.find((n) => n.chainId === header.chain_id)
-        this.provider = new Provider(this.network.rpcNodes)
+        const { header } = this.request.args.transaction;
+        this.network = networks.find((n) => n.chainId === header.chain_id);
+        this.provider = new Provider(this.network.rpcNodes);
         this.provider.onError = (error) => {
-          this.provider.currentNodeId = 0
-          throw error
-        }
-        this.networkTag = this.network ? this.network.tag : "Unknown chain id"
-        this.maxMana = utils.formatUnits(header.rc_limit, 8)
-        this.nonce = header.nonce
-        this.payer = header.payer
-        this.payee = header.payee || ""
+          this.provider.currentNodeId = 0;
+          throw error;
+        };
+        this.networkTag = this.network ? this.network.tag : "Unknown chain id";
+        this.maxMana = utils.formatUnits(header.rc_limit, 8);
+        this.nonce = header.nonce;
+        this.payer = header.payer;
+        this.payee = header.payee || "";
 
         const nicknamesAbi = await this._getAbi(
           this.networkTag,
           this.network.nicknamesContractId
-        )
+        );
         this.nicknames = new Contract({
           id: this.network.nicknamesContractId,
           abi: nicknamesAbi,
@@ -1014,12 +1073,12 @@ export default {
           serializer: await this.newSandboxSerializer(
             nicknamesAbi.koilib_types
           ),
-        }).functions
+        }).functions;
 
         const abiFreeManaSharer = await this._getAbi(
           this.network.tag,
           this.network.freeManaSharer
-        )
+        );
         this.freeManaSharer = new Contract({
           id: this.network.freeManaSharer,
           abi: abiFreeManaSharer,
@@ -1027,11 +1086,13 @@ export default {
           serializer: await this.newSandboxSerializer(
             abiFreeManaSharer.koilib_types
           ),
-        })
+        });
 
         this.tokens = await this._getTokens();
-        const koinToken = this.tokens.find(t => t.nickname === "koin" && t.network === this.network.tag);
-        console.log({tokens: this.tokens, network: this.network});
+        const koinToken = this.tokens.find(
+          (t) => t.nickname === "koin" && t.network === this.network.tag
+        );
+        console.log({ tokens: this.tokens, network: this.network });
         if (!koinToken) throw new Error("Koin contract ID not found");
 
         this.koinContract = new Contract({
@@ -1048,49 +1109,49 @@ export default {
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        })
+        });
 
         if (this.request.args.signerAddress) {
-          this.addSigner(this.request.args.signerAddress)
+          this.addSigner(this.request.args.signerAddress);
         } else {
-          this.addSigner(this.accounts[0].address)
+          this.addSigner(this.accounts[0].address);
           console.warn(
             `The function kondor.signer.sendTransaction will be deprecated in the future. Please use kondor.getSigner(signerAddress).sendTransaction. Consider using kondor-js@^0.2.6`
-          )
-          this.isOldKondor = true
+          );
+          this.isOldKondor = true;
         }
 
         if (this.request.args.transaction.signatures) {
           const signerAddresses = await Signer.fromSeed("x").recoverAddresses(
             this.request.args.transaction
-          )
+          );
           signerAddresses.forEach((address, i) =>
             this.addSigner(address, this.request.args.transaction.signatures[i])
-          )
+          );
         }
 
         if (this.request.args.optsSend && this.request.args.optsSend.abis) {
-          this.abis = this.request.args.optsSend.abis
+          this.abis = this.request.args.optsSend.abis;
         } else if (this.request.args.abis) {
-          this.abis = this.request.args.abis
+          this.abis = this.request.args.abis;
         }
 
-        const { operations } = this.request.args.transaction
+        const { operations } = this.request.args.transaction;
 
-        this.operations = []
+        this.operations = [];
         for (let i = 0; i < operations.length; i += 1) {
-          const op = operations[i]
+          const op = operations[i];
           if (op.upload_contract) {
             this.abiUploadContract = {
               contractId: op.upload_contract.contract_id,
               abi: op.upload_contract.abi,
-            }
-            const title = "Upload contract 😎"
-            const bytecode = utils.decodeBase64url(op.upload_contract.bytecode)
+            };
+            const title = "Upload contract 😎";
+            const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
             const authMessage = (a) =>
               a
                 ? "The authorize function of the contract"
-                : "The private key of the contract ID"
+                : "The private key of the contract ID";
             this.operations.push({
               upload_contract: true,
               title,
@@ -1132,9 +1193,9 @@ export default {
               ],
               style: { bgUploadContract: true },
               viewMore: false,
-            })
+            });
           } else if (op.set_system_call) {
-            const title = "Set system call ⚙️"
+            const title = "Set system call ⚙️";
             this.operations.push({
               set_system_call: true,
               title,
@@ -1150,9 +1211,9 @@ export default {
               ],
               style: { bgUploadContract: true },
               viewMore: false,
-            })
+            });
           } else if (op.set_system_contract) {
-            const title = "Set system contract ⚙️"
+            const title = "Set system contract ⚙️";
             this.operations.push({
               set_system_contract: true,
               title,
@@ -1168,9 +1229,9 @@ export default {
               ],
               style: { bgUploadContract: true },
               viewMore: false,
-            })
+            });
           } else {
-            await this.beautifyAction("operation", op)
+            await this.beautifyAction("operation", op);
           }
         }
 
@@ -1179,20 +1240,20 @@ export default {
             this.isOldKondor ? "kondor" : ""
           }${this.isOldKoilib ? " and " : ""}${
             this.isOldKoilib ? "koilib" : ""
-          }. Its support will be deprecated in a future release`
+          }. Its support will be deprecated in a future release`;
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 
     afterUnlocked() {
-      this.unlocked = true
-      this.checkEvents()
+      this.unlocked = true;
+      this.checkEvents();
     },
 
     async buildTransaction() {
-      let rcLimit = 1e8 * Number(this.maxMana.replace("MANA", "").trim())
+      let rcLimit = 1e8 * Number(this.maxMana.replace("MANA", "").trim());
 
       if (!rcLimit) {
         if (this.externalSigners)
@@ -1202,9 +1263,9 @@ export default {
               "it because the signatures of the external signers will",
               "become invalid",
             ].join(" ")
-          )
-        rcLimit = 1
-        this.maxMana = "0.00000001"
+          );
+        rcLimit = 1;
+        this.maxMana = "0.00000001";
       }
 
       this.transaction = new Transaction({
@@ -1216,24 +1277,24 @@ export default {
           payer: this.payer,
           ...(this.payee && { payee: this.payee }),
         },
-      })
+      });
       this.transaction.transaction.operations =
-        this.request.args.transaction.operations
-      await this.transaction.prepare()
+        this.request.args.transaction.operations;
+      await this.transaction.prepare();
     },
 
     async useManaMeter() {
-      const initialPayee = this.transaction.transaction.header.payee
-      const initialPayer = this.transaction.transaction.header.payer
-      this.transaction.transaction.header.payee = initialPayee || initialPayer
-      this.transaction.transaction.header.payer = this.network.manaMeter
+      const initialPayee = this.transaction.transaction.header.payee;
+      const initialPayer = this.transaction.transaction.header.payer;
+      this.transaction.transaction.header.payee = initialPayee || initialPayer;
+      this.transaction.transaction.header.payer = this.network.manaMeter;
       this.transaction.transaction.header.rc_limit = Math.floor(
         0.9 * Number(await this.provider.getAccountRc(this.network.manaMeter))
-      )
+      );
       this.transaction.transaction.id = Transaction.computeTransactionId(
         this.transaction.transaction.header
-      )
-      return { payee: initialPayee, payer: initialPayer }
+      );
+      return { payee: initialPayee, payer: initialPayer };
     },
 
     /**
@@ -1241,32 +1302,32 @@ export default {
      */
     async signTransaction() {
       for (let i = 0; i < this.signers.length; i += 1) {
-        const s = this.signers[i]
+        const s = this.signers[i];
         const acc = this.$store.state.accounts.find(
           (a) => a.address === s.address
-        )
+        );
         if (acc) {
-          const signer = Signer.fromWif(acc.privateKey)
-          signer.provider = this.provider
-          signer.rcOptions = { estimateRc: false }
-          await signer.signTransaction(this.transaction.transaction)
+          const signer = Signer.fromWif(acc.privateKey);
+          signer.provider = this.provider;
+          signer.rcOptions = { estimateRc: false };
+          await signer.signTransaction(this.transaction.transaction);
         } else {
           if (!s.signature) {
-            throw new Error(`No signature for ${s.address}`)
+            throw new Error(`No signature for ${s.address}`);
           }
           const address = Signer.recoverAddress(
             utils.toUint8Array(this.transaction.transaction.id.slice(6)),
             utils.decodeBase64url(s.signature)
-          )
+          );
           if (address !== s.address) {
             throw new Error(
               `The transaction has changed and it's not possible to generate a new signature of ${s.address}`
-            )
+            );
           }
           if (!this.transaction.transaction.signatures) {
-            this.transaction.transaction.signatures = []
+            this.transaction.transaction.signatures = [];
           }
-          this.transaction.transaction.signatures.push(s.signature)
+          this.transaction.transaction.signatures.push(s.signature);
         }
       }
     },
@@ -1315,9 +1376,15 @@ export default {
           console.log(`Processing ${this.receipt.events.length} events`);
           for (let i = 0; i < this.receipt.events.length; i += 1) {
             const event = this.receipt.events[i];
-            console.log(`Processing event ${i + 1}:`, JSON.stringify(event, null, 2));
+            console.log(
+              `Processing event ${i + 1}:`,
+              JSON.stringify(event, null, 2)
+            );
             await this.beautifyAction("event", event);
-            console.log(`Beautified event ${i + 1}:`, JSON.stringify(this.events[this.events.length - 1], null, 2));
+            console.log(
+              `Beautified event ${i + 1}:`,
+              JSON.stringify(this.events[this.events.length - 1], null, 2)
+            );
           }
         }
         this.manaUsed = `${utils.formatUnits(this.receipt.rc_used, 8)} mana`;
@@ -1333,12 +1400,12 @@ export default {
     },
 
     async skipEvents() {
-      this.loadingSkipEvents = true
+      this.loadingSkipEvents = true;
       try {
-        await this.buildTransaction()
+        await this.buildTransaction();
         if (this.optimizeMana && !this.externalSigners) {
-          const { payer, payee } = await this.useManaMeter()
-          await this.signTransaction()
+          const { payer, payee } = await this.useManaMeter();
+          await this.signTransaction();
           const { header, id } = await estimateAndAdjustMana({
             payer,
             payee,
@@ -1346,70 +1413,70 @@ export default {
             transaction: this.transaction,
             provider: this.provider,
             koinContract: this.koinContract,
-          })
-          this.transaction.transaction.header = header
-          this.transaction.transaction.id = id
-          this.transaction.transaction.signatures = []
+          });
+          this.transaction.transaction.header = header;
+          this.transaction.transaction.id = id;
+          this.transaction.transaction.signatures = [];
         }
-        this.readyToSend = true
-        this.loadingSkipEvents = false
+        this.readyToSend = true;
+        this.loadingSkipEvents = false;
       } catch (error) {
-        this.readyToSend = false
-        this.loadingSkipEvents = false
+        this.readyToSend = false;
+        this.loadingSkipEvents = false;
         this.alertDanger(error.message);
-        throw error
+        throw error;
       }
     },
 
     async sendTransaction() {
       if (!this.readyToSend) await this.skipEvents();
-      let message = { id: this.request.id }
+      let message = { id: this.request.id };
 
       try {
         if (
           !this.transaction.transaction.signatures ||
           this.transaction.transaction.signatures.length === 0
         ) {
-          await this.signTransaction()
+          await this.signTransaction();
         }
 
         if (this.typeRequest === "send") {
-          const receipt = await this.transaction.send({ broadcast: true })
+          const receipt = await this.transaction.send({ broadcast: true });
           message.result = {
             receipt,
             transaction: this.transaction.transaction,
-          }
+          };
         } else {
-          message.result = this.transaction.transaction
+          message.result = this.transaction.transaction;
         }
       } catch (err) {
-        message.error = err.message
+        message.error = err.message;
       }
-      this.sendResponse("extension", message, this.request.sender)
-      window.close()
+      this.sendResponse("extension", message, this.request.sender);
+      window.close();
     },
 
     cancel() {
       const message = {
         id: this.request.id,
         error: "sendTransaction cancelled",
-      }
-      this.sendResponse("extension", message, this.request.sender)
-      window.close()
+      };
+      this.sendResponse("extension", message, this.request.sender);
+      window.close();
     },
 
     toggleViewMoreOperation(i) {
-      this.$set(this.operations[i], 'viewMore', !this.operations[i].viewMore);
+      this.$set(this.operations[i], "viewMore", !this.operations[i].viewMore);
     },
 
     toggleViewMoreEvent(i) {
-      this.$set(this.events[i], 'viewMore', !this.events[i].viewMore);
+      this.$set(this.events[i], "viewMore", !this.events[i].viewMore);
     },
 
     toggleAdvanced() {
-      console.log("toggleAdvanced called, current state:", this.showAdvanced)
-      this.showAdvanced = !this.showAdvanced
-      console.log("New state:", this.showAdvanced)
+      console.log("toggleAdvanced called, current state:", this.showAdvanced);
+      this.showAdvanced = !this.showAdvanced;
+      console.log("New state:", this.showAdvanced);
     },
 
     toggleFilteredEvents() {
@@ -1419,9 +1486,8 @@ export default {
     toggleEventDetails() {
       this.showDetailedEvents = !this.showDetailedEvents;
     },
-    
   },
-}
+};
 </script>
 <style scoped>
 .title {
@@ -1510,7 +1576,7 @@ input {
 .op-header {
   padding: 1rem;
   color: var(--kondor-light);
-  margin-top: .5em;
+  margin-top: 0.5em;
   border-top-left-radius: 1em;
   border-top-right-radius: 1em;
   display: flex;
@@ -1524,7 +1590,7 @@ input {
 .op-header-image {
   width: 3em;
   height: 3em;
-  padding: .8em;
+  padding: 0.8em;
   background-color: var(--kondor-purple30);
   border-radius: 50%;
   display: flex;
@@ -1540,14 +1606,15 @@ input {
 .op-header-image2 {
   width: 3em;
   height: 3em;
-  padding: .8em;
+  padding: 0.8em;
   background-color: var(--kondor-purple30);
   border-radius: 50%;
   display: flex;
   justify-content: center;
 }
 
-.op-header-image img, .op-header-image2 img {
+.op-header-image img,
+.op-header-image2 img {
   max-width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -1594,7 +1661,7 @@ input {
 
 .op-body-row {
   display: flex;
-  margin: .5rem 0;
+  margin: 0.5rem 0;
   justify-content: space-between;
   flex-direction: column;
 }
@@ -1603,11 +1670,10 @@ input {
   color: gray;
   min-width: 5.5rem;
   max-width: 5.5rem;
-  margin-right: 0.5rem
+  margin-right: 0.5rem;
 }
 
 .field-data {
-
 }
 
 .update-events {

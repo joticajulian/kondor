@@ -12,7 +12,7 @@
         type="text"
         placeholder="Name"
         @keyup.enter="accept"
-      />
+      >
     </div>
     <div>
       <input
@@ -21,7 +21,7 @@
         type="checkbox"
         name="watch-mode"
         value="watch-mode"
-      />
+      >
       <label for="watch-mode">Import in watch mode (no private key)</label>
     </div>
     <div v-if="watchMode">
@@ -32,7 +32,7 @@
         type="text"
         placeholder="Address"
         @keyup.enter="accept"
-      />
+      >
     </div>
     <div v-else>
       <label for="privateKey">Private Key</label>
@@ -42,22 +42,32 @@
         type="text"
         placeholder="Private Key"
         @keyup.enter="accept"
-      />
+      >
     </div>
     <div class="actions">
-      <button class="custom-button secondary" @click="cancel">cancel</button>
-      <button class="custom-button primary" @click="accept">accept</button>
+      <button
+        class="custom-button secondary"
+        @click="cancel"
+      >
+        cancel
+      </button>
+      <button
+        class="custom-button primary"
+        @click="accept"
+      >
+        accept
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import router from "@/index/router"
-import PageTitle from "@/shared/components/PageTitle.vue"
+import router from "@/index/router";
+import PageTitle from "@/shared/components/PageTitle.vue";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
 
 export default {
   components: { PageTitle },
@@ -68,7 +78,7 @@ export default {
       watchMode: false,
       address: "",
       privateKey: "",
-    }
+    };
   },
 
   methods: {
@@ -80,25 +90,25 @@ export default {
           passwordId: 0,
           watchMode: this.watchMode,
           address: this.address,
-        })
+        });
 
         this.$store.state.currentIndexAccount =
-          this.$store.state.accounts.length - 1
+          this.$store.state.accounts.length - 1;
         await this._setCurrentIndexAccount(
           this.$store.state.currentIndexAccount
-        )
-        router.back()
+        );
+        router.back();
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 
     cancel() {
-      router.back()
+      router.back();
     },
   },
-}
+};
 </script>
 <style scoped>
 input {

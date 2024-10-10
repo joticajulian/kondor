@@ -23,7 +23,7 @@ export default {
 </script>
 <style scoped>
 .page-title {
-  background-color: var(--primary-dark)222;
+  background-color: var(--primary-dark) 222;
   color: var(--primary-light);
   padding: 20px;
   text-align: center;

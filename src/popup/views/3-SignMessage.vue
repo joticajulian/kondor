@@ -103,15 +103,15 @@
 </template>
 
 <script>
-import { Signer, utils } from "koilib"
+import { Signer, utils } from "koilib";
 
 // mixins
-import Message from "@/popup/mixins/Message"
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
+import Message from "@/popup/mixins/Message";
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
 
 // components
-import Unlock from "@/shared/components/Unlock.vue"
+import Unlock from "@/shared/components/Unlock.vue";
 
 export default {
   name: "SignMessage",
@@ -130,30 +130,30 @@ export default {
       request: null,
       showAdvanced: false,
       dataLoaded: false,
-    }
+    };
   },
 
   computed: {
     simplifiedDomain() {
       try {
-        const url = new URL(this.requester.origin)
-        const hostname = url.hostname
-        const parts = hostname.split(".")
-        return parts.length > 2 ? parts[parts.length - 2] : parts[0]
+        const url = new URL(this.requester.origin);
+        const hostname = url.hostname;
+        const parts = hostname.split(".");
+        return parts.length > 2 ? parts[parts.length - 2] : parts[0];
       } catch (error) {
-        return this.requester.origin
+        return this.requester.origin;
       }
     },
   },
 
   mounted() {
-    this.loadData()
+    this.loadData();
   },
 
   methods: {
     async loadData() {
-      console.log("loadData called")
-      let requests
+      console.log("loadData called");
+      let requests;
       if (process.env.VUE_APP_ENV === "test") {
         requests = [
           {
@@ -195,65 +195,65 @@ export default {
               },
             },
           },
-        ]
+        ];
       } else {
         requests = this.$store.state.requests.filter((r) => {
-          return r.command === "signer:signMessage"
-        })
+          return r.command === "signer:signMessage";
+        });
       }
-      this.request = requests[0]
-      this.requester = this.request.sender
-      await this.displayRequest()
+      this.request = requests[0];
+      this.requester = this.request.sender;
+      await this.displayRequest();
     },
 
     async displayRequest() {
-      console.log("displayRequest called")
-      this.message = this.request.args.message
-      this.accounts = await this._getAccounts()
+      console.log("displayRequest called");
+      this.message = this.request.args.message;
+      this.accounts = await this._getAccounts();
       this.signer = this.accounts.find(
         (a) => a.address === this.request.args.signerAddress
-      )
-      this.dataLoaded = true
+      );
+      this.dataLoaded = true;
     },
 
     afterUnlocked() {
-      console.log("afterUnlocked called")
-      this.unlocked = true
+      console.log("afterUnlocked called");
+      this.unlocked = true;
     },
 
     async sign() {
-      let message = { id: this.request.id }
+      let message = { id: this.request.id };
       try {
         const acc = this.$store.state.accounts.find(
           (a) => a.address === this.request.args.signerAddress
-        )
-        const signer = Signer.fromWif(acc.privateKey)
-        const signature = await signer.signMessage(this.request.args.message)
+        );
+        const signer = Signer.fromWif(acc.privateKey);
+        const signature = await signer.signMessage(this.request.args.message);
 
-        message.result = utils.encodeBase64url(signature)
+        message.result = utils.encodeBase64url(signature);
       } catch (err) {
-        message.error = err.message
+        message.error = err.message;
       }
-      this.sendResponse("extension", message, this.request.sender)
-      window.close()
+      this.sendResponse("extension", message, this.request.sender);
+      window.close();
     },
 
     cancel() {
       const message = {
         id: this.request.id,
         error: "signMessage cancelled",
-      }
-      this.sendResponse("extension", message, this.request.sender)
-      window.close()
+      };
+      this.sendResponse("extension", message, this.request.sender);
+      window.close();
     },
 
     toggleAdvanced() {
-      console.log("toggleAdvanced called, current state:", this.showAdvanced)
-      this.showAdvanced = !this.showAdvanced
-      console.log("New state:", this.showAdvanced)
+      console.log("toggleAdvanced called, current state:", this.showAdvanced);
+      this.showAdvanced = !this.showAdvanced;
+      console.log("New state:", this.showAdvanced);
     },
   },
-}
+};
 </script>
 
 <style scoped>

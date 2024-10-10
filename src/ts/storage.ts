@@ -43,7 +43,7 @@ export interface Network {
   tag: string;
   chainId: string;
   rpcNodes: string[];
-  explorer?: { tx: string; block: string; };
+  explorer?: { tx: string; block: string };
   nicknamesContractId?: string;
   kapNameServiceContractId?: string;
   kapProfileContractId?: string;
@@ -133,7 +133,8 @@ export async function getNetworks(strict = true): Promise<Network[]> {
       "explorer",
     ] as const;
     fields.forEach((field) => {
-      network[field] = DEFAULT_NETWORKS[i][field]! as string & string[] & { tx: string; block: string; };
+      network[field] = DEFAULT_NETWORKS[i][field]! as string &
+        string[] & { tx: string; block: string };
     });
   });
 

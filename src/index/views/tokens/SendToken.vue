@@ -122,9 +122,7 @@
         cancel
       </button>
       <button
-        :disabled="
-          !isSendButtonEnabled
-        "
+        :disabled="!isSendButtonEnabled"
         class="custom-button primary"
         @click="transfer"
       >
@@ -194,8 +192,13 @@ export default {
   },
   computed: {
     isSendButtonEnabled() {
-      return this.isToValid && this.amount > 0 && this.isAmountValid && !this.makingTransfer;
-    }
+      return (
+        this.isToValid &&
+        this.amount > 0 &&
+        this.isAmountValid &&
+        !this.makingTransfer
+      );
+    },
   },
 
   watch: {
@@ -569,7 +572,7 @@ export default {
           serializer: this.serializer,
         }).functions;
 
-        const koinToken = this.miniTokens.find(t => t.nickname === "koin");
+        const koinToken = this.miniTokens.find((t) => t.nickname === "koin");
         if (!koinToken) throw new Error("Koin contract id not found");
 
         const koinContract = new Contract({
@@ -665,12 +668,12 @@ export default {
     onPaste(event) {
       this.$nextTick(() => {
         this.$nextTick(() => {
-          this.to = event.target.value;  // Force the v-model to update
-          this.validateToDebounced();    // Trigger the validation again
+          this.to = event.target.value; // Force the v-model to update
+          this.validateToDebounced(); // Trigger the validation again
         });
       });
     },
-  }
+  },
 };
 </script>
 <style scoped>
@@ -767,7 +770,7 @@ input.invalid {
 
 .group-free-mana {
   display: flex;
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 
 .success {
@@ -785,7 +788,7 @@ input.invalid {
 .row {
   display: flex;
   justify-content: space-between;
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 
 a {

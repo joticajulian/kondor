@@ -1,6 +1,6 @@
 :root {
   --app-width: 357px;
-  
+
   /* --kondor-light: #f7dcbf; */
   --kondor-gray: #828282;
   --kondor-purple: #7061ef;
@@ -604,5 +604,3 @@ label {
   font-feature-settings: "liga";
   -webkit-font-smoothing: antialiased;
 }
-
-

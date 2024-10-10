@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="screen-heading">
-    <PageTitle
+      <PageTitle
         title="Add Token"
         subtitle="Add a token to your main account"
       />
@@ -10,11 +10,17 @@
     <div class="selection-group">
       <select
         v-model="selectedToken"
-        @change="onTokenSelected"
         :disabled="showAdvanced"
         class="option-select"
+        @change="onTokenSelected"
       >
-        <option class="option-select" disabled value="">Select a token</option>
+        <option
+          class="option-select"
+          disabled
+          value=""
+        >
+          Select a token
+        </option>
         <option
           v-for="token in koindxTokens"
           :key="token.address"
@@ -24,18 +30,27 @@
         </option>
       </select>
 
-      <input v-if="useNickname"
+      <input
+        v-if="useNickname"
         v-model="name"
         type="text"
         placeholder="Nickname"
         @keyup.enter="accept"
-      />
+      >
 
       <div class="row">
-        <a class="advanced-toggle" @click="toggleAdvanced()"
-          >Advanced
-          <span v-if="!showAdvanced" class="material-icons">expand_more</span>
-          <span v-else class="material-icons">expand_less</span>
+        <a
+          class="advanced-toggle"
+          @click="toggleAdvanced()"
+        >Advanced
+          <span
+            v-if="!showAdvanced"
+            class="material-icons"
+          >expand_more</span>
+          <span
+            v-else
+            class="material-icons"
+          >expand_less</span>
         </a>
       </div>
       <!-- <div v-if="showAdvanced" class="advanced-content">
@@ -52,14 +67,14 @@
           type="text"
           placeholder="Token to remove"
           @keyup.enter="remove"
-        />
+        >
 
         <button
-        @click="remove"
-        class="custom-button primary"
-      >
-        <span class="custom-button primary">remove</span>
-      </button>
+          class="custom-button primary"
+          @click="remove"
+        >
+          <span class="custom-button primary">remove</span>
+        </button>
       </div>
     </div>
 
@@ -67,43 +82,59 @@
       <button
         v-if="!requestSecondConfirmation"
         :disabled="loading"
-        @click="accept"
         class="custom-button primary"
+        @click="accept"
       >
-        <span v-if="loading" class="loader2" />
-        <span v-else class="custom-button primary">accept</span>
+        <span
+          v-if="loading"
+          class="loader2"
+        />
+        <span
+          v-else
+          class="custom-button primary"
+        >accept</span>
       </button>
 
-      <div v-else class="second-confirmation">
+      <div
+        v-else
+        class="second-confirmation"
+      >
         <!-- <div v-if="!tokenPermanentAddress" class="warning-notification">
           The token address is not permanent and could be changed at any time.
           Only continue if you understand the risks.
         </div> -->
-        <button @click="accept2" class="custom-button primary">
+        <button
+          class="custom-button primary"
+          @click="accept2"
+        >
           Yes, add token
         </button>
       </div>
 
-      <button @click="cancel" class="custom-button secondary">cancel</button>
+      <button
+        class="custom-button secondary"
+        @click="cancel"
+      >
+        cancel
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { Contract, Provider, utils } from "koilib"
-import axios from "axios"
-import router from "@/index/router"
-import emptyToken from "@/shared/assets/empty-token.png"
-import PageTitle from "../../../shared/components/PageTitle"
-
+import { Contract, Provider, utils } from "koilib";
+import axios from "axios";
+import router from "@/index/router";
+import emptyToken from "@/shared/assets/empty-token.png";
+import PageTitle from "../../../shared/components/PageTitle";
 
 // mixins
-import ViewHelper from "@/shared/mixins/ViewHelper"
-import Storage from "@/shared/mixins/Storage"
-import Sandbox from "@/shared/mixins/Sandbox"
+import ViewHelper from "@/shared/mixins/ViewHelper";
+import Storage from "@/shared/mixins/Storage";
+import Sandbox from "@/shared/mixins/Sandbox";
 
 function fromUtf8ToHex(text) {
-  return utils.toHexString(new TextEncoder().encode(text))
+  return utils.toHexString(new TextEncoder().encode(text));
 }
 
 function fromHexToUtf8(hex) {
@@ -130,26 +161,26 @@ export default {
       koindxTokens: [], // To store the list of tokens from KoinDX
       selectedToken: "", // To store the selected token from the dropdown
       useNickname: false,
-    }
+    };
   },
 
   watch: {
     "$store.state.currentNetwork": async function () {
-      await this.loadNetwork()
+      await this.loadNetwork();
     },
 
     name: function () {
-      this.requestSecondConfirmation = false
+      this.requestSecondConfirmation = false;
     },
 
     tokenAddress: function () {
-      this.requestSecondConfirmation = false
+      this.requestSecondConfirmation = false;
     },
   },
 
   async mounted() {
-    await this.loadNetwork()
-    await this.fetchKoindxTokens() // Fetch KoinDX tokens on component mount
+    await this.loadNetwork();
+    await this.fetchKoindxTokens(); // Fetch KoinDX tokens on component mount
   },
 
   methods: {
@@ -157,20 +188,20 @@ export default {
       try {
         this.$store.state.networks = await this._getNetworks();
         this.tokens = await this._getTokens();
-        const currentTag = await this._getCurrentNetwork()
+        const currentTag = await this._getCurrentNetwork();
         this.$store.state.currentNetwork = this.$store.state.networks.findIndex(
           (n) => n.tag === currentTag
-        )
+        );
         this.network =
-          this.$store.state.networks[this.$store.state.currentNetwork]
-        this.provider = new Provider(this.network.rpcNodes)
+          this.$store.state.networks[this.$store.state.currentNetwork];
+        this.provider = new Provider(this.network.rpcNodes);
 
         // load nicknames contract
         if (this.network.nicknamesContractId) {
           const nicknamesAbi = await this._getAbi(
             this.network.tag,
             this.network.nicknamesContractId
-          )
+          );
           this.nicknames = new Contract({
             id: this.network.nicknamesContractId,
             abi: nicknamesAbi,
@@ -178,11 +209,11 @@ export default {
             serializer: await this.newSandboxSerializer(
               nicknamesAbi.koilib_types
             ),
-          }).functions
+          }).functions;
         }
       } catch (error) {
-        this.alertDanger(error.message)
-        throw error
+        this.alertDanger(error.message);
+        throw error;
       }
     },
 
@@ -190,29 +221,32 @@ export default {
       try {
         const response = await axios.get(
           `https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/${this.network.tag}.json`
-        )
+        );
         this.koindxTokens = [
           ...response.data.tokens,
           { name: "Other", symbol: "use nickname" },
         ];
       } catch (error) {
-        console.error("Failed to fetch KoinDX tokens", error)
+        console.error("Failed to fetch KoinDX tokens", error);
       }
     },
 
     toggleAdvanced() {
-      this.showAdvanced = !this.showAdvanced
+      this.showAdvanced = !this.showAdvanced;
       if (this.showAdvanced) {
-        this.selectedToken = "" // Clear selected token when advanced mode is on
+        this.selectedToken = ""; // Clear selected token when advanced mode is on
       }
     },
 
     onTokenSelected() {
       if (this.selectedToken && !this.showAdvanced) {
-        if (this.selectedToken.name === "Other" && this.selectedToken.symbol === "use nickname") {
+        if (
+          this.selectedToken.name === "Other" &&
+          this.selectedToken.symbol === "use nickname"
+        ) {
           this.useNickname = true;
         } else {
-          this.tokenAddress = this.selectedToken.address // Set the contract address
+          this.tokenAddress = this.selectedToken.address; // Set the contract address
           this.useNickname = false;
         }
       }
@@ -230,7 +264,7 @@ export default {
 
     async accept() {
       try {
-        this.loading = true
+        this.loading = true;
         const newToken = {
           network: this.network.tag,
           contractId: "",
@@ -241,7 +275,7 @@ export default {
           permanentAddress: true,
           addresses: [],
           noAddresses: [],
-        }
+        };
 
         if (!this.useNickname) {
           if (!this.tokenAddress) {
@@ -274,11 +308,9 @@ export default {
         }
 
         try {
-          const { result: resultMetadata } = await this.nicknames.metadata_of(
-            {
-              token_id: tokenId,
-            }
-          );
+          const { result: resultMetadata } = await this.nicknames.metadata_of({
+            token_id: tokenId,
+          });
           const metadata = JSON.parse(resultMetadata.value);
           if (metadata.image) newToken.image = metadata.image;
         } catch (error) {
@@ -295,54 +327,54 @@ export default {
           serializer: await this.newSandboxSerializer(
             utils.tokenAbi.koilib_types
           ),
-        }).functions
+        }).functions;
 
-        const { result: symbol } = await contract.symbol({})
-        let { result: decimals } = await contract.decimals({})
+        const { result: symbol } = await contract.symbol({});
+        let { result: decimals } = await contract.decimals({});
 
-        if (!symbol || !symbol.value) throw new Error("Token without symbol")
-        if (!decimals) decimals = 0
+        if (!symbol || !symbol.value) throw new Error("Token without symbol");
+        if (!decimals) decimals = 0;
 
-        newToken.symbol = symbol.value
-        newToken.decimals = decimals.value
+        newToken.symbol = symbol.value;
+        newToken.decimals = decimals.value;
 
         const existingId = this.tokens.findIndex(
           (t) =>
             t.contractId === newToken.contractId &&
             t.network === this.network.tag
-        )
+        );
         if (existingId >= 0) {
-          const { addresses, noAddresses } = this.tokens[existingId]
+          const { addresses, noAddresses } = this.tokens[existingId];
           this.tokens[existingId] = {
             ...newToken,
             addresses,
             noAddresses,
-          }
+          };
         } else {
-          this.tokens.push(newToken)
+          this.tokens.push(newToken);
         }
 
         // this.requestSecondConfirmation = !this.tokenPermanentAddress;
         this.requestSecondConfirmation = false; // TODO: request confirmation
         if (!this.requestSecondConfirmation) {
-          await this._setTokens(this.tokens)
-          router.back()
+          await this._setTokens(this.tokens);
+          router.back();
         }
-        this.loading = false
+        this.loading = false;
       } catch (error) {
-        this.alertDanger(error.message)
-        this.loading = false
-        throw error
+        this.alertDanger(error.message);
+        this.loading = false;
+        throw error;
       }
     },
 
     async accept2() {
-      await this._setTokens(this.tokens)
-      router.back()
+      await this._setTokens(this.tokens);
+      router.back();
     },
 
     cancel() {
-      router.back()
+      router.back();
     },
 
     async remove() {
@@ -350,13 +382,18 @@ export default {
         const contractIdOrNickname = this.tokenToRemove.trim();
         let id;
         if (contractIdOrNickname.startsWith("1")) {
-          id = this.tokens.findIndex((t) => t.contractId === contractIdOrNickname);
+          id = this.tokens.findIndex(
+            (t) => t.contractId === contractIdOrNickname
+          );
         } else {
-          id = this.tokens.findIndex((t) => t.nickname === contractIdOrNickname);
+          id = this.tokens.findIndex(
+            (t) => t.nickname === contractIdOrNickname
+          );
         }
-  
+
         if (id < 0) throw new Error("Token not found");
-        if (this.tokens[id].nickname === "koin") throw new Error("Koin cannot be removed");
+        if (this.tokens[id].nickname === "koin")
+          throw new Error("Koin cannot be removed");
 
         this.tokens.splice(id, 1);
         const tokens = (await this._getTokens()).filter((t) => {
@@ -374,7 +411,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style scoped>
