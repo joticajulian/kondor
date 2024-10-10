@@ -219,6 +219,10 @@
       v-if="showAdvanced"
       class="advanced-container"
     >
+      <div v-if="externalSigners" class="warning-message">
+        It is not possible to modify the transaction because it is already
+        signed by another address.
+      </div>
       <div class="tx-header">
         <div class="group-input">
           <label for="network">Network</label>
@@ -354,7 +358,7 @@
       </button>
       <button
         class="custom-button primary"
-        :disabled="!unlocked || !readyToSend"
+        :disabled="!unlocked || loadingEvents || loadingSkipEvents"
         @click="sendTransaction"
       >
         Sign
@@ -1281,7 +1285,7 @@ export default {
         } else {
           await this.buildTransaction();
           console.log("Transaction built");
-          if (this.optimizeMana) {
+          if (this.optimizeMana && !this.externalSigners) {
             const { payer, payee } = await this.useManaMeter();
             await this.signTransaction();
             const { header, id } = await estimateAndAdjustMana({
@@ -1332,7 +1336,7 @@ export default {
       this.loadingSkipEvents = true
       try {
         await this.buildTransaction()
-        if (this.optimizeMana) {
+        if (this.optimizeMana && !this.externalSigners) {
           const { payer, payee } = await this.useManaMeter()
           await this.signTransaction()
           const { header, id } = await estimateAndAdjustMana({
@@ -1352,7 +1356,7 @@ export default {
       } catch (error) {
         this.readyToSend = false
         this.loadingSkipEvents = false
-        this.alertDanger(error.message)
+        this.alertDanger(error.message);
         throw error
       }
     },
