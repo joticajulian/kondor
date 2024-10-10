@@ -6,10 +6,10 @@ dotenv.config();
 const testMode = process.argv[2] === "development";
 
 const icons = {
-  16: testMode ? "/images/kondor-dev-16.png" : "/images/kondor-16.png",
-  32: testMode ? "/images/kondor-dev-32.png" : "/images/kondor-32.png",
-  48: testMode ? "/images/kondor-dev-48.png" : "/images/kondor-48.png",
-  128: testMode ? "/images/kondor-dev-128.png" : "/images/kondor-128.png",
+  16: testMode ? "/images/kondor-beta-16.png" : "/images/kondor-16.png",
+  32: testMode ? "/images/kondor-beta-32.png" : "/images/kondor-32.png",
+  48: testMode ? "/images/kondor-beta-48.png" : "/images/kondor-48.png",
+  128: testMode ? "/images/kondor-beta-128.png" : "/images/kondor-128.png",
 };
 
 const manifest = {
