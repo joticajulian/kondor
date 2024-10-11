@@ -506,22 +506,35 @@ export default {
   },
 
   watch: {
-    useFreeMana: async function (newVal) {
+    useFreeMana: function (newVal) {
       if (newVal) {
         this.payer = this.network.freeManaSharer;
         this.payee = this.request.args.transaction.header.payer;
+        this.readyToSend = false;
       } else {
         this.payer = this.request.args.transaction.header.payer;
+        this.readyToSend = false;
       }
     },
 
     payer: async function () {
       this.nonce = await this.provider.getNextNonce(this.payee || this.payer);
+      this.readyToSend = false;
     },
 
     payee: async function () {
       this.nonce = await this.provider.getNextNonce(this.payee || this.payer);
+      this.readyToSend = false;
     },
+
+    maxMana: function () {
+      this.readyToSend = false;
+    },
+
+    nonce: function () {
+      this.readyToSend = false;
+    },
+
     showAdvanced(newVal) {
       console.log("showAdvanced changed:", newVal);
     },
