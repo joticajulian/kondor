@@ -7,6 +7,15 @@ import {
   utils,
 } from "koilib";
 
+interface AvailableManaResponse {
+  current: number;
+  reserved: number;
+  balance: number;
+  availableBalance: number;
+  transferDetected: boolean;
+  recommendedManaOffset: number;
+}
+
 export function toUint8Array(hexString: string): Uint8Array {
   return new Uint8Array(
     hexString
@@ -81,6 +90,31 @@ export async function getReservedAccountRc(
   return reserved;
 }
 
+export async function getAvailableManaFreeManaSharer(opts: {
+  freeManaSharer: Contract;
+  provider: Provider;
+}) {
+  const { freeManaSharer, provider } = opts;
+  const { result } = await freeManaSharer.functions.get_status();
+  return result
+    ? {
+        current: Number(result.available_mana || 0),
+        reserved: await getReservedAccountRc(freeManaSharer.getId(), provider),
+        balance: Number(result.koin_balance || 0),
+        availableBalance: Number(result.available_balance || 0),
+        recommendedManaOffset: Number(result.recommended_mana_offset || 0),
+        transferDetected: false,
+      }
+    : {
+        current: 0,
+        reserved: 0,
+        balance: 0,
+        availableBalance: 0,
+        recommendedManaOffset: 0,
+        transferDetected: false,
+      };
+}
+
 export async function getAvailableMana(
   account: string,
   opts: {
@@ -130,7 +164,14 @@ export async function getAvailableMana(
   }
   const availableBalance = balance;
 
-  return { current, reserved, balance, availableBalance, transferDetected };
+  return {
+    current,
+    reserved,
+    balance,
+    availableBalance,
+    transferDetected,
+    recommendedManaOffset: 0,
+  };
 }
 
 export async function estimateAndAdjustMana(args: {
@@ -159,17 +200,11 @@ export async function estimateAndAdjustMana(args: {
   const header = JSON.parse(
     JSON.stringify(transaction.transaction.header)
   ) as TransactionHeaderJson;
+
   try {
     receipt = await transaction.send({ broadcast: false });
     if (!receipt) throw new Error("no receipt received from the rpc node");
     if (receipt.rpc_error) {
-      /* const availableMana = await getAvailableMana(initialPayer, {
-        provider,
-        koinContract,
-      }); */
-
-      /* transaction.transaction.header.rc_limit =
-        availableMana.current - availableMana.reserved; */
       console.log(receipt.rpc_error);
       throw new Error(
         [
@@ -205,11 +240,22 @@ export async function estimateAndAdjustMana(args: {
   }
 
   let rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
-  const availableMana1 = await getAvailableMana(initialPayer, {
-    provider,
-    koinContract,
-    receipt,
-  });
+
+  let availableMana1: AvailableManaResponse;
+  if (initialPayer === freeManaSharer.getId()) {
+    availableMana1 = await getAvailableManaFreeManaSharer({
+      freeManaSharer,
+      provider,
+    });
+    rcLimit += availableMana1.recommendedManaOffset;
+  } else {
+    availableMana1 = await getAvailableMana(initialPayer, {
+      provider,
+      koinContract,
+      receipt,
+    });
+  }
+
   if (availableMana1.current - availableMana1.reserved < rcLimit) {
     if (initialPayer === freeManaSharer.getId()) {
       throw new Error(
@@ -223,36 +269,22 @@ export async function estimateAndAdjustMana(args: {
     }
 
     // check if the free mana sharer can pay the transaction
-    const { result } = await freeManaSharer.functions.get_status();
-    const availableMana2 = result
-      ? {
-          current: Number(result.available_mana || 0),
-          reserved: await getReservedAccountRc(
-            freeManaSharer.getId(),
-            provider
-          ),
-          balance: Number(result.koin_balance || 0),
-          availableBalance: Number(result.available_balance || 0),
-          recommendedManaOffset: Number(result.recommended_mana_offset || 0),
-          transferDetected: false,
-        }
-      : {
-          current: 0,
-          reserved: 0,
-          balance: 0,
-          availableBalance: 0,
-          recommendedManaOffset: 0,
-          transferDetected: false,
-        };
-    //todo: remove
-    /*const availableMana2 = {
-      current: 9999,
-      reserved: 6000_00000000,
-      balance: 6000_00000000,
-    };*/
-    const rcLimitFreeMana = rcLimit + availableMana2.recommendedManaOffset;
-    if (availableMana2.current - availableMana2.reserved < rcLimitFreeMana) {
-      const timeFreeMana = formatTime(rcLimitFreeMana, availableMana2);
+    const availableManaFreeManaSharer = await getAvailableManaFreeManaSharer({
+      freeManaSharer,
+      provider,
+    });
+
+    const rcLimitFreeMana =
+      rcLimit + availableManaFreeManaSharer.recommendedManaOffset;
+    if (
+      availableManaFreeManaSharer.current -
+        availableManaFreeManaSharer.reserved <
+      rcLimitFreeMana
+    ) {
+      const timeFreeMana = formatTime(
+        rcLimitFreeMana,
+        availableManaFreeManaSharer
+      );
       const messageFreeMana =
         timeFreeMana === "no balance"
           ? "The free mana service is unavailable due to lack of funds."

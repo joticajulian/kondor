@@ -3,12 +3,12 @@ import { Signer } from "koilib";
 import * as storage from "../../../lib/storage";
 import { HDKoinos } from "../../../lib/HDKoinos";
 import abiClaimMainnet from "../assets/abiClaimMainnet.json";
-import abiKoinMainnet from "../assets/abiKoinMainnet.json";
-import abiKoinHarbinger from "../assets/abiKoinHarbinger.json";
+// import abiKoinMainnet from "../assets/abiKoinMainnet.json";
+// import abiKoinHarbinger from "../assets/abiKoinHarbinger.json";
 import abiPobMainnet from "../assets/abiPobMainnet.json";
 import abiPobHarbinger from "../assets/abiPobHarbinger.json";
-import abiVhpMainnet from "../assets/abiVhpMainnet.json";
-import abiVhpHarbinger from "../assets/abiVhpHarbinger.json";
+// import abiVhpMainnet from "../assets/abiVhpMainnet.json";
+// import abiVhpHarbinger from "../assets/abiVhpHarbinger.json";
 import abiBurnkoinMainnet from "../assets/abiBurnkoinMainnet.json";
 import abiBurnkoinTokenMainnet from "../assets/abiBurnkoinTokenMainnet.json";
 import abiFogata from "../assets/abiFogata.json";
@@ -210,10 +210,10 @@ export default {
       switch (network) {
       case "mainnet": {
         switch (contractId) {
-        case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
-          return abiKoinMainnet;
-        case "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr":
-          return abiVhpMainnet;
+        // case "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL":
+        //   return abiKoinMainnet;
+        // case "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr":
+        //   return abiVhpMainnet;
         case "159myq5YUhhoVWu3wsHKHiJYKPKGUrGiyv":
           return abiPobMainnet;
         case "18zw3ZokdfHtudzaWAUnU4tUvKzKiJeN76":
@@ -242,10 +242,10 @@ export default {
       }
       case "harbinger": {
         switch (contractId) {
-        case "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju":
-          return abiKoinHarbinger;
-        case "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi":
-          return abiVhpHarbinger;
+        // case "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju":
+        //   return abiKoinHarbinger;
+        // case "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi":
+        //   return abiVhpHarbinger;
         case "1MAbK5pYkhp9yHnfhYamC3tfSLmVRTDjd9":
           return abiPobHarbinger;
         case "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR":

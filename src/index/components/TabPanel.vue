@@ -149,11 +149,6 @@
           class="coin-item"
         >
           <div class="coin-icon-and-name">
-            <!-- <img
-              :src="getTokenImageById(coin.contractId)"
-              :alt="symbol"
-              class="coin-image"
-            > -->
             <img
               :src="coin.image"
               :alt="symbol"
@@ -182,205 +177,6 @@ import { Contract, Provider, utils } from "koilib";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
 import Sandbox from "@/shared/mixins/Sandbox";
-
-// TODO: do not hardcode the tokens. Use a dynamic approach
-// like calling the nicknames or call a special contract or api
-// to query the tokens. Also, store custom tokens in the local storage.
-const defaultTokens = [
-  {
-    network: "mainnet",
-    address: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
-    symbol: "KOIN",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png",
-  },
-  {
-    network: "mainnet",
-    address: "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr",
-    symbol: "VHP",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png",
-  },
-  {
-    network: "mainnet",
-    address: "15VPnHQgm9yTWGuxCmfsPABJYnDNFymkTM",
-    symbol: "ETH",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15twURbNdh6S7GVXhqVs6MoZAhCfDSdoyd.png",
-  },
-  {
-    network: "mainnet",
-    address: "19WrWze3XAoMa3Mwqys4rJMP6emZX2wfpH",
-    symbol: "USDT",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N.png",
-  },
-  {
-    network: "mainnet",
-    address: "1BzymN6NwNyQszkEPkmSjnCLxpLpxHF4p7",
-    symbol: "BTC",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png",
-  },
-  {
-    network: "mainnet",
-    address: "1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy",
-    symbol: "pVHP",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1NHReq2apWsQ6UPBjNqcV3ABsj88Ncimiy.png",
-  },
-  {
-    network: "mainnet",
-    address: "1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS",
-    symbol: "KAN",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LeWGhDVD8g5rGCL4aDegEf9fKyTL1KhsS.png",
-  },
-  {
-    network: "mainnet",
-    address: "1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ",
-    symbol: "BTK",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1F81UPvBW4g2jFLU5VuBvoPeZFFHL5fPqQ.png",
-  },
-  {
-    network: "mainnet",
-    address: "1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD",
-    symbol: "KCT",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1BTQCpospHJRA7VAtZ4wvitdcqYCvkwBCD.png",
-  },
-  {
-    network: "mainnet",
-    address: "1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG",
-    symbol: "DRUGS",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1A7ix1dr77wUVD3XtCwbthbysT5LeB1CeG.png",
-  },
-  {
-    network: "mainnet",
-    address: "17t977jJZ7DYKPQsjqtStbpvmde1DditXW",
-    symbol: "UP",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/17t977jJZ7DYKPQsjqtStbpvmde1DditXW.png",
-  },
-  {
-    network: "mainnet",
-    address: "1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx",
-    symbol: "PUNKSK",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1Q9o3uTa6L9XMFeUM5yfZyYuyGxn1ai2gx.png",
-  },
-  {
-    network: "mainnet",
-    address: "143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8",
-    symbol: "OGAS",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/143CLkKmfqa6trCbjxDMKojjeLq2q4RGD8.png",
-  },
-  {
-    network: "mainnet",
-    address: "1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC",
-    symbol: "EGG",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1AFMFjbSzpnK58xbwt6cyAnhLF77qm5FeC.png",
-  },
-  {
-    network: "mainnet",
-    address: "1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ",
-    symbol: "DGK",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KU6cUY3TwYQzTRHakUcviiYmxNepRKkhQ.png",
-  },
-  {
-    network: "mainnet",
-    address: "1KroK111wVj8QU3ydFHqPpNyVtfgV8n755",
-    symbol: "KROK",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1KroK111wVj8QU3ydFHqPpNyVtfgV8n755.png",
-  },
-  {
-    network: "mainnet",
-    address: "1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP",
-    symbol: "KG",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1GNkfsZp9ySg314QFVZAAew1VDbjGNZrZP.png",
-  },
-  {
-    network: "mainnet",
-    address: "1EoGf6wPB632JudW1P12aSByLJdeNajWoU",
-    symbol: "MEOW",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1EoGf6wPB632JudW1P12aSByLJdeNajWoU.png",
-  },
-  {
-    network: "mainnet",
-    address: "1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf",
-    symbol: "GAS",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1LntV8aVpngLCYLTZuHuuevvUZcBhVPegf.png",
-  },
-  {
-    network: "mainnet",
-    address: "1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA",
-    symbol: "RWA",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/1H1tWd95HvL2wT25qpXrVMosGdGUNPRFiA.png",
-  },
-  {
-    network: "mainnet",
-    address: "18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf",
-    symbol: "RUN",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/18JRrBdnNqQ99faV6sn6Un1MbvU5sZWgzf.png",
-  },
-  {
-    network: "mainnet",
-    address: "16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs",
-    symbol: "BALD",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/16aD3Ax1kC8WKAsNevAfwyEAzoYL9T7AYs.png",
-  },
-
-  {
-    network: "harbinger",
-    address: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
-    symbol: "tKOIN",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/koin.png",
-  },
-  {
-    network: "harbinger",
-    address: "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi",
-    symbol: "VHP",
-    decimals: 8,
-    image:
-      "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/vhp.png",
-  },
-];
 
 export default {
   mixins: [Storage, Sandbox, ViewHelper],
@@ -586,8 +382,9 @@ export default {
 
             const eventsProcessed = await Promise.all(
               rawEvents.map(async (e) => {
-                const token = defaultTokens.find(
-                  (t) => t.address === e.source && t.network === this.networkTag
+                const token = this.coins.find(
+                  (t) =>
+                    t.contractId === e.source && t.network === this.networkTag
                 );
                 if (
                   !token ||
@@ -678,12 +475,6 @@ export default {
       const price = this.prices[coin.symbol];
       if (!price) return "N/A";
       return (Number(coin.balance) * price).toFixed(2);
-    },
-
-    getTokenImageById(contractId) {
-      const token = defaultTokens.find((t) => t.address === contractId);
-      if (token) return token.image;
-      return "https://raw.githubusercontent.com/koindx/token-list/main/src/images/mainnet/15zQzktjXHPRstPYB9dqs6jUuCUCVvMGB9.png";
     },
 
     openTransactionUrl(url) {
