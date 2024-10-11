@@ -180,6 +180,7 @@ export default {
       showAdvanced: false,
       maxMana: 10,
       payer: "",
+      payee: "",
       useFreeMana: false,
       resolvedAddress: "",
       resolvedMessage: "",
@@ -212,6 +213,15 @@ export default {
     tokenId2: function (newVal) {
       const token = this.miniTokens.find((t) => t.contractId === newVal);
       this.loadToken(token);
+    },
+    useFreeMana: function (newVal) {
+      if (newVal) {
+        this.payer = this.network.freeManaSharer;
+        this.payee = this.address;
+      } else {
+        this.payer = this.address;
+        this.payee = "";
+      }
     },
   },
 
@@ -632,8 +642,8 @@ export default {
 
         // adjust mana
         const { header, id } = await estimateAndAdjustMana({
-          payer: this.address,
-          payee: "",
+          payer: this.payer || this.address,
+          payee: this.payee,
           transaction,
           provider: this.provider,
           koinContract,
