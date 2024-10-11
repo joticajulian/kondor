@@ -30,6 +30,14 @@ import { formatTime } from "../../../lib/utils";
 
 const FIVE_DAYS = 432e6; // 5 * 24 * 60 * 60 * 1000
 
+function fromHexToUtf8(hex) {
+  return new TextDecoder().decode(utils.toUint8Array(hex));
+}
+
+function fromUtf8ToHex(utf8) {
+  return "0x" + utils.toHexString(new TextEncoder().encode(utf8));
+}
+
 export default {
   components: { WalletInfo, TabPanel },
   mixins: [Storage, Sandbox, ViewHelper],
@@ -291,10 +299,21 @@ export default {
     async updateSavedTokens() {
       let tokens = await this._getTokens();
 
+      const nicknamesAbi = await this._getAbi(
+        "mainnet", // both mainnet and testnet use the same ABI
+        this.$store.state.networks.find(
+          (n) => n.tag === "mainnet"
+        ).nicknamesContractId
+      );
+
+      const serializer = await this.newSandboxSerializer(
+        nicknamesAbi.koilib_types
+      );
+
       tokens = await Promise.all(
         tokens.map(async (token) => {
           token.image = emptyToken;
-          if (!token.nickname) return token;
+          // if (!token.nickname) return token;
 
           const networkId = this.$store.state.networks.findIndex(
             (n) => n.tag === token.network
@@ -302,23 +321,27 @@ export default {
           const network = this.$store.state.networks[networkId];
           const provider = new Provider(network.rpcNodes);
 
-          const nicknamesAbi = await this._getAbi(
-            token.network,
-            network.nicknamesContractId
-          );
-
           const nicknames = new Contract({
             id: network.nicknamesContractId,
             abi: nicknamesAbi,
             provider,
-            serializer: await this.newSandboxSerializer(
-              nicknamesAbi.koilib_types
-            ),
+            serializer,
           }).functions;
 
-          const tokenId = `0x${utils.toHexString(
-            new TextEncoder().encode(token.nickname)
-          )}`;
+          let tokenId = "";
+          if (token.nickname) {
+            tokenId = fromUtf8ToHex(token.nickname);
+          } else {
+            const { result } = await nicknames.get_main_token({
+              value: token.contractId,
+            });
+            if (result && result.token_id) {
+              tokenId = result.token_id;
+              token.nickname = fromHexToUtf8(tokenId);
+            } else {
+              return token;
+            }
+          }
 
           try {
             const { result: resultAddress } = await nicknames.get_address({
