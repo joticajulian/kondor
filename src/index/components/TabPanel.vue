@@ -383,7 +383,8 @@ export default {
             const eventsProcessed = await Promise.all(
               rawEvents.map(async (e) => {
                 const token = this.coins.find(
-                  (t) => t.contractId === e.source && t.network === this.networkTag
+                  (t) =>
+                    t.contractId === e.source && t.network === this.networkTag
                 );
                 if (
                   !token ||

@@ -24,12 +24,14 @@
 </template>
 
 <script>
+import * as packageJson from "../../../package.json";
+
 export default {
   name: "Status",
   props: {
     title: {
       type: String,
-      default: "Kondor v0.91.3",
+      default: `Kondor v${packageJson.version}`,
     },
     isActive: {
       type: Boolean,
@@ -81,6 +83,7 @@ export default {
   font-weight: normal;
   margin: 0;
   padding: 0.5em 0;
+  text-transform: none;
 }
 
 .status-indicator {
