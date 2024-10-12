@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.0.0](https://github.com/joticajulian/kondor/releases/tag/v1.0.0) (2024-10-12)
+
+### 🚀 Features
+
+- New improved UI.
+- Add tokens by selecting them from a dropdown menu.
+- Load NFTs by querying the Kollection's API.
+- Load the account history: Recent token transfers.
+- Updates in the popup to sign transactions:
+  - Load the image of contracts by looking the nickname metadata.
+  - Simplification of the information displayed: It contains a summary of operations and events and the user can click on each of them to see the details.
+  - When the details of operations/events contains token amounts they are formatted with decimals and symbol.
+  - The events are filtered: Only the ones related to user tokens are visible. The rest are collapsed with the possibility to expand all of them.
+  - The events are triggered automatically.
+
 ## [v0.11.1](https://github.com/joticajulian/kondor/releases/tag/v0.11.1) (2024-07-13)
 
 ### 🐛 Bug Fixes

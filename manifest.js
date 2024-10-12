@@ -13,9 +13,9 @@ const icons = {
 };
 
 const manifest = {
-  name: "Kondor Beta",
+  name: "Kondor",
   description: "Koinos Wallet in your browser",
-  version: testMode ? "0.0.0" : packageJson.version,
+  version: testMode ? "0.91.5" : packageJson.version,
   manifest_version: 3,
   permissions: ["storage", "windows"],
   background: {
