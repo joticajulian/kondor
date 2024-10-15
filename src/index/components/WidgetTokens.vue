@@ -301,9 +301,8 @@ export default {
 
       const nicknamesAbi = await this._getAbi(
         "mainnet", // both mainnet and testnet use the same ABI
-        this.$store.state.networks.find(
-          (n) => n.tag === "mainnet"
-        ).nicknamesContractId
+        this.$store.state.networks.find((n) => n.tag === "mainnet")
+          .nicknamesContractId
       );
 
       const serializer = await this.newSandboxSerializer(
