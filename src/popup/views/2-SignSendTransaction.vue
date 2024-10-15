@@ -77,10 +77,7 @@
       v-if="true"
       style="width: 100%"
     >
-      <div
-        v-if="receipt"
-        class="subtitle"
-      >
+      <div class="subtitle">
         Events
         <span
           v-if="loadingEvents"
@@ -1375,7 +1372,29 @@ export default {
             this.transaction.transaction.signatures = [];
           }
           await this.signTransaction();
-          this.receipt = await this.transaction.send({ broadcast: false });
+
+          for (let i = 0; i < 5; i += 1) {
+            try {
+              this.receipt = await this.transaction.send({ broadcast: false });
+            } catch (error) {
+              if (i >= 4) throw error;
+              if (
+                error.message.includes("transaction reverted: insufficient rc")
+              ) {
+                this.transaction.transaction.header.rc_limit = (
+                  Number(this.transaction.transaction.header.rc_limit) +
+                  Number("100000000")
+                ).toString();
+                const id = Transaction.computeTransactionId(
+                  this.transaction.transaction.header
+                );
+                this.transaction.transaction.id = id;
+                this.transaction.transaction.signatures = [];
+                await this.signTransaction();
+              }
+            }
+          }
+
           this.maxMana = utils.formatUnits(
             this.transaction.transaction.header.rc_limit,
             8
