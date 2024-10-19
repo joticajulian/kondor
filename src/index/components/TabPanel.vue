@@ -414,6 +414,9 @@ export default {
                 });
 
                 const { args } = await contract.decodeEvent(e);
+                if (args.to !== this.address && args.from !== this.address) {
+                  return {};
+                }
 
                 let amountFloat =
                   Number(args.value) / Math.pow(10, token.decimals);
