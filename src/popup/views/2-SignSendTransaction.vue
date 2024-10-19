@@ -159,6 +159,17 @@
               {{ arg.data }}
             </div>
           </div>
+          <div class="op-remove-section">
+            <button
+              class="op-button-remove"
+              @click="removeOperation(i)"
+            >
+              <span
+                v-if="true"
+                class="s1 material-icons"
+              >delete</span>
+            </button>
+          </div>
         </div>
       </transition>
     </div>
@@ -684,9 +695,7 @@ export default {
       console.log("Starting decodeTransaction");
       await this.decodeTransaction();
       if (this.unlocked) {
-        console.log("Starting checkEvents");
         await this.checkEvents();
-        console.log("checkEvents completed");
       }
     } catch (error) {
       console.error("Error during component initialization:", error);
@@ -1706,23 +1715,44 @@ export default {
           id: this.tokenId2,
           abi: utils.tokenAbi,
           serializer: this.serializerToken,
+          options: { onlyOperation: true },
         });
-        const { operation } = await tokenContract.functions.approve(
-          {
-            owner: this.signers[this.signers.length - 1].address,
-            spender: this.resolvedAddress || this.spender,
-            value: utils.parseUnits(this.amount, 8),
-          },
-          { onlyOperation: true }
+        const approveArgs = {
+          owner: this.signers[this.signers.length - 1].address,
+          spender: this.resolvedAddress || this.spender,
+          value: utils.parseUnits(this.amount, 8),
+        };
+        const { operation: op1 } = await tokenContract.functions.approve(
+          approveArgs
         );
-        this.rawOperations.unshift(operation);
+        // add approval at the beginning
+        this.rawOperations.unshift(op1);
+
+        // remove remaining value at the end
+        approveArgs.value = "0";
+        const { operation: op2 } = await tokenContract.functions.approve(
+          approveArgs
+        );
+        this.rawOperations.push(op2);
+
+        this.readyToSend = false;
+        this.settingAllowance = false;
+
         await this.decodeOperations();
         this.addingApproval = false;
+        if (this.unlocked) await this.checkEvents();
       } catch (error) {
         this.addingApproval = false;
         this.alertDanger(error.message);
         throw error;
       }
+    },
+
+    async removeOperation(i) {
+      this.rawOperations.splice(i, 1);
+      this.operations.splice(i, 1);
+      this.readyToSend = false;
+      if (this.unlocked) await this.checkEvents();
     },
 
     onPaste(event) {
@@ -1911,6 +1941,21 @@ input {
   margin: 0.5rem 0;
   justify-content: space-between;
   flex-direction: column;
+}
+
+.op-remove-section {
+  text-align: end;
+}
+
+.op-button-remove {
+  padding: 0.2rem;
+  width: 1rem;
+  border-color: var(--kondor-red);
+  background-color: var(--kondor-red);
+}
+
+.s1 {
+  font-size: 1rem;
 }
 
 .field-name {
