@@ -1083,8 +1083,7 @@ export default {
           } else {
             // Fallback to previous logic for non-transfer events
             const positiveValueArg = args.find((arg) => {
-              const numericValue = parseFloat(arg.data);
-              return !isNaN(numericValue) && numericValue > 0;
+              return !isNaN(arg.data.split(" ")[0]);
             });
             if (positiveValueArg) {
               positiveValue = positiveValueArg.data;
@@ -2083,6 +2082,7 @@ input {
   font-size: 0.9em;
 }
 .tb-container {
+  width: 342px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2308,6 +2308,7 @@ input:checked + .slider:before {
 .set-allowance-title {
   width: 100%;
   text-align: end;
+  padding-right: 2rem;
 }
 
 .setting-allowance {
