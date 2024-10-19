@@ -439,7 +439,8 @@ label {
   align-items: center;
 }
 
-.input-group input {
+.input-group input,
+.input-group select {
   flex-grow: 1;
 }
 

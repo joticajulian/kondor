@@ -7,7 +7,97 @@
       </div>
       <div>{{ requester.origin }}</div>
     </div>
-
+    <div
+      class="op-viewmore set-allowance-title"
+      @click="toggleSettingAllowance()"
+    >
+      Set allowance {{ settingAllowance ? "▲" : "▼" }}
+    </div>
+    <div
+      v-if="settingAllowance"
+      class="setting-allowance"
+    >
+      <div class="group-input">
+        <label>Token</label>
+        <select
+          id="select-token"
+          v-model="tokenId2"
+          name="select-token"
+          class="flex2 pad1"
+        >
+          <option
+            v-for="token in tokens"
+            :key="token.contractId"
+            :value="token.contractId"
+          >
+            {{ token.nickname ? `@${token.nickname}` : token.contractId }}
+          </option>
+        </select>
+      </div>
+      <div class="group-input">
+        <label>Spender</label>
+        <input
+          v-model="spender"
+          type="text"
+          placeholder="Enter address or nickname"
+          :class="
+            isSpenderValidated &&
+              !isSpenderValidating &&
+              spender.length > 0 &&
+              !isSpenderValid
+              ? 'invalid'
+              : ''
+          "
+          @input="validateSpenderDebounced()"
+          @paste="onPaste"
+          @keyup="changeSpender()"
+        >
+      </div>
+      <div style="display: flex; align-items: center">
+        <span
+          v-if="isSpenderValidating"
+          class="spinner material-icons"
+        >sync</span>
+        <span
+          v-else-if="isSpenderValid"
+          class="success material-icons"
+        >check_circle_outline</span>
+        <span
+          v-else-if="isSpenderValidated && spender.length > 0"
+          class="error material-icons"
+        >error_outline</span>
+        <div
+          v-if="!!resolvedAddress"
+          class="info"
+        >
+          {{ resolvedMessage }}
+        </div>
+      </div>
+      <div class="group-input">
+        <label>Amount</label>
+        <input
+          v-model="amount"
+          type="number"
+          :min="0"
+          :class="!isAmountValid ? 'invalid' : ''"
+          class="flex2 m0"
+          @input="validateAmountDebounced()"
+        >
+      </div>
+      <div class="action-allowance">
+        <button
+          :disabled="!isApprovalButtonEnabled"
+          class="custom-button primary"
+          @click="addApproval"
+        >
+          <span
+            v-if="addingApproval"
+            class="loader2"
+          />
+          <span v-else>approve</span>
+        </button>
+      </div>
+    </div>
     <div
       v-for="(op, i) in operations"
       :key="'op' + i"
@@ -444,6 +534,7 @@ export default {
       accounts: [],
       signerSelected: null,
       provider: null,
+      serializerToken: null,
       network: {},
       networkTag: "mainnet",
       optimizeMana: true,
@@ -454,6 +545,7 @@ export default {
       nonce: "",
       transaction: null,
       operations: [],
+      rawOperations: [],
       signers: [],
       externalSigners: false,
       events: [],
@@ -474,6 +566,18 @@ export default {
       loadingSkipEvents: false,
       showDetailedEvents: false,
       tokens: null,
+      // approval
+      settingAllowance: false,
+      addingApproval: false,
+      tokenId2: "",
+      spender: "",
+      isSpenderValidated: false,
+      isSpenderValidating: false,
+      isSpenderValid: false,
+      isAmountValid: false,
+      resolvedAddress: false,
+      resolvedMessage: false,
+      amount: 0,
     };
   },
   computed: {
@@ -499,6 +603,21 @@ export default {
       } catch (error) {
         return this.requester.origin; // Return the original if parsing fails
       }
+    },
+
+    isApprovalButtonEnabled() {
+      console.log(`
+        ${this.isSpenderValid}
+        ${this.amount > 0}
+        ${this.isAmountValid}
+        ${!this.addingApproval}
+      `);
+      return (
+        this.isSpenderValid &&
+        this.amount > 0 &&
+        this.isAmountValid &&
+        !this.addingApproval
+      );
     },
   },
 
@@ -535,6 +654,11 @@ export default {
     showAdvanced(newVal) {
       console.log("showAdvanced changed:", newVal);
     },
+  },
+
+  created() {
+    this.validateSpenderDebounced = this.debounce(this.validateSpender);
+    this.validateAmountDebounced = this.debounce(this.validateAmount);
   },
 
   async mounted() {
@@ -1098,13 +1222,16 @@ export default {
           ),
         });
 
-        this.tokens = await this._getTokens();
-        const koinToken = this.tokens.find(
-          (t) => t.nickname === "koin" && t.network === this.network.tag
+        this.tokens = (await this._getTokens()).filter(
+          (t) => t.network === this.network.tag
         );
+        const koinToken = this.tokens.find((t) => t.nickname === "koin");
         console.log({ tokens: this.tokens, network: this.network });
         if (!koinToken) throw new Error("Koin contract ID not found");
 
+        this.serializerToken = await this.newSandboxSerializer(
+          utils.tokenAbi.koilib_types
+        );
         this.koinContract = new Contract({
           id: koinToken.contractId,
           abi: {
@@ -1116,9 +1243,7 @@ export default {
             },
           },
           provider: this.provider,
-          serializer: await this.newSandboxSerializer(
-            utils.tokenAbi.koilib_types
-          ),
+          serializer: this.serializerToken,
         });
 
         if (this.request.args.signerAddress) {
@@ -1147,103 +1272,9 @@ export default {
         }
 
         const { operations } = this.request.args.transaction;
+        this.rawOperations = operations;
 
-        this.operations = [];
-        for (let i = 0; i < operations.length; i += 1) {
-          const op = operations[i];
-          if (op.upload_contract) {
-            this.abiUploadContract = {
-              contractId: op.upload_contract.contract_id,
-              abi: op.upload_contract.abi,
-            };
-            const title = "Upload contract 😎";
-            const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
-            const authMessage = (a) =>
-              a
-                ? "The authorize function of the contract"
-                : "The private key of the contract ID";
-            this.operations.push({
-              upload_contract: true,
-              title,
-              args: [
-                {
-                  field: "Contract ID",
-                  data: op.upload_contract.contract_id,
-                },
-                {
-                  field: "Bytecode size",
-                  data: bytecode.length,
-                },
-                {
-                  field: "SHA256",
-                  data: utils.toHexString(
-                    new Uint8Array(
-                      await crypto.subtle.digest("SHA-256", bytecode)
-                    )
-                  ),
-                },
-                {
-                  field: "Who approves contract calls?",
-                  data: authMessage(
-                    op.upload_contract.authorizes_call_contract
-                  ),
-                },
-                {
-                  field: "Who approves consumption of mana?",
-                  data: authMessage(
-                    op.upload_contract.authorizes_transaction_application
-                  ),
-                },
-                {
-                  field: "Who approves new contract updates?",
-                  data: authMessage(
-                    op.upload_contract.authorizes_upload_contract
-                  ),
-                },
-              ],
-              style: { bgUploadContract: true },
-              viewMore: false,
-            });
-          } else if (op.set_system_call) {
-            const title = "Set system call ⚙️";
-            this.operations.push({
-              set_system_call: true,
-              title,
-              args: [
-                {
-                  field: "Call ID",
-                  data: op.set_system_call.call_id,
-                },
-                {
-                  field: "Target",
-                  data: JSON.stringify(op.set_system_call.target),
-                },
-              ],
-              style: { bgUploadContract: true },
-              viewMore: false,
-            });
-          } else if (op.set_system_contract) {
-            const title = "Set system contract ⚙️";
-            this.operations.push({
-              set_system_contract: true,
-              title,
-              args: [
-                {
-                  field: "Contract ID",
-                  data: op.set_system_contract.contract_id,
-                },
-                {
-                  field: "System contract",
-                  data: op.set_system_contract.system_contract,
-                },
-              ],
-              style: { bgUploadContract: true },
-              viewMore: false,
-            });
-          } else {
-            await this.beautifyAction("operation", op);
-          }
-        }
+        await this.decodeOperations();
 
         if (this.isOldKoilib || this.isOldKondor)
           this.footnoteMessage = `This website is using an old version of ${
@@ -1254,6 +1285,103 @@ export default {
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
+      }
+    },
+
+    async decodeOperations() {
+      this.operations = [];
+      for (let i = 0; i < this.rawOperations.length; i += 1) {
+        const op = this.rawOperations[i];
+        if (op.upload_contract) {
+          this.abiUploadContract = {
+            contractId: op.upload_contract.contract_id,
+            abi: op.upload_contract.abi,
+          };
+          const title = "Upload contract 😎";
+          const bytecode = utils.decodeBase64url(op.upload_contract.bytecode);
+          const authMessage = (a) =>
+            a
+              ? "The authorize function of the contract"
+              : "The private key of the contract ID";
+          this.operations.push({
+            upload_contract: true,
+            title,
+            args: [
+              {
+                field: "Contract ID",
+                data: op.upload_contract.contract_id,
+              },
+              {
+                field: "Bytecode size",
+                data: bytecode.length,
+              },
+              {
+                field: "SHA256",
+                data: utils.toHexString(
+                  new Uint8Array(
+                    await crypto.subtle.digest("SHA-256", bytecode)
+                  )
+                ),
+              },
+              {
+                field: "Who approves contract calls?",
+                data: authMessage(op.upload_contract.authorizes_call_contract),
+              },
+              {
+                field: "Who approves consumption of mana?",
+                data: authMessage(
+                  op.upload_contract.authorizes_transaction_application
+                ),
+              },
+              {
+                field: "Who approves new contract updates?",
+                data: authMessage(
+                  op.upload_contract.authorizes_upload_contract
+                ),
+              },
+            ],
+            style: { bgUploadContract: true },
+            viewMore: false,
+          });
+        } else if (op.set_system_call) {
+          const title = "Set system call ⚙️";
+          this.operations.push({
+            set_system_call: true,
+            title,
+            args: [
+              {
+                field: "Call ID",
+                data: op.set_system_call.call_id,
+              },
+              {
+                field: "Target",
+                data: JSON.stringify(op.set_system_call.target),
+              },
+            ],
+            style: { bgUploadContract: true },
+            viewMore: false,
+          });
+        } else if (op.set_system_contract) {
+          const title = "Set system contract ⚙️";
+          this.operations.push({
+            set_system_contract: true,
+            title,
+            args: [
+              {
+                field: "Contract ID",
+                data: op.set_system_contract.contract_id,
+              },
+              {
+                field: "System contract",
+                data: op.set_system_contract.system_contract,
+              },
+            ],
+            style: { bgUploadContract: true },
+            viewMore: false,
+          });
+        } else {
+          await this.beautifyAction("operation", op);
+        }
       }
     },
 
@@ -1288,8 +1416,7 @@ export default {
           ...(this.payee && { payee: this.payee }),
         },
       });
-      this.transaction.transaction.operations =
-        this.request.args.transaction.operations;
+      this.transaction.transaction.operations = this.rawOperations;
       await this.transaction.prepare();
     },
 
@@ -1517,6 +1644,95 @@ export default {
 
     toggleEventDetails() {
       this.showDetailedEvents = !this.showDetailedEvents;
+    },
+
+    toggleSettingAllowance() {
+      this.settingAllowance = !this.settingAllowance;
+    },
+
+    changeSpender() {
+      this.isSpenderValidated = false;
+      this.resolvedAddress = "";
+      this.resolvedMessage = "";
+    },
+
+    async validateSpender() {
+      this.isSpenderValidating = true;
+
+      // check if it is a public address
+      try {
+        this.isSpenderValid = utils.isChecksumAddress(this.spender);
+      } catch (_) {
+        this.isSpenderValid = false;
+      }
+      if (this.isSpenderValid) {
+        this.isSpenderValidating = false;
+        this.isSpenderValidated = true;
+        return;
+      }
+
+      // check if it is a nickname
+      if (this.network.nicknamesContractId) {
+        try {
+          const { result } = await this.nicknames.get_address({
+            value: this.spender,
+          });
+          this.resolvedAddress = result?.value;
+          this.resolvedMessage = `@${this.spender} resolves to ${this.resolvedAddress}`;
+          this.isSpenderValid = !!this.resolvedAddress;
+        } catch (_) {
+          this.isSpenderValid = false;
+        }
+        if (this.isSpenderValid) {
+          this.isSpenderValidating = false;
+          this.isSpenderValidated = true;
+          return;
+        }
+      }
+
+      this.isSpenderValid = false;
+      this.isSpenderValidating = false;
+      this.isSpenderValidated = true;
+    },
+
+    validateAmount() {
+      const amount = parseFloat(this.amount);
+      this.isAmountValid = !isNaN(this.amount) && !isNaN(amount) && 0 <= amount;
+    },
+
+    async addApproval() {
+      this.addingApproval = true;
+      try {
+        const tokenContract = new Contract({
+          id: this.tokenId2,
+          abi: utils.tokenAbi,
+          serializer: this.serializerToken,
+        });
+        const { operation } = await tokenContract.functions.approve(
+          {
+            owner: this.signers[this.signers.length - 1].address,
+            spender: this.resolvedAddress || this.spender,
+            value: utils.parseUnits(this.amount, 8),
+          },
+          { onlyOperation: true }
+        );
+        this.rawOperations.unshift(operation);
+        await this.decodeOperations();
+        this.addingApproval = false;
+      } catch (error) {
+        this.addingApproval = false;
+        this.alertDanger(error.message);
+        throw error;
+      }
+    },
+
+    onPaste(event) {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.spender = event.target.value; // Force the v-model to update
+          this.validateSpenderDebounced(); // Trigger the validation again
+        });
+      });
     },
   },
 };
@@ -2087,5 +2303,34 @@ input:checked + .slider:before {
   font-size: 0.8em;
   color: var(--kondor-green);
   margin-top: 0.2em;
+}
+
+.set-allowance-title {
+  width: 100%;
+  text-align: end;
+}
+
+.setting-allowance {
+  width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.flex2 {
+  flex: 2;
+}
+
+.pad1 {
+  padding: 1rem;
+}
+
+.m0 {
+  margin: 0;
+}
+
+.action-allowance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
