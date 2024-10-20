@@ -737,11 +737,11 @@ export default {
           "token.transfer_event": { argument: "token.transfer_args", format },
           "token.mint_event": { argument: "token.mint_args", format },
           "token.burn_event": { argument: "token.burn_args", format },
-          "token.approve": { argument: "token.approve_args", format },
+          "token.approve_event": { argument: "token.approve_args", format },
           "token.transfer": { argument: "token.transfer_args", format },
           "token.mint": { argument: "token.mint_args", format },
           "token.burn": { argument: "token.burn_args", format },
-          "token.approve_event": { argument: "token.approve_args", format },
+          "token.approve": { argument: "token.approve_args", format },
           "koinos.contracts.token.transfer_event": {
             argument: "token.transfer_args",
             format,

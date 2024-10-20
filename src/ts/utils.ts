@@ -143,7 +143,7 @@ export async function getAvailableMana(
       receipt.events.map(async (event) => {
         if (
           event.source !== koinContract.getId() ||
-          event.name !== "koinos.contracts.token.transfer_event"
+          !event.name.includes("transfer_event")
         )
           return;
         if (!event.impacted || event.impacted[1] !== account) return;
@@ -200,6 +200,7 @@ export async function estimateAndAdjustMana(args: {
   const header = JSON.parse(
     JSON.stringify(transaction.transaction.header)
   ) as TransactionHeaderJson;
+  console.log("mana estimation initialized");
 
   try {
     receipt = await transaction.send({ broadcast: false });
@@ -238,22 +239,30 @@ export async function estimateAndAdjustMana(args: {
     console.log(error);
     throw new Error(errorJson.error);
   }
+  console.log(`rc_used: ${receipt.rc_used}`);
 
   let rcLimit = Math.floor(1.1 * Number(receipt.rc_used));
+  console.log(`adding 10% extra: rc_limit = ${rcLimit}`);
 
   let availableMana1: AvailableManaResponse;
   if (initialPayer === freeManaSharer.getId()) {
+    console.log("the payer is already the free mana sharer");
     availableMana1 = await getAvailableManaFreeManaSharer({
       freeManaSharer,
       provider,
     });
     rcLimit += availableMana1.recommendedManaOffset;
+    console.log(
+      `adding recommended offset for free mana sharer. rc_limit = ${rcLimit}`
+    );
   } else {
     availableMana1 = await getAvailableMana(initialPayer, {
       provider,
       koinContract,
       receipt,
     });
+    console.log(`available mana for payer ${initialPayer}:`);
+    console.log(availableMana1);
   }
 
   if (availableMana1.current - availableMana1.reserved < rcLimit) {
@@ -267,12 +276,17 @@ export async function estimateAndAdjustMana(args: {
         ].join(" ")
       );
     }
+    console.log(
+      `payer ${initialPayer} does not have enough mana. Checking the free mana sharer`
+    );
 
     // check if the free mana sharer can pay the transaction
     const availableManaFreeManaSharer = await getAvailableManaFreeManaSharer({
       freeManaSharer,
       provider,
     });
+    console.log("available mana for free mana sharer");
+    console.log(availableManaFreeManaSharer);
 
     const rcLimitFreeMana =
       rcLimit + availableManaFreeManaSharer.recommendedManaOffset;
