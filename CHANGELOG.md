@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.1.0](https://github.com/joticajulian/kondor/releases/tag/v1.1.0) (2024-10-20)
+
+### 🚀 Features
+
+- Option to set allowances in the popup to sign transactions.
+
+### 🐛 Bug Fixes
+
+- Fix for the [bug #843 of koinos chain](https://github.com/koinos/koinos-chain/issues/843): After the estimation of mana it's still necessary to recalculate it. Then this version adds minor increasements of mana (1 mana) in a for loop until the rc limit is ok for the blockchain.
+- Fix account history: Previous version was reporting some wrong events.
+- Fix get accounts: The option to select multiple accounts is restored back.
+- Fix mana optimization taking into account the new event names of Koin Contract.
+
 ## [v1.0.0](https://github.com/joticajulian/kondor/releases/tag/v1.0.0) (2024-10-12)
 
 ### 🚀 Features
