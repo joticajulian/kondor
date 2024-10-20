@@ -15,7 +15,7 @@
           v-for="(account, index) in accounts"
           :key="index"
           class="account-item"
-          :class="{ selected: selectedIndex === index }"
+          :class="{ selected: inputs[index] === true }"
           @click="selectAccount(index)"
         >
           <span class="account-name">{{ account.name }}</span>
@@ -39,7 +39,7 @@
           </button>
           <button
             class="custom-button primary"
-            :disabled="selectedIndex === null"
+            :disabled="!somethingSelected"
             @click="accept"
           >
             Accept
@@ -62,7 +62,8 @@ export default {
     return {
       requester: "",
       id: -1,
-      selectedIndex: null,
+      somethingSelected: false,
+      inputs: [],
       accounts: [],
     };
   },
@@ -79,37 +80,45 @@ export default {
     async loadAccounts() {
       this.accounts = await this._getAccounts();
       // Automatically select the first account
-      if (this.accounts.length > 0) {
-        this.selectedIndex = 0;
-      }
+      if (this.accounts.length > 0) this.selectAccount(0);
     },
     selectAccount(index) {
-      this.selectedIndex = index;
+      this.somethingSelected = false;
+      this.inputs = this.accounts.map((account, i) => {
+        const val = i === index ? !this.inputs[i] : this.inputs[i];
+        if (val === true) this.somethingSelected = true;
+        return val;
+      });
     },
     formatAddress(address) {
       return `${address.slice(0, 10)}...${address.slice(-5)}`;
     },
     async accept() {
-      if (this.selectedIndex !== null) {
-        const selectedAccount = this.accounts[this.selectedIndex];
-        const message = {
-          id: this.id,
-          result: [
-            {
-              name: selectedAccount.name,
-              address: selectedAccount.address,
-              signers: selectedAccount.signers
-                ? selectedAccount.signers.map((signer) => ({
+      if (!this.somethingSelected) return;
+      const accounts = this.accounts
+        .filter((account, index) => {
+          return this.inputs[index];
+        })
+        .map((account) => {
+          return {
+            name: account.name,
+            address: account.address,
+            signers: account.signers
+              ? account.signers.map((signer) => {
+                return {
                   name: signer.name,
                   address: signer.address,
-                }))
-                : [],
-            },
-          ],
-        };
-        this.sendResponse("extension", message, this.requester);
-        window.close();
-      }
+                };
+              })
+              : [],
+          };
+        });
+      const message = {
+        id: this.id,
+        result: accounts,
+      };
+      this.sendResponse("extension", message, this.requester);
+      window.close();
     },
     cancel() {
       const message = {
