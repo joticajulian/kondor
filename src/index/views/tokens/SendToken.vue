@@ -593,6 +593,9 @@ export default {
               "koinos.contracts.token.transfer_event": {
                 argument: "token.transfer_args",
               },
+              "token.transfer_event": {
+                argument: "token.transfer_args",
+              },
             },
           },
           provider: this.provider,
