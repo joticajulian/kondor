@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { utils } from "koilib";
 import * as storage from "../../lib/storage";
+import { fetchTokenPrices } from "../services/tokenPriceService";
 
 Vue.use(Vuex);
 
@@ -63,7 +64,28 @@ export default new Vuex.Store({
     showCurrentNetwork: true,
     showAvatarMenu: true,
     showAccountMenu: false,
+    tokenPrices: {}, // Add this new state property
   },
-  mutations: {},
-  actions: {},
+  mutations: {
+    SET_TOKEN_PRICES(state, prices) {
+      console.log("Setting token prices in store:", prices);
+      state.tokenPrices = prices;
+    },
+  },
+  actions: {
+    async fetchTokenPrices({ commit }) {
+      try {
+        const result = await fetchTokenPrices();
+        console.log("Fetched token prices:", result);
+        const prices = {};
+        result.tokens.forEach(token => {
+          prices[token.symbol] = token.price;
+        });
+        console.log("Processed prices:", prices);
+        commit('SET_TOKEN_PRICES', prices);
+      } catch (error) {
+        console.error("Error fetching token prices:", error);
+      }
+    },
+  },
 });

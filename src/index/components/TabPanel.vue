@@ -135,6 +135,12 @@
                 </span>
               </div>
             </div>
+            <span
+              v-if="tokenPrices[event.token.symbol]"
+              class="token-price"
+            >
+              Price: ${{ tokenPrices[event.token.symbol].toFixed(2) }}
+            </span>
           </div>
         </div>
       </div>
@@ -156,7 +162,13 @@
             >
             <div class="coin-name-container">
               <span class="coin-symbol">{{ coin.symbol }}</span>
-              <span class="coin-name">{{ coin.name }}</span>
+              <span class="coin-name">
+                <span
+                  v-if="!tokenPrices[coin.symbol]"
+                  class="loading-price"
+                >Loading<span class="ellipsis" /></span>
+                <span v-else>${{ formatPrice(tokenPrices[coin.symbol]) }}</span>
+              </span>
             </div>
           </div>
           <div class="coin-balance-value">
@@ -172,6 +184,7 @@
 <script>
 import axios from "axios";
 import { Contract, Provider, utils } from "koilib";
+import { mapState, mapActions } from 'vuex';
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -217,9 +230,10 @@ export default {
       return `https://kollection.app/profile/${this.address}`;
     },
     filteredCoins() {
-      // return this.coins.filter(coin => parseFloat(coin.balance) > 0);
+      console.log("Filtered coins:", this.coins);
       return this.coins;
     },
+    ...mapState(['tokenPrices']),
   },
 
   watch: {
@@ -257,9 +271,13 @@ export default {
     );
 
     this.fetchData();
+    await this.fetchTokenPrices();
+    console.log("Token prices in component:", this.tokenPrices);
   },
 
   methods: {
+    ...mapActions(['fetchTokenPrices']),
+
     getTruncatedTransactionId(id) {
       return id
         ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}`
@@ -458,12 +476,15 @@ export default {
       }
     },
 
-    setActiveTab(tab) {
+    async setActiveTab(tab) {
       this.activeTab = tab;
-      if (tab === "coins") {
-        this.refreshCoins();
+      if (tab === 'activity') {
+        await this.fetchTokenPrices();
+        await this.fetchAccountHistory();
+      } else if (tab === 'coins') {
+        await this.refreshCoins();
       } else {
-        this.fetchData();
+        await this.fetchData();
       }
     },
 
@@ -475,13 +496,39 @@ export default {
     },
 
     calculateUsdValue(coin) {
-      const price = this.prices[coin.symbol];
-      if (!price) return "N/A";
-      return (Number(coin.balance) * price).toFixed(2);
+      console.log(`Calculating USD value for ${coin.symbol}`);
+      console.log(`Coin data:`, coin);
+      console.log(`Token prices:`, this.tokenPrices);
+      
+      const price = this.tokenPrices[coin.symbol];
+      console.log(`Price for ${coin.symbol}:`, price);
+      
+      if (!price || price === "N/A") {
+        console.log(`No price available for ${coin.symbol}`);
+        return "N/A";
+      }
+      
+      const balance = parseFloat(coin.balance);
+      console.log(`Parsed balance for ${coin.symbol}:`, balance);
+      
+      if (isNaN(balance)) {
+        console.log(`Invalid balance for ${coin.symbol}`);
+        return "N/A";
+      }
+      
+      const usdValue = (balance * price).toFixed(2);
+      console.log(`Calculated USD value for ${coin.symbol}:`, usdValue);
+      
+      return usdValue;
     },
 
     openTransactionUrl(url) {
       window.open(url, "_blank");
+    },
+
+    formatPrice(price) {
+      if (!price) return 'N/A';
+      return price.toFixed(4);
     },
   },
 };
@@ -708,9 +755,9 @@ export default {
   color: var(--primary-light);
 }
 
-.coin-name {
-  font-size: 14px;
-  color: var(--primary-gray);
+.coin-price {
+  font-size: 0.8em;
+  color: #888;
 }
 
 .coin-balance-value {
@@ -757,4 +804,38 @@ export default {
 .transaction-id:hover {
   color: var(--kondor-purple);
 }
+
+.token-price {
+  font-size: 0.8em;
+  color: #888;
+  margin-left: 10px;
+}
+
+.loading-price {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.ellipsis {
+  display: inline-block;
+  width: 12px;
+  text-align: left;
+}
+
+.ellipsis::after {
+  content: '...';
+  display: inline-block;
+  animation: ellipsis 1.5s infinite;
+  width: 0;
+  overflow: hidden;
+}
+
+@keyframes ellipsis {
+  0% { width: 0; }
+  25% { width: 3px; }
+  50% { width: 6px; }
+  75% { width: 9px; }
+  100% { width: 12px; }
+}
 </style>
+
