@@ -65,11 +65,16 @@ export default new Vuex.Store({
     showAvatarMenu: true,
     showAccountMenu: false,
     tokenPrices: {}, // Add this new state property
+    totalBalance: 0, // Add this new state property
   },
   mutations: {
     SET_TOKEN_PRICES(state, prices) {
       console.log("Setting token prices in store:", prices);
       state.tokenPrices = prices;
+    },
+    SET_TOTAL_BALANCE(state, balance) { // Add this new mutation
+      console.log("Setting total balance in store:", balance);
+      state.totalBalance = balance;
     },
   },
   actions: {

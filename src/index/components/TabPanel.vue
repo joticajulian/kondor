@@ -234,6 +234,13 @@ export default {
       return this.coins;
     },
     ...mapState(['tokenPrices']),
+    totalBalance() {
+      return this.filteredCoins.reduce((total, coin) => {
+        const price = this.tokenPrices[coin.symbol] || 0;
+        const balance = parseFloat(coin.balance) || 0;
+        return total + (balance * price);
+      }, 0).toFixed(2);
+    },
   },
 
   watch: {
@@ -252,6 +259,9 @@ export default {
       this.networkTag =
         this.$store.state.networks[this.$store.state.currentNetwork].tag;
       this.filteredEvents = [];
+    },
+    totalBalance(newBalance) {
+      this.$store.commit('SET_TOTAL_BALANCE', parseFloat(newBalance));
     },
   },
 
