@@ -165,15 +165,21 @@
               <span class="coin-name">
                 <span
                   v-if="!tokenPrices[coin.symbol]"
-                  class="loading-price"
-                >Loading<span class="ellipsis" /></span>
+                  class="skeleton-loader price-skeleton"
+                />
                 <span v-else>${{ formatPrice(tokenPrices[coin.symbol]) }}</span>
               </span>
             </div>
           </div>
           <div class="coin-balance-value">
             <span class="coin-balance">{{ coin.balance }}</span>
-            <span class="coin-value">${{ calculateUsdValue(coin) }} USD</span>
+            <span class="coin-value">
+              <span
+                v-if="!tokenPrices[coin.symbol]"
+                class="skeleton-loader value-skeleton"
+              />
+              <span v-else>${{ calculateUsdValue(coin) }} USD</span>
+            </span>
           </div>
         </div>
       </div>
@@ -847,5 +853,30 @@ export default {
   75% { width: 9px; }
   100% { width: 12px; }
 }
-</style>
 
+.skeleton-loader {
+  display: inline-block;
+  background: linear-gradient(90deg, #2c2c2c 25%, #3a3a3a 50%, #2c2c2c 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.price-skeleton {
+  width: 60px;
+  height: 14px;
+}
+
+.value-skeleton {
+  width: 80px;
+  height: 16px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+</style>

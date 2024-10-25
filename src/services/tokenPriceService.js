@@ -51,16 +51,21 @@ export async function fetchTokenPrices() {
   let result = { tokens: [], errors: [] };
 
   try {
-    const tokens = await fetchTokenList();
-    result.tokenCount = tokens.length;
+    // Fetch token list and KOIN/USDT price in parallel
+    const [tokens, koinUsdtPrice] = await Promise.all([
+      fetchTokenList(),
+      fetchPrice(KOIN_ADDRESS, CHAINGE_USDT_ADDRESS)
+    ]);
 
-    const koinUsdtPrice = await fetchPrice(KOIN_ADDRESS, CHAINGE_USDT_ADDRESS);
     if (koinUsdtPrice === null) {
       throw new Error("Failed to fetch KOIN/USDT price");
     }
+
+    result.tokenCount = tokens.length;
     result.koinUsdtPrice = koinUsdtPrice;
 
-    for (const token of tokens) {
+    // Fetch prices for all tokens in parallel
+    const pricePromises = tokens.map(async (token) => {
       if (token && token.address) {
         try {
           let priceInUsdt;
@@ -70,21 +75,26 @@ export async function fetchTokenPrices() {
             const priceInKoin = await fetchPrice(token.address, KOIN_ADDRESS);
             priceInUsdt = priceInKoin !== null ? priceInKoin * koinUsdtPrice : null;
           }
-          result.tokens.push({
+          return {
             name: token.name,
             symbol: token.symbol,
             price: priceInUsdt !== null ? priceInUsdt : "N/A",
-          });
+          };
         } catch (error) {
           result.errors.push(`Error processing ${token.symbol}: ${error.message}`);
+          return null;
         }
-        await delay(100); // Add a delay of 1 second between API calls
       }
-    }
+      return null;
+    });
+
+    // Wait for all price fetches to complete
+    const tokenResults = await Promise.all(pricePromises);
+    result.tokens = tokenResults.filter(token => token !== null);
+
   } catch (error) {
     result.errors.push(`Main error: ${error.message}`);
   }
 
   return result;
 }
-
