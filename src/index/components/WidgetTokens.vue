@@ -85,13 +85,15 @@ export default {
   },
 
   watch: {
-    "$store.state.currentIndexAccount": function () {
-      this.loadAccount(this.$store.state.currentIndexAccount);
+    "$store.state.currentIndexAccount": async function () {
+      await this.loadAccount(this.$store.state.currentIndexAccount);
+      await this.$store.dispatch('fetchTokenPrices', this.address);
     },
     "$store.state.currentNetwork": async function () {
       await this.loadNetwork();
       this.tokenId = "";
-      this.loadAccount(this.$store.state.currentIndexAccount);
+      await this.loadAccount(this.$store.state.currentIndexAccount);
+      await this.$store.dispatch('fetchTokenPrices', this.address);
     },
   },
 
@@ -111,8 +113,6 @@ export default {
         await this.loadAccount(this.$store.state.currentIndexAccount);
       } else {
         this.$store.state.currentIndexAccount = index;
-        // the change will trigger the watch function which will
-        // call this.loadAccount
       }
       await this.updateSavedTokens();
       console.log("Saved tokens updated");
@@ -667,3 +667,4 @@ input {
   text-align: center;
 }
 </style>
+

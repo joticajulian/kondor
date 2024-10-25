@@ -76,25 +76,24 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async fetchTokenPrices({ commit }) {
+    async fetchTokenPrices({ commit }, accountAddress) {
       try {
-        const result = await fetchTokenPrices();
-        console.log("Fetched token prices:", result);
+        const result = await fetchTokenPrices(accountAddress);
+        console.log("Fetched token prices for account:", accountAddress, result);
         const prices = {};
         result.tokens.forEach(token => {
           prices[token.symbol] = token.price;
         });
-        console.log("Processed prices:", prices);
+        console.log("Processed prices for account:", accountAddress, prices);
         commit('SET_TOKEN_PRICES', prices);
       } catch (error) {
-        console.error("Error fetching token prices:", error);
+        console.error("Error fetching token prices for account:", accountAddress, error);
       }
     },
     async calculateTotalBalance({ commit, state }) {
       console.time('store:calculateTotalBalance');
       try {
         let total = 0;
-        // Assuming we have access to the current account's token balances
         const tokenBalances = state.accounts[state.currentIndexAccount].tokenBalances || {};
         
         for (const [symbol, balance] of Object.entries(tokenBalances)) {

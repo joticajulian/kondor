@@ -46,14 +46,49 @@ async function fetchPrice(baseAddress, quoteAddress) {
   }
 }
 
-export async function fetchTokenPrices() {
+const STORAGE_KEY_PREFIX = 'latestTokenPrices_';
+
+async function getCachedPrices(accountAddress) {
+  return new Promise((resolve) => {
+    const storageKey = STORAGE_KEY_PREFIX + accountAddress;
+    chrome.storage.local.get([storageKey], (result) => {
+      console.log("Retrieved from storage for account:", accountAddress, result);
+      const cachedData = result[storageKey];
+      if (cachedData && Date.now() - cachedData.timestamp < PRICE_EXPIRY_TIME) {
+        console.log("Using cached prices for account:", accountAddress, cachedData.data);
+        resolve(cachedData.data);
+      } else {
+        console.log("No valid cached prices found for account:", accountAddress);
+        resolve(null);
+      }
+    });
+  });
+}
+
+async function cacheTokenPrices(data, accountAddress) {
+  return new Promise((resolve) => {
+    const storageKey = STORAGE_KEY_PREFIX + accountAddress;
+    const cacheData = {
+      timestamp: Date.now(),
+      data: data
+    };
+    chrome.storage.local.set({ [storageKey]: cacheData }, () => {
+      if (chrome.runtime.lastError) {
+        console.error("Error caching prices for account:", accountAddress, chrome.runtime.lastError);
+      } else {
+        console.log("Prices cached successfully for account:", accountAddress, cacheData);
+      }
+      resolve();
+    });
+  });
+}
+
+export async function fetchTokenPrices(accountAddress) {
   let result = { tokens: [], errors: [] };
 
   try {
-    // Try to get cached prices first
-    const cachedPrices = await getCachedPrices();
+    const cachedPrices = await getCachedPrices(accountAddress);
     if (cachedPrices) {
-      console.log("Returning cached prices");
       return cachedPrices;
     }
 
@@ -101,7 +136,7 @@ export async function fetchTokenPrices() {
 
     // After successfully fetching new prices, cache them
     if (result.tokens.length > 0) {
-      await cacheTokenPrices(result);
+      await cacheTokenPrices(result, accountAddress);
     }
 
   } catch (error) {
@@ -113,38 +148,4 @@ export async function fetchTokenPrices() {
   return result;
 }
 
-async function getCachedPrices() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEY], (result) => {
-      console.log("Retrieved from storage:", result);
-      const cachedData = result[STORAGE_KEY];
-      if (cachedData && Date.now() - cachedData.timestamp < PRICE_EXPIRY_TIME) {
-        console.log("Using cached prices:", cachedData.data);
-        resolve(cachedData.data);
-      } else {
-        console.log("No valid cached prices found");
-        resolve(null);
-      }
-    });
-  });
-}
-
-async function cacheTokenPrices(data) {
-  return new Promise((resolve) => {
-    const cacheData = {
-      timestamp: Date.now(),
-      data: data
-    };
-    chrome.storage.local.set({ [STORAGE_KEY]: cacheData }, () => {
-      if (chrome.runtime.lastError) {
-        console.error("Error caching prices:", chrome.runtime.lastError);
-      } else {
-        console.log("Prices cached successfully:", cacheData);
-      }
-      resolve();
-    });
-  });
-}
-
-const STORAGE_KEY = 'latestTokenPrices';
 const PRICE_EXPIRY_TIME = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
