@@ -228,6 +228,7 @@ export default {
       provider: null,
       networkTag: null,
       filteredEvents: [],
+      isLoadingPrices: true,
     };
   },
 
@@ -289,6 +290,7 @@ export default {
     this.fetchData();
     await this.fetchTokenPrices();
     console.log("Token prices in component:", this.tokenPrices);
+    await this.refreshPrices();
   },
 
   methods: {
@@ -545,6 +547,13 @@ export default {
     formatPrice(price) {
       if (!price) return 'N/A';
       return price.toFixed(4);
+    },
+
+    async refreshPrices() {
+      this.isLoadingPrices = true;
+      await this.fetchTokenPrices();
+      this.isLoadingPrices = false;
+      console.log("Updated token prices:", this.tokenPrices);
     },
   },
 };
@@ -879,4 +888,23 @@ export default {
     background-position: -200% 0;
   }
 }
+
+.token-price-skeleton {
+  width: 60px;
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 </style>
+

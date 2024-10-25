@@ -64,16 +64,14 @@ export default new Vuex.Store({
     showCurrentNetwork: true,
     showAvatarMenu: true,
     showAccountMenu: false,
-    tokenPrices: {}, // Add this new state property
-    totalBalance: 0, // Add this new state property
+    tokenPrices: {},
+    totalBalance: '0.00',
   },
   mutations: {
     SET_TOKEN_PRICES(state, prices) {
-      console.log("Setting token prices in store:", prices);
       state.tokenPrices = prices;
     },
-    SET_TOTAL_BALANCE(state, balance) { // Add this new mutation
-      console.log("Setting total balance in store:", balance);
+    SET_TOTAL_BALANCE(state, balance) {
       state.totalBalance = balance;
     },
   },
@@ -91,6 +89,25 @@ export default new Vuex.Store({
       } catch (error) {
         console.error("Error fetching token prices:", error);
       }
+    },
+    async calculateTotalBalance({ commit, state }) {
+      console.time('store:calculateTotalBalance');
+      try {
+        let total = 0;
+        // Assuming we have access to the current account's token balances
+        const tokenBalances = state.accounts[state.currentIndexAccount].tokenBalances || {};
+        
+        for (const [symbol, balance] of Object.entries(tokenBalances)) {
+          const price = state.tokenPrices[symbol] || 0;
+          total += balance * price;
+        }
+        
+        commit('SET_TOTAL_BALANCE', total.toFixed(2));
+      } catch (error) {
+        console.error('Error calculating total balance:', error);
+        commit('SET_TOTAL_BALANCE', '0.00');
+      }
+      console.timeEnd('store:calculateTotalBalance');
     },
   },
 });
