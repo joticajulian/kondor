@@ -108,5 +108,11 @@ export default new Vuex.Store({
       }
       console.timeEnd('store:calculateTotalBalance');
     },
+    async fetchAllAccountsPrices({ state, dispatch }) {
+      console.log("updating prices for all accounts", state.accounts);
+      for (const account of state.accounts) {
+        await dispatch('fetchTokenPrices', account.address);
+      }
+    },
   },
 });
