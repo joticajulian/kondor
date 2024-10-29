@@ -1,7 +1,11 @@
 /* eslint-disable no-undef */
-const TOKEN_LIST_URL = "https://raw.githubusercontent.com/koindx/token-list/refs/heads/main/src/tokens/mainnet.json";
-const PRICE_API_BASE_URL = "https://koinoscollective.org/api/koindx/pair";
-const CHAINGE_USDT_ADDRESS = "14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N";
+import store from '../shared/store';
+const { 
+  CHAINGE_USDT_ADDRESS,
+  TOKEN_LIST_URL,
+  PRICE_API_BASE_URL 
+} = require('../ts/storage.ts');
+
 const KOIN_ADDRESS = "koin";
 
 async function fetchTokenList() {
@@ -84,6 +88,14 @@ async function cacheTokenPrices(data, accountAddress) {
 }
 
 export async function fetchTokenPrices(accountAddress) {
+  if (store.state.currentNetwork === 1) {
+    return { 
+      tokens: [], 
+      errors: ['Price fetching is disabled on testnet'],
+      tokenCount: 0
+    };
+  }
+
   let result = { tokens: [], errors: [] };
 
   try {

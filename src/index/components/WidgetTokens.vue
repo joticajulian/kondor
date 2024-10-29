@@ -9,6 +9,7 @@
       :address="address"
       :coins="miniTokens"
       :prices="tokenPrices"
+      :is-testnet="isTestnet"
       @refresh-coins="handleRefreshCoins"
     />
   </div>
@@ -82,6 +83,9 @@ export default {
         }, 0)
         .toLocaleString();
     },
+    isTestnet() {
+      return this.$store.state.currentNetwork === 1;
+    }
   },
 
   watch: {
@@ -140,6 +144,26 @@ export default {
     },
 
     async loadTokenBalance(t) {
+      if (this.isTestnet) {
+        const defaultResponse = {
+          balanceSatoshis: "0",
+          balance: "0",
+          balanceWithSymbol: `0 ${t.symbol}`,
+          balanceUSD: "$0 USD",
+          price: 0
+        };
+
+        // For koin in testnet, we still want to show mana
+        if (t.nickname === 'koin') {
+          this.timeRechargeMana = "No mana";
+          this.manaPercent = 0;
+          this.availablePercent = 0;
+          this.liquidKoin = "0";
+          this.showLiquidKoin = true;
+        }
+
+        return defaultResponse;
+      }
       console.log(`Starting loadTokenBalance for ${t.nickname}`);
       const contract = new Contract({
         id: t.contractId,

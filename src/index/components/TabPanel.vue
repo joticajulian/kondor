@@ -10,70 +10,72 @@
     </div>
     <div class="panel">
       <div v-if="activeTab === 'nfts'">
-        <div
-          v-if="loading"
-          class="loading"
-        >
-          Loading NFTs...
-        </div>
-        <div
-          v-else-if="error"
-          class="error-message"
-        >
-          {{ error }}
-        </div>
-        <div v-else>
-          <div v-if="nfts && nfts.length > 0">
-            <div class="nft-grid">
-              <div
-                v-for="nft in nfts"
-                :key="nft.id"
-                class="nft-item"
-              >
-                <img
-                  v-if="nft.metadata && nft.metadata.image"
-                  :src="nft.metadata.image"
-                  :alt="nft.metadata.name"
-                  class="nft-image"
-                >
-                <div class="nft-info">
-                  <h3 class="nft-name">
-                    {{
-                      nft.metadata
-                        ? nft.metadata.name || "Untitled"
-                        : "Untitled"
-                    }}
-                  </h3>
-                  <p class="nft-description">
-                    {{
-                      nft.metadata
-                        ? truncateDescription(nft.metadata.description) ||
-                          "No description"
-                        : "No description"
-                    }}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="kollection-link">
-              <a
-                :href="kollectionProfileUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src="../../../public/images/kollection-logo.svg"
-                  alt=""
-                >
-                <span>View on Kollection</span>
-              </a>
-            </div>
+        <div v-if="!isTestnet">
+          <div
+            v-if="loading"
+            class="loading"
+          >
+            Loading NFTs...
           </div>
           <div
-            v-else
-            class="no-nfts"
+            v-else-if="error"
+            class="error-message"
           >
-            No NFTs found for this address
+            {{ error }}
+          </div>
+          <div v-else>
+            <div v-if="nfts && nfts.length > 0">
+              <div class="nft-grid">
+                <div
+                  v-for="nft in nfts"
+                  :key="nft.id"
+                  class="nft-item"
+                >
+                  <img
+                    v-if="nft.metadata && nft.metadata.image"
+                    :src="nft.metadata.image"
+                    :alt="nft.metadata.name"
+                    class="nft-image"
+                  >
+                  <div class="nft-info">
+                    <h3 class="nft-name">
+                      {{
+                        nft.metadata
+                          ? nft.metadata.name || "Untitled"
+                          : "Untitled"
+                      }}
+                    </h3>
+                    <p class="nft-description">
+                      {{
+                        nft.metadata
+                          ? truncateDescription(nft.metadata.description) ||
+                            "No description"
+                          : "No description"
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="kollection-link">
+                <a
+                  :href="kollectionProfileUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="../../../public/images/kollection-logo.svg"
+                    alt=""
+                  >
+                  <span>View on Kollection</span>
+                </a>
+              </div>
+            </div>
+            <div
+              v-else
+              class="no-nfts"
+            >
+              No NFTs found for this address
+            </div>
           </div>
         </div>
       </div>
@@ -150,6 +152,12 @@
         class="coins-container"
       >
         <div
+          v-if="isTestnet"
+          class="testnet-message"
+        >
+          Pricing is not available in testnet mode
+        </div>
+        <div
           v-for="(coin, symbol) in filteredCoins"
           :key="symbol"
           class="coin-item"
@@ -163,8 +171,9 @@
             <div class="coin-name-container">
               <span class="coin-symbol">{{ coin.symbol }}</span>
               <span class="coin-name">
+                <span v-if="isTestnet">&nbsp;</span>
                 <span
-                  v-if="!tokenPrices[coin.symbol]"
+                  v-else-if="!tokenPrices[coin.symbol]"
                   class="skeleton-loader price-skeleton"
                 />
                 <span v-else>${{ formatPrice(tokenPrices[coin.symbol]) }}</span>
@@ -174,8 +183,10 @@
           <div class="coin-balance-value">
             <span class="coin-balance">{{ coin.balance }}</span>
             <span class="coin-value">
+              <span v-if="isTestnet">&nbsp;</span>
+              <span v-else-if="tokenPrices[coin.symbol] === undefined">&nbsp;</span>
               <span
-                v-if="!tokenPrices[coin.symbol]"
+                v-else-if="!tokenPrices[coin.symbol]"
                 class="skeleton-loader value-skeleton"
               />
               <span v-else>${{ calculateUsdValue(coin) }} USD</span>
@@ -213,6 +224,7 @@ export default {
       type: Object,
       required: true,
     },
+    isTestnet: Boolean, 
   },
 
   data() {
@@ -896,6 +908,14 @@ export default {
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
   border-radius: 4px;
+}
+.testnet-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--primary-gray);
+  background-color: #252525;
+  border-radius: 12px;
+  margin: 10px;
 }
 
 @keyframes loading {

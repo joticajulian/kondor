@@ -23,6 +23,9 @@ export async function read<T = unknown>(
 }
 
 export const DEFAULT_CURRENT_NETWORK = "mainnet";
+export const CHAINGE_USDT_ADDRESS = "14MjxccMUZrtBPXnNkuAC5MLtPev2Zsk3N";
+export const TOKEN_LIST_URL = "https://raw.githubusercontent.com/koindx/token-list/refs/heads/main/src/tokens/mainnet.json";
+export const PRICE_API_BASE_URL = "https://koinoscollective.org/api/koindx/pair";
 
 export async function setCurrentNetwork(currentNetwork: string): Promise<void> {
   return write("currentNetwork", currentNetwork);
