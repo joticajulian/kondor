@@ -61,7 +61,9 @@
       "plugin:vue/recommended"
     ],
     "parserOptions": {
-      "parser": "babel-eslint"
+      "parser": "babel-eslint",
+      "ecmaVersion": 2020,
+      "sourceType": "module"
     },
     "ignorePatterns": [
       "lib/*.js"

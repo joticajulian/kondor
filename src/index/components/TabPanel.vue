@@ -10,70 +10,72 @@
     </div>
     <div class="panel">
       <div v-if="activeTab === 'nfts'">
-        <div
-          v-if="loading"
-          class="loading"
-        >
-          Loading NFTs...
-        </div>
-        <div
-          v-else-if="error"
-          class="error-message"
-        >
-          {{ error }}
-        </div>
-        <div v-else>
-          <div v-if="nfts && nfts.length > 0">
-            <div class="nft-grid">
-              <div
-                v-for="nft in nfts"
-                :key="nft.id"
-                class="nft-item"
-              >
-                <img
-                  v-if="nft.metadata && nft.metadata.image"
-                  :src="nft.metadata.image"
-                  :alt="nft.metadata.name"
-                  class="nft-image"
-                >
-                <div class="nft-info">
-                  <h3 class="nft-name">
-                    {{
-                      nft.metadata
-                        ? nft.metadata.name || "Untitled"
-                        : "Untitled"
-                    }}
-                  </h3>
-                  <p class="nft-description">
-                    {{
-                      nft.metadata
-                        ? truncateDescription(nft.metadata.description) ||
-                          "No description"
-                        : "No description"
-                    }}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="kollection-link">
-              <a
-                :href="kollectionProfileUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src="../../../public/images/kollection-logo.svg"
-                  alt=""
-                >
-                <span>View on Kollection</span>
-              </a>
-            </div>
+        <div v-if="!isTestnet">
+          <div
+            v-if="loading"
+            class="loading"
+          >
+            Loading NFTs...
           </div>
           <div
-            v-else
-            class="no-nfts"
+            v-else-if="error"
+            class="error-message"
           >
-            No NFTs found for this address
+            {{ error }}
+          </div>
+          <div v-else>
+            <div v-if="nfts && nfts.length > 0">
+              <div class="nft-grid">
+                <div
+                  v-for="nft in nfts"
+                  :key="nft.id"
+                  class="nft-item"
+                >
+                  <img
+                    v-if="nft.metadata && nft.metadata.image"
+                    :src="nft.metadata.image"
+                    :alt="nft.metadata.name"
+                    class="nft-image"
+                  >
+                  <div class="nft-info">
+                    <h3 class="nft-name">
+                      {{
+                        nft.metadata
+                          ? nft.metadata.name || "Untitled"
+                          : "Untitled"
+                      }}
+                    </h3>
+                    <p class="nft-description">
+                      {{
+                        nft.metadata
+                          ? truncateDescription(nft.metadata.description) ||
+                            "No description"
+                          : "No description"
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="kollection-link">
+                <a
+                  :href="kollectionProfileUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="../../../public/images/kollection-logo.svg"
+                    alt=""
+                  >
+                  <span>View on Kollection</span>
+                </a>
+              </div>
+            </div>
+            <div
+              v-else
+              class="no-nfts"
+            >
+              No NFTs found for this address
+            </div>
           </div>
         </div>
       </div>
@@ -135,6 +137,12 @@
                 </span>
               </div>
             </div>
+            <span
+              v-if="tokenPrices[event.token.symbol]"
+              class="token-price"
+            >
+              Price: ${{ tokenPrices[event.token.symbol].toFixed(2) }}
+            </span>
           </div>
         </div>
       </div>
@@ -143,6 +151,12 @@
         v-if="activeTab === 'coins'"
         class="coins-container"
       >
+        <div
+          v-if="isTestnet"
+          class="testnet-message"
+        >
+          Pricing is not available in testnet mode
+        </div>
         <div
           v-for="(coin, symbol) in filteredCoins"
           :key="symbol"
@@ -156,12 +170,32 @@
             >
             <div class="coin-name-container">
               <span class="coin-symbol">{{ coin.symbol }}</span>
-              <span class="coin-name">{{ coin.name }}</span>
+              <span class="coin-name">
+                <span v-if="isTestnet">&nbsp;</span>
+                <span
+                  v-else-if="tokenPrices[coin.symbol] === undefined"
+                >&nbsp;</span>
+                <span
+                  v-else-if="!tokenPrices[coin.symbol]"
+                  class="skeleton-loader price-skeleton"
+                />
+                <span v-else>${{ formatPrice(tokenPrices[coin.symbol]) }}</span>
+              </span>
             </div>
           </div>
           <div class="coin-balance-value">
             <span class="coin-balance">{{ coin.balance }}</span>
-            <span class="coin-value">${{ calculateUsdValue(coin) }} USD</span>
+            <span class="coin-value">
+              <span v-if="isTestnet">&nbsp;</span>
+              <span
+                v-else-if="tokenPrices[coin.symbol] === undefined"
+              >&nbsp;</span>
+              <span
+                v-else-if="!tokenPrices[coin.symbol]"
+                class="skeleton-loader value-skeleton"
+              />
+              <span v-else>${{ calculateUsdValue(coin) }} USD</span>
+            </span>
           </div>
         </div>
       </div>
@@ -172,6 +206,7 @@
 <script>
 import axios from "axios";
 import { Contract, Provider, utils } from "koilib";
+import { mapState, mapActions } from "vuex";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -194,6 +229,7 @@ export default {
       type: Object,
       required: true,
     },
+    isTestnet: Boolean,
   },
 
   data() {
@@ -209,6 +245,7 @@ export default {
       provider: null,
       networkTag: null,
       filteredEvents: [],
+      isLoadingPrices: true,
     };
   },
 
@@ -217,8 +254,18 @@ export default {
       return `https://kollection.app/profile/${this.address}`;
     },
     filteredCoins() {
-      // return this.coins.filter(coin => parseFloat(coin.balance) > 0);
+      console.log("Filtered coins:", this.coins);
       return this.coins;
+    },
+    ...mapState(["tokenPrices"]),
+    totalBalance() {
+      return this.filteredCoins
+        .reduce((total, coin) => {
+          const price = this.tokenPrices[coin.symbol] || 0;
+          const balance = parseFloat(coin.balance) || 0;
+          return total + balance * price;
+        }, 0)
+        .toFixed(2);
     },
   },
 
@@ -239,6 +286,9 @@ export default {
         this.$store.state.networks[this.$store.state.currentNetwork].tag;
       this.filteredEvents = [];
     },
+    totalBalance(newBalance) {
+      this.$store.commit("SET_TOTAL_BALANCE", parseFloat(newBalance));
+    },
   },
 
   async mounted() {
@@ -257,9 +307,14 @@ export default {
     );
 
     this.fetchData();
+    await this.fetchTokenPrices();
+    console.log("Token prices in component:", this.tokenPrices);
+    await this.refreshPrices();
   },
 
   methods: {
+    ...mapActions(["fetchTokenPrices"]),
+
     getTruncatedTransactionId(id) {
       return id
         ? `${id.substring(0, 6)}...${id.substring(id.length - 6)}`
@@ -458,12 +513,15 @@ export default {
       }
     },
 
-    setActiveTab(tab) {
+    async setActiveTab(tab) {
       this.activeTab = tab;
-      if (tab === "coins") {
-        this.refreshCoins();
+      if (tab === "activity") {
+        await this.fetchTokenPrices();
+        await this.fetchAccountHistory();
+      } else if (tab === "coins") {
+        await this.refreshCoins();
       } else {
-        this.fetchData();
+        await this.fetchData();
       }
     },
 
@@ -475,13 +533,46 @@ export default {
     },
 
     calculateUsdValue(coin) {
-      const price = this.prices[coin.symbol];
-      if (!price) return "N/A";
-      return (Number(coin.balance) * price).toFixed(2);
+      console.log(`Calculating USD value for ${coin.symbol}`);
+      console.log(`Coin data:`, coin);
+      console.log(`Token prices:`, this.tokenPrices);
+
+      const price = this.tokenPrices[coin.symbol];
+      console.log(`Price for ${coin.symbol}:`, price);
+
+      if (!price || price === "N/A") {
+        console.log(`No price available for ${coin.symbol}`);
+        return "N/A";
+      }
+
+      const balance = parseFloat(coin.balance);
+      console.log(`Parsed balance for ${coin.symbol}:`, balance);
+
+      if (isNaN(balance)) {
+        console.log(`Invalid balance for ${coin.symbol}`);
+        return "N/A";
+      }
+
+      const usdValue = (balance * price).toFixed(2);
+      console.log(`Calculated USD value for ${coin.symbol}:`, usdValue);
+
+      return usdValue;
     },
 
     openTransactionUrl(url) {
       window.open(url, "_blank");
+    },
+
+    formatPrice(price) {
+      if (!price) return "N/A";
+      return price.toFixed(4);
+    },
+
+    async refreshPrices() {
+      this.isLoadingPrices = true;
+      await this.fetchTokenPrices();
+      this.isLoadingPrices = false;
+      console.log("Updated token prices:", this.tokenPrices);
     },
   },
 };
@@ -708,9 +799,9 @@ export default {
   color: var(--primary-light);
 }
 
-.coin-name {
-  font-size: 14px;
-  color: var(--primary-gray);
+.coin-price {
+  font-size: 0.8em;
+  color: #888;
 }
 
 .coin-balance-value {
@@ -756,5 +847,100 @@ export default {
 
 .transaction-id:hover {
   color: var(--kondor-purple);
+}
+
+.token-price {
+  font-size: 0.8em;
+  color: #888;
+  margin-left: 10px;
+}
+
+.loading-price {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.ellipsis {
+  display: inline-block;
+  width: 12px;
+  text-align: left;
+}
+
+.ellipsis::after {
+  content: "...";
+  display: inline-block;
+  animation: ellipsis 1.5s infinite;
+  width: 0;
+  overflow: hidden;
+}
+
+@keyframes ellipsis {
+  0% {
+    width: 0;
+  }
+  25% {
+    width: 3px;
+  }
+  50% {
+    width: 6px;
+  }
+  75% {
+    width: 9px;
+  }
+  100% {
+    width: 12px;
+  }
+}
+
+.skeleton-loader {
+  display: inline-block;
+  background: linear-gradient(90deg, #2c2c2c 25%, #3a3a3a 50%, #2c2c2c 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.price-skeleton {
+  width: 60px;
+  height: 14px;
+}
+
+.value-skeleton {
+  width: 80px;
+  height: 16px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.token-price-skeleton {
+  width: 60px;
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+.testnet-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--primary-gray);
+  background-color: #252525;
+  border-radius: 12px;
+  margin: 10px;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 </style>

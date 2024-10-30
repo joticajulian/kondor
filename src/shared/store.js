@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import { utils } from "koilib";
 import * as storage from "../../lib/storage";
+import { fetchTokenPrices } from "../services/tokenPriceService";
 
 Vue.use(Vuex);
 
@@ -63,7 +64,64 @@ export default new Vuex.Store({
     showCurrentNetwork: true,
     showAvatarMenu: true,
     showAccountMenu: false,
+    tokenPrices: {},
+    totalBalance: "0.00",
   },
-  mutations: {},
-  actions: {},
+  mutations: {
+    SET_TOKEN_PRICES(state, prices) {
+      state.tokenPrices = prices;
+    },
+    SET_TOTAL_BALANCE(state, balance) {
+      state.totalBalance = balance;
+    },
+  },
+  actions: {
+    async fetchTokenPrices({ commit }, accountAddress) {
+      try {
+        const result = await fetchTokenPrices(accountAddress);
+        console.log(
+          "Fetched token prices for account:",
+          accountAddress,
+          result
+        );
+        const prices = {};
+        result.tokens.forEach((token) => {
+          prices[token.symbol] = token.price;
+        });
+        console.log("Processed prices for account:", accountAddress, prices);
+        commit("SET_TOKEN_PRICES", prices);
+      } catch (error) {
+        console.error(
+          "Error fetching token prices for account:",
+          accountAddress,
+          error
+        );
+      }
+    },
+    async calculateTotalBalance({ commit, state }) {
+      console.time("store:calculateTotalBalance");
+      try {
+        let total = 0;
+        const tokenBalances =
+          state.accounts[state.currentIndexAccount].tokenBalances || {};
+
+        for (const [symbol, balance] of Object.entries(tokenBalances)) {
+          const price = state.tokenPrices[symbol] || 0;
+          total += balance * price;
+        }
+
+        commit("SET_TOTAL_BALANCE", total.toFixed(2));
+      } catch (error) {
+        console.error("Error calculating total balance:", error);
+        commit("SET_TOTAL_BALANCE", "0.00");
+      }
+      console.timeEnd("store:calculateTotalBalance");
+    },
+    async fetchAllAccountsPrices({ state, dispatch }) {
+      console.log("updating prices for all accounts", state.accounts);
+      for (const account of state.accounts) {
+        await dispatch("fetchTokenPrices", account.address);
+      }
+    },
+  },
 });

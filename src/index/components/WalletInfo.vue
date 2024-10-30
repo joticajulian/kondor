@@ -1,7 +1,7 @@
 <template>
   <div class="wallet-balance">
     <h1 class="balance">
-      ${{ balance }}
+      ${{ totalBalance }}
     </h1>
     <p class="mana tooltip">
       Mana {{ manaPercent }}%
@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "WalletBalance",
 
@@ -66,6 +68,7 @@ export default {
   },
 
   computed: {
+    ...mapState(["totalBalance"]),
     manaPercent() {
       return this.manaPercentage.toFixed(2);
     },
