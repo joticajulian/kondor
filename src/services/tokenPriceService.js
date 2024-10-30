@@ -1,10 +1,10 @@
 /* eslint-disable no-undef */
-import store from '../shared/store';
-const { 
+import store from "../shared/store";
+import {
   CHAINGE_USDT_ADDRESS,
   TOKEN_LIST_URL,
-  PRICE_API_BASE_URL 
-} = require('../ts/storage.ts');
+  PRICE_API_BASE_URL,
+} from "../../lib/storage.js";
 
 const KOIN_ADDRESS = "koin";
 
@@ -45,24 +45,38 @@ async function fetchPrice(baseAddress, quoteAddress) {
       throw new Error("Unexpected price response format");
     }
   } catch (error) {
-    console.error(`Failed to fetch price for ${baseAddress}/${quoteAddress}:`, error);
+    console.error(
+      `Failed to fetch price for ${baseAddress}/${quoteAddress}:`,
+      error
+    );
     throw error;
   }
 }
 
-const STORAGE_KEY_PREFIX = 'latestTokenPrices_';
+const STORAGE_KEY_PREFIX = "latestTokenPrices_";
 
 async function getCachedPrices(accountAddress) {
   return new Promise((resolve) => {
     const storageKey = STORAGE_KEY_PREFIX + accountAddress;
     chrome.storage.local.get([storageKey], (result) => {
-      console.log("Retrieved from storage for account:", accountAddress, result);
+      console.log(
+        "Retrieved from storage for account:",
+        accountAddress,
+        result
+      );
       const cachedData = result[storageKey];
       if (cachedData && Date.now() - cachedData.timestamp < PRICE_EXPIRY_TIME) {
-        console.log("Using cached prices for account:", accountAddress, cachedData.data);
+        console.log(
+          "Using cached prices for account:",
+          accountAddress,
+          cachedData.data
+        );
         resolve(cachedData.data);
       } else {
-        console.log("No valid cached prices found for account:", accountAddress);
+        console.log(
+          "No valid cached prices found for account:",
+          accountAddress
+        );
         resolve(null);
       }
     });
@@ -74,13 +88,21 @@ async function cacheTokenPrices(data, accountAddress) {
     const storageKey = STORAGE_KEY_PREFIX + accountAddress;
     const cacheData = {
       timestamp: Date.now(),
-      data: data
+      data: data,
     };
     chrome.storage.local.set({ [storageKey]: cacheData }, () => {
       if (chrome.runtime.lastError) {
-        console.error("Error caching prices for account:", accountAddress, chrome.runtime.lastError);
+        console.error(
+          "Error caching prices for account:",
+          accountAddress,
+          chrome.runtime.lastError
+        );
       } else {
-        console.log("Prices cached successfully for account:", accountAddress, cacheData);
+        console.log(
+          "Prices cached successfully for account:",
+          accountAddress,
+          cacheData
+        );
       }
       resolve();
     });
@@ -89,10 +111,10 @@ async function cacheTokenPrices(data, accountAddress) {
 
 export async function fetchTokenPrices(accountAddress) {
   if (store.state.currentNetwork === 1) {
-    return { 
-      tokens: [], 
-      errors: ['Price fetching is disabled on testnet'],
-      tokenCount: 0
+    return {
+      tokens: [],
+      errors: ["Price fetching is disabled on testnet"],
+      tokenCount: 0,
     };
   }
 
@@ -108,7 +130,7 @@ export async function fetchTokenPrices(accountAddress) {
     // Fetch token list and KOIN/USDT price in parallel
     const [tokens, koinUsdtPrice] = await Promise.all([
       fetchTokenList(),
-      fetchPrice(KOIN_ADDRESS, CHAINGE_USDT_ADDRESS)
+      fetchPrice(KOIN_ADDRESS, CHAINGE_USDT_ADDRESS),
     ]);
 
     if (koinUsdtPrice === null) {
@@ -127,7 +149,8 @@ export async function fetchTokenPrices(accountAddress) {
             priceInUsdt = koinUsdtPrice;
           } else {
             const priceInKoin = await fetchPrice(token.address, KOIN_ADDRESS);
-            priceInUsdt = priceInKoin !== null ? priceInKoin * koinUsdtPrice : null;
+            priceInUsdt =
+              priceInKoin !== null ? priceInKoin * koinUsdtPrice : null;
           }
           return {
             name: token.name,
@@ -135,7 +158,9 @@ export async function fetchTokenPrices(accountAddress) {
             price: priceInUsdt !== null ? priceInUsdt : "N/A",
           };
         } catch (error) {
-          result.errors.push(`Error processing ${token.symbol}: ${error.message}`);
+          result.errors.push(
+            `Error processing ${token.symbol}: ${error.message}`
+          );
           return null;
         }
       }
@@ -144,13 +169,12 @@ export async function fetchTokenPrices(accountAddress) {
 
     // Wait for all price fetches to complete
     const tokenResults = await Promise.all(pricePromises);
-    result.tokens = tokenResults.filter(token => token !== null);
+    result.tokens = tokenResults.filter((token) => token !== null);
 
     // After successfully fetching new prices, cache them
     if (result.tokens.length > 0) {
       await cacheTokenPrices(result, accountAddress);
     }
-
   } catch (error) {
     console.error("Error in fetchTokenPrices:", error);
     result.errors.push(`Main error: ${error.message}`);

@@ -173,6 +173,9 @@
               <span class="coin-name">
                 <span v-if="isTestnet">&nbsp;</span>
                 <span
+                  v-else-if="tokenPrices[coin.symbol] === undefined"
+                >&nbsp;</span>
+                <span
                   v-else-if="!tokenPrices[coin.symbol]"
                   class="skeleton-loader price-skeleton"
                 />
@@ -184,7 +187,9 @@
             <span class="coin-balance">{{ coin.balance }}</span>
             <span class="coin-value">
               <span v-if="isTestnet">&nbsp;</span>
-              <span v-else-if="tokenPrices[coin.symbol] === undefined">&nbsp;</span>
+              <span
+                v-else-if="tokenPrices[coin.symbol] === undefined"
+              >&nbsp;</span>
               <span
                 v-else-if="!tokenPrices[coin.symbol]"
                 class="skeleton-loader value-skeleton"
@@ -201,7 +206,7 @@
 <script>
 import axios from "axios";
 import { Contract, Provider, utils } from "koilib";
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from "vuex";
 
 // mixins
 import ViewHelper from "@/shared/mixins/ViewHelper";
@@ -224,7 +229,7 @@ export default {
       type: Object,
       required: true,
     },
-    isTestnet: Boolean, 
+    isTestnet: Boolean,
   },
 
   data() {
@@ -252,13 +257,15 @@ export default {
       console.log("Filtered coins:", this.coins);
       return this.coins;
     },
-    ...mapState(['tokenPrices']),
+    ...mapState(["tokenPrices"]),
     totalBalance() {
-      return this.filteredCoins.reduce((total, coin) => {
-        const price = this.tokenPrices[coin.symbol] || 0;
-        const balance = parseFloat(coin.balance) || 0;
-        return total + (balance * price);
-      }, 0).toFixed(2);
+      return this.filteredCoins
+        .reduce((total, coin) => {
+          const price = this.tokenPrices[coin.symbol] || 0;
+          const balance = parseFloat(coin.balance) || 0;
+          return total + balance * price;
+        }, 0)
+        .toFixed(2);
     },
   },
 
@@ -280,7 +287,7 @@ export default {
       this.filteredEvents = [];
     },
     totalBalance(newBalance) {
-      this.$store.commit('SET_TOTAL_BALANCE', parseFloat(newBalance));
+      this.$store.commit("SET_TOTAL_BALANCE", parseFloat(newBalance));
     },
   },
 
@@ -306,7 +313,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['fetchTokenPrices']),
+    ...mapActions(["fetchTokenPrices"]),
 
     getTruncatedTransactionId(id) {
       return id
@@ -508,10 +515,10 @@ export default {
 
     async setActiveTab(tab) {
       this.activeTab = tab;
-      if (tab === 'activity') {
+      if (tab === "activity") {
         await this.fetchTokenPrices();
         await this.fetchAccountHistory();
-      } else if (tab === 'coins') {
+      } else if (tab === "coins") {
         await this.refreshCoins();
       } else {
         await this.fetchData();
@@ -529,26 +536,26 @@ export default {
       console.log(`Calculating USD value for ${coin.symbol}`);
       console.log(`Coin data:`, coin);
       console.log(`Token prices:`, this.tokenPrices);
-      
+
       const price = this.tokenPrices[coin.symbol];
       console.log(`Price for ${coin.symbol}:`, price);
-      
+
       if (!price || price === "N/A") {
         console.log(`No price available for ${coin.symbol}`);
         return "N/A";
       }
-      
+
       const balance = parseFloat(coin.balance);
       console.log(`Parsed balance for ${coin.symbol}:`, balance);
-      
+
       if (isNaN(balance)) {
         console.log(`Invalid balance for ${coin.symbol}`);
         return "N/A";
       }
-      
+
       const usdValue = (balance * price).toFixed(2);
       console.log(`Calculated USD value for ${coin.symbol}:`, usdValue);
-      
+
       return usdValue;
     },
 
@@ -557,7 +564,7 @@ export default {
     },
 
     formatPrice(price) {
-      if (!price) return 'N/A';
+      if (!price) return "N/A";
       return price.toFixed(4);
     },
 
@@ -860,7 +867,7 @@ export default {
 }
 
 .ellipsis::after {
-  content: '...';
+  content: "...";
   display: inline-block;
   animation: ellipsis 1.5s infinite;
   width: 0;
@@ -868,11 +875,21 @@ export default {
 }
 
 @keyframes ellipsis {
-  0% { width: 0; }
-  25% { width: 3px; }
-  50% { width: 6px; }
-  75% { width: 9px; }
-  100% { width: 12px; }
+  0% {
+    width: 0;
+  }
+  25% {
+    width: 3px;
+  }
+  50% {
+    width: 6px;
+  }
+  75% {
+    width: 9px;
+  }
+  100% {
+    width: 12px;
+  }
 }
 
 .skeleton-loader {
@@ -927,4 +944,3 @@ export default {
   }
 }
 </style>
-

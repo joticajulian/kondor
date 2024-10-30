@@ -17,17 +17,4 @@ module.exports = {
       filename: "options.html",
     },
   },
-  configureWebpack: {
-    resolve: {
-      extensions: ['.js', '.ts']
-    },
-    module: {
-      rules: [
-        {
-          test: /\.ts$/,
-          loader: 'ts-loader'
-        }
-      ]
-    }
-  }
 };

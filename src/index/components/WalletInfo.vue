@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from "vuex";
 
 export default {
   name: "WalletBalance",
@@ -68,7 +68,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['totalBalance']),
+    ...mapState(["totalBalance"]),
     manaPercent() {
       return this.manaPercentage.toFixed(2);
     },

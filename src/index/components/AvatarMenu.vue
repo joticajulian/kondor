@@ -149,7 +149,7 @@ export default {
     },
     isTestnetMode: {
       get() {
-        return this.$store.state.currentNetwork === 1; 
+        return this.$store.state.currentNetwork === 1;
       },
       set(value) {
         const networkIndex = value ? 1 : 0; // 1 for testnet, 0 for mainnet
