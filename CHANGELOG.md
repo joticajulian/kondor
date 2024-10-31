@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.0](https://github.com/joticajulian/kondor/releases/tag/v1.2.0) (2024-10-31)
+
+### 🚀 Features
+
+- Fetch prices for all tokens from KoinDX.
+
+### 🐛 Bug Fixes
+
+- Fix links for NFTs using images hosted in IPFS.
+- The popup to select accounts will auto select the first one only if the user has 1 account. Otherwise nothing is selected by default
+
 ## [v1.1.0](https://github.com/joticajulian/kondor/releases/tag/v1.1.0) (2024-10-20)
 
 ### 🚀 Features
