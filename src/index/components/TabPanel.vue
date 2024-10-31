@@ -33,9 +33,11 @@
                 >
                   <img
                     v-if="nft.metadata && nft.metadata.image"
-                    :src="nft.metadata.image"
+                    :src="convertIPFSUrl(nft.metadata.image)"
                     :alt="nft.metadata.name"
                     class="nft-image"
+                    @error="handleImageError"
+                    @load="handleImageLoad"
                   >
                   <div class="nft-info">
                     <h3 class="nft-name">
@@ -573,6 +575,25 @@ export default {
       await this.fetchTokenPrices();
       this.isLoadingPrices = false;
       console.log("Updated token prices:", this.tokenPrices);
+    },
+
+    convertIPFSUrl(url) {
+      if (!url) return url;
+      if (url.startsWith("ipfs://")) {
+        // Replace ipfs:// with the ipfs.io gateway
+        return url.replace("ipfs://", "https://ipfs.io/ipfs/");
+      }
+      return url;
+    },
+
+    handleImageError(e) {
+      console.log("Image failed to load:", e.target.src);
+      // Optionally set a fallback image
+      // e.target.src = 'path/to/fallback/image.png';
+    },
+
+    handleImageLoad(e) {
+      console.log("Image loaded successfully:", e.target.src);
     },
   },
 };
