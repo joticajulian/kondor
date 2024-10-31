@@ -579,21 +579,21 @@ export default {
 
     convertIPFSUrl(url) {
       if (!url) return url;
-      if (url.startsWith('ipfs://')) {
+      if (url.startsWith("ipfs://")) {
         // Replace ipfs:// with the ipfs.io gateway
-        return url.replace('ipfs://', 'https://ipfs.io/ipfs/');
+        return url.replace("ipfs://", "https://ipfs.io/ipfs/");
       }
       return url;
     },
 
     handleImageError(e) {
-      console.log('Image failed to load:', e.target.src);
+      console.log("Image failed to load:", e.target.src);
       // Optionally set a fallback image
       // e.target.src = 'path/to/fallback/image.png';
     },
 
     handleImageLoad(e) {
-      console.log('Image loaded successfully:', e.target.src);
+      console.log("Image loaded successfully:", e.target.src);
     },
   },
 };
