@@ -79,8 +79,8 @@ export default {
   methods: {
     async loadAccounts() {
       this.accounts = await this._getAccounts();
-      // Automatically select the first account
-      if (this.accounts.length > 0) this.selectAccount(0);
+      // Automatically select the first account if there is only 1 account
+      if (this.accounts.length === 1) this.selectAccount(0);
     },
     selectAccount(index) {
       this.somethingSelected = false;
