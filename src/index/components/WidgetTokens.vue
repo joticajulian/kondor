@@ -159,7 +159,10 @@ export default {
           owner: this.address,
         });
         balanceSatoshis = result.value;
-        balance = utils.formatUnits(balanceSatoshis, t.decimals);
+        // todo: update koilib
+        balance = t.decimals
+          ? utils.formatUnits(balanceSatoshis, t.decimals)
+          : balanceSatoshis;
         console.log(`Raw balance for ${t.nickname}:`, balanceSatoshis);
         console.log(`Formatted balance for ${t.nickname}:`, balance);
       } catch (error) {

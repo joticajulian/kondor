@@ -841,7 +841,10 @@ export default {
       case "number": {
         const decimals = format[argName].decimals || 0;
         const symbol = format[argName].symbol || "";
-        const amount = utils.formatUnits(data, decimals);
+        // todo: update koilib
+        const amount = decimals
+          ? utils.formatUnits(data, decimals)
+          : data;
 
         // Format the number with commas for thousands separators
         const formattedAmount = new Intl.NumberFormat("en-US", {

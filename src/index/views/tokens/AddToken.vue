@@ -333,10 +333,9 @@ export default {
         let { result: decimals } = await contract.decimals({});
 
         if (!symbol || !symbol.value) throw new Error("Token without symbol");
-        if (!decimals) decimals = 0;
 
         newToken.symbol = symbol.value;
-        newToken.decimals = decimals.value;
+        newToken.decimals = decimals ? decimals.value : 0;
 
         const existingId = this.tokens.findIndex(
           (t) =>

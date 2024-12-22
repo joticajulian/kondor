@@ -188,6 +188,7 @@ export default {
       kapNameService: null,
       nicknames: null,
       tokenId2: "",
+      tokenDecimals: undefined,
       makingTransfer: false,
     };
   },
@@ -314,7 +315,10 @@ export default {
           owner: this.address,
         });
         balanceSatoshis = result.value;
-        balance = utils.formatUnits(balanceSatoshis, t.decimals);
+        // todo: update koilib
+        balance = t.decimals
+          ? utils.formatUnits(balanceSatoshis, t.decimals)
+          : balanceSatoshis;
       } catch (error) {
         console.error(`error while loading the balance of @${t.nickname}`);
         console.error(error);
@@ -422,6 +426,7 @@ export default {
             token.contractId === this.tokenId2
           ) {
             this.tokenId2 = token.contractId;
+            this.tokenDecimals = token.decimals;
             this.tokenName = token.nickname;
             this.tokenImage = token.image;
             this.tokenSymbol = token.symbol;
@@ -482,6 +487,7 @@ export default {
 
     async loadToken(t) {
       this.tokenId2 = t.contractId;
+      this.tokenDecimals = t.decimals;
       this.tokenName = t.nickname;
       this.tokenImage = t.image;
       this.tokenSymbol = t.symbol;
@@ -627,7 +633,7 @@ export default {
         await transaction.pushOperation(contract.transfer, {
           from: this.address,
           to: this.resolvedAddress || this.to,
-          value: utils.parseUnits(this.amount, 8),
+          value: utils.parseUnits(this.amount, this.tokenDecimals),
           memo: this.memo,
         });
 
