@@ -1515,7 +1515,7 @@ export default {
             try {
               this.receipt = await this.transaction.send({ broadcast: false });
             } catch (error) {
-              if (i >= 4) throw error;
+              if (i >= 4 || this.externalSigners) throw error;
               if (
                 error.message.includes("transaction reverted: insufficient rc")
               ) {
