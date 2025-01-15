@@ -19,7 +19,7 @@
     "@dicebear/avatars-identicon-sprites": "^4.10.8",
     "core-js": "^3.20.3",
     "ethers": "^5.6.2",
-    "koilib": "^7.1.1",
+    "koilib": "^9.0.0",
     "kondor-js": "^1.1.0",
     "qrcode.vue": "1.7.0",
     "vue": "^2.6.14",

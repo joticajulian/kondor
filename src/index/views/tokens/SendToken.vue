@@ -669,7 +669,7 @@ export default {
         this.alertSuccess("Sent. Waiting to be mined ...");
         console.log(`Transaction id ${transaction.id} submitted. Receipt:`);
         console.log(receipt);
-        const { blockNumber } = await transaction.wait("byBlock", 60_000);
+        const { blockNumber } = await transaction.wait("byTransactionId");
         console.log("block number " + blockNumber);
         this.alertSuccess(`Sent. Transaction mined in block ${blockNumber}`);
         this.makingTransfer = false;
