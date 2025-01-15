@@ -842,9 +842,7 @@ export default {
         const decimals = format[argName].decimals || 0;
         const symbol = format[argName].symbol || "";
         // todo: update koilib
-        const amount = decimals
-          ? utils.formatUnits(data, decimals)
-          : data;
+        const amount = decimals ? utils.formatUnits(data, decimals) : data;
 
         // Format the number with commas for thousands separators
         const formattedAmount = new Intl.NumberFormat("en-US", {

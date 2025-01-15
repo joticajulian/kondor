@@ -26,7 +26,7 @@
           :key="token.address"
           :value="token"
         >
-          {{ token.name }} ({{ token.symbol }})
+          {{ token.id }}
         </option>
       </select>
 
@@ -35,6 +35,14 @@
         v-model="name"
         type="text"
         placeholder="Nickname"
+        @keyup.enter="accept"
+      >
+
+      <input
+        v-if="useCustomAddress"
+        v-model="customAddress"
+        type="text"
+        placeholder="Address"
         @keyup.enter="accept"
       >
 
@@ -142,6 +150,9 @@ function fromHexToUtf8(hex) {
   return new TextDecoder().decode(utils.toUint8Array(hex2));
 }
 
+const importByNickname = "Import token by nickname";
+const importByAddress = "Import token by address";
+
 export default {
   components: { PageTitle },
   mixins: [Storage, Sandbox, ViewHelper],
@@ -149,6 +160,7 @@ export default {
     return {
       showAdvanced: false,
       name: "",
+      customAddress: "",
       tokenAddress: "",
       tokenToRemove: "",
       nicknames: null,
@@ -161,6 +173,7 @@ export default {
       koindxTokens: [], // To store the list of tokens from KoinDX
       selectedToken: "", // To store the selected token from the dropdown
       useNickname: false,
+      useCustomAddress: false,
     };
   },
 
@@ -223,8 +236,12 @@ export default {
           `https://raw.githubusercontent.com/koindx/token-list/main/src/tokens/${this.network.tag}.json`
         );
         this.koindxTokens = [
-          ...response.data.tokens,
-          { name: "Other", symbol: "use nickname" },
+          { id: importByNickname },
+          { id: importByAddress },
+          ...response.data.tokens.map((t) => ({
+            ...t,
+            id: `${t.name} (${t.symbol})`,
+          })),
         ];
       } catch (error) {
         console.error("Failed to fetch KoinDX tokens", error);
@@ -240,14 +257,16 @@ export default {
 
     onTokenSelected() {
       if (this.selectedToken && !this.showAdvanced) {
-        if (
-          this.selectedToken.name === "Other" &&
-          this.selectedToken.symbol === "use nickname"
-        ) {
+        if (this.selectedToken.id === importByNickname) {
           this.useNickname = true;
+          this.useCustomAddress = false;
+        } else if (this.selectedToken.id === importByAddress) {
+          this.useNickname = false;
+          this.useCustomAddress = true;
         } else {
           this.tokenAddress = this.selectedToken.address; // Set the contract address
           this.useNickname = false;
+          this.useCustomAddress = false;
         }
       }
     },
@@ -257,7 +276,8 @@ export default {
         value: address,
       });
       if (!result || !result.token_id) {
-        throw new Error(`No nickname for address ${address}`);
+        return "";
+        // throw new Error(`No nickname for address ${address}`);
       }
       return fromHexToUtf8(result.token_id);
     },
@@ -277,7 +297,12 @@ export default {
           noAddresses: [],
         };
 
-        if (!this.useNickname) {
+        if (this.useCustomAddress) {
+          // Custom Address
+          this.tokenAddress = this.customAddress;
+          this.name = "";
+        } else if (!this.useNickname) {
+          // KoinDX list
           if (!this.tokenAddress) {
             throw new Error("Select a token from the list");
           }
@@ -289,35 +314,46 @@ export default {
           }
         }
 
-        const tokenId = `0x${fromUtf8ToHex(this.name)}`;
-        try {
-          const { result } = await this.nicknames.get_address({
-            value: this.name,
-          });
-          newToken.contractId = result.value;
-          newToken.nickname = this.name;
-          newToken.permanentAddress =
-            !!result.address_modifiable_only_by_governance ||
-            !!result.permanent_address;
-          this.tokenPermanentAddress = newToken.permanentAddress;
-        } catch (error) {
-          console.log(error);
-          throw new Error(
-            `nickname @${this.name} not found in ${this.network.tag} network`
-          );
-        }
+        if (this.name) {
+          // token with a nickname
+          const tokenId = `0x${fromUtf8ToHex(this.name)}`;
+          try {
+            const { result } = await this.nicknames.get_address({
+              value: this.name,
+            });
+            newToken.contractId = result.value;
+            newToken.nickname = this.name;
+            newToken.permanentAddress =
+              !!result.address_modifiable_only_by_governance ||
+              !!result.permanent_address;
+            this.tokenPermanentAddress = newToken.permanentAddress;
+          } catch (error) {
+            console.log(error);
+            throw new Error(
+              `nickname @${this.name} not found in ${this.network.tag} network`
+            );
+          }
 
-        try {
-          const { result: resultMetadata } = await this.nicknames.metadata_of({
-            token_id: tokenId,
-          });
-          const metadata = JSON.parse(resultMetadata.value);
-          if (metadata.image) newToken.image = metadata.image;
-        } catch (error) {
-          console.error(
-            `error when loading metadata of token @${newToken.nickname}`
-          );
-          console.error(error);
+          try {
+            const { result: resultMetadata } = await this.nicknames.metadata_of(
+              {
+                token_id: tokenId,
+              }
+            );
+            const metadata = JSON.parse(resultMetadata.value);
+            if (metadata.image) newToken.image = metadata.image;
+          } catch (error) {
+            console.error(
+              `error when loading metadata of token @${newToken.nickname}`
+            );
+            console.error(error);
+          }
+        } else {
+          // token without a nickname
+          newToken.contractId = this.tokenAddress;
+          newToken.nickname = "";
+          newToken.permanentAddress = true;
+          newToken.image = emptyToken;
         }
 
         const contract = new Contract({
