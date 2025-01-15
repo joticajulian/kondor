@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.2](https://github.com/joticajulian/kondor/releases/tag/v1.2.2) (2025-01-15)
+
+### 🚀 Features
+
+- We restored the option to import a token by its address.
+- The process to confirm transactions has been improved. Now the loop checks if the transaction was mined instead of searching the transaction in the blocks.
+
+### 🐛 Bug Fixes
+
+- Avoid the computation of mana optimization if the transaction is already signed. For instance, when creating a new pool in KoinDX.
+
 ## [v1.2.1](https://github.com/joticajulian/kondor/releases/tag/v1.2.1) (2024-12-22)
 
 ### 🐛 Bug Fixes
