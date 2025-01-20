@@ -1266,7 +1266,7 @@ export default {
         }
 
         if (this.request.args.transaction.signatures) {
-          const signerAddresses = await Signer.fromSeed("x").recoverAddresses(
+          const signerAddresses = await Signer.recoverAddresses(
             this.request.args.transaction
           );
           signerAddresses.forEach((address, i) =>
