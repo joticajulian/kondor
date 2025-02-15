@@ -6,6 +6,14 @@
         {{ simplifiedDomain }}
       </div>
       <div>{{ requester.origin }}</div>
+      <div
+        v-if="kondorVersionBelow1"
+        class="wi-orange"
+      >
+        website using an old version of kondor-js
+        <span v-if="kondorVersion">({{ kondorVersion }})</span>. It is
+        recommended to update it to version >= 1.0.0
+      </div>
     </div>
     <div
       class="op-viewmore set-allowance-title"
@@ -568,6 +576,8 @@ export default {
       request: null,
       isOldKoilib: false,
       isOldKondor: false,
+      kondorVersion: "",
+      kondorVersionBelow1: false,
       nicknames: null,
       koinContract: null,
       freeManaSharer: null,
@@ -691,6 +701,13 @@ export default {
       this.request = requests[0];
       this.requester = this.request.sender;
       this.typeRequest = this.send ? "send" : "sign";
+      this.kondorVersion = this.request.args.kondorVersion;
+      if (this.kondorVersion) {
+        this.kondorVersionBelow1 =
+          Number(this.kondorVersion.replace(/\./g, "")) < 100;
+      } else {
+        this.kondorVersionBelow1 = true;
+      }
 
       console.log("Starting decodeTransaction");
       await this.decodeTransaction();
@@ -2297,6 +2314,11 @@ input:checked + .slider:before {
   color: var(--primary-light);
   font-weight: bold;
 }
+
+.wi-orange {
+  color: orange;
+}
+
 .advanced-toggle {
   margin: 10px 0;
   display: flex;
