@@ -151,54 +151,56 @@ export default {
 
     async _getTokens(strict = false) {
       let tokens = await this._read("tokens", strict);
-      if (!tokens) {
-        tokens = [
-          {
-            network: "mainnet",
-            contractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
-            nickname: "koin",
-            symbol: "KOIN",
-            decimals: 8,
-            image:
-              "https://files.peakd.com/file/peakd-hive/jga/AJizr3uSbFj2e8s3k5LBeARYf7g8p4xUrRNbHGEwNuEm25sAykFpvkLMZiGNgvG.png",
-            /*
-            // Load the token for a specific list of addresses
-            // Default: all addresses
-            addresses: [],
+      const otherTokens = tokens.filter(t => t.nickname !== "koin" && t.nickname !== "vhp");
+      tokens = [
+        {
+          network: "mainnet",
+          // contractId: "15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL",
+          contractId: "19GYjDBVXU7keLbYvMLazsGQn3GTWHjHkK",
+          nickname: "koin",
+          symbol: "KOIN",
+          decimals: 8,
+          image:
+            "https://files.peakd.com/file/peakd-hive/jga/AJizr3uSbFj2e8s3k5LBeARYf7g8p4xUrRNbHGEwNuEm25sAykFpvkLMZiGNgvG.png",
+          /*
+          // Load the token for a specific list of addresses
+          // Default: all addresses
+          addresses: [],
 
-            // Exceptions to the previous rule
-            noAddresses: [],
-            */
-          },
-          {
-            network: "mainnet",
-            contractId: "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr",
-            nickname: "vhp",
-            symbol: "VHP",
-            decimals: 8,
-            image:
-              "https://files.peakd.com/file/peakd-hive/jga/AJdLAV524tVfwnkV7iCjPFE2HvArB8pDyLdNVZfEQYBUGhWJ7TMniKx8uYuoQyh.png",
-          },
-          {
-            network: "harbinger",
-            contractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
-            nickname: "koin",
-            symbol: "tKOIN",
-            decimals: 8,
-            image:
-              "https://files.peakd.com/file/peakd-hive/jga/AJizr3uSbFj2e8s3k5LBeARYf7g8p4xUrRNbHGEwNuEm25sAykFpvkLMZiGNgvG.png",
-          },
-          {
-            network: "harbinger",
-            contractId: "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi",
-            nickname: "vhp",
-            symbol: "VHP",
-            decimals: 8,
-            image:
-              "https://files.peakd.com/file/peakd-hive/jga/AJdLAV524tVfwnkV7iCjPFE2HvArB8pDyLdNVZfEQYBUGhWJ7TMniKx8uYuoQyh.png",
-          },
-        ];
-      }
+          // Exceptions to the previous rule
+          noAddresses: [],
+          */
+        },
+        {
+          network: "mainnet",
+          // contractId: "18tWNU7E4yuQzz7hMVpceb9ixmaWLVyQsr",
+          contractId: "12Y5vW6gk8GceH53YfRkRre2Rrcsgw7Naq",
+          nickname: "vhp",
+          symbol: "VHP",
+          decimals: 8,
+          image:
+            "https://files.peakd.com/file/peakd-hive/jga/AJdLAV524tVfwnkV7iCjPFE2HvArB8pDyLdNVZfEQYBUGhWJ7TMniKx8uYuoQyh.png",
+        },
+        {
+          network: "harbinger",
+          contractId: "1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y",
+          nickname: "koin",
+          symbol: "tKOIN",
+          decimals: 8,
+          image:
+            "https://files.peakd.com/file/peakd-hive/jga/AJizr3uSbFj2e8s3k5LBeARYf7g8p4xUrRNbHGEwNuEm25sAykFpvkLMZiGNgvG.png",
+        },
+        {
+          network: "harbinger",
+          contractId: "12Y5vW6gk8GceH53YfRkRre2Rrcsgw7Naq",
+          nickname: "vhp",
+          symbol: "VHP",
+          decimals: 8,
+          image:
+            "https://files.peakd.com/file/peakd-hive/jga/AJdLAV524tVfwnkV7iCjPFE2HvArB8pDyLdNVZfEQYBUGhWJ7TMniKx8uYuoQyh.png",
+        },
+        ...otherTokens
+      ];
       return tokens;
     },
 

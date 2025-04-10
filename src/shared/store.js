@@ -55,8 +55,8 @@ export default new Vuex.Store({
       salt: "89c31dbb0175c54f2642ee582c610ff3",
       networks: storage.DEFAULT_NETWORKS,
       currentNetwork: storage.DEFAULT_CURRENT_NETWORK,
-      "mainnet-abi-15DJN4a8SgrbGhhGksSBASiSYjGnMU8dGL": utils.tokenAbi,
-      "harbinger-abi-19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ": utils.tokenAbi,
+      "mainnet-abi-19GYjDBVXU7keLbYvMLazsGQn3GTWHjHkK": utils.tokenAbi,
+      "harbinger-abi-1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y": utils.tokenAbi,
     },
     sandboxLoaded: false,
 
