@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.4](https://github.com/joticajulian/kondor/releases/tag/v1.2.4) (2025-04-10)
+
+### 🚀 Features
+
+- Warning for websites using old versions of kondor-js
+
+### 🐛 Bug Fixes
+
+- Update KOIN and VHP contract addresses after the new governance update.
+
 ## [v1.2.3](https://github.com/joticajulian/kondor/releases/tag/v1.2.3) (2025-01-20)
 
 ### 🐛 Bug Fixes
