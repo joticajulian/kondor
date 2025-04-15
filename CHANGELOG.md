@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.5](https://github.com/joticajulian/kondor/releases/tag/v1.2.5) (2025-04-15)
+
+### 🐛 Bug Fixes
+
+- Fix issue of loading tokens for new installations.
+
 ## [v1.2.4](https://github.com/joticajulian/kondor/releases/tag/v1.2.4) (2025-04-10)
 
 ### 🚀 Features
