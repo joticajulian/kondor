@@ -151,7 +151,9 @@ export default {
 
     async _getTokens(strict = false) {
       let tokens = await this._read("tokens", strict);
-      const otherTokens = tokens.filter(t => t.nickname !== "koin" && t.nickname !== "vhp");
+      const otherTokens = tokens
+        ? tokens.filter((t) => t.nickname !== "koin" && t.nickname !== "vhp")
+        : [];
       tokens = [
         {
           network: "mainnet",
@@ -199,7 +201,7 @@ export default {
           image:
             "https://files.peakd.com/file/peakd-hive/jga/AJdLAV524tVfwnkV7iCjPFE2HvArB8pDyLdNVZfEQYBUGhWJ7TMniKx8uYuoQyh.png",
         },
-        ...otherTokens
+        ...otherTokens,
       ];
       return tokens;
     },
