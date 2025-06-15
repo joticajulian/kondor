@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.6](https://github.com/joticajulian/kondor/releases/tag/v1.2.6) (2025-06-15)
+
+### 🐛 Bug Fixes
+
+- Update contract addresses for testnet.
+
 ## [v1.2.5](https://github.com/joticajulian/kondor/releases/tag/v1.2.5) (2025-04-15)
 
 ### 🐛 Bug Fixes
