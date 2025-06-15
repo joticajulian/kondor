@@ -91,7 +91,8 @@ export const DEFAULT_NETWORKS: Network[] = [
     },
     nicknamesContractId: "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR",
     // freeManaSharer: "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN",
-    freeManaSharer: "1A5ovJ6htWqnh8qDiXPQMuWmqxtVr2q3Gn",
+    // freeManaSharer: "1A5ovJ6htWqnh8qDiXPQMuWmqxtVr2q3Gn",
+    freeManaSharer: "1NDqFZLVJUtuY3FNii8ZAJ4kAiUnESur1n",
     manaMeter: "19jgVtCHfhzgzAWNVyRzhoH9G5aa9VTZCE",
   },
 ];

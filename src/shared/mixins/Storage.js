@@ -185,7 +185,7 @@ export default {
         },
         {
           network: "harbinger",
-          contractId: "1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y",
+          contractId: "1FaSvLjQJsCJKq5ybmGsMMQs8RQYyVv8ju",
           nickname: "koin",
           symbol: "tKOIN",
           decimals: 8,
@@ -194,7 +194,7 @@ export default {
         },
         {
           network: "harbinger",
-          contractId: "12Y5vW6gk8GceH53YfRkRre2Rrcsgw7Naq",
+          contractId: "17n12ktwN79sR6ia9DDgCfmw77EgpbTyBi",
           nickname: "vhp",
           symbol: "VHP",
           decimals: 8,
@@ -237,7 +237,7 @@ export default {
           return abiKapNameService;
         case "1KD9Es7LBBjA1FY3ViCgQJ7e6WH1ipKbhz":
           return abiNicknamesMainnet;
-        case "162GhJwsciDiKsgwzj2t6VoFHt3RMzGKdG":
+        case storage.DEFAULT_NETWORKS[0].freeManaSharer:
           return abiFreeManaSharer;
         default:
           break;
@@ -254,7 +254,7 @@ export default {
           return abiPobHarbinger;
         case "1KXsC2bSnKAMAZ51gq3xxKBo74a7cDJjkR":
           return abiNicknamesHarbinger;
-        case "1A5ovJ6htWqnh8qDiXPQMuWmqxtVr2q3Gn":
+        case storage.DEFAULT_NETWORKS[1].freeManaSharer:
           return abiFreeManaSharer;
         default:
           break;
