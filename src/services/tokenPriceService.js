@@ -128,10 +128,10 @@ export async function fetchTokenPrices(accountAddress) {
   let result = { tokens: [], errors: [] };
 
   try {
-    const cachedPrices = await getCachedPrices(accountAddress);
+    /* const cachedPrices = await getCachedPrices(accountAddress);
     if (cachedPrices) {
       return cachedPrices;
-    }
+    } */
 
     console.log("Fetching fresh prices");
     // Fetch token list and KOIN/USDT price in parallel
