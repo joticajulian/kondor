@@ -335,9 +335,9 @@ export default {
       if (this.network.tag === "mainnet" && t.nickname === "koin") {
         try {
           const response = await axios.get(
-            "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
+            "https://api.mexc.com/api/v3/ticker/price?symbol=KOINUSDT"
           );
-          const price = Number(response.data.data[0].last);
+          const price = Number(response.data.price);
           const balanceSatoshisNumber = Number(balanceSatoshis);
           balanceUSD = `$${(balanceSatoshisNumber * price).toFixed(2)} USD`;
         } catch (error) {

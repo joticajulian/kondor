@@ -27,6 +27,13 @@ async function fetchTokenList() {
   }
 }
 
+async function fetchKoinPriceMexc() {
+  const url = "https://api.mexc.com/api/v3/ticker/price?symbol=KOINUSDT";
+  const response = await fetch(url);
+  const data = await response.json();
+  return parseFloat(data.price);
+}
+
 async function fetchPrice(baseAddress, quoteAddress) {
   console.log(`Fetching price for ${baseAddress}/${quoteAddress}...`);
   const url = `${PRICE_API_BASE_URL}/${baseAddress}/${quoteAddress}/get_quote/1`;
@@ -129,8 +136,8 @@ export async function fetchTokenPrices(accountAddress) {
     console.log("Fetching fresh prices");
     // Fetch token list and KOIN/USDT price in parallel
     const [tokens, koinUsdtPrice] = await Promise.all([
-      fetchTokenList(),
-      fetchPrice(KOIN_ADDRESS, CHAINGE_USDT_ADDRESS),
+      [],// fetchTokenList(), // TODO: the price discovery from koindx is not working
+      fetchKoinPriceMexc(),
     ]);
 
     if (koinUsdtPrice === null) {

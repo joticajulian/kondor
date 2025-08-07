@@ -184,9 +184,9 @@ export default {
       if (this.network.tag === "mainnet" && t.nickname === "koin") {
         try {
           const response = await axios.get(
-            "https://www.mexc.com/open/api/v2/market/ticker?symbol=koin_usdt"
+            "https://api.mexc.com/api/v3/ticker/price?symbol=KOINUSDT"
           );
-          price = parseFloat(response.data.data[0].last);
+          price = parseFloat(response.data.price);
           const balanceNumber = Number(balance);
           balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
           this.tokenPrices[t.symbol] = price;
