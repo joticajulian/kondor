@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.7](https://github.com/joticajulian/kondor/releases/tag/v1.2.7) (2025-08-07)
+
+### 🐛 Bug Fixes
+
+- Update KOIN price from MEXC.
+- The price discovery from KoinDX has been disabled due to issues with the API.
+- The cached price has been disabled.
+
 ## [v1.2.6](https://github.com/joticajulian/kondor/releases/tag/v1.2.6) (2025-06-15)
 
 ### 🐛 Bug Fixes
