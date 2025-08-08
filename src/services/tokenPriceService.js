@@ -136,7 +136,7 @@ export async function fetchTokenPrices(accountAddress) {
     console.log("Fetching fresh prices");
     // Fetch token list and KOIN/USDT price in parallel
     const [tokens, koinUsdtPrice] = await Promise.all([
-      [],// fetchTokenList(), // TODO: the price discovery from koindx is not working
+      [{ address: "koin", symbol: "KOIN" }], // fetchTokenList(), // TODO: the price discovery from koindx is not working
       fetchKoinPriceMexc(),
     ]);
 
