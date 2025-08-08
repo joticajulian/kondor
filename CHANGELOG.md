@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.8](https://github.com/joticajulian/kondor/releases/tag/v1.2.8) (2025-08-08)
+
+### 🐛 Bug Fixes
+
+- Fix KOIN price from MEXC.
+
 ## [v1.2.7](https://github.com/joticajulian/kondor/releases/tag/v1.2.7) (2025-08-07)
 
 ### 🐛 Bug Fixes
