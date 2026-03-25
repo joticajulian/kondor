@@ -1,12 +1,52 @@
 /* eslint-disable no-undef */
+import { Contract, Provider } from "koilib";
 import store from "../shared/store";
 import {
   CHAINGE_USDT_ADDRESS,
   TOKEN_LIST_URL,
   PRICE_API_BASE_URL,
+  KOINDX_VUSD_KOIN_PAIR,
 } from "../../lib/storage.js";
 
 const KOIN_ADDRESS = "koin";
+
+const koindxPairAbi = {
+  methods: {
+    get_reserves: {
+      entry_point: 0x6d0c5abf,
+      argument: "pair.get_reserves_arguments",
+      return: "pair.get_reserves_result",
+      read_only: true,
+    },
+  },
+  koilib_types: {
+    nested: {
+      pair: {
+        nested: {
+          get_reserves_arguments: {
+            fields: {},
+          },
+          get_reserves_result: {
+            fields: {
+              reserve_a: {
+                type: "uint64",
+                id: 1,
+                options: { jstype: "JS_STRING" },
+              },
+              reserve_b: {
+                type: "uint64",
+                id: 2,
+                options: { jstype: "JS_STRING" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+const MAINNET_RPC = "https://api.koinos.io";
 
 async function fetchTokenList() {
   try {
@@ -27,11 +67,27 @@ async function fetchTokenList() {
   }
 }
 
-async function fetchKoinPriceMexc() {
-  const url = "https://api.mexc.com/api/v3/ticker/price?symbol=KOINUSDT";
-  const response = await fetch(url);
-  const data = await response.json();
-  return parseFloat(data.price);
+export async function fetchKoinPriceKoindx() {
+  const provider = new Provider(MAINNET_RPC);
+  const pairContract = new Contract({
+    id: KOINDX_VUSD_KOIN_PAIR,
+    abi: koindxPairAbi,
+    provider,
+  });
+  const { result } = await pairContract.functions.get_reserves();
+  if (!result || !result.reserve_a || !result.reserve_b) {
+    throw new Error("Failed to get reserves from KoinDX pair contract");
+  }
+  const reserveA = parseFloat(result.reserve_a);
+  const reserveB = parseFloat(result.reserve_b);
+  if (reserveA === 0) {
+    throw new Error("Reserve A is zero, cannot compute price");
+  }
+  const price = reserveB / reserveA;
+  console.log(
+    `KOIN price from KoinDX: ${price} (reserve_a=${result.reserve_a}, reserve_b=${result.reserve_b})`
+  );
+  return price;
 }
 
 async function fetchPrice(baseAddress, quoteAddress) {
@@ -136,8 +192,8 @@ export async function fetchTokenPrices(accountAddress) {
     console.log("Fetching fresh prices");
     // Fetch token list and KOIN/USDT price in parallel
     const [tokens, koinUsdtPrice] = await Promise.all([
-      [{ address: "koin", symbol: "KOIN" }], // fetchTokenList(), // TODO: the price discovery from koindx is not working
-      fetchKoinPriceMexc(),
+      [{ address: "koin", symbol: "KOIN" }], // fetchTokenList(),
+      fetchKoinPriceKoindx(),
     ]);
 
     if (koinUsdtPrice === null) {

@@ -28,6 +28,7 @@ export const TOKEN_LIST_URL =
   "https://raw.githubusercontent.com/koindx/token-list/refs/heads/main/src/tokens/mainnet.json";
 export const PRICE_API_BASE_URL =
   "https://koinoscollective.org/api/koindx/pair";
+export const KOINDX_VUSD_KOIN_PAIR = "1E8AjPZxKLJGFouXtNNkPcYxAgsTh4AUTN";
 
 export async function setCurrentNetwork(currentNetwork: string): Promise<void> {
   return write("currentNetwork", currentNetwork);
