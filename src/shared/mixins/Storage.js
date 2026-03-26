@@ -151,6 +151,9 @@ export default {
 
     async _getTokens(strict = false) {
       let tokens = await this._read("tokens", strict);
+      if (!Array.isArray(tokens) && typeof tokens === "object") {
+        tokens = Object.values(tokens);
+      }
       const otherTokens = tokens
         ? tokens.filter((t) => t.nickname !== "koin" && t.nickname !== "vhp")
         : [];
