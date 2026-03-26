@@ -8,7 +8,7 @@ Kondor is a Chrome browser extension (Manifest V3) wallet for the Koinos Blockch
 
 ### Critical: Node.js OpenSSL compatibility
 
-This project uses Webpack 4 and Vue CLI 4, which rely on legacy OpenSSL hash functions. On Node.js 17+, you **must** set `NODE_OPTIONS=--openssl-legacy-provider` before running any build or dev command. This is already configured in `~/.bashrc` for cloud agents.
+This project uses Webpack 4 and Vue CLI 4, which rely on legacy OpenSSL hash functions. Build/dev/lint scripts now run through `scripts/run-with-openssl-legacy.js`, which automatically injects `--openssl-legacy-provider` on Node.js 17+ (including Node 18/20/22). Manual `NODE_OPTIONS` export is not required.
 
 ### Development workflow (SPA / test mode)
 
