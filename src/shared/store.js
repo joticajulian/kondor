@@ -1,12 +1,9 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 import { utils } from "koilib";
 import * as storage from "../../lib/storage";
 import { fetchTokenPrices } from "../services/tokenPriceService";
-
-Vue.use(Vuex);
-
-export default new Vuex.Store({
+ 
+export default createStore({
   state: {
     password: "",
     mnemonic: null,

@@ -630,7 +630,7 @@ export default {
         await transaction.pushOperation(contract.transfer, {
           from: this.address,
           to: this.resolvedAddress || this.to,
-          value: utils.parseUnits(this.amount, this.tokenDecimals),
+          value: utils.parseUnits(String(this.amount), this.tokenDecimals),
           memo: this.memo,
         });
 
