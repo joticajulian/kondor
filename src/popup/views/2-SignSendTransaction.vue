@@ -1651,11 +1651,11 @@ export default {
     },
 
     toggleViewMoreOperation(i) {
-      this.$set(this.operations[i], "viewMore", !this.operations[i].viewMore);
+      this.operations[i].viewMore = !this.operations[i].viewMore;
     },
 
     toggleViewMoreEvent(i) {
-      this.$set(this.events[i], "viewMore", !this.events[i].viewMore);
+      this.events[i].viewMore = !this.events[i].viewMore;
     },
 
     toggleAdvanced() {
