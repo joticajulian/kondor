@@ -136,8 +136,8 @@
   </div>
 </template>
 <script>
-import axios from "axios";
 import { Contract, Provider, Signer, Transaction, utils } from "koilib";
+import { fetchKoinPriceKoindx } from "@/services/tokenPriceService";
 import router from "@/index/router";
 import ViewHelper from "@/shared/mixins/ViewHelper";
 import Storage from "@/shared/mixins/Storage";
@@ -334,14 +334,11 @@ export default {
       let balanceUSD = "$0 USD";
       if (this.network.tag === "mainnet" && t.nickname === "koin") {
         try {
-          const response = await axios.get(
-            "https://api.mexc.com/api/v3/ticker/price?symbol=KOINUSDT"
-          );
-          const price = Number(response.data.price);
+          const price = await fetchKoinPriceKoindx();
           const balanceSatoshisNumber = Number(balanceSatoshis);
           balanceUSD = `$${(balanceSatoshisNumber * price).toFixed(2)} USD`;
         } catch (error) {
-          console.error("Error when loading price from MEXC");
+          console.error("Error when loading price from KoinDX");
           console.error(error);
           balanceUSD = "USD Error";
         }

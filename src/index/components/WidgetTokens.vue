@@ -16,9 +16,9 @@
 </template>
 
 <script>
-import axios from "axios";
 import router from "@/index/router";
 import { Contract, Provider, Signer, utils } from "koilib";
+import { fetchKoinPriceKoindx } from "@/services/tokenPriceService";
 import emptyToken from "@/shared/assets/empty-token.png";
 import WalletInfo from "./WalletInfo.vue";
 import TabPanel from "./TabPanel.vue";
@@ -183,17 +183,14 @@ export default {
       let balanceUSD = "$0 USD";
       if (this.network.tag === "mainnet" && t.nickname === "koin") {
         try {
-          const response = await axios.get(
-            "https://api.mexc.com/api/v3/ticker/price?symbol=KOINUSDT"
-          );
-          price = parseFloat(response.data.price);
+          price = await fetchKoinPriceKoindx();
           const balanceNumber = Number(balance);
           balanceUSD = `$${(balanceNumber * price).toFixed(2)} USD`;
           this.tokenPrices[t.symbol] = price;
           console.log(`USD price loaded for ${t.nickname}:`, price);
         } catch (error) {
           console.error(
-            `Error when loading price for ${t.nickname} from MEXC API:`,
+            `Error when loading price for ${t.nickname} from KoinDX:`,
             error
           );
           balanceUSD = "USD Price Unavailable";
