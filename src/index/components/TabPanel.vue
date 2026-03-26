@@ -200,6 +200,13 @@
             </span>
           </div>
         </div>
+        <button
+          class="configure-tokens-button"
+          @click="openTokenSettings"
+        >
+          <span class="material-icons">tune</span>
+          Configure tokens
+        </button>
       </div>
     </div>
   </div>
@@ -570,6 +577,10 @@ export default {
       return price.toFixed(4);
     },
 
+    openTokenSettings() {
+      this.$router.push({ name: "Token Settings" });
+    },
+
     async refreshPrices() {
       this.isLoadingPrices = true;
       await this.fetchTokenPrices();
@@ -840,24 +851,23 @@ export default {
   color: var(--primary-gray);
 }
 
-.manage-tokens {
+.configure-tokens-button {
+  margin-top: 0.5em;
+  width: 100%;
+  border: 1px solid #3b3b3b;
+  background-color: transparent;
+  color: var(--primary-light);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 15px;
-  margin-top: 10px;
-  cursor: pointer;
+  gap: 0.4em;
+  padding: 0.8em 1em;
 }
 
-.settings-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-}
-
-.manage-tokens span {
-  color: var(--primary-gray);
-  font-size: 14px;
+.configure-tokens-button:hover {
+  border-color: var(--kondor-purple);
+  color: var(--kondor-purple);
 }
 
 .transaction-id {
