@@ -1,3 +1,5 @@
+import { newSandboxSerializer, sendSandbox } from "../utils/sandboxSerializer";
+
 /**
  * Mixin to communicate with sandbox html
  *
@@ -15,12 +17,6 @@
  *   communicates with public/sandbox.html which is loaded in the
  *   App (see App.vue on each page) as an iframe.
  */
-
-function toHexString(buffer) {
-  return Array.from(buffer)
-    .map((n) => `0${Number(n).toString(16)}`.slice(-2))
-    .join("");
-}
 
 export default {
   name: "Sandbox mixin",
@@ -42,44 +38,7 @@ export default {
      * id, command, args.
      */
     async sendSandbox(command, args) {
-      const iframeSandbox = document.getElementById("sandbox");
-      while (!this.$store.state.sandboxLoaded) {
-        await new Promise((r) => setTimeout(r, 20));
-      }
-      const reqId = crypto.randomUUID();
-      return await new Promise((resolve, reject) => {
-        // prepare the listener
-        const listener = (event) => {
-          // ignore requests
-          if (event.data.command) return;
-
-          const { id, result, error } = event.data;
-
-          // ignore different ids
-          if (id !== reqId) return;
-
-          // send response
-          if (error) {
-            reject(new Error(error));
-          } else {
-            resolve(result);
-          }
-          window.removeEventListener("message", listener);
-        };
-
-        // listen
-        window.addEventListener("message", listener);
-
-        // send request
-        iframeSandbox.contentWindow.postMessage(
-          {
-            id: reqId,
-            command,
-            args,
-          },
-          "*"
-        );
-      });
+      return sendSandbox(command, args, this.$store);
     },
 
     /**
@@ -87,27 +46,7 @@ export default {
      * as a proxy to a serializer located in the sandbox
      */
     async newSandboxSerializer(...constructorArgs) {
-      const serId = toHexString(
-        window.crypto.getRandomValues(new Uint8Array(5))
-      );
-      await this.sendSandbox("newSerializer", {
-        serId,
-        serArgs: constructorArgs,
-      });
-      return {
-        serialize: async (...serArgs) => {
-          return this.sendSandbox("serialize", {
-            serId,
-            serArgs,
-          });
-        },
-        deserialize: async (...serArgs) => {
-          return this.sendSandbox("deserialize", {
-            serId,
-            serArgs,
-          });
-        },
-      };
+      return newSandboxSerializer(this.$store, ...constructorArgs);
     },
   },
 };
