@@ -49,6 +49,10 @@ Setup the project by installing dependencies:
 yarn install
 ```
 
+> Node.js compatibility: this project supports Node.js 18+.
+> For Node.js 17+ (including 18, 20, 22), build/dev scripts automatically inject
+> `--openssl-legacy-provider` when needed, so no manual `NODE_OPTIONS` export is required.
+
 ### Run as Single-Page Application
 
 When testing in localhost we need a proxy server to avoid the issues with cors. Start the server that adds the corresponding headers:
