@@ -14,6 +14,15 @@ export default {
   mixins: [Sandbox],
 
   mounted() {
+    const hasExtensionRuntime =
+      typeof chrome !== "undefined" &&
+      chrome.runtime &&
+      chrome.runtime.onMessage &&
+      chrome.runtime.sendMessage;
+
+    // In SPA/test mode there is no extension runtime available.
+    if (!hasExtensionRuntime) return;
+
     this.messenger = new Messenger({
       onExtensionRequest: async (message, id, sender) => {
         const { command, args, to } = message;
@@ -74,11 +83,14 @@ export default {
       },
     });
 
-    this.returnPopupReady();
+    this.returnPopupReady().catch((error) => {
+      console.error("failed to return popup ready signal", error);
+    });
   },
 
   methods: {
     async returnPopupReady() {
+      if (!this.messenger) return;
       const tabId = await this.messenger.sendExtensionMessage(
         "background",
         "getTab"
@@ -87,7 +99,9 @@ export default {
     },
 
     sendResponse(type, message, requester) {
-      this.messenger.sendResponse(type, message, requester);
+      if (this.messenger) {
+        this.messenger.sendResponse(type, message, requester);
+      }
 
       // remove request
       const index = this.$store.state.requests.findIndex(
