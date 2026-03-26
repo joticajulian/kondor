@@ -14,28 +14,37 @@ const koindxPairAbi = {
   methods: {
     get_reserves: {
       entry_point: 0x6d0c5abf,
-      argument: "pair.get_reserves_arguments",
-      return: "pair.get_reserves_result",
+      argument: "core.get_reserves_arguments",
+      return: "core.get_reserves_result",
       read_only: true,
     },
   },
   koilib_types: {
     nested: {
-      pair: {
+      core: {
         nested: {
           get_reserves_arguments: {
             fields: {},
           },
           get_reserves_result: {
             fields: {
-              reserve_a: {
-                type: "uint64",
+              kLast: {
+                type: "string",
                 id: 1,
-                options: { jstype: "JS_STRING" },
               },
-              reserve_b: {
+              reserveA: {
                 type: "uint64",
                 id: 2,
+                options: { jstype: "JS_STRING" },
+              },
+              reserveB: {
+                type: "uint64",
+                id: 3,
+                options: { jstype: "JS_STRING" },
+              },
+              blockTime: {
+                type: "uint64",
+                id: 4,
                 options: { jstype: "JS_STRING" },
               },
             },
@@ -75,17 +84,17 @@ export async function fetchKoinPriceKoindx() {
     provider,
   });
   const { result } = await pairContract.functions.get_reserves();
-  if (!result || !result.reserve_a || !result.reserve_b) {
+  if (!result || !result.reserveA || !result.reserveB) {
     throw new Error("Failed to get reserves from KoinDX pair contract");
   }
-  const reserveA = parseFloat(result.reserve_a);
-  const reserveB = parseFloat(result.reserve_b);
+  const reserveA = parseFloat(result.reserveA);
+  const reserveB = parseFloat(result.reserveB);
   if (reserveA === 0) {
     throw new Error("Reserve A is zero, cannot compute price");
   }
   const price = reserveB / reserveA;
   console.log(
-    `KOIN price from KoinDX: ${price} (reserve_a=${result.reserve_a}, reserve_b=${result.reserve_b})`
+    `KOIN price from KoinDX: ${price} (reserveA=${result.reserveA}, reserveB=${result.reserveB})`
   );
   return price;
 }
