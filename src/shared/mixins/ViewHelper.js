@@ -12,7 +12,7 @@ export default {
   },
 
   created() {
-    switch (router.currentRoute.path) {
+    switch (router.currentRoute.value.path) {
     case "/":
       this.$store.state.showBackButton = false;
       this.$store.state.showCurrentNetwork = false;

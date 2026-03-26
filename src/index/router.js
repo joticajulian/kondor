@@ -1,5 +1,4 @@
-import Vue from "vue";
-import Router from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import Welcome from "./views/1-Welcome.vue";
 import NewWallet from "./views/2-NewWallet.vue";
 import ImportSeedPhrase from "./views/3a-ImportSeedPhrase";
@@ -18,9 +17,8 @@ import TokenSettings from "./views/tokens/Settings";
 import AddToken from "./views/tokens/AddToken";
 import AccountHistory from "./views/AccountHistory.vue";
 
-Vue.use(Router);
-
-export default new Router({
+export default createRouter({
+  history: createWebHashHistory(),
   routes: [
     {
       path: "/",

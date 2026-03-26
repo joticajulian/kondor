@@ -37,7 +37,7 @@ export default {
     },
     "$store.state.accounts": function () {
       if (
-        router.currentRoute.path !== "/" &&
+        router.currentRoute.value.path !== "/" &&
         this.$store.state.accounts.length === 0
       )
         router.push("/");
@@ -46,7 +46,7 @@ export default {
 
   mounted() {
     if (
-      router.currentRoute.path !== "/" &&
+      router.currentRoute.value.path !== "/" &&
       this.$store.state.accounts.length === 0
     )
       router.push("/");
@@ -120,4 +120,3 @@ export default {
   color: var(--kondor-light);
 }
 </style>
-Last edited 8 minutes ago Claude

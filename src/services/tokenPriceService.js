@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import { Contract, Provider } from "koilib";
 import store from "../shared/store";
+import { newSandboxSerializer } from "../shared/utils/sandboxSerializer";
 import {
   CHAINGE_USDT_ADDRESS,
   TOKEN_LIST_URL,
@@ -89,10 +90,15 @@ async function fetchTokenList() {
 
 export async function fetchKoinPriceKoindx() {
   const provider = new Provider(getMainnetRpcNodes());
+  const serializer = await newSandboxSerializer(
+    store,
+    koindxPairAbi.koilib_types
+  );
   const pairContract = new Contract({
     id: KOINDX_VUSD_KOIN_PAIR,
     abi: koindxPairAbi,
     provider,
+    serializer,
   });
   const { result } = await pairContract.functions.get_reserves();
   if (!result || !result.reserveA || !result.reserveB) {
