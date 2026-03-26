@@ -6,6 +6,7 @@ import {
   TOKEN_LIST_URL,
   PRICE_API_BASE_URL,
   KOINDX_VUSD_KOIN_PAIR,
+  DEFAULT_NETWORKS,
 } from "../../lib/storage.js";
 
 const KOIN_ADDRESS = "koin";
@@ -55,7 +56,17 @@ const koindxPairAbi = {
   },
 };
 
-const MAINNET_RPC = "https://api.koinos.io";
+function getMainnetRpcNodes() {
+  const networks = store.state.networks;
+  if (networks && networks.length > 0) {
+    const mainnet = networks.find((n) => n.tag === "mainnet");
+    if (mainnet && mainnet.rpcNodes && mainnet.rpcNodes.length > 0) {
+      return mainnet.rpcNodes;
+    }
+  }
+  const defaultMainnet = DEFAULT_NETWORKS.find((n) => n.tag === "mainnet");
+  return defaultMainnet.rpcNodes;
+}
 
 async function fetchTokenList() {
   try {
@@ -77,7 +88,7 @@ async function fetchTokenList() {
 }
 
 export async function fetchKoinPriceKoindx() {
-  const provider = new Provider(MAINNET_RPC);
+  const provider = new Provider(getMainnetRpcNodes());
   const pairContract = new Contract({
     id: KOINDX_VUSD_KOIN_PAIR,
     abi: koindxPairAbi,
