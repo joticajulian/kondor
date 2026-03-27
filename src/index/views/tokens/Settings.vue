@@ -516,9 +516,10 @@ h2 {
 }
 
 .token-card {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   gap: 0.8em;
-  align-items: flex-start;
+  align-items: start;
   border: 1px solid #343434;
   border-radius: 12px;
   padding: 0.8em;
@@ -533,7 +534,7 @@ h2 {
 }
 
 .token-info {
-  flex: 1;
+  width: 100%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -561,12 +562,15 @@ h2 {
 
 .token-value {
   color: var(--primary-light);
-  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .remove-button {
+  grid-column: 1 / -1;
+  justify-self: end;
   min-width: 5.4em;
-  margin-top: auto;
+  margin-top: 0.2em;
 }
 
 .danger {
