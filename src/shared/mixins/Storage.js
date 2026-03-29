@@ -420,16 +420,16 @@ export default {
       const { canRemove, reason } = this._getAccountRemovalInfo(index, accounts);
       if (!canRemove) throw new Error(reason || "Account cannot be removed");
 
-      const [removedAccount] = accounts.splice(index, 1);
+      const removedAccount = accounts[index];
+      if (!removedAccount) throw new Error("Account not found");
       const encryptedAccounts = (await this._getAccounts()) || [];
-      let encryptedIndex = index;
-      if (encryptedAccounts[index]?.address !== removedAccount.address) {
-        encryptedIndex = encryptedAccounts.findIndex(
-          (acc) => acc.address === removedAccount.address
-        );
-      }
+      const encryptedIndex = encryptedAccounts.findIndex(
+        (acc) => acc.address === removedAccount.address
+      );
       if (encryptedIndex < 0)
         throw new Error("Unable to find account in encrypted storage");
+
+      accounts.splice(index, 1);
       encryptedAccounts.splice(encryptedIndex, 1);
       await this._setAccounts(encryptedAccounts);
 
