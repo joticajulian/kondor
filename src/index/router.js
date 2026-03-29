@@ -10,6 +10,7 @@ import Signers from "./views/5-Signers.vue";
 import CreateAccount from "./views/setting-CreateAccount";
 import ImportAccount from "./views/setting-ImportAccount";
 import UpdateAccount from "./views/setting-UpdateAccount";
+import ConfirmRemoveAccount from "./views/setting-ConfirmRemoveAccount";
 import Buy from "./views/action-Buy";
 import SendToken from "./views/tokens/SendToken";
 import ReceiveToken from "./views/tokens/ReceiveToken";
@@ -74,6 +75,11 @@ export default createRouter({
       path: "/updateAccount",
       name: "Update Account",
       component: UpdateAccount,
+    },
+    {
+      path: "/confirmRemoveAccount",
+      name: "Confirm Remove Account",
+      component: ConfirmRemoveAccount,
     },
     {
       path: "/buy",

@@ -117,20 +117,10 @@ export default {
         );
         const account = this.$store.state.accounts[storeAccId];
         if (!account) throw new Error("Account not found");
-
-        const approved = window.confirm(
-          `Remove "${account.name}" (${account.address})?`
-        );
-        if (!approved) return;
-
-        await this._removeAccount(storeAccId);
-        this.alertSuccess("Account removed");
-
-        if (this.$store.state.accounts.length === 0) {
-          router.push("/");
-          return;
-        }
-        router.push("/dashboard");
+        router.push({
+          path: "/confirmRemoveAccount",
+          query: { address: account.address },
+        });
       } catch (error) {
         this.alertDanger(error.message);
         throw error;
