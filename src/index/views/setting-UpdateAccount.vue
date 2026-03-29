@@ -63,7 +63,7 @@ export default {
     return {
       name: "",
       encryptedAccounts: [],
-      accId: undefined,
+      accountAddress: "",
       canRemove: false,
       removeDisabledReason: "",
     };
@@ -71,13 +71,19 @@ export default {
 
   async mounted() {
     const { address } = this.$route.query;
+    if (!address) throw new Error("Account address is required");
+    this.accountAddress = address;
     this.encryptedAccounts = (await this._getAccounts()) || [];
-    this.accId = this.encryptedAccounts.findIndex(
-      (acc) => acc.address === address
+    const encryptedAccId = this.encryptedAccounts.findIndex(
+      (acc) => acc.address === this.accountAddress
     );
-    if (this.accId < 0) throw new Error("Account not found");
-    this.name = this.encryptedAccounts[this.accId].name;
-    const removalInfo = this._getAccountRemovalInfo(this.accId);
+    const storeAccId = this.$store.state.accounts.findIndex(
+      (acc) => acc.address === this.accountAddress
+    );
+    if (encryptedAccId < 0 || storeAccId < 0) throw new Error("Account not found");
+
+    this.name = this.encryptedAccounts[encryptedAccId].name;
+    const removalInfo = this._getAccountRemovalInfo(storeAccId);
     this.canRemove = removalInfo.canRemove;
     this.removeDisabledReason = removalInfo.reason;
   },
@@ -86,8 +92,16 @@ export default {
     async accept() {
       try {
         if (!this.name) throw new Error("No name defined");
-        this.$store.state.accounts[this.accId].name = this.name;
-        this.encryptedAccounts[this.accId].name = this.name;
+        const storeAccId = this.$store.state.accounts.findIndex(
+          (acc) => acc.address === this.accountAddress
+        );
+        const encryptedAccId = this.encryptedAccounts.findIndex(
+          (acc) => acc.address === this.accountAddress
+        );
+        if (storeAccId < 0 || encryptedAccId < 0)
+          throw new Error("Account not found");
+        this.$store.state.accounts[storeAccId].name = this.name;
+        this.encryptedAccounts[encryptedAccId].name = this.name;
         await this._setAccounts(this.encryptedAccounts);
         this.alertSuccess("Account updated");
         router.back();
@@ -98,7 +112,10 @@ export default {
     },
     async removeAccount() {
       try {
-        const account = this.$store.state.accounts[this.accId];
+        const storeAccId = this.$store.state.accounts.findIndex(
+          (acc) => acc.address === this.accountAddress
+        );
+        const account = this.$store.state.accounts[storeAccId];
         if (!account) throw new Error("Account not found");
 
         const approved = window.confirm(
@@ -106,7 +123,7 @@ export default {
         );
         if (!approved) return;
 
-        await this._removeAccount(this.accId);
+        await this._removeAccount(storeAccId);
         this.alertSuccess("Account removed");
 
         if (this.$store.state.accounts.length === 0) {
