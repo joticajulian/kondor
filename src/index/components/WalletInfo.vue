@@ -35,13 +35,6 @@
         </span>
         Receive
       </button>
-      <button
-        class="action-button add-token"
-        @click="navigateToAddToken"
-      >
-        <span class="icon">+</span>
-        Add Token
-      </button>
     </div>
   </div>
 </template>
@@ -85,11 +78,6 @@ export default {
       this.$router.push({
         name: "Receive Token",
         params: { tokenId: tokenId },
-      });
-    },
-    navigateToAddToken() {
-      this.$router.push({
-        name: "Add Token",
       });
     },
   },
@@ -177,7 +165,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 30%;
+  flex: 1;
+  width: auto;
 }
 
 .action-button .icon {
