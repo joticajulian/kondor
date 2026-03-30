@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.3.0](https://github.com/joticajulian/kondor/releases/tag/v1.3.0) (2026-03-30)
+
+### 🚀 Features
+
+- The dependencies were updated and now it uses Vue 3
+- Option to update/remove accounts
+- Koin price obtained from the KOIN/vUSD pair instead of MEXC
+- The page to configure tokens were renovated
+
 ## [v1.2.8](https://github.com/joticajulian/kondor/releases/tag/v1.2.8) (2025-08-08)
 
 ### 🐛 Bug Fixes
