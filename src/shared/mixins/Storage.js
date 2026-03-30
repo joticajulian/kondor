@@ -373,6 +373,79 @@ export default {
       await this._setAccounts(encryptedAccounts);
     },
 
+    _getAccountRemovalInfo(index, accounts = this.$store.state.accounts) {
+      if (!Array.isArray(accounts) || accounts.length === 0) {
+        return {
+          canRemove: false,
+          reason: "No accounts found",
+        };
+      }
+      if (index < 0 || index >= accounts.length) {
+        return {
+          canRemove: false,
+          reason: "Account not found",
+        };
+      }
+
+      const account = accounts[index];
+      // Imported/watch accounts do not have a derivation path.
+      if (!account.keyPath) {
+        return {
+          canRemove: true,
+          reason: "",
+        };
+      }
+
+      let lastDerivedIndex = -1;
+      accounts.forEach((acc, i) => {
+        if (acc.keyPath) lastDerivedIndex = i;
+      });
+
+      if (index === lastDerivedIndex) {
+        return {
+          canRemove: true,
+          reason: "",
+        };
+      }
+
+      return {
+        canRemove: false,
+        reason:
+          "This account is derived from the seed phrase. Remove newer derived accounts first.",
+      };
+    },
+
+    async _removeAccount(index) {
+      const accounts = this.$store.state.accounts;
+      const { canRemove, reason } = this._getAccountRemovalInfo(index, accounts);
+      if (!canRemove) throw new Error(reason || "Account cannot be removed");
+
+      const removedAccount = accounts[index];
+      if (!removedAccount) throw new Error("Account not found");
+      const encryptedAccounts = (await this._getAccounts()) || [];
+      const encryptedIndex = encryptedAccounts.findIndex(
+        (acc) => acc.address === removedAccount.address
+      );
+      if (encryptedIndex < 0)
+        throw new Error("Unable to find account in encrypted storage");
+
+      accounts.splice(index, 1);
+      encryptedAccounts.splice(encryptedIndex, 1);
+      await this._setAccounts(encryptedAccounts);
+
+      let nextCurrentIndex = this.$store.state.currentIndexAccount;
+      if (accounts.length === 0) {
+        nextCurrentIndex = 0;
+      } else if (index < nextCurrentIndex) {
+        nextCurrentIndex -= 1;
+      } else if (nextCurrentIndex >= accounts.length) {
+        nextCurrentIndex = accounts.length - 1;
+      }
+
+      this.$store.state.currentIndexAccount = nextCurrentIndex;
+      await this._setCurrentIndexAccount(nextCurrentIndex);
+    },
+
     async _addSigner(params) {
       let { name, accIndex, privateKey, passwordId, watchMode, address } =
         params;
