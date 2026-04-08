@@ -459,11 +459,6 @@
       </div>
     </div>
 
-    <div class="warning-message">
-      Be careful of unknown contracts as they could be malicious. Please
-      interact only with contracts you trust.
-    </div>
-
     <div v-if="!unlocked">
       <Unlock
         @onUnlock="afterUnlocked()"
