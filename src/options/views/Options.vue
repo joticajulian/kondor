@@ -28,6 +28,16 @@
             <span class="sm-text">Seed phrase and private keys</span>
           </div>
         </span>
+        <span
+          class="tab"
+          :class="{ active: activeTab === 'authorizations' }"
+          @click="activeTab = 'authorizations'"
+        >
+          <div class="tab-detail">
+            <span class="lg-text">Authorizations</span>
+            <span class="sm-text">Manage auto-sign websites and functions</span>
+          </div>
+        </span>
       </div>
 
       <transition
@@ -172,6 +182,84 @@
             </div>
           </div>
         </div>
+        <div
+          v-else-if="activeTab === 'authorizations'"
+          key="authorizations"
+          class="settings-container"
+        >
+          <div class="top content">
+            <h2>Auto-sign authorizations</h2>
+            <p class="description">
+              Requests from authorized websites are signed directly when every
+              operation in the transaction matches one of these
+              contract/entry-point pairs.
+            </p>
+            <div
+              v-for="(authorization, i) in autoSignAuthorizations"
+              :key="`authorization-${i}`"
+              class="authorization-card"
+            >
+              <div class="input-group">
+                <div class="description">
+                  Website origin
+                </div>
+                <input
+                  v-model="authorization.origin"
+                  type="text"
+                  placeholder="https://example.com"
+                >
+              </div>
+              <div
+                v-for="(func, j) in authorization.functions"
+                :key="`authorization-function-${i}-${j}`"
+                class="authorization-function-row"
+              >
+                <input
+                  v-model="func.contractId"
+                  type="text"
+                  placeholder="Contract ID"
+                >
+                <input
+                  v-model="func.entryPoint"
+                  type="text"
+                  placeholder="Entry point"
+                >
+                <button
+                  class="small-danger-button"
+                  @click="removeAuthorizationFunction(i, j)"
+                >
+                  Remove
+                </button>
+              </div>
+              <div class="authorization-actions">
+                <button
+                  class="custom-button"
+                  @click="addAuthorizationFunction(i)"
+                >
+                  Add function
+                </button>
+                <button
+                  class="small-danger-button"
+                  @click="removeAuthorization(i)"
+                >
+                  Remove website
+                </button>
+              </div>
+            </div>
+            <button
+              class="custom-button"
+              @click="addAuthorization()"
+            >
+              Add website
+            </button>
+          </div>
+          <button
+            class="custom-button"
+            @click="updateAutoSignAuthorizations()"
+          >
+            Save authorizations
+          </button>
+        </div>
       </transition>
     </div>
   </div>
@@ -194,19 +282,61 @@ export default {
       accounts: [],
       networks: [],
       secretsVisible: false,
+      autoSignAuthorizations: [],
     };
   },
 
   mounted() {
     this.loadNetworks();
+    this.loadAutoSignAuthorizations();
   },
 
   methods: {
+    createNewAuthorization() {
+      return {
+        origin: "",
+        functions: [{ contractId: "", entryPoint: "" }],
+      };
+    },
+
+    normalizeOrigin(origin) {
+      const value = (origin || "").trim();
+      if (!value) return "";
+      try {
+        return new URL(value).origin;
+      } catch {
+        return value;
+      }
+    },
+
+    sanitizeAuthorizations(authorizations) {
+      return (authorizations || [])
+        .map((authorization) => {
+          const origin = this.normalizeOrigin(authorization.origin);
+          const functions = (authorization.functions || [])
+            .map((func) => ({
+              contractId: (func.contractId || "").trim(),
+              entryPoint: String(func.entryPoint || "").trim(),
+            }))
+            .filter((func) => func.contractId && func.entryPoint);
+          return { origin, functions };
+        })
+        .filter((authorization) => authorization.origin && authorization.functions.length);
+    },
+
     async loadNetworks() {
       this.networks = await this._getNetworks();
       this.networks.forEach((n) => {
         n.rpcNodesText = n.rpcNodes.join(",");
       });
+    },
+
+    async loadAutoSignAuthorizations() {
+      const authorizations = await this._getAutoSignAuthorizations();
+      this.autoSignAuthorizations = this.sanitizeAuthorizations(authorizations);
+      if (this.autoSignAuthorizations.length === 0) {
+        this.autoSignAuthorizations = [this.createNewAuthorization()];
+      }
     },
 
     async updateNetworks() {
@@ -221,6 +351,42 @@ export default {
         })
       );
       this.alertSuccess("Networks updated");
+    },
+
+    addAuthorization() {
+      this.autoSignAuthorizations.push(this.createNewAuthorization());
+    },
+
+    removeAuthorization(index) {
+      this.autoSignAuthorizations.splice(index, 1);
+      if (this.autoSignAuthorizations.length === 0) {
+        this.autoSignAuthorizations.push(this.createNewAuthorization());
+      }
+    },
+
+    addAuthorizationFunction(index) {
+      this.autoSignAuthorizations[index].functions.push({
+        contractId: "",
+        entryPoint: "",
+      });
+    },
+
+    removeAuthorizationFunction(authIndex, functionIndex) {
+      this.autoSignAuthorizations[authIndex].functions.splice(functionIndex, 1);
+      if (this.autoSignAuthorizations[authIndex].functions.length === 0) {
+        this.autoSignAuthorizations[authIndex].functions.push({
+          contractId: "",
+          entryPoint: "",
+        });
+      }
+    },
+
+    async updateAutoSignAuthorizations() {
+      const sanitized = this.sanitizeAuthorizations(this.autoSignAuthorizations);
+      await this._setAutoSignAuthorizations(sanitized);
+      this.autoSignAuthorizations =
+        sanitized.length > 0 ? sanitized : [this.createNewAuthorization()];
+      this.alertSuccess("Authorizations updated");
     },
 
     async viewSecrets() {
@@ -379,6 +545,35 @@ input {
   flex-direction: column;
   gap: 1em;
   width: 100%;
+}
+
+.authorization-card {
+  border: 1px solid var(--primary-dark-light);
+  border-radius: 0.7em;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+.authorization-function-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.7em;
+  margin-bottom: 0.7em;
+}
+
+.authorization-actions {
+  display: flex;
+  gap: 0.7em;
+  justify-content: flex-end;
+}
+
+.small-danger-button {
+  border: 1px solid var(--kondor-red);
+  background: transparent;
+  color: var(--kondor-red);
+  border-radius: 0.5em;
+  padding: 0.4em 0.8em;
+  cursor: pointer;
 }
 
 .tabs button {

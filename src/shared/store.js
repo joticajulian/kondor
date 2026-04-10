@@ -52,6 +52,7 @@ export default createStore({
       salt: "89c31dbb0175c54f2642ee582c610ff3",
       networks: storage.DEFAULT_NETWORKS,
       currentNetwork: storage.DEFAULT_CURRENT_NETWORK,
+      autoSignAuthorizations: [],
       "mainnet-abi-19GYjDBVXU7keLbYvMLazsGQn3GTWHjHkK": utils.tokenAbi,
       "harbinger-abi-1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y": utils.tokenAbi,
     },

@@ -57,6 +57,16 @@ export interface Network {
   manaMeter?: string;
 }
 
+export interface AutoSignFunctionAuthorization {
+  contractId: string;
+  entryPoint: string;
+}
+
+export interface AutoSignWebsiteAuthorization {
+  origin: string;
+  functions: AutoSignFunctionAuthorization[];
+}
+
 export const DEFAULT_NETWORKS: Network[] = [
   {
     name: "Koinos Mainnet",
@@ -146,4 +156,44 @@ export async function getNetworks(strict = true): Promise<Network[]> {
   });
 
   return networks!;
+}
+
+export async function setAutoSignAuthorizations(
+  authorizations: AutoSignWebsiteAuthorization[]
+): Promise<void> {
+  const sanitized = (authorizations || [])
+    .map((authorization) => {
+      const origin = (authorization.origin || "").trim();
+      const functions = (authorization.functions || [])
+        .map((f) => ({
+          contractId: (f.contractId || "").trim(),
+          entryPoint: String(f.entryPoint || "").trim(),
+        }))
+        .filter((f) => f.contractId && f.entryPoint);
+      return { origin, functions };
+    })
+    .filter((authorization) => authorization.origin && authorization.functions.length);
+  return write("autoSignAuthorizations", sanitized);
+}
+
+export async function getAutoSignAuthorizations(
+  strict = false
+): Promise<AutoSignWebsiteAuthorization[]> {
+  const authorizations = await read<AutoSignWebsiteAuthorization[]>(
+    "autoSignAuthorizations",
+    strict
+  );
+  if (!authorizations || !Array.isArray(authorizations)) return [];
+  return authorizations
+    .map((authorization) => {
+      const origin = (authorization.origin || "").trim();
+      const functions = (authorization.functions || [])
+        .map((f) => ({
+          contractId: (f.contractId || "").trim(),
+          entryPoint: String(f.entryPoint || "").trim(),
+        }))
+        .filter((f) => f.contractId && f.entryPoint);
+      return { origin, functions };
+    })
+    .filter((authorization) => authorization.origin && authorization.functions.length);
 }
