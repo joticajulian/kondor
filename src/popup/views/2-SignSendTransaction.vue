@@ -1736,10 +1736,9 @@ export default {
 
     getAuthorizedFunctionsFromOperations(operations) {
       if (!Array.isArray(operations)) return [];
-      const allCallContract = operations.every((operation) => operation.call_contract);
-      if (!allCallContract) return [];
       const uniqueFunctions = {};
       operations.forEach((operation) => {
+        if (!operation.call_contract) return;
         const contractId = String(operation.call_contract.contract_id || "").trim();
         const entryPoint = String(operation.call_contract.entry_point ?? "").trim();
         if (!contractId || !entryPoint) return;
