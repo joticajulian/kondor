@@ -9,8 +9,12 @@ import {
 } from "koilib";
 import { Messenger, Sender } from "kondor-js";
 import * as storage from "./storage";
-import { HDKoinos } from "./HDKoinos";
 import { toUint8Array } from "./utils";
+import {
+  decryptAccountsWithPassword,
+  DecryptedWalletAccount,
+  EncryptedWalletAccount,
+} from "./wallet";
 
 const EXPIRATION_ID = 30 * 60 * 1000; // 30 minutes
 
@@ -22,19 +26,6 @@ interface AutoSignRequestArgs {
     signerAddress?: string;
     transaction: TransactionJson;
   };
-}
-
-interface EncryptedAccount {
-  name: string;
-  address: string;
-  keyPath?: string;
-  encryptedPrivateKey?: string;
-}
-
-interface AccountWithPrivateKey {
-  name: string;
-  address: string;
-  privateKey: string;
 }
 
 const getIds = async () => {
@@ -186,51 +177,21 @@ async function decryptText(encrypted: string, password: string): Promise<string>
 
 async function getAccountsForAutoSign(
   password: string
-): Promise<AccountWithPrivateKey[]> {
-  const encryptedAccounts =
-    (await storage.read<EncryptedAccount[]>("accounts", false)) || [];
-  if (!encryptedAccounts.length) {
-    throw new Error("AUTO_SIGN_FALLBACK: no accounts found");
-  }
-  const encryptedMnemonic = await storage.read<string>("mnemonic0", false);
-  let hdKoinos: HDKoinos | null = null;
-  if (encryptedMnemonic) {
-    const mnemonic = await decryptText(encryptedMnemonic, password);
-    hdKoinos = new HDKoinos(mnemonic);
-  }
-
-  return Promise.all(
-    encryptedAccounts.map(async (account) => {
-      if (account.keyPath) {
-        if (!hdKoinos) {
-          throw new Error(
-            `AUTO_SIGN_FALLBACK: missing mnemonic for ${account.address}`
-          );
-        }
-        const derived = hdKoinos.deriveKey({
-          name: account.name,
-          keyPath: account.keyPath,
-          address: account.address,
-        });
-        return {
-          name: account.name,
-          address: account.address,
-          privateKey: derived.private.privateKey,
-        };
-      }
-      if (!account.encryptedPrivateKey) {
-        throw new Error(
-          `AUTO_SIGN_FALLBACK: account ${account.address} has no private key`
-        );
-      }
-      const privateKey = await decryptText(account.encryptedPrivateKey, password);
-      return {
-        name: account.name,
-        address: account.address,
-        privateKey,
-      };
-    })
+) {
+  const encryptedAccounts = await storage.read<EncryptedWalletAccount[]>(
+    "accounts",
+    false
   );
+  const encryptedMnemonic = await storage.read<string>("mnemonic0", false);
+  const { accounts } = await decryptAccountsWithPassword({
+    password,
+    encryptedMnemonic,
+    encryptedAccounts,
+    decryptText,
+    requirePrivateKey: true,
+    errorPrefix: "AUTO_SIGN_FALLBACK",
+  });
+  return accounts;
 }
 
 async function autoSignTransaction(
@@ -239,7 +200,7 @@ async function autoSignTransaction(
   const password = await readSession<string>("password0");
   if (!password) throw new Error("AUTO_SIGN_FALLBACK: wallet is locked");
 
-  let accounts: AccountWithPrivateKey[];
+  let accounts: DecryptedWalletAccount[];
   try {
     accounts = await getAccountsForAutoSign(password);
   } catch (error) {
