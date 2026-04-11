@@ -145,6 +145,21 @@ export default {
       return storage.getNetworks(strict);
     },
 
+    async _setAutoSignAuthorizations(authorizations) {
+      if (process.env.VUE_APP_ENV === "test") {
+        return this._write("autoSignAuthorizations", authorizations);
+      }
+      return storage.setAutoSignAuthorizations(authorizations);
+    },
+
+    async _getAutoSignAuthorizations(strict = false) {
+      if (process.env.VUE_APP_ENV === "test") {
+        const authorizations = await this._read("autoSignAuthorizations", strict);
+        return authorizations || [];
+      }
+      return storage.getAutoSignAuthorizations(strict);
+    },
+
     async _setTokens(tokens) {
       return this._write("tokens", tokens);
     },
