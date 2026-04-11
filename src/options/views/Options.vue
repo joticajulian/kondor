@@ -7,37 +7,51 @@
         </div>
       </header>
 
-      <div class="tabs">
-        <span
-          class="tab"
+      <div class="page-intro">
+        <h2>Settings</h2>
+        <p class="description">
+          Manage network, wallet, and transaction authorization preferences.
+        </p>
+      </div>
+
+      <div
+        class="tabs"
+        role="tablist"
+        aria-label="Settings sections"
+      >
+        <button
+          class="tab-pill"
           :class="{ active: activeTab === 'networks' }"
+          role="tab"
+          type="button"
+          :aria-selected="activeTab === 'networks'"
           @click="activeTab = 'networks'"
         >
-          <div class="tab-detail">
-            <span class="lg-text">Networks</span>
-            <span class="sm-text">Network configuration</span>
-          </div>
-        </span>
-        <span
-          class="tab"
+          <span class="tab-pill-title">Networks</span>
+          <span class="tab-pill-subtitle">Network configuration</span>
+        </button>
+        <button
+          class="tab-pill"
           :class="{ active: activeTab === 'wallet' }"
+          role="tab"
+          type="button"
+          :aria-selected="activeTab === 'wallet'"
           @click="activeTab = 'wallet'"
         >
-          <div class="tab-detail">
-            <span class="lg-text">Wallet</span>
-            <span class="sm-text">Seed phrase and private keys</span>
-          </div>
-        </span>
-        <span
-          class="tab"
+          <span class="tab-pill-title">Wallet</span>
+          <span class="tab-pill-subtitle">Seed phrase and private keys</span>
+        </button>
+        <button
+          class="tab-pill"
           :class="{ active: activeTab === 'authorizations' }"
+          role="tab"
+          type="button"
+          :aria-selected="activeTab === 'authorizations'"
           @click="activeTab = 'authorizations'"
         >
-          <div class="tab-detail">
-            <span class="lg-text">Authorizations</span>
-            <span class="sm-text">Manage auto-sign websites and functions</span>
-          </div>
-        </span>
+          <span class="tab-pill-title">Authorizations</span>
+          <span class="tab-pill-subtitle">Auto-sign websites and functions</span>
+        </button>
       </div>
 
       <transition
@@ -84,12 +98,14 @@
               </div>
             </div>
           </div>
-          <button
-            class="custom-button"
-            @click="updateNetworks()"
-          >
-            Update Networks
-          </button>
+          <div class="section-actions">
+            <button
+              class="custom-button primary action-button"
+              @click="updateNetworks()"
+            >
+              Save network changes
+            </button>
+          </div>
         </div>
 
         <div
@@ -246,19 +262,23 @@
                 </button>
               </div>
             </div>
+            <div class="section-actions left">
+              <button
+                class="custom-button secondary action-button auto-width"
+                @click="addAuthorization()"
+              >
+                Add website
+              </button>
+            </div>
+          </div>
+          <div class="section-actions">
             <button
-              class="custom-button"
-              @click="addAuthorization()"
+              class="custom-button primary action-button"
+              @click="updateAutoSignAuthorizations()"
             >
-              Add website
+              Save authorizations
             </button>
           </div>
-          <button
-            class="custom-button"
-            @click="updateAutoSignAuthorizations()"
-          >
-            Save authorizations
-          </button>
         </div>
       </transition>
     </div>
@@ -409,38 +429,64 @@ input {
   color: var(--primary-gray);
 }
 
-/* tabs */
+.page-intro {
+  margin-bottom: 1.2rem;
+}
+
+.page-intro h2 {
+  margin: 0;
+}
+
 .tabs {
   display: flex;
-  gap: 1em;
-  margin-bottom: 2em;
-  margin-bottom: 2em;
-  justify-content: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
-.tab {
+
+.tab-pill {
+  all: unset;
+  border: 1px solid var(--primary-dark-light);
+  background: #181818;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  min-width: 12rem;
   display: flex;
   flex-direction: column;
-  padding: 1em;
+  gap: 0.4rem;
   cursor: pointer;
-  border-radius: 0.5em;
-  transition: background-color 0.3s;
+  transition: border-color 0.2s ease, background-color 0.2s ease,
+    transform 0.2s ease;
 }
-.tab-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
+
+.tab-pill:hover {
+  border-color: var(--kondor-purple);
+  transform: translateY(-1px);
 }
-.lg-text {
-  font-size: 1.5em;
+
+.tab-pill.active {
+  background: var(--kondor-purple30);
+  border-color: var(--kondor-purple);
+}
+
+.tab-pill-title {
+  font-size: 1rem;
   font-weight: 600;
+  color: var(--primary-light);
 }
-.sm-text {
-  font-size: 1em;
+
+.tab-pill-subtitle {
+  font-size: 0.8rem;
+  color: var(--primary-gray);
 }
 .settings-container {
   display: flex;
   flex-direction: column;
-  gap: 2em;
+  gap: 1.4rem;
+  border: 1px solid var(--primary-dark-light);
+  border-radius: 0.9rem;
+  padding: 1.2rem;
+  background: #171717;
 }
 .container {
   margin: 0;
@@ -548,10 +594,11 @@ input {
 }
 
 .authorization-card {
-  border: 1px solid var(--primary-dark-light);
+  border: 1px solid #3a3a3a;
   border-radius: 0.7em;
   padding: 1em;
-  margin-bottom: 1em;
+  margin-bottom: 0.8em;
+  background: #131313;
 }
 
 .authorization-function-row {
@@ -564,7 +611,8 @@ input {
 .authorization-actions {
   display: flex;
   gap: 0.7em;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .small-danger-button {
@@ -576,21 +624,25 @@ input {
   cursor: pointer;
 }
 
-.tabs button {
-  padding: 0.5em 1em;
-  font-size: 1em;
-  background-color: #333333;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.section-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
-.tabs button.active {
-  background-color: #444444;
+.section-actions.left {
+  justify-content: flex-start;
 }
 
-.tabs button:hover {
-  background-color: #555555;
+.action-button {
+  width: auto;
+  min-width: 12rem;
+  margin: 0;
+  height: auto;
+}
+
+.auto-width {
+  min-width: auto;
 }
 
 /* Transition styles */
@@ -607,6 +659,7 @@ input {
 @media (max-width: 768px) {
   .inside-container {
     width: 90%;
+    padding: 1.5rem;
   }
 
   .input-group {
@@ -623,6 +676,26 @@ input {
 
   .content .wide {
     flex-direction: column;
+  }
+
+  .tab-pill {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .authorization-function-row {
+    grid-template-columns: 1fr;
+  }
+
+  .section-actions,
+  .section-actions.left {
+    justify-content: stretch;
+  }
+
+  .action-button,
+  .auto-width {
+    width: 100%;
+    min-width: auto;
   }
 }
 </style>
