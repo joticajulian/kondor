@@ -20,6 +20,7 @@
   },
   "files": [
     "src/ts/storage.ts",
+    "src/ts/encryption.ts",
     "src/ts/HDKoinos.ts",
     "src/ts/utils.ts",
     "src/ts/wallet.ts"

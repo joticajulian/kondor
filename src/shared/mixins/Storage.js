@@ -2,6 +2,7 @@
 import { Signer } from "koilib";
 import * as storage from "../../../lib/storage";
 import { HDKoinos } from "../../../lib/HDKoinos";
+import * as encryption from "../../../lib/encryption";
 import abiClaimMainnet from "../assets/abiClaimMainnet.json";
 // import abiKoinMainnet from "../assets/abiKoinMainnet.json";
 // import abiKoinHarbinger from "../assets/abiKoinHarbinger.json";
@@ -16,20 +17,6 @@ import abiNicknamesMainnet from "../assets/abiNicknamesMainnet.json";
 import abiNicknamesHarbinger from "../assets/abiNicknamesHarbinger.json";
 import abiKapNameService from "../assets/abiKapNameService.json";
 import abiFreeManaSharer from "../assets/abiFreeManaSharer.json";
-
-function toUint8Array(hexString) {
-  return new Uint8Array(
-    hexString
-      .match(/[\dA-F]{2}/gi) // separate into pairs
-      .map((s) => parseInt(s, 16)) // convert to integers
-  );
-}
-
-function toHexString(buffer) {
-  return Array.from(buffer)
-    .map((n) => `0${Number(n).toString(16)}`.slice(-2))
-    .join("");
-}
 
 export default {
   name: "Storage mixin",
@@ -540,89 +527,12 @@ export default {
       return this._read("currentIndexAccount", strict);
     },
 
-    // TODO: remove the following functions and replace them
-    // with the ones in storage.ts
-
-    async getOptsEncryption() {
-      let saltString = await this._read("salt", false);
-      let ivString = await this._read("iv", false);
-      if (!saltString || !ivString) {
-        saltString = toHexString(
-          window.crypto.getRandomValues(new Uint8Array(16))
-        );
-        ivString = toHexString(
-          window.crypto.getRandomValues(new Uint8Array(12))
-        );
-        await this._write("salt", saltString);
-        await this._write("iv", ivString);
-      }
-      const salt = toUint8Array(saltString).buffer;
-      const iv = toUint8Array(ivString).buffer;
-      return { salt, iv };
-    },
-
-    getKeyMaterial(password) {
-      let enc = new TextEncoder();
-      return window.crypto.subtle.importKey(
-        "raw",
-        enc.encode(password),
-        { name: "PBKDF2" },
-        false,
-        ["deriveBits", "deriveKey"]
-      );
-    },
-
-    async getKey(password, salt) {
-      const keyMaterial = await this.getKeyMaterial(password);
-      return window.crypto.subtle.deriveKey(
-        {
-          name: "PBKDF2",
-          salt: salt,
-          iterations: 100000,
-          hash: "SHA-256",
-        },
-        keyMaterial,
-        { name: "AES-GCM", length: 256 },
-        true,
-        ["encrypt", "decrypt"]
-      );
-    },
-
     async encrypt(data, password) {
-      const { salt, iv } = await this.getOptsEncryption();
-      const key = await this.getKey(password, salt);
-      const encoded = new TextEncoder().encode(data);
-
-      const bufferEncrypted = await window.crypto.subtle.encrypt(
-        { name: "AES-GCM", iv },
-        key,
-        encoded
-      );
-      return toHexString(new Uint8Array(bufferEncrypted));
+      return encryption.encryptText(data, password);
     },
 
     async decrypt(encrypted, password) {
-      const { salt, iv } = await this.getOptsEncryption();
-      const key = await this.getKey(password, salt);
-      let bufferEncrypted;
-      try {
-        bufferEncrypted = toUint8Array(encrypted);
-      } catch (error) {
-        throw new Error(`Invalid encryted value (${encrypted})`);
-      }
-
-      let decrypted;
-      try {
-        decrypted = await window.crypto.subtle.decrypt(
-          { name: "AES-GCM", iv },
-          key,
-          bufferEncrypted
-        );
-      } catch (error) {
-        throw new Error("Invalid password");
-      }
-
-      return new TextDecoder().decode(decrypted);
+      return encryption.decryptText(encrypted, password);
     },
   },
 };

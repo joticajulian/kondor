@@ -9,7 +9,7 @@ import {
 } from "koilib";
 import { Messenger, Sender } from "kondor-js";
 import * as storage from "./storage";
-import { toUint8Array } from "./utils";
+import { decryptText } from "./encryption";
 import {
   decryptAccountsWithPassword,
   DecryptedWalletAccount,
@@ -132,47 +132,6 @@ async function readSession<T>(key: string): Promise<T | undefined> {
       resolve(result[key] as T | undefined);
     });
   });
-}
-
-async function getKeyMaterial(password: string) {
-  const enc = new TextEncoder();
-  return crypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    { name: "PBKDF2" },
-    false,
-    ["deriveBits", "deriveKey"]
-  );
-}
-
-async function getKey(password: string, salt: ArrayBufferLike) {
-  const keyMaterial = await getKeyMaterial(password);
-  return crypto.subtle.deriveKey(
-    {
-      name: "PBKDF2",
-      salt,
-      iterations: 100000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    { name: "AES-GCM", length: 256 },
-    true,
-    ["encrypt", "decrypt"]
-  );
-}
-
-async function decryptText(encrypted: string, password: string): Promise<string> {
-  const saltString = await storage.read<string>("salt", true);
-  const ivString = await storage.read<string>("iv", true);
-  const salt = toUint8Array(saltString).buffer;
-  const iv = toUint8Array(ivString).buffer;
-  const key = await getKey(password, salt);
-  const decrypted = await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
-    key,
-    toUint8Array(encrypted)
-  );
-  return new TextDecoder().decode(decrypted);
 }
 
 async function getAccountsForAutoSign(
