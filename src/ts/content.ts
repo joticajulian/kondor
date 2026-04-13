@@ -1,4 +1,5 @@
 import { Messenger } from "kondor-js";
+import * as storage from "./storage";
 
 interface Event {
   data: {
@@ -12,6 +13,19 @@ interface Event {
     postMessage: (data: unknown, target: string) => void;
   };
   origin: string;
+}
+
+interface CallContractOperation {
+  call_contract?: {
+    contract_id?: string;
+    entry_point?: string | number;
+  };
+}
+
+interface TransactionArgs {
+  transaction?: {
+    operations?: CallContractOperation[];
+  };
 }
 
 declare const window: {
@@ -61,6 +75,47 @@ async function preparePopup() {
   while (!popupReady) await new Promise((r) => setTimeout(r, 20));
 }
 
+function normalizeOrigin(origin: string): string {
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return origin;
+  }
+}
+
+function getRequestedFunctions(args: unknown) {
+  const txArgs = args as TransactionArgs;
+  const operations = txArgs.transaction?.operations || [];
+  if (!operations.length) return [];
+  const requestedFunctions = [];
+  for (let i = 0; i < operations.length; i += 1) {
+    const callContract = operations[i].call_contract;
+    if (!callContract || !callContract.contract_id) return null;
+    const contractId = String(callContract.contract_id).trim();
+    const entryPoint = String(callContract.entry_point ?? "").trim();
+    if (!contractId || !entryPoint) return null;
+    requestedFunctions.push({ contractId, entryPoint });
+  }
+  return requestedFunctions;
+}
+
+async function isAutoSignAllowed(origin: string, args: unknown): Promise<boolean> {
+  const requestedFunctions = getRequestedFunctions(args);
+  if (!requestedFunctions || requestedFunctions.length === 0) return false;
+  const authorizations = await storage.getAutoSignAuthorizations();
+  const authorization = authorizations.find(
+    (item) => normalizeOrigin(item.origin) === normalizeOrigin(origin)
+  );
+  if (!authorization || !authorization.functions?.length) return false;
+  return requestedFunctions.every((requestedFunction) =>
+    authorization.functions.some(
+      (allowed) =>
+        allowed.contractId === requestedFunction.contractId &&
+        String(allowed.entryPoint) === requestedFunction.entryPoint
+    )
+  );
+}
+
 const messenger: Messenger = new Messenger({
   onExtensionRequest: async (message) => {
     const { command } = message;
@@ -78,6 +133,28 @@ const messenger: Messenger = new Messenger({
     const isBackgroundCommand = backgroundCommands.includes(command!);
     const isPopupCommand = popupCommands.includes(command!);
     if (!isBackgroundCommand && !isPopupCommand) return undefined;
+
+    const isTransactionPopupCommand =
+      command === "signer:signTransaction" || command === "signer:sendTransaction";
+    if (isTransactionPopupCommand && (await isAutoSignAllowed(event.origin, args))) {
+      try {
+        return messenger.sendExtensionMessage(
+          "background",
+          "signer:autoSignTransaction",
+          {
+            command,
+            args,
+          },
+          {
+            ping: true,
+            pingTimeout: 2000,
+          }
+        );
+      } catch (error) {
+        const errorMessage = (error as Error).message || "";
+        if (!errorMessage.startsWith("AUTO_SIGN_FALLBACK:")) throw error;
+      }
+    }
 
     if (isPopupCommand) {
       popupReady = false;

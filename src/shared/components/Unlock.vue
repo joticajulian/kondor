@@ -32,9 +32,9 @@
 </template>
 
 <script>
-import { Signer } from "koilib";
 import Storage from "@/shared/mixins/Storage";
 import { HDKoinos } from "../../../lib/HDKoinos";
+import { decryptAccountsWithPassword } from "../../../lib/wallet";
 
 export default {
   name: "Unlock",
@@ -76,65 +76,34 @@ export default {
       try {
         const encryptedMnemonic = await this._getMnemonic(0);
         const encryptedAccounts = await this._getAccounts();
-        let accounts = [];
-        let mnemonic = null;
-        let hdKoinos = null;
-        if (encryptedMnemonic) {
-          mnemonic = await this.decrypt(encryptedMnemonic, this.password);
-          hdKoinos = new HDKoinos(mnemonic);
-        }
-        if (!encryptedAccounts || encryptedAccounts.length === 0) {
-          throw new Error("No accounts stored in the wallet");
-        }
-        accounts = await Promise.all(
-          encryptedAccounts.map(async (encAccount) => {
-            let account;
-            if (encAccount.keyPath) {
-              account = hdKoinos.deriveKey(encAccount);
-            } else {
-              let privateKey = "";
-              if (encAccount.encryptedPrivateKey) {
-                privateKey = await this.decrypt(
-                  encAccount.encryptedPrivateKey,
-                  this.password
-                );
-
-                const sig = Signer.fromWif(privateKey);
-                if (sig.getAddress() !== encAccount.address) {
-                  throw new Error(
-                    `Error in "${encAccount.name}". Expected address: ${
-                      encAccount.address
-                    }. Derived: ${sig.getAddress()}`
-                  );
-                }
-              }
-
-              account = {
-                public: {
-                  name: encAccount.name,
-                  address: encAccount.address,
-                },
-                private: {
-                  privateKey,
-                },
+        const { mnemonic, accounts: decryptedAccounts } =
+          await decryptAccountsWithPassword({
+            password: this.password,
+            encryptedMnemonic,
+            encryptedAccounts,
+            decryptText: this.decrypt,
+          });
+        const hdKoinos = mnemonic ? new HDKoinos(mnemonic) : null;
+        const accounts = decryptedAccounts.map((account) => {
+          const signers = (account.signers || []).map((signer) => {
+            if (!signer.keyPath || !hdKoinos) {
+              return {
+                name: signer.name,
+                address: signer.address,
+                privateKey: "",
               };
             }
-
+            const signerAcc = hdKoinos.deriveKey(signer);
             return {
-              ...account.public,
-              ...account.private,
-              signers: encAccount.signers
-                ? encAccount.signers.map((s) => {
-                  const signerAcc = hdKoinos.deriveKey(s);
-                  return {
-                    ...signerAcc.public,
-                    ...signerAcc.private,
-                  };
-                })
-                : [],
+              ...signerAcc.public,
+              ...signerAcc.private,
             };
-          })
-        );
+          });
+          return {
+            ...account,
+            signers,
+          };
+        });
 
         this.$store.state.mnemonic0 = mnemonic;
         this.$store.state.accounts = accounts;

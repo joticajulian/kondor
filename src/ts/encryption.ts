@@ -1,15 +1,17 @@
 import * as storage from "./storage";
 import { toHexString, toUint8Array } from "./utils";
 
-async function getOptsEncryption(): Promise<{
+export async function getOptsEncryption(): Promise<{
   salt: ArrayBufferLike;
   iv: ArrayBufferLike;
 }> {
   let saltString = await storage.read<string>("salt", false);
   let ivString = await storage.read<string>("iv", false);
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi) throw new Error("Crypto API not available");
   if (!saltString || !ivString) {
-    saltString = toHexString(window.crypto.getRandomValues(new Uint8Array(16)));
-    ivString = toHexString(window.crypto.getRandomValues(new Uint8Array(12)));
+    saltString = toHexString(cryptoApi.getRandomValues(new Uint8Array(16)));
+    ivString = toHexString(cryptoApi.getRandomValues(new Uint8Array(12)));
     await storage.write("salt", saltString);
     await storage.write("iv", ivString);
   }
@@ -18,9 +20,11 @@ async function getOptsEncryption(): Promise<{
   return { salt, iv };
 }
 
-async function getKeyMaterial(password: string) {
+export async function getKeyMaterial(password: string) {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi) throw new Error("Crypto API not available");
   let enc = new TextEncoder();
-  return window.crypto.subtle.importKey(
+  return cryptoApi.subtle.importKey(
     "raw",
     enc.encode(password),
     { name: "PBKDF2" },
@@ -29,9 +33,11 @@ async function getKeyMaterial(password: string) {
   );
 }
 
-async function getKey(password: string, salt: ArrayBufferLike) {
+export async function getKey(password: string, salt: ArrayBufferLike) {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi) throw new Error("Crypto API not available");
   const keyMaterial = await getKeyMaterial(password);
-  return window.crypto.subtle.deriveKey(
+  return cryptoApi.subtle.deriveKey(
     {
       name: "PBKDF2",
       salt,
@@ -45,16 +51,16 @@ async function getKey(password: string, salt: ArrayBufferLike) {
   );
 }
 
-export async function encrypt(
-  data: Record<string, unknown>,
+export async function encryptText(
+  data: string,
   password: string
 ): Promise<string> {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi) throw new Error("Crypto API not available");
   const { salt, iv } = await getOptsEncryption();
   const key = await getKey(password, salt);
-  const message = JSON.stringify(data);
-  const encoded = new TextEncoder().encode(message);
-
-  const bufferEncrypted = await window.crypto.subtle.encrypt(
+  const encoded = new TextEncoder().encode(data);
+  const bufferEncrypted = await cryptoApi.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
     encoded
@@ -62,10 +68,12 @@ export async function encrypt(
   return toHexString(new Uint8Array(bufferEncrypted));
 }
 
-export async function decrypt(
+export async function decryptText(
   encrypted: string,
   password: string
-): Promise<Record<string, unknown>> {
+): Promise<string> {
+  const cryptoApi = globalThis.crypto;
+  if (!cryptoApi) throw new Error("Crypto API not available");
   const { salt, iv } = await getOptsEncryption();
   const key = await getKey(password, salt);
   let bufferEncrypted;
@@ -77,7 +85,7 @@ export async function decrypt(
 
   let decrypted;
   try {
-    decrypted = await window.crypto.subtle.decrypt(
+    decrypted = await cryptoApi.subtle.decrypt(
       { name: "AES-GCM", iv },
       key,
       bufferEncrypted
@@ -85,9 +93,23 @@ export async function decrypt(
   } catch (error) {
     throw new Error("Invalid password");
   }
+  return new TextDecoder().decode(decrypted);
+}
 
+export async function encrypt(
+  data: Record<string, unknown>,
+  password: string
+): Promise<string> {
+  const message = JSON.stringify(data);
+  return encryptText(message, password);
+}
+
+export async function decrypt(
+  encrypted: string,
+  password: string
+): Promise<Record<string, unknown>> {
   try {
-    const message = new TextDecoder().decode(decrypted);
+    const message = await decryptText(encrypted, password);
     return JSON.parse(message);
   } catch (error) {
     throw new Error("Decrypted value cannot be decoded and parsed to JSON");

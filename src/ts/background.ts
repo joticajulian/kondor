@@ -9,10 +9,24 @@ import {
 } from "koilib";
 import { Messenger, Sender } from "kondor-js";
 import * as storage from "./storage";
+import { decryptText } from "./encryption";
+import {
+  decryptAccountsWithPassword,
+  DecryptedWalletAccount,
+  EncryptedWalletAccount,
+} from "./wallet";
 
 const EXPIRATION_ID = 30 * 60 * 1000; // 30 minutes
 
 let tabIdRequester: number | undefined;
+
+interface AutoSignRequestArgs {
+  command: "signer:signTransaction" | "signer:sendTransaction";
+  args: {
+    signerAddress?: string;
+    transaction: TransactionJson;
+  };
+}
 
 const getIds = async () => {
   const ids =
@@ -110,6 +124,101 @@ async function getChainIdFromStorage(
   const network = networks.find((n) => n.tag === networkTag);
   if (!network) throw new Error(`network ${networkTag} not found`);
   return network.chainId;
+}
+
+async function readSession<T>(key: string): Promise<T | undefined> {
+  return new Promise((resolve) => {
+    chrome.storage.session.get([key], (result) => {
+      resolve(result[key] as T | undefined);
+    });
+  });
+}
+
+async function getAccountsForAutoSign(
+  password: string
+) {
+  const encryptedAccounts = await storage.read<EncryptedWalletAccount[]>(
+    "accounts",
+    false
+  );
+  const encryptedMnemonic = await storage.read<string>("mnemonic0", false);
+  const { accounts } = await decryptAccountsWithPassword({
+    password,
+    encryptedMnemonic,
+    encryptedAccounts,
+    decryptText,
+    requirePrivateKey: true,
+    errorPrefix: "AUTO_SIGN_FALLBACK",
+  });
+  return accounts;
+}
+
+async function autoSignTransaction(
+  inputArgs: AutoSignRequestArgs
+): Promise<unknown> {
+  const password = await readSession<string>("password0");
+  if (!password) throw new Error("AUTO_SIGN_FALLBACK: wallet is locked");
+
+  let accounts: DecryptedWalletAccount[];
+  try {
+    accounts = await getAccountsForAutoSign(password);
+  } catch (error) {
+    const errorMessage = (error as Error).message || "account decryption failed";
+    if (errorMessage.startsWith("AUTO_SIGN_FALLBACK:")) throw error;
+    throw new Error(`AUTO_SIGN_FALLBACK: ${errorMessage}`);
+  }
+  const signerAddress = inputArgs.args.signerAddress || accounts[0]?.address;
+  if (!signerAddress)
+    throw new Error("AUTO_SIGN_FALLBACK: no signer address available");
+  const account = accounts.find((a) => a.address === signerAddress);
+  if (!account) {
+    throw new Error(
+      `AUTO_SIGN_FALLBACK: signer address ${signerAddress} not found in wallet`
+    );
+  }
+
+  const transaction = JSON.parse(
+    JSON.stringify(inputArgs.args.transaction)
+  ) as TransactionJson;
+  if (!transaction.header) {
+    transaction.header = { payer: signerAddress };
+  }
+  if (!transaction.header.payer) {
+    transaction.header.payer = signerAddress;
+  }
+
+  const networks = await storage.getNetworks();
+  let network = transaction.header.chain_id
+    ? networks.find((n) => n.chainId === transaction.header!.chain_id)
+    : undefined;
+  if (!network) {
+    const currentNetwork = await storage.getCurrentNetwork();
+    network = networks.find((n) => n.tag === currentNetwork);
+  }
+  if (!network) throw new Error("AUTO_SIGN_FALLBACK: current network not found");
+  if (!transaction.header.chain_id) {
+    transaction.header.chain_id = network.chainId;
+  }
+
+  const provider = new Provider(network.rpcNodes);
+  const preparedTransaction = await Transaction.prepareTransaction(
+    transaction,
+    provider
+  );
+
+  const signer = Signer.fromWif(account.privateKey);
+  signer.provider = provider;
+  signer.rcOptions = { estimateRc: false };
+  await signer.signTransaction(preparedTransaction);
+
+  if (inputArgs.command === "signer:sendTransaction") {
+    const receipt = await provider.sendTransaction(preparedTransaction, true);
+    return {
+      receipt,
+      transaction: preparedTransaction,
+    };
+  }
+  return preparedTransaction;
 }
 
 function checkKondorWindows(): Promise<chrome.windows.Window[]> {
@@ -339,6 +448,10 @@ const messenger = new Messenger({
           };
           const provider = await getProvider(network);
           result = await provider.invokeGetContractMetadata(contractId);
+          break;
+        }
+        case "signer:autoSignTransaction": {
+          result = await autoSignTransaction(args as AutoSignRequestArgs);
           break;
         }
 

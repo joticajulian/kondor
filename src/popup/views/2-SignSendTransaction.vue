@@ -16,6 +16,47 @@
       </div>
     </div>
     <div
+      v-if="authorizedFunctions.length > 0"
+      class="auto-sign-box"
+    >
+      <label class="auto-sign-checkbox">
+        <input
+          v-model="rememberAuthorization"
+          type="checkbox"
+        >
+        Remember this website and these functions for future calls
+      </label>
+      <div class="auto-sign-origin">
+        {{ requester.origin }}
+      </div>
+      <div class="auto-sign-functions">
+        <div
+          v-for="(func, i) in authorizedFunctions"
+          :key="`auth-func-${i}`"
+          class="auto-sign-function"
+        >
+          <div class="auto-sign-function-title">
+            Contract: {{ func.contractId }}
+          </div>
+          <div>Entry point: {{ func.entryPoint }}</div>
+        </div>
+      </div>
+      <button
+        class="auto-sign-info-button"
+        @click="toggleAutoSignExplanation"
+      >
+        {{ showAutoSignExplanation ? "Hide details" : "How does this work?" }}
+      </button>
+      <div
+        v-if="showAutoSignExplanation"
+        class="auto-sign-explanation"
+      >
+        If enabled, Kondor stores this website and the listed contract functions
+        locally. Future requests from this website that only call these same
+        functions are signed directly without opening this popup.
+      </div>
+    </div>
+    <div
       class="op-viewmore set-allowance-title"
       @click="toggleSettingAllowance()"
     >
@@ -599,6 +640,9 @@ export default {
       resolvedAddress: false,
       resolvedMessage: false,
       amount: 0,
+      rememberAuthorization: false,
+      showAutoSignExplanation: false,
+      authorizedFunctions: [],
     };
   },
   computed: {
@@ -701,6 +745,9 @@ export default {
       this.request = requests[0];
       this.requester = this.request.sender;
       this.typeRequest = this.send ? "send" : "sign";
+      this.authorizedFunctions = this.getAuthorizedFunctionsFromOperations(
+        this.request.args.transaction.operations
+      );
       this.kondorVersion = this.request.args.kondorVersion;
       if (this.kondorVersion) {
         this.kondorVersionBelow1 =
@@ -1634,6 +1681,13 @@ export default {
         } else {
           message.result = this.transaction.transaction;
         }
+        if (this.rememberAuthorization) {
+          try {
+            await this.rememberAutoSignAuthorization();
+          } catch (error) {
+            console.error("failed to save auto-sign authorization", error);
+          }
+        }
       } catch (err) {
         message.error = err.message;
       }
@@ -1674,6 +1728,70 @@ export default {
 
     toggleSettingAllowance() {
       this.settingAllowance = !this.settingAllowance;
+    },
+
+    toggleAutoSignExplanation() {
+      this.showAutoSignExplanation = !this.showAutoSignExplanation;
+    },
+
+    getAuthorizedFunctionsFromOperations(operations) {
+      if (!Array.isArray(operations)) return [];
+      const uniqueFunctions = {};
+      operations.forEach((operation) => {
+        if (!operation.call_contract) return;
+        const contractId = String(operation.call_contract.contract_id || "").trim();
+        const entryPoint = String(operation.call_contract.entry_point ?? "").trim();
+        if (!contractId || !entryPoint) return;
+        uniqueFunctions[`${contractId}:${entryPoint}`] = {
+          contractId,
+          entryPoint,
+        };
+      });
+      return Object.values(uniqueFunctions);
+    },
+
+    normalizeOrigin(origin) {
+      try {
+        return new URL(origin).origin;
+      } catch {
+        return origin;
+      }
+    },
+
+    async rememberAutoSignAuthorization() {
+      if (!this.requester || !this.requester.origin) return;
+      if (!this.authorizedFunctions.length) return;
+      const origin = this.normalizeOrigin(this.requester.origin);
+      const authorizations = await this._getAutoSignAuthorizations();
+      const index = authorizations.findIndex(
+        (authorization) =>
+          this.normalizeOrigin(authorization.origin) === this.normalizeOrigin(origin)
+      );
+      if (index < 0) {
+        authorizations.push({
+          origin,
+          functions: this.authorizedFunctions,
+        });
+      } else {
+        const mergedFunctions = {};
+        authorizations[index].functions.forEach((func) => {
+          const contractId = String(func.contractId || "").trim();
+          const entryPoint = String(func.entryPoint || "").trim();
+          if (!contractId || !entryPoint) return;
+          mergedFunctions[`${contractId}:${entryPoint}`] = {
+            contractId,
+            entryPoint,
+          };
+        });
+        this.authorizedFunctions.forEach((func) => {
+          mergedFunctions[`${func.contractId}:${func.entryPoint}`] = {
+            contractId: func.contractId,
+            entryPoint: func.entryPoint,
+          };
+        });
+        authorizations[index].functions = Object.values(mergedFunctions);
+      }
+      await this._setAutoSignAuthorizations(authorizations);
     },
 
     changeSpender() {
@@ -2383,6 +2501,72 @@ input:checked + .slider:before {
   width: 100%;
   padding: 1rem;
   box-sizing: border-box;
+}
+
+.auto-sign-box {
+  width: 92%;
+  margin-top: 1rem;
+  background-color: var(--primary-darker);
+  border: 1px solid var(--primary-dark-light);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.auto-sign-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--primary-light);
+  font-size: 0.9rem;
+}
+
+.auto-sign-checkbox input[type="checkbox"] {
+  margin: 0;
+}
+
+.auto-sign-origin {
+  margin-top: 0.6rem;
+  color: var(--primary-gray);
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.auto-sign-functions {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auto-sign-function {
+  background-color: var(--primary-dark-light);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  color: var(--primary-gray);
+}
+
+.auto-sign-function-title {
+  color: var(--primary-light);
+  margin-bottom: 0.2rem;
+}
+
+.auto-sign-info-button {
+  margin-top: 0.7rem;
+  background: transparent;
+  color: var(--kondor-purple);
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auto-sign-explanation {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--primary-gray);
 }
 
 .flex2 {
